@@ -22,8 +22,8 @@
     <Filter Include="Resources\testdata\test-from">
       <UniqueIdentifier>{94cf4606-8491-4cc9-bf88-7bfed0b16333}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ProvinceMapper\PointMapper">
-      <UniqueIdentifier>{7ec89ad7-4f4c-46f4-bca7-cc59b78f0d4a}</UniqueIdentifier>
+    <Filter Include="ProvinceMapper\LinkMapper">
+      <UniqueIdentifier>{1e4e1925-6488-42c5-a2f5-aca5830b029c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,14 +66,14 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageBox.cpp">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\CoPoint.cpp">
-      <Filter>ProvinceMapper\PointMapper</Filter>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\Point.cpp">
-      <Filter>ProvinceMapper\PointMapper</Filter>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\LinkMapper.cpp">
-      <Filter>ProvinceMapper\PointMapper</Filter>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\Province.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,17 +113,17 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageBox.h">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\CoPoint.h">
-      <Filter>ProvinceMapper\PointMapper</Filter>
-    </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Frames\PointData.h">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\Point.h">
-      <Filter>ProvinceMapper\PointMapper</Filter>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\LinkMapper.h">
-      <Filter>ProvinceMapper\PointMapper</Filter>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\Province.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,5 +160,13 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
       <Filter>Resources\testdata\test-from</Filter>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ProvinceMapper\Resources\test-from\definition.csv">
+      <Filter>Resources\testdata\test-from</Filter>
+    </None>
+    <None Include="ProvinceMapper\Resources\test-to\definition.csv">
+      <Filter>Resources\testdata\test-to</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -23,10 +23,10 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageTab.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\PointWindow.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\MainFrame.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\Province.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\Point.cpp" />
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\LinkMapper.cpp" />
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\CoPoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\CommonFunctions.h" />
@@ -41,10 +41,10 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\PointData.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\PointWindow.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\MainFrame.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\Province.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\Point.h" />
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\LinkMapper.h" />
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\CoPoint.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico" />
@@ -71,22 +71,32 @@
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\provinces.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/test-to</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-to</DestinationFolders>
     </CopyFileToFolders>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\rivers.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/test-to</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-to</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/test-from</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-from</DestinationFolders>
     </CopyFileToFolders>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/test-from</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-from</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv">
+      <FileType>Document</FileType>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <PropertyGroup Label="Globals">
