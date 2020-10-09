@@ -75,6 +75,9 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Province.cpp">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -123,6 +126,9 @@
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\Province.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClInclude>
   </ItemGroup>

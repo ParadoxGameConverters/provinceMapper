@@ -11,25 +11,30 @@ LinkMapper::LinkMapper(std::istream& theStream)
 
 LinkMapper::LinkMapper()
 {
-	links = std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>();
 	registerKeys();
 	parseFile("test_mappings.txt");
 	clearRegisteredKeywords();
+	if (!versions.empty())
+		activeVersion = versions.rbegin()->second;
 }
 
 void LinkMapper::registerKeys()
 {
-	registerKeyword("link", [this](const std::string& unused, std::istream& theStream) {
-		const auto link = std::make_shared<LinkMapping>(theStream);
-		links->push_back(link);
+	registerRegex(R"(\d+.\d+.\d+)", [this](const std::string& versionName, std::istream& theStream) {
+		const auto version = std::make_shared<LinkMappingVersion>(theStream);
+		versions.insert(std::pair(versionName, version));
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
-void LinkMapper::exportLinks() const
+void LinkMapper::exportMappings() const
 {
 	std::ofstream linkFile("test_mappings.txt");
-	for (const auto& link: *links)
-		linkFile << *link;
+	for (const auto& [versionName, version]: versions)
+	{
+		linkFile << versionName << " = {\n";
+		linkFile << *version;
+		linkFile << "}\n";		
+	}
 	linkFile.close();
 }

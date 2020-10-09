@@ -25,6 +25,7 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\MainFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Province.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
   </ItemGroup>
@@ -43,6 +44,7 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\MainFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\Province.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
   </ItemGroup>

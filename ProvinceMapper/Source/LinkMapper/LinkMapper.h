@@ -1,8 +1,7 @@
 #ifndef LINK_MAPPER_H
 #define LINK_MAPPER_H
 
-#include "LinkMapper.h"
-#include "LinkMapping.h"
+#include "LinkMappingVersion.h"
 #include "Parser.h"
 
 class LinkMapper: commonItems::parser
@@ -11,12 +10,13 @@ class LinkMapper: commonItems::parser
 	LinkMapper();
 	explicit LinkMapper(std::istream& theStream);
 
-	void exportLinks() const;
-	[[nodiscard]] const auto& getLinks() const { return links; }
+	void exportMappings() const;
+	[[nodiscard]] const auto& getLinks() const { return activeVersion->getLinks(); }
 
   private:
 	void registerKeys();
-	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
+	std::map<std::string, std::shared_ptr<LinkMappingVersion>> versions;
+	std::shared_ptr<LinkMappingVersion> activeVersion;
 };
 
 #endif // LINK_MAPPER_H

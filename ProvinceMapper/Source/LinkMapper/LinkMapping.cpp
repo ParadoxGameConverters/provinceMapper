@@ -28,7 +28,7 @@ void LinkMapping::registerKeys()
 
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 {
-	output << "link = { ";
+	output << "\tlink = { ";
 	if (!linkMapping.comment.empty())
 	{
 		output << "comment = \"" << linkMapping.comment << "\" }\n";
