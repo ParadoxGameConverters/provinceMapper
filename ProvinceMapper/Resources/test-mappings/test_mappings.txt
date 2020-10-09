@@ -1,0 +1,10 @@
+# This file defines points that geographically represent the same point on both maps.
+# We will alter source map to match target map.
+# The more points are in common, the smaller resulting discrepancy as warping will be more localized.
+# Having less than 4 points makes adjusting pointless, ideally have a hundred.
+
+link = { name="Point A" source = { 249 351 } target = { 300 300 } }
+link = { name="Point b" source = { 150 250 } target = { 200 200 } }
+link = { name="Point c" source = { 130 201 } target = { 100 100 } }
+link = { name="Point d" source = { 50 75 } target = { 60 60 } }
+link = { name="Point e" source = { 240 150 } target = { 200 100 } }
