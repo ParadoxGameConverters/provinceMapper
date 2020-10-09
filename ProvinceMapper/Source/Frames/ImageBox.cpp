@@ -23,6 +23,8 @@ ImageBox::ImageBox(wxWindow* parent, const wxImage& theImage, ImageTabSelector t
 
 	image = theImage;
 	dc = new wxClientDC(this); // Device Context, a drawable area.
+	bitmap = wxBitmap(image);
+	SetMinSize(bitmap.GetSize());
 }
 
 void ImageBox::paintEvent(wxPaintEvent& evt)
@@ -31,21 +33,32 @@ void ImageBox::paintEvent(wxPaintEvent& evt)
 }
 void ImageBox::paintNow()
 {
+	for (const auto& point: knownPoints)
+	{
+		auto red = image.GetRed(point.x, point.y);
+		auto green = image.GetGreen(point.x, point.y);
+		auto blue = image.GetBlue(point.x, point.y);		
+		auto tempimage = image;
+		//tempimage.SetMask();
+		tempimage.SetMaskFromImage(tempimage, red, green, blue);
+		//auto tempbitmap = wxBitmap(tempimage);
+		//auto mask = new wxMask(tempbitmap, "black");
+		//auto maskbitmap = mask->GetBitmap();
+		//tempimage.
+		bitmap = wxBitmap(tempimage);
+		
+	}
+		
+	// Log(LogLevel::Debug) << "mask " << std::to_string(red) << " " << std::to_string(green) << " " << std::to_string(blue);
+
+	// bitmap.SetMask(mask);
+
+	
 	render();
 }
 void ImageBox::render()
 {
-	dc->DrawBitmap(image, 0, 0, false);
-	SetMinSize(image.GetSize());
-	wxPen pen = dc->GetPen();
-	pen.SetColour("white");
-	pen.SetWidth(3);
-	dc->SetPen(pen);
-	dc->SetBrush(*wxRED_BRUSH);
-	for (const auto& point: knownPoints)
-	{
-		dc->DrawCircle(point.x, point.y, 5);
-	}
+	dc->DrawBitmap(bitmap, 0, 0, false);
 }
 void ImageBox::onSize(wxSizeEvent& event)
 {
@@ -102,7 +115,7 @@ void ImageBox::updatePoint(wxCommandEvent& event)
 		}
 		else
 		{
-			knownPoints.emplace_back(updatedPoint);
+			registerPoint(updatedPoint);
 		}
 	}
 }

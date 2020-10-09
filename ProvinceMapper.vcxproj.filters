@@ -66,13 +66,13 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageBox.cpp">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\PointMapper.cpp">
-      <Filter>ProvinceMapper\PointMapper</Filter>
-    </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\PointMapper\CoPoint.cpp">
       <Filter>ProvinceMapper\PointMapper</Filter>
     </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\PointMapper\Point.cpp">
+      <Filter>ProvinceMapper\PointMapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\PointMapper\LinkMapper.cpp">
       <Filter>ProvinceMapper\PointMapper</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,9 +113,6 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageBox.h">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\PointMapper.h">
-      <Filter>ProvinceMapper\PointMapper</Filter>
-    </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\PointMapper\CoPoint.h">
       <Filter>ProvinceMapper\PointMapper</Filter>
     </ClInclude>
@@ -123,6 +120,9 @@
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\PointMapper\Point.h">
+      <Filter>ProvinceMapper\PointMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\PointMapper\LinkMapper.h">
       <Filter>ProvinceMapper\PointMapper</Filter>
     </ClInclude>
   </ItemGroup>

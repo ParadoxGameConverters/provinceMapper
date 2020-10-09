@@ -25,7 +25,7 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\MainFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\PointMapper\Point.cpp" />
-    <ClCompile Include="ProvinceMapper\Source\PointMapper\PointMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\PointMapper\LinkMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\PointMapper\CoPoint.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -43,7 +43,7 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\MainFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\PointMapper\Point.h" />
-    <ClInclude Include="ProvinceMapper\Source\PointMapper\PointMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\PointMapper\LinkMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\PointMapper\CoPoint.h" />
   </ItemGroup>
   <ItemGroup>

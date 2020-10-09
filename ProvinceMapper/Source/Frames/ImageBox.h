@@ -26,6 +26,7 @@ class ImageBox: public wxWindow
 
 	wxClientDC* dc = nullptr;
 	wxImage image;
+	wxBitmap bitmap;
 	ImageTabSelector selector;
 	std::vector<Point> knownPoints;
 	void onKeyDown(wxKeyEvent& event);
