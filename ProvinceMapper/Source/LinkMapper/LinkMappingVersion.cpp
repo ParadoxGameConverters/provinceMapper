@@ -1,6 +1,5 @@
 #include "LinkMappingVersion.h"
 #include "ParserHelpers.h"
-#include "Log.h"
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream)
 {

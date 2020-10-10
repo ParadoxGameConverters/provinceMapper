@@ -1,6 +1,6 @@
 #include "LinkMapping.h"
-#include "Log.h"
 #include "ParserHelpers.h"
+#include "Log.h"
 
 LinkMapping::LinkMapping(std::istream& theStream)
 {
@@ -15,10 +15,10 @@ void LinkMapping::registerKeys()
 		name = commonItems::singleString(theStream).getString();
 	});
 	registerKeyword("source", [this](const std::string& unused, std::istream& theStream) {
-		sources.insert(Province(commonItems::singleInt(theStream).getInt()));
+		sources.insert(commonItems::singleInt(theStream).getInt());
 	});
 	registerKeyword("target", [this](const std::string& unused, std::istream& theStream) {
-		targets.insert(Province(commonItems::singleInt(theStream).getInt()));
+		targets.insert(commonItems::singleInt(theStream).getInt());
 	});
 	registerKeyword("comment", [this](const std::string& unused, std::istream& theStream) {
 		comment = commonItems::singleString(theStream).getString();
@@ -38,45 +38,41 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		output << "name = \"" << linkMapping.name << "\" ";
 	for (const auto& province: linkMapping.sources)
 	{
-		output << "ck3 = " << province.ID << " ";
+		output << "ck3 = " << province << " ";
 	}
 	for (const auto& province: linkMapping.targets)
 	{
-		output << "eu4 = " << province.ID << " ";
+		output << "eu4 = " << province << " ";
 	}
 	output << "} # ";
-	bool first = true;
-	for (const auto& province: linkMapping.sources)
-	{
-		if (first)
+	if (linkMapping.sources.size() > 1 && linkMapping.targets.size() > 1)
+		output << "MANY-TO-MANY: ";
+	std::string comma;
+	if (!linkMapping.sources.empty())
+		for (const auto& province: linkMapping.sources)
 		{
-			output << province.name;
-			first = false;
+			output << comma;
+			output << province;
+			comma = ", ";
 		}
-		else
-		{
-			output << ", " << province.name;
-		}
-	}
+	else
+		output << "NOTHING";
 	output << " -> ";
-	first = true;
-	for (const auto& province: linkMapping.targets)
-	{
-		if (first)
+	comma.clear();
+	if (!linkMapping.targets.empty())
+		for (const auto& province: linkMapping.targets)
 		{
-			output << province.name;
-			first = false;
+			output << comma;
+			output << province;
+			comma = ", ";
 		}
-		else
-		{
-			output << ", " << province.name;
-		}
-	}
+	else
+		output << "DROPPED";
 	output << "\n";
 	return output;
 }
 
-void LinkMapping::toggleSource(const Province& theSource)
+void LinkMapping::toggleSource(int theSource)
 {
 	if (sources.count(theSource))
 		sources.erase(theSource);
@@ -84,7 +80,7 @@ void LinkMapping::toggleSource(const Province& theSource)
 		sources.insert(theSource);
 }
 
-void LinkMapping::toggleTarget(const Province& theTarget)
+void LinkMapping::toggleTarget(int theTarget)
 {
 	if (sources.count(theTarget))
 		sources.erase(theTarget);

@@ -2,9 +2,7 @@
 #define LINK_MAPPING_H
 
 #include <set>
-
 #include "Parser.h"
-#include "Province.h"
 
 class LinkMapping: commonItems::parser
 {
@@ -13,8 +11,8 @@ class LinkMapping: commonItems::parser
 	explicit LinkMapping(std::istream& theStream);
 
 	void setName(const std::string& theName) { name = theName; }
-	void toggleSource(const Province& theSource);
-	void toggleTarget(const Province& theTarget);
+	void toggleSource(int theSource);
+	void toggleTarget(int theTarget);
 	void setComment(const std::string& theComment) { comment = theComment; }
 
 	[[nodiscard]] const auto& getName() const { return name; }
@@ -27,8 +25,8 @@ class LinkMapping: commonItems::parser
 	void registerKeys();
 
 	std::string name;
-	std::set<Province> sources;
-	std::set<Province> targets;
+	std::set<int> sources;
+	std::set<int> targets;
 	std::string comment;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);

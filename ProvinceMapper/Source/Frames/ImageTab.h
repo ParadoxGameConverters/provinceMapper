@@ -9,9 +9,7 @@ class ImageTab: public wxScrolledWindow
 {
   public:
 	ImageTab(wxWindow* parent, ImageTabSelector selector);
-	void registerPoint(const Point& point);
 	void refresh();
-	void updatePoint(wxCommandEvent& event);
 
   private:
 	ImageBox* imageBox = nullptr;

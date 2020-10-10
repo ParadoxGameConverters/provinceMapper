@@ -4,10 +4,10 @@
 #include <wx/wx.h>
 #endif
 
-#include "PointWindow.h"
+#include "LinkWindow.h"
 #include <wx/notebook.h>
 #include "ImageTab.h"
-#include "../PointMapper/PointMapper.h"
+#include "../LinkMapper/LinkMapper.h"
 
 class MainFrame: public wxFrame
 {
@@ -20,16 +20,10 @@ class MainFrame: public wxFrame
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
-	void onPointPlaced(wxCommandEvent& event);
-	void onUpdatePoint(wxCommandEvent& event);
-	void onDeselectWorkingPoint(wxCommandEvent& event);
 	void onChangeTab(wxCommandEvent& event);
-	void onDeleteWorkingPoint(wxCommandEvent& event);
-	void onExportPoints(wxCommandEvent& event);
-	void onExportAdjustedMap(wxCommandEvent& event);
 
-	PointMapper pointMapper;
-	PointWindow* pointWindow = nullptr;
+	LinkMapper linkMapper;
+	LinkWindow* linkWindow = nullptr;
 	wxNotebook* notebook = nullptr;
 	wxFlexGridSizer* vbox = nullptr;
 	ImageTab* imageTabFrom = nullptr;

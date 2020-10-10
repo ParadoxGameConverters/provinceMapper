@@ -25,6 +25,12 @@
     <Filter Include="ProvinceMapper\LinkMapper">
       <UniqueIdentifier>{1e4e1925-6488-42c5-a2f5-aca5830b029c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProvinceMapper\Provinces">
+      <UniqueIdentifier>{ade7c5a7-2f05-44f5-aa8e-d7a7adfec65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Definitions">
+      <UniqueIdentifier>{b404327d-b433-434e-a7c4-ade8b87c0a28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commonItems\ParserHelpers.cpp">
@@ -51,9 +57,6 @@
     <ClCompile Include="commonItems\CommonFunctions.cpp">
       <Filter>commonItems</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\Frames\PointWindow.cpp">
-      <Filter>ProvinceMapper\Frames</Filter>
-    </ClCompile>
     <ClCompile Include="commonItems\StringUtils.cpp">
       <Filter>commonItems</Filter>
     </ClCompile>
@@ -72,11 +75,17 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\LinkMapper\Province.cpp">
-      <Filter>ProvinceMapper\LinkMapper</Filter>
-    </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp">
       <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp">
+      <Filter>ProvinceMapper\Provinces</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\LinkWindow.cpp">
+      <Filter>ProvinceMapper\Frames</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,9 +110,6 @@
     <ClInclude Include="commonItems\CommonFunctions.h">
       <Filter>commonItems</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\PointWindow.h">
-      <Filter>ProvinceMapper\Frames</Filter>
-    </ClInclude>
     <ClInclude Include="commonItems\StringUtils.h">
       <Filter>commonItems</Filter>
     </ClInclude>
@@ -116,20 +122,23 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageBox.h">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\PointData.h">
-      <Filter>ProvinceMapper\Frames</Filter>
-    </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\LinkMapper\Province.h">
-      <Filter>ProvinceMapper\LinkMapper</Filter>
-    </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h">
       <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h">
+      <Filter>ProvinceMapper\Provinces</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\LinkWindow.h">
+      <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -166,13 +175,7 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
       <Filter>Resources\testdata\test-from</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ProvinceMapper\Resources\test-from\definition.csv">
-      <Filter>Resources\testdata\test-from</Filter>
-    </None>
-    <None Include="ProvinceMapper\Resources\test-to\definition.csv">
-      <Filter>Resources\testdata\test-to</Filter>
-    </None>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv" />
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv" />
   </ItemGroup>
 </Project>

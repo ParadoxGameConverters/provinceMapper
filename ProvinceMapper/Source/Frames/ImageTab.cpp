@@ -16,6 +16,7 @@ ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector): wxScrolledWi
 		imageBox = new ImageBox(this, image, theSelector);
 		imageTabSizer->Add(imageBox); // Add the image to the sizer
 		imageBox->SetMinSize(image.GetSize()); // and set minimum size to the size if the image we loaded, so everything displays at once.
+		Log(LogLevel::Debug) << "loaded from " << image.GetSize().GetX() << "x" << image.GetSize().GetY();
 	}
 	if (theSelector == ImageTabSelector::TARGET)
 	{
@@ -29,18 +30,7 @@ ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector): wxScrolledWi
 	SetSizer(imageTabSizer); // Here we register the sizer with our ImageTab.
 }
 
-void ImageTab::registerPoint(const Point& point)
-{
-	imageBox->registerPoint(point);
-}
-
 void ImageTab::refresh()
 {
-	imageBox->paintNow();
-}
-
-void ImageTab::updatePoint(wxCommandEvent& event)
-{
-	imageBox->updatePoint(event);
 	imageBox->paintNow();
 }

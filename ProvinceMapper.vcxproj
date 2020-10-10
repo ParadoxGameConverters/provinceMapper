@@ -19,15 +19,16 @@
     <ClCompile Include="commonItems\ParserHelpers.cpp" />
     <ClCompile Include="commonItems\StringUtils.cpp" />
     <ClCompile Include="commonItems\WinUtils.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageBox.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageTab.cpp" />
-    <ClCompile Include="ProvinceMapper\Source\Frames\PointWindow.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\LinkWindow.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\MainFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
-    <ClCompile Include="ProvinceMapper\Source\LinkMapper\Province.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\CommonFunctions.h" />
@@ -37,16 +38,16 @@
     <ClInclude Include="commonItems\Parser.h" />
     <ClInclude Include="commonItems\ParserHelpers.h" />
     <ClInclude Include="commonItems\StringUtils.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageBox.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageTab.h" />
-    <ClInclude Include="ProvinceMapper\Source\Frames\PointData.h" />
-    <ClInclude Include="ProvinceMapper\Source\Frames\PointWindow.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\LinkWindow.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\MainFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
-    <ClInclude Include="ProvinceMapper\Source\LinkMapper\Province.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico" />
