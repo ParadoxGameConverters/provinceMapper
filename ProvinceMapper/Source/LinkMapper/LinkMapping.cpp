@@ -1,24 +1,30 @@
 #include "LinkMapping.h"
 #include "ParserHelpers.h"
 #include "Log.h"
+#include "../Provinces/Province.h"
+#include "../Definitions/Definitions.h"
 
-LinkMapping::LinkMapping(std::istream& theStream)
+LinkMapping::LinkMapping(std::istream& theStream, const Definitions& sourceDefs, const Definitions& targetDefs)
 {
-	registerKeys();
+	registerKeys(sourceDefs, targetDefs);
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-void LinkMapping::registerKeys()
+void LinkMapping::registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs)
 {
 	registerKeyword("name", [this](const std::string& unused, std::istream& theStream) {
 		name = commonItems::singleString(theStream).getString();
 	});
-	registerKeyword("source", [this](const std::string& unused, std::istream& theStream) {
-		sources.insert(commonItems::singleInt(theStream).getInt());
+	registerKeyword("source", [this, sourceDefs](const std::string& unused, std::istream& theStream) {
+		const auto id = commonItems::singleInt(theStream).getInt();
+		if (sourceDefs.getProvinces().count(id))
+			sources.insert(sourceDefs.getProvinces().find(id)->second);
 	});
-	registerKeyword("target", [this](const std::string& unused, std::istream& theStream) {
-		targets.insert(commonItems::singleInt(theStream).getInt());
+	registerKeyword("target", [this, targetDefs](const std::string& unused, std::istream& theStream) {
+		const auto id = commonItems::singleInt(theStream).getInt();
+		if (targetDefs.getProvinces().count(id))
+			sources.insert(targetDefs.getProvinces().find(id)->second);
 	});
 	registerKeyword("comment", [this](const std::string& unused, std::istream& theStream) {
 		comment = commonItems::singleString(theStream).getString();
@@ -72,7 +78,7 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 	return output;
 }
 
-void LinkMapping::toggleSource(int theSource)
+void LinkMapping::toggleSource(const std::shared_ptr<Province>& theSource)
 {
 	if (sources.count(theSource))
 		sources.erase(theSource);
@@ -80,7 +86,7 @@ void LinkMapping::toggleSource(int theSource)
 		sources.insert(theSource);
 }
 
-void LinkMapping::toggleTarget(int theTarget)
+void LinkMapping::toggleTarget(const std::shared_ptr<Province>& theTarget)
 {
 	if (sources.count(theTarget))
 		sources.erase(theTarget);

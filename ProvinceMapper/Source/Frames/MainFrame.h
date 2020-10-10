@@ -7,6 +7,7 @@
 #include "LinkWindow.h"
 #include <wx/notebook.h>
 #include "ImageTab.h"
+#include "../Definitions/Definitions.h"
 #include "../LinkMapper/LinkMapper.h"
 
 class MainFrame: public wxFrame
@@ -22,10 +23,13 @@ class MainFrame: public wxFrame
 	void onSupportUs(wxCommandEvent& event);
 	void onChangeTab(wxCommandEvent& event);
 
-	LinkMapper linkMapper;
 	LinkWindow* linkWindow = nullptr;
 	wxNotebook* notebook = nullptr;
 	wxFlexGridSizer* vbox = nullptr;
 	ImageTab* imageTabFrom = nullptr;
 	ImageTab* imageTabTo = nullptr;
+
+	Definitions sourceDefs;
+	Definitions targetDefs;
+	LinkMapper linkMapper;
 };

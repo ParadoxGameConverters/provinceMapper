@@ -1,18 +1,19 @@
 #include "LinkMappingVersion.h"
 #include "ParserHelpers.h"
+#include "../Definitions/Definitions.h"
 
-LinkMappingVersion::LinkMappingVersion(std::istream& theStream)
+LinkMappingVersion::LinkMappingVersion(std::istream& theStream, const Definitions& sourceDefs, const Definitions& targetDefs)
 {
 	links = std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>();
-	registerKeys();
+	registerKeys(sourceDefs, targetDefs);
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-void LinkMappingVersion::registerKeys()
+void LinkMappingVersion::registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs)
 {
-	registerKeyword("link", [this](const std::string& unused, std::istream& theStream) {
-		const auto link = std::make_shared<LinkMapping>(theStream);
+	registerKeyword("link", [this, sourceDefs, targetDefs](const std::string& unused, std::istream& theStream) {
+		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs);
 		links->push_back(link);
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);

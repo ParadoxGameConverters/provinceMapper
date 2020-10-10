@@ -2,17 +2,20 @@
 #define LINK_MAPPING_H
 
 #include <set>
+
 #include "Parser.h"
 
+class Province;
+class Definitions;
 class LinkMapping: commonItems::parser
 {
   public:
 	LinkMapping() = default;
-	explicit LinkMapping(std::istream& theStream);
+	explicit LinkMapping(std::istream& theStream, const Definitions& sourceDefs, const Definitions& targetDefs);
 
 	void setName(const std::string& theName) { name = theName; }
-	void toggleSource(int theSource);
-	void toggleTarget(int theTarget);
+	void toggleSource(const std::shared_ptr<Province>& theSource);
+	void toggleTarget(const std::shared_ptr<Province>& theTarget);
 	void setComment(const std::string& theComment) { comment = theComment; }
 
 	[[nodiscard]] const auto& getName() const { return name; }
@@ -22,11 +25,11 @@ class LinkMapping: commonItems::parser
 	friend std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 
   private:
-	void registerKeys();
+	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs);
 
 	std::string name;
-	std::set<int> sources;
-	std::set<int> targets;
+	std::set<std::shared_ptr<Province>> sources;
+	std::vector<std::shared_ptr<Province>> targets;
 	std::string comment;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);

@@ -7,6 +7,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// It receives events from both the visual side (imageTabs and pointWindow), and the logical/file side (pointMapper),
 	// and dispatches in response.
 
+	sourceDefs.loadDefinitions("test-from/definition.csv");
+	targetDefs.loadDefinitions("test-from/definition.csv");
+	
 	Bind(wxEVT_CHANGE_TAB, &MainFrame::onChangeTab, this);
 	Bind(wxEVT_MENU, &MainFrame::onExit, this, wxID_EXIT);
 	Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
