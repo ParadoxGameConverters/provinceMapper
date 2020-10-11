@@ -175,7 +175,11 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
       <Filter>Resources\testdata\test-from</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv" />
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv" />
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv">
+      <Filter>Resources\testdata\test-to</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
+      <Filter>Resources\testdata\test-from</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

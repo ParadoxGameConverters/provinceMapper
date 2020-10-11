@@ -1,4 +1,6 @@
 #include "MainFrame.h"
+#include <wx/rawbmp.h>
+#include "Log.h"
 #include "wx/splitter.h"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
@@ -8,7 +10,25 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	// and dispatches in response.
 
 	sourceDefs.loadDefinitions("test-from/definition.csv");
-	targetDefs.loadDefinitions("test-from/definition.csv");
+	Log(LogLevel::Debug) << "loaded " << sourceDefs.getProvinces().size() << " source provinces.";
+	targetDefs.loadDefinitions("test-to/definition.csv");
+	Log(LogLevel::Debug) << "loaded " << targetDefs.getProvinces().size() << " target provinces.";
+	linkMapper.loadMappings("test_mappings.txt", sourceDefs, targetDefs);
+	auto activeLinks = linkMapper.getLinks();
+	Log(LogLevel::Debug) << "loaded " << activeLinks->size() << " active links.";
+	// Import pixels.
+	wxImage img;
+	img.LoadFile("test-from/provinces.bmp", wxBITMAP_TYPE_BMP);
+	unsigned char* rgb = img.GetData();
+
+	for (int y = 0; y < img.GetSize().GetY(); y++)
+		for (int x = 0; x < img.GetSize().GetX(); x++)
+		{
+			int offs = (y * img.GetSize().GetX()) + x;
+			offs *= 3;
+			sourceDefs.registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
+		}
+	Log(LogLevel::Debug) << "registered source pixels.";
 	
 	Bind(wxEVT_CHANGE_TAB, &MainFrame::onChangeTab, this);
 	Bind(wxEVT_MENU, &MainFrame::onExit, this, wxID_EXIT);

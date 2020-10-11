@@ -11,12 +11,14 @@ public:
 	void loadDefinitions(const std::string& fileName);
 	void loadDefinitions(std::istream& theStream);
 
+	void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);
 	[[nodiscard]] const auto& getProvinces() const { return provinces; }
 
 private:
 	void parseStream(std::istream& theStream);
 
-	std::map<int, std::shared_ptr<Province>> provinces;
+	std::map<int, std::shared_ptr<Province>> provinces; // ID, province
+	std::map<unsigned int, std::shared_ptr<Province>> chromaCache; // color, province
 };
 
 #endif // DEFINITIONS_H
