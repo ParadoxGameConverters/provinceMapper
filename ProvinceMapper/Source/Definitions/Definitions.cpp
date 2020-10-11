@@ -41,17 +41,17 @@ void Definitions::parseStream(std::istream& theStream)
 			sepLoc = line.find(';', sepLocSave + 1);
 			if (sepLoc == std::string::npos)
 				continue;
-			province->r = std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1));
+			province->r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
 			sepLocSave = sepLoc;
 			sepLoc = line.find(';', sepLocSave + 1);
 			if (sepLoc == std::string::npos)
 				continue;
-			province->g = std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1));
+			province->g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
 			sepLocSave = sepLoc;
 			sepLoc = line.find(';', sepLocSave + 1);
 			if (sepLoc == std::string::npos)
 				continue;
-			province->b = std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1));
+			province->b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
 			sepLocSave = sepLoc;
 			sepLoc = line.find(';', sepLocSave + 1);
 			if (sepLoc == std::string::npos)

@@ -25,6 +25,7 @@ ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector): wxScrolledWi
 		imageBox = new ImageBox(this, image, theSelector);
 		imageTabSizer->Add(imageBox);
 		imageBox->SetMinSize(image.GetSize());
+		Log(LogLevel::Debug) << "loaded to " << image.GetSize().GetX() << "x" << image.GetSize().GetY();
 	}
 
 	SetSizer(imageTabSizer); // Here we register the sizer with our ImageTab.

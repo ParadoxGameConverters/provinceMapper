@@ -10,11 +10,11 @@ class LinkMapper: commonItems::parser
   public:
 	void loadMappings(const std::string& fileName, const Definitions& sourceDefs, const Definitions& targetDefs);
 	void exportMappings() const;
-	[[nodiscard]] const auto& getLinks() const { return activeVersion->getLinks(); }
+	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 
   private:
 	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs);
-	std::map<std::string, std::shared_ptr<LinkMappingVersion>> versions;
+	std::vector<std::shared_ptr<LinkMappingVersion>> versions;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 };
 
