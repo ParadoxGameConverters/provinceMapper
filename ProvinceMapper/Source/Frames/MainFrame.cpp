@@ -28,17 +28,17 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 			offs *= 3;
 			sourceDefs.registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 		}
-	Log(LogLevel::Debug) << "registered " << img.GetSize().GetX() * img.GetSize().GetY() << " source pixels.";
+	Log(LogLevel::Debug) << "registered " << img.GetSize().GetX() <<"x"<< img.GetSize().GetY() << " source pixels.";
 	img.LoadFile("test-to/provinces.bmp", wxBITMAP_TYPE_BMP);
 	rgb = img.GetData();
 	for (auto y = 0; y < img.GetSize().GetY(); y++)
 		for (auto x = 0; x < img.GetSize().GetX(); x++)
 		{
-			auto offs = (y * img.GetSize().GetX()) + x;
+			auto offs = y * img.GetSize().GetX() + x;
 			offs *= 3;
 			targetDefs.registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 		}
-	Log(LogLevel::Debug) << "registered " << img.GetSize().GetX() * img.GetSize().GetY() << " target pixels.";
+	Log(LogLevel::Debug) << "registered " << img.GetSize().GetX() <<"x"<< img.GetSize().GetY() << " target pixels.";
 
 	
 	Bind(wxEVT_CHANGE_TAB, &MainFrame::onChangeTab, this);
@@ -52,9 +52,9 @@ void MainFrame::initFrame()
 	vbox = new wxFlexGridSizer(1, 2, 0, 0); // This is a "Sizer". It visually defines our application as a grid, of 1 row and 2 columns.
 	notebook = new wxNotebook(this, wxID_ANY); // This is a "Notebook" for the tab layout of the ImageTabs.
 
-	imageTabFrom = new ImageTab(notebook, ImageTabSelector::SOURCE); // We create the first image here
+	imageTabFrom = new ImageTab(notebook, ImageTabSelector::SOURCE, linkMapper.getActiveVersion()); // We create the first image here
 	notebook->AddPage(imageTabFrom, "Source"); // And give it to the notebook
-	imageTabTo = new ImageTab(notebook, ImageTabSelector::TARGET);
+	imageTabTo = new ImageTab(notebook, ImageTabSelector::TARGET, linkMapper.getActiveVersion());
 	notebook->AddPage(imageTabTo, "Target");
 
 	linkWindow = new LinkWindow(this, linkMapper.getActiveVersion()); // Pointwindow goes to the right.

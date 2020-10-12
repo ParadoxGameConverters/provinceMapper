@@ -1,6 +1,6 @@
 #include "Province.h"
 
-Pixel::Pixel(int tx, int ty, unsigned char tr, unsigned char tg, unsigned char tb): x(tx), y(tx), r(tr), g(tg), b(tb)
+Pixel::Pixel(int tx, int ty, unsigned char tr, unsigned char tg, unsigned char tb): x(tx), y(ty), r(tr), g(tg), b(tb)
 {
 }
 

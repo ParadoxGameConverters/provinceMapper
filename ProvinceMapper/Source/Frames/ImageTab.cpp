@@ -2,7 +2,8 @@
 #include "OSCompatibilityLayer.h"
 #include <wx/wrapsizer.h>
 
-ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector): wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
+ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector, const std::shared_ptr<LinkMappingVersion>& theActiveVersion):
+	 wxScrolledWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
 {
 	// ImageTab is a notebook page, that will contain the actual image. 
 	
@@ -13,7 +14,7 @@ ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector): wxScrolledWi
 	{
 		wxImage image; // We load an image
 		image.LoadFile("test-from/provinces.bmp", wxBITMAP_TYPE_BMP);
-		imageBox = new ImageBox(this, image, theSelector);
+		imageBox = new ImageBox(this, image, theSelector, theActiveVersion);
 		imageTabSizer->Add(imageBox); // Add the image to the sizer
 		imageBox->SetMinSize(image.GetSize()); // and set minimum size to the size if the image we loaded, so everything displays at once.
 		Log(LogLevel::Debug) << "loaded from " << image.GetSize().GetX() << "x" << image.GetSize().GetY();
@@ -22,7 +23,7 @@ ImageTab::ImageTab(wxWindow* parent, ImageTabSelector theSelector): wxScrolledWi
 	{
 		wxImage image;
 		image.LoadFile("test-to/provinces.bmp", wxBITMAP_TYPE_BMP);
-		imageBox = new ImageBox(this, image, theSelector);
+		imageBox = new ImageBox(this, image, theSelector, theActiveVersion);
 		imageTabSizer->Add(imageBox);
 		imageBox->SetMinSize(image.GetSize());
 		Log(LogLevel::Debug) << "loaded to " << image.GetSize().GetX() << "x" << image.GetSize().GetY();
