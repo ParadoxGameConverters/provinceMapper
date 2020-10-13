@@ -4,11 +4,11 @@
 #include <wx/wx.h>
 #endif
 
-#include "LinkWindow.h"
-#include <wx/notebook.h>
-#include "ImageTab.h"
 #include "../Definitions/Definitions.h"
 #include "../LinkMapper/LinkMapper.h"
+#include "ImageTab.h"
+#include "LinkWindow.h"
+#include <wx/splitter.h>
 
 class MainFrame: public wxFrame
 {
@@ -21,10 +21,13 @@ class MainFrame: public wxFrame
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
-	void onChangeTab(wxCommandEvent& event);
+
+	void readPixels(ImageTabSelector selector, const wxImage& img);
+	static int coordsToOffset(int x, int y, int width);
+	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
 
 	LinkWindow* linkWindow = nullptr;
-	wxNotebook* notebook = nullptr;
+	wxSplitterWindow* notebook = nullptr;
 	wxFlexGridSizer* vbox = nullptr;
 	ImageTab* imageTabFrom = nullptr;
 	ImageTab* imageTabTo = nullptr;

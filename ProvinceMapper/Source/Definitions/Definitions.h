@@ -12,6 +12,7 @@ public:
 	void loadDefinitions(std::istream& theStream);
 
 	void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);
+	void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);
 	[[nodiscard]] const auto& getProvinces() const { return provinces; }
 
 private:

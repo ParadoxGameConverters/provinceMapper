@@ -17,12 +17,12 @@ class ImageBox: public wxWindow
 {
   public:
 	ImageBox(wxWindow* parent, const wxImage& theImage, ImageTabSelector theSelector, const std::shared_ptr<LinkMappingVersion>& theActiveVersion);
-	void paintNow();
+	void paintNow() const;
 
   private:
 	void paintEvent(wxPaintEvent& evt);
 	void onSize(wxSizeEvent& event);
-	void render();
+	void render() const;
 	void generateBlackList();
 
 	wxClientDC* dc = nullptr;

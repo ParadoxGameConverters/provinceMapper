@@ -11,18 +11,15 @@ ImageBox::ImageBox(wxWindow* parent, const wxImage& theImage, ImageTabSelector t
 	eventListener = parent; // command events will propagate up the thread to someone who's listening, likely mainframe.
 	selector = theSelector; // We should know which of the images we are.
 	Bind(wxEVT_PAINT, &ImageBox::paintEvent, this);
-	Bind(wxEVT_SIZE, &ImageBox::onSize, this);
+	//Bind(wxEVT_SIZE, &ImageBox::onSize, this);
 
-	Log(LogLevel::Debug) << "in box";
 	auto dataSize = theImage.GetSize().GetX() * theImage.GetSize().GetY() * 3;
 	imageData = new unsigned char[dataSize];
 	memcpy(imageData, theImage.GetData(), dataSize);	
-	Log(LogLevel::Debug) << "stored data size" << dataSize;
 	width = theImage.GetSize().GetX();
 	height = theImage.GetSize().GetY();
 	dc = new wxClientDC(this); // Device Context, a drawable area.
 
-	Log(LogLevel::Debug) << "genning";
 	generateBlackList();
 }
 
@@ -30,20 +27,19 @@ void ImageBox::paintEvent(wxPaintEvent& evt)
 {
 	render();
 }
-void ImageBox::paintNow()
+void ImageBox::paintNow() const
 {
 	render();
 }
-void ImageBox::render()
+void ImageBox::render() const
 {
 	const wxImage bmp(width, height, imageData, true);
 	dc->DrawBitmap(bmp, 0, 0, false);
-	SetMinSize(wxSize(width, height));
 }
 void ImageBox::onSize(wxSizeEvent& evt)
 {
-	paintNow();
 	evt.Skip();
+	//paintNow();
 }
 
 void ImageBox::generateBlackList()

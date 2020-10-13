@@ -77,3 +77,12 @@ void Definitions::registerPixel(int x, int y, unsigned char r, unsigned char g, 
 	if (chromaItr != chromaCache.end())
 		chromaItr->second->pixels.emplace_back(pixel);
 }
+
+void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b)
+{
+	Pixel pixel(x, y, r, g, b);
+	const unsigned int chroma = r << 16 | g << 8 | b;
+	const auto& chromaItr = chromaCache.find(chroma);
+	if (chromaItr != chromaCache.end())
+		chromaItr->second->borderPixels.emplace_back(pixel);
+}

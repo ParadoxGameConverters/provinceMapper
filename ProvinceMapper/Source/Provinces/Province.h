@@ -28,7 +28,8 @@ struct Province
 	mutable unsigned char b = 0;
 	mutable std::string locName;
 	mutable std::string mapDataName;
-	std::vector<Pixel> pixels;
+	std::vector<Pixel> pixels; // Not border pixels, just the inner stuff!
+	std::vector<Pixel> borderPixels;
 };
 
 #endif // PROVINCE_H

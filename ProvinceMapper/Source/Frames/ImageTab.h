@@ -10,7 +10,7 @@ class ImageTab: public wxScrolledWindow
 {
   public:
 	ImageTab(wxWindow* parent, ImageTabSelector selector, const std::shared_ptr<LinkMappingVersion>& theActiveVersion);
-	void refresh();
+	//void refresh();
 
   private:
 	ImageBox* imageBox = nullptr;
