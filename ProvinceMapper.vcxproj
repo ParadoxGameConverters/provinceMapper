@@ -21,6 +21,7 @@
     <ClCompile Include="commonItems\WinUtils.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageBox.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\ImageCanvas.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageTab.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\LinkWindow.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="commonItems\StringUtils.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageBox.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\ImageCanvas.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageTab.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\LinkWindow.h" />

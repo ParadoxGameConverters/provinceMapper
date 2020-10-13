@@ -90,6 +90,9 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\ImageFrame.cpp">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\ImageCanvas.cpp">
+      <Filter>ProvinceMapper\Frames</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -144,6 +147,9 @@
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Frames\ImageFrame.h">
+      <Filter>ProvinceMapper\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\ImageCanvas.h">
       <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,6 +10,8 @@
 #include "LinkWindow.h"
 #include <wx/splitter.h>
 
+class ImageFrame;
+
 class MainFrame: public wxFrame
 {
   public:
@@ -21,16 +23,18 @@ class MainFrame: public wxFrame
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
+	void initImageFrame(wxCommandEvent& event);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static int coordsToOffset(int x, int y, int width);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
 
 	LinkWindow* linkWindow = nullptr;
-	wxSplitterWindow* notebook = nullptr;
 	wxFlexGridSizer* vbox = nullptr;
-	ImageTab* imageTabFrom = nullptr;
-	ImageTab* imageTabTo = nullptr;
+	
+	ImageFrame* imageFrame = nullptr;
+	wxImage* sourceImg;
+	wxImage* targetImg;
 
 	Definitions sourceDefs;
 	Definitions targetDefs;
