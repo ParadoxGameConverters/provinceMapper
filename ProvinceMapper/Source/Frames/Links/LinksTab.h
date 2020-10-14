@@ -10,7 +10,7 @@ class LinkMappingVersion;
 class LinksTab: public wxNotebookPage
 {
   public:
-	LinksTab(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theVersion, int theID);
+	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, int theID);
 	void redrawGrid() const;
 
   private:

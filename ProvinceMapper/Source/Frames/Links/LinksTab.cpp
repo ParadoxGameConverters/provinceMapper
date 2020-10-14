@@ -3,13 +3,9 @@
 #include "../../LinkMapper/LinkMappingVersion.h"
 
 LinksTab::LinksTab(wxWindow* parent,
-	 const std::shared_ptr<LinkMappingVersion>& theVersion, int theID):
-	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
+	 std::shared_ptr<LinkMappingVersion> theVersion, int theID):
+	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), eventListener(parent), version(std::move(theVersion)), ID(theID)
 {
-	ID = theID;
-	version = theVersion;
-	eventListener = parent;
-
 	// Pointwindow displays the points we get from PointMapper.
 
 	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);

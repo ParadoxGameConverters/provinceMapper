@@ -5,14 +5,11 @@
 #include "../../LinkMapper/LinkMappingVersion.h"
 
 LinksFrame::LinksFrame(wxWindow* parent,
-	 const std::vector<std::shared_ptr<LinkMappingVersion>>& theVersions,
-	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion):
-	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE)
-{
-	versions = theVersions;
-	activeVersion = theActiveVersion;
-	eventListener = parent;
-}
+	 std::vector<std::shared_ptr<LinkMappingVersion>> theVersions,
+	 std::shared_ptr<LinkMappingVersion> theActiveVersion):
+	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE),
+	 eventListener(parent), versions(std::move(theVersions)), activeVersion(std::move(theActiveVersion))
+{}
 
 void LinksFrame::initFrame()
 {

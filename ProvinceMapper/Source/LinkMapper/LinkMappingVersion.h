@@ -8,7 +8,7 @@ class Definitions;
 class LinkMappingVersion: commonItems::parser
 {
   public:
-	LinkMappingVersion(std::istream& theStream, const std::string& theVersionName, const Definitions& sourceDefs, const Definitions& targetDefs);
+	LinkMappingVersion(std::istream& theStream, std::string theVersionName, const Definitions& sourceDefs, const Definitions& targetDefs);
 
 	[[nodiscard]] const auto& getLinks() const { return links; }
 	[[nodiscard]] const auto& getName() const { return versionName; }

@@ -2,10 +2,10 @@
 #include "ParserHelpers.h"
 #include "../Definitions/Definitions.h"
 
-LinkMappingVersion::LinkMappingVersion(std::istream& theStream, const std::string& theVersionName, const Definitions& sourceDefs, const Definitions& targetDefs)
+LinkMappingVersion::LinkMappingVersion(std::istream& theStream, std::string theVersionName, const Definitions& sourceDefs, const Definitions& targetDefs):
+	 versionName(std::move(theVersionName)),
+	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
-	versionName = theVersionName;
-	links = std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>();
 	registerKeys(sourceDefs, targetDefs);
 	parseStream(theStream);
 	clearRegisteredKeywords();
