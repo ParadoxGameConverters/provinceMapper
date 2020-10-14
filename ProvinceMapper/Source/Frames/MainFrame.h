@@ -6,12 +6,11 @@
 
 #include "../Definitions/Definitions.h"
 #include "../LinkMapper/LinkMapper.h"
-#include "ImageTab.h"
-#include "LinkWindow.h"
 #include <wx/splitter.h>
 
+enum class ImageTabSelector;
 class ImageFrame;
-
+class LinksFrame;
 class MainFrame: public wxFrame
 {
   public:
@@ -24,17 +23,18 @@ class MainFrame: public wxFrame
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
 	void initImageFrame(wxCommandEvent& event);
+	void initLinksFrame(wxCommandEvent& event);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static int coordsToOffset(int x, int y, int width);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
 
-	LinkWindow* linkWindow = nullptr;
+	LinksFrame* linksFrame = nullptr;
 	wxFlexGridSizer* vbox = nullptr;
 	
 	ImageFrame* imageFrame = nullptr;
-	wxImage* sourceImg;
-	wxImage* targetImg;
+	wxImage* sourceImg = nullptr;
+	wxImage* targetImg = nullptr;
 
 	Definitions sourceDefs;
 	Definitions targetDefs;

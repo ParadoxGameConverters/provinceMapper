@@ -31,6 +31,12 @@
     <Filter Include="ProvinceMapper\Definitions">
       <UniqueIdentifier>{b404327d-b433-434e-a7c4-ade8b87c0a28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProvinceMapper\Frames\Images">
+      <UniqueIdentifier>{02874f61-4800-4b86-b0b8-ff7ecd002cf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Frames\Links">
+      <UniqueIdentifier>{38ec3c3f-d7b2-4699-8433-0963855f1b54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commonItems\ParserHelpers.cpp">
@@ -60,14 +66,8 @@
     <ClCompile Include="commonItems\StringUtils.cpp">
       <Filter>commonItems</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\Frames\ImageTab.cpp">
-      <Filter>ProvinceMapper\Frames</Filter>
-    </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp">
       <Filter>ProvinceMapper</Filter>
-    </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\Frames\ImageBox.cpp">
-      <Filter>ProvinceMapper\Frames</Filter>
     </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp">
       <Filter>ProvinceMapper\LinkMapper</Filter>
@@ -84,14 +84,17 @@
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp">
       <Filter>ProvinceMapper\Definitions</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\Frames\LinkWindow.cpp">
-      <Filter>ProvinceMapper\Frames</Filter>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\Frames\ImageFrame.cpp">
-      <Filter>ProvinceMapper\Frames</Filter>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
     </ClCompile>
-    <ClCompile Include="ProvinceMapper\Source\Frames\ImageCanvas.cpp">
-      <Filter>ProvinceMapper\Frames</Filter>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksFrame.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksTab.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,14 +122,8 @@
     <ClInclude Include="commonItems\StringUtils.h">
       <Filter>commonItems</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\ImageTab.h">
-      <Filter>ProvinceMapper\Frames</Filter>
-    </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h">
       <Filter>ProvinceMapper</Filter>
-    </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\ImageBox.h">
-      <Filter>ProvinceMapper\Frames</Filter>
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h">
       <Filter>ProvinceMapper\LinkMapper</Filter>
@@ -143,14 +140,17 @@
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h">
       <Filter>ProvinceMapper\Definitions</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\LinkWindow.h">
-      <Filter>ProvinceMapper\Frames</Filter>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\ImageFrame.h">
-      <Filter>ProvinceMapper\Frames</Filter>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
     </ClInclude>
-    <ClInclude Include="ProvinceMapper\Source\Frames\ImageCanvas.h">
-      <Filter>ProvinceMapper\Frames</Filter>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksFrame.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksTab.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

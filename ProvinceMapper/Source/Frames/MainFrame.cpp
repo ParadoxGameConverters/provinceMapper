@@ -2,14 +2,12 @@
 #include <wx/rawbmp.h>
 #include "Log.h"
 #include "wx/splitter.h"
-#include "ImageFrame.h"
+#include "Images/ImageFrame.h"
+#include "Images/ImageCanvas.h"
+#include "Links/LinksFrame.h"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
-{
-	// MainFrame is what holds the entire application together, visually and logically.
-	// It receives events from both the visual side (imageTabs and pointWindow), and the logical/file side (pointMapper),
-	// and dispatches in response.
-	
+{	
 	Bind(wxEVT_MENU, &MainFrame::onExit, this, wxID_EXIT);
 	Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
 	Bind(wxEVT_MENU, &MainFrame::onSupportUs, this, wxID_NETWORK);
@@ -19,17 +17,19 @@ void MainFrame::initFrame()
 {
 	auto evt = wxCommandEvent();
 	initImageFrame(evt);
+	initLinksFrame(evt);
 	vbox = new wxFlexGridSizer(1, 2, 0, 0);
-
-	linkWindow = new LinkWindow(this, linkMapper.getActiveVersion());
-	linkWindow->SetMinSize(wxSize(400, 1000));
-
-	vbox->Add(linkWindow, wxSizerFlags(0).Expand());
-
 	SetSizer(vbox);
 
-	linkWindow->redrawGrid();
 }
+
+void MainFrame::initLinksFrame(wxCommandEvent& event)
+{
+	linksFrame = new LinksFrame(this, linkMapper.getVersions(), linkMapper.getActiveVersion());
+	linksFrame->initFrame();
+	linksFrame->Show();
+}
+
 
 void MainFrame::initImageFrame(wxCommandEvent& event)
 {
@@ -54,6 +54,13 @@ void MainFrame::initImageFrame(wxCommandEvent& event)
 	Log(LogLevel::Info) << "Registered " << targetImg->GetSize().GetX() << "x" << targetImg->GetSize().GetY() << " target pixels.";
 	
 	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg);
+	wxMenu* menuDropDown = new wxMenu;
+	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
+	menuDropDown->Append(wxID_BOLD, "Toggle The Black");
+	wxMenuBar* imageMenuBar = new wxMenuBar;
+	imageMenuBar->Append(menuDropDown, "&Image");
+	imageFrame->SetMenuBar(imageMenuBar);
+
 	imageFrame->Show();
 }
 

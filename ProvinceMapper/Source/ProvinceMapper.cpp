@@ -6,7 +6,7 @@ wxIMPLEMENT_APP(ProvinceMapper);
 bool ProvinceMapper::OnInit()
 {
 	wxInitAllImageHandlers();
-	MainFrame* frame = new MainFrame("ProvinceMapper", wxPoint(50, 50), wxSize(600, 900));
+	MainFrame* frame = new MainFrame("ProvinceMapper", wxPoint(50, 50), wxSize(600, 600));
 	frame->initFrame();
 	frame->SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 

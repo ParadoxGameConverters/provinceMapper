@@ -11,6 +11,7 @@ class LinkMapper: commonItems::parser
 	void loadMappings(const std::string& fileName, const Definitions& sourceDefs, const Definitions& targetDefs);
 	void exportMappings() const;
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
+	[[nodiscard]] const auto& getVersions() const { return versions; }
 
   private:
 	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs);

@@ -1,12 +1,13 @@
-#include "LinkWindow.h"
-#include "../Provinces/Province.h"
+#include "LinksTab.h"
+#include "../../Provinces/Province.h"
+#include "../../LinkMapper/LinkMappingVersion.h"
 
-wxDEFINE_EVENT(wxEVT_CHANGE_TAB, wxCommandEvent);
-
-LinkWindow::LinkWindow(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theActiveVersion):
-	 wxWindow(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
+LinksTab::LinksTab(wxWindow* parent,
+	 const std::shared_ptr<LinkMappingVersion>& theVersion, int theID):
+	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
 {
-	activeVersion = theActiveVersion;
+	ID = theID;
+	version = theVersion;
 	eventListener = parent;
 
 	// Pointwindow displays the points we get from PointMapper.
@@ -15,12 +16,9 @@ LinkWindow::LinkWindow(wxWindow* parent, const std::shared_ptr<LinkMappingVersio
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->HideCellEditControl();
 	theGrid->HideRowLabels();
-	theGrid->SetColLabelValue(0, activeVersion->getName());
-	theGrid->SetColLabelAlignment(wxLEFT, wxCENTER);
 	theGrid->SetScrollRate(0, 20);
-	theGrid->SetColLabelSize(20);
 
-	theGrid->AutoSize();
+	theGrid->SetMinSize(wxSize(600, 900));
 	GetParent()->Layout();
 
 	wxBoxSizer* logBox = new wxBoxSizer(wxVERTICAL);
@@ -29,13 +27,13 @@ LinkWindow::LinkWindow(wxWindow* parent, const std::shared_ptr<LinkMappingVersio
 	logBox->Fit(this);
 }
 
-void LinkWindow::redrawGrid() const
+void LinksTab::redrawGrid() const
 {
 	auto rowCounter = 0;
 	theGrid->BeginBatch();
 	theGrid->DeleteRows(0, theGrid->GetNumberRows());
 
-	for (const auto& link: *activeVersion->getLinks())
+	for (const auto& link: *version->getLinks())
 	{
 		auto bgcolor = wxColour(240, 240, 240);
 		std::string name;

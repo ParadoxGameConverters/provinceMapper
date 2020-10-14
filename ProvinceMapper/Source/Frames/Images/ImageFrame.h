@@ -1,12 +1,12 @@
 #pragma once
 #include <wx/wxprec.h>
 
-#include "../LinkMapper/LinkMappingVersion.h"
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
 
-
+class LinkMappingVersion;
+class wxSplitterWindow;
 class ImageCanvas;
 enum class ImageTabSelector;
 
@@ -18,8 +18,13 @@ class ImageFrame: public wxFrame
 	void render();
 	
   private:
-	void OnScrollPaint(wxPaintEvent& event);
+	void onScrollPaint(wxPaintEvent& event);
+	void onToggleOrientation(wxCommandEvent& event);
+	void onToggleBlack(wxCommandEvent& event);
 
 	ImageCanvas* sourceCanvas;
 	ImageCanvas* targetCanvas;
+	wxSplitterWindow* splitter;
+
+	bool black = false;
 };
