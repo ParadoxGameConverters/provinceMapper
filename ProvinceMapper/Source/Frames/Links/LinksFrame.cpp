@@ -9,10 +9,9 @@ LinksFrame::LinksFrame(wxWindow* parent,
 	 std::shared_ptr<LinkMappingVersion> theActiveVersion):
 	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE),
 	 eventListener(parent), versions(std::move(theVersions)), activeVersion(std::move(theActiveVersion))
-{}
-
-void LinksFrame::initFrame()
 {
+	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
+
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900));
 
@@ -33,12 +32,12 @@ void LinksFrame::initFrame()
 	this->SetSizer(vbox);
 	this->Centre();
 
-	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
+	
+	SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 }
 
 void LinksFrame::onResize(wxSizeEvent& event)
 {
-	// layout everything in the dialog
 	notebook->SetVirtualSize(event.GetSize());
 	notebook->Layout();
 	event.Skip();

@@ -13,7 +13,6 @@ class LinksFrame: public wxFrame
 {
   public:
 	LinksFrame(wxWindow* parent, std::vector<std::shared_ptr<LinkMappingVersion>> theVersions, std::shared_ptr<LinkMappingVersion> theActiveVersion);
-	void initFrame();
 
   private:
 	wxNotebook* notebook = nullptr;

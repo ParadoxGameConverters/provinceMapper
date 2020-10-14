@@ -2,17 +2,17 @@
 #include "../../Provinces/Province.h"
 #include "../../LinkMapper/LinkMappingVersion.h"
 
-LinksTab::LinksTab(wxWindow* parent,
-	 std::shared_ptr<LinkMappingVersion> theVersion, int theID):
+LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, int theID):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), eventListener(parent), version(std::move(theVersion)), ID(theID)
 {
-	// Pointwindow displays the points we get from PointMapper.
-
 	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->HideCellEditControl();
 	theGrid->HideRowLabels();
+	theGrid->SetColLabelValue(0, version->getName());
+	theGrid->SetColLabelAlignment(wxLEFT, wxCENTER);
 	theGrid->SetScrollRate(0, 20);
+	theGrid->SetColLabelSize(20);
 
 	theGrid->SetMinSize(wxSize(600, 900));
 	GetParent()->Layout();

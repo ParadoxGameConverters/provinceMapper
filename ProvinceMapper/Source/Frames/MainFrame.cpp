@@ -26,7 +26,6 @@ void MainFrame::initFrame()
 void MainFrame::initLinksFrame(wxCommandEvent& event)
 {
 	linksFrame = new LinksFrame(this, linkMapper.getVersions(), linkMapper.getActiveVersion());
-	linksFrame->initFrame();
 	linksFrame->Show();
 }
 

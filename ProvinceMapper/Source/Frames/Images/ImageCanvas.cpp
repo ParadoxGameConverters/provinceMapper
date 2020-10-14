@@ -7,7 +7,6 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	 wxImage* theImage):
 	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL)
 {
-	// ImageBox is the raw image + display functions.
 	image = theImage;
 	width = image->GetSize().GetX();
 	height = image->GetSize().GetY();
