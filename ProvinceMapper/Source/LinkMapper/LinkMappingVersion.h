@@ -8,7 +8,12 @@ class Definitions;
 class LinkMappingVersion: commonItems::parser
 {
   public:
-	LinkMappingVersion(std::istream& theStream, std::string theVersionName, const Definitions& sourceDefs, const Definitions& targetDefs);
+	LinkMappingVersion(std::istream& theStream,
+		 std::string theVersionName,
+		 const Definitions& sourceDefs,
+		 const Definitions& targetDefs,
+		 const std::string& sourceToken,
+		 const std::string& targetToken);
 
 	[[nodiscard]] const auto& getLinks() const { return links; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
@@ -18,7 +23,7 @@ class LinkMappingVersion: commonItems::parser
   private:
 	std::string versionName;
 	
-	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs);
+	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);

@@ -9,7 +9,11 @@ class LinkMapping: commonItems::parser
 {
   public:
 	LinkMapping() = default;
-	explicit LinkMapping(std::istream& theStream, const Definitions& sourceDefs, const Definitions& targetDefs);
+	explicit LinkMapping(std::istream& theStream,
+		 const Definitions& sourceDefs,
+		 const Definitions& targetDefs,
+		 const std::string& sourceToken,
+		 const std::string& targetToken);
 
 	void toggleSource(const std::shared_ptr<Province>& theSource);
 	void toggleTarget(const std::shared_ptr<Province>& theTarget);
@@ -22,7 +26,7 @@ class LinkMapping: commonItems::parser
 	friend std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 
   private:
-	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs);
+	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
 
 	std::vector<std::shared_ptr<Province>> sources;
 	std::vector<std::shared_ptr<Province>> targets;

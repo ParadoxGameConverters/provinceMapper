@@ -1,25 +1,29 @@
 #include "LinkMapping.h"
-#include "ParserHelpers.h"
-#include "Log.h"
-#include "Provinces/Province.h"
 #include "Definitions/Definitions.h"
+#include "Log.h"
+#include "ParserHelpers.h"
+#include "Provinces/Province.h"
 
-LinkMapping::LinkMapping(std::istream& theStream, const Definitions& sourceDefs, const Definitions& targetDefs)
+LinkMapping::LinkMapping(std::istream& theStream,
+	 const Definitions& sourceDefs,
+	 const Definitions& targetDefs,
+	 const std::string& sourceToken,
+	 const std::string& targetToken)
 {
-	registerKeys(sourceDefs, targetDefs);
+	registerKeys(sourceDefs, targetDefs, sourceToken, targetToken);
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-void LinkMapping::registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs)
+void LinkMapping::registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken)
 {
-	registerKeyword("ck3", [this, sourceDefs](const std::string& unused, std::istream& theStream) {
+	registerKeyword(sourceToken, [this, sourceDefs](const std::string& unused, std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
 		const auto& provinces = sourceDefs.getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
-	registerKeyword("eu4", [this, targetDefs](const std::string& unused, std::istream& theStream) {
+	registerKeyword(targetToken, [this, targetDefs](const std::string& unused, std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
 		const auto& provinces = targetDefs.getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
@@ -62,7 +66,7 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		for (const auto& province: linkMapping.sources)
 		{
 			output << comma;
-			output << province;
+			output << province->mapDataName;
 			comma = ", ";
 		}
 	else
@@ -75,12 +79,12 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		for (const auto& province: linkMapping.targets)
 		{
 			output << comma;
-			output << province;
+			output << province->mapDataName;
 			comma = ", ";
 		}
 	else
 		output << "DROPPED";
-	
+
 	output << "\n";
 	return output;
 }

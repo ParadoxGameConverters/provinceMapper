@@ -8,6 +8,7 @@
 #include "LinkMapper/LinkMapper.h"
 #include "Configuration/Configuration.h"
 #include <wx/splitter.h>
+#include <array>
 
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
@@ -23,12 +24,19 @@ class MainFrame: public wxFrame
 	void initFrame();
 
   private:
+
+	void populateFrame();
+	
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
-	void initImageFrame(wxCommandEvent& event);
-	void initLinksFrame(wxCommandEvent& event);
+	void initImageFrame();
+	void initLinksFrame();
 	void onPathChanged(wxFileDirPickerEvent& evt);
+	void onTokenChanged(wxCommandEvent& evt);
+	void onStartButton(wxCommandEvent& evt);
+	void applySanityToButton();
+	void onSaveLinks(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static int coordsToOffset(int x, int y, int width);
@@ -44,9 +52,23 @@ class MainFrame: public wxFrame
 	wxDirPickerCtrl* sourceDirPicker = nullptr;
 	wxDirPickerCtrl* targetDirPicker = nullptr;
 	wxFilePickerCtrl* linkFilePicker = nullptr;
+	wxTextCtrl* sourceTokenField = nullptr;
+	wxTextCtrl* targetTokenField = nullptr;
+
+	wxWindow* sourceDirStatus = nullptr;
+	wxWindow* targetDirStatus = nullptr;
+	wxWindow* linkFileStatus = nullptr;
+	wxWindow* sourceTokenStatus = nullptr;
+	wxWindow* targetTokenStatus = nullptr;
+
+	wxButton* startButton = nullptr;
 	
 	Definitions sourceDefs;
 	Definitions targetDefs;
 	LinkMapper linkMapper;
 	Configuration configuration;
+
+	std::string linksFileString;
+
+	std::array<bool, 5> sanity = {false, false, false, false, false}; // source/target pickers, links, source/target tokens
 };

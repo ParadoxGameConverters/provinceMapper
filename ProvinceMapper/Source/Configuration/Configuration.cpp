@@ -48,6 +48,8 @@ void Configuration::save() const
 
 void Configuration::load()
 {
+	registerKeys();
 	if (commonItems::DoesFileExist("configuration.txt"))
 		parseFile("configuration.txt");
+	clearRegisteredKeywords();
 }
