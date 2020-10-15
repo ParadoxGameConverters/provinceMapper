@@ -1,8 +1,8 @@
 #include "Definitions.h"
+#include "../Provinces/Province.h"
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
 #include <fstream>
-#include "../Provinces/Province.h"
 
 void Definitions::loadDefinitions(std::istream& theStream)
 {
@@ -43,7 +43,7 @@ void Definitions::parseStream(std::istream& theStream)
 		}
 		catch (std::exception& e)
 		{
-			throw std::runtime_error("Line: |" + line + "| is unparseable! Breaking. (" + e.what() + ")");			
+			throw std::runtime_error("Line: |" + line + "| is unparseable! Breaking. (" + e.what() + ")");
 		}
 	}
 }
@@ -76,7 +76,6 @@ std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::
 	auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
 	return std::make_tuple(ID, r, g, b, mapDataName);
 }
-
 
 void Definitions::registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b)
 {
