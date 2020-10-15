@@ -6,10 +6,11 @@
 #include "ImageCanvas.h"
 
 ImageFrame::ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theActiveVersion, wxImage* sourceImg, wxImage* targetImg):
-	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL)
+	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
+	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
 
@@ -88,4 +89,10 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	}
 	render();
 	Refresh();
+}
+
+void ImageFrame::onClose(wxCloseEvent& event)
+{
+	// We need to kill the app.
+	eventHandler->QueueEvent(event.Clone());
 }

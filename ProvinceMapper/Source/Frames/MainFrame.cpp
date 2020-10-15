@@ -67,7 +67,7 @@ void MainFrame::initFrame()
 	sizer->Add(sourceTokenStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
 
 	// Target Token
-	auto* targetTokenText = new wxStaticText(this, wxID_ANY, "Source Token", wxDefaultPosition);
+	auto* targetTokenText = new wxStaticText(this, wxID_ANY, "Target Token", wxDefaultPosition);
 	targetTokenField = new wxTextCtrl(this, 4, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_DEFAULT);
 	targetTokenField->Bind(wxEVT_TEXT, &MainFrame::onTokenChanged, this);
 	targetTokenStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
@@ -76,7 +76,7 @@ void MainFrame::initFrame()
 	sizer->Add(targetTokenField, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(targetTokenStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
 
-	// The button
+	// The Button
 	startButton = new wxButton(this, wxID_ANY, "Begin!", wxDefaultPosition, wxDefaultSize);
 	startButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrame::onStartButton, this);
 	startButton->Disable();
@@ -138,7 +138,7 @@ void MainFrame::populateFrame()
 		path16 = commonItems::convertUTF8ToUTF16(path);
 		const auto rawFile = trimPath(path);
 		const auto rawPath = path.substr(0, rawFile.size());
-		initialPath = commonItems::convertUTF8ToUTF16(rawPath);
+		initialPath = commonItems::convertUTF8ToUTF16(rawPath);		
 	}
 	linkFilePicker->SetPath(path16);
 	linkFilePicker->SetInitialDirectory(initialPath);
@@ -151,9 +151,9 @@ void MainFrame::initLinksFrame()
 	linksFrame = new LinksFrame(this, linkMapper.getVersions(), linkMapper.getActiveVersion());
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_SAVE, "Save Links");
-	auto* imageMenuBar = new wxMenuBar;
-	imageMenuBar->Append(menuDropDown, "&Save");
-	linksFrame->SetMenuBar(imageMenuBar);
+	auto* linksMenuBar = new wxMenuBar;
+	linksMenuBar->Append(menuDropDown, "&Save");
+	linksFrame->SetMenuBar(linksMenuBar);
 	linksFrame->Show();
 }
 
@@ -386,8 +386,10 @@ void MainFrame::applySanityToButton()
 void MainFrame::onStartButton(wxCommandEvent& evt)
 {
 	startButton->Disable();
+	Refresh();
 	initImageFrame();
 	initLinksFrame();
+	Hide();
 }
 
 void MainFrame::onSaveLinks(wxCommandEvent& evt)

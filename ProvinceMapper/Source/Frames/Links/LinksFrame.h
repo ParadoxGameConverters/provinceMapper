@@ -18,6 +18,7 @@ class LinksFrame: public wxFrame
 	wxNotebook* notebook = nullptr;
 
 	void onResize(wxSizeEvent& evt);
+	void onClose(wxCloseEvent& event);
 	
 	std::vector<std::shared_ptr<LinkMappingVersion>> versions;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
@@ -25,5 +26,5 @@ class LinksFrame: public wxFrame
 	std::pair<int, LinksTab*> activePage;
 
   protected:
-	wxEvtHandler* eventListener = nullptr;
+	wxEvtHandler* eventHandler = nullptr;
 };
