@@ -26,8 +26,8 @@ ImageFrame::ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersio
 	targetCanvas->Bind(wxEVT_PAINT, &ImageFrame::onScrollPaint, this);
 
 	splitter->SetMinSize(wxSize(1200, 800));
-	splitter->SetSashGravity(1.0);
-	splitter->SplitVertically(sourceCanvas, targetCanvas, GetSize().x / 2);
+	splitter->SetSashGravity(0.5);
+	splitter->SplitVertically(sourceCanvas, targetCanvas);
 
 	SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 }
@@ -73,18 +73,18 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	if (black == true)
 	{
 		black = false;
-		sourceCanvas->clearBlackList();
+		sourceCanvas->clearShadedPixels();
 		sourceCanvas->restoreImageData();
-		targetCanvas->clearBlackList();
+		targetCanvas->clearShadedPixels();
 		targetCanvas->restoreImageData();
 	}
 	else
 	{
 		black = true;
-		sourceCanvas->generateBlackList();
-		sourceCanvas->applyBlackList();
-		targetCanvas->generateBlackList();
-		targetCanvas->applyBlackList();
+		sourceCanvas->generateShadedPixels();
+		sourceCanvas->applyShadedPixels();
+		targetCanvas->generateShadedPixels();
+		targetCanvas->applyShadedPixels();
 	}
 	render();
 	Refresh();

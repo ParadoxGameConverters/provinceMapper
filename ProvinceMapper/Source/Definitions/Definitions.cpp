@@ -30,59 +30,66 @@ void Definitions::parseStream(std::istream& theStream)
 		if (line[0] == '#' || line[1] == '#' || line.length() < 4)
 			continue;
 
-		auto province = std::make_shared<Province>();
 		try
 		{
-			auto sepLoc = line.find(';');
-			if (sepLoc == std::string::npos)
-				continue;
-			auto sepLocSave = sepLoc;
-			province->ID = std::stoi(line.substr(0, sepLoc));
-			sepLoc = line.find(';', sepLocSave + 1);
-			if (sepLoc == std::string::npos)
-				continue;
-			province->r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-			sepLocSave = sepLoc;
-			sepLoc = line.find(';', sepLocSave + 1);
-			if (sepLoc == std::string::npos)
-				continue;
-			province->g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-			sepLocSave = sepLoc;
-			sepLoc = line.find(';', sepLocSave + 1);
-			if (sepLoc == std::string::npos)
-				continue;
-			province->b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-			sepLocSave = sepLoc;
-			sepLoc = line.find(';', sepLocSave + 1);
-			if (sepLoc == std::string::npos)
-				continue;
-			province->mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+			const auto& parsedLine = parseLine(line);
+			if (parsedLine)
+			{
+				const auto [ID, r, g, b, mapDataName] = *parsedLine;
+				auto province = std::make_shared<Province>(ID, r, g, b, mapDataName);
+				provinces.insert(std::pair(province->ID, province));
+				chromaCache.insert(std::pair(pixelPack(province->r, province->g, province->b), province));
+			}
 		}
 		catch (std::exception& e)
 		{
-			throw std::runtime_error("Line: |" + line + "| is unparseable! Breaking. (" + e.what() + ")");
+			throw std::runtime_error("Line: |" + line + "| is unparseable! Breaking. (" + e.what() + ")");			
 		}
-		
-		provinces.insert(std::pair(province->ID, province));
-		unsigned int color = province->r << 16 | province->g << 8 | province->b;
-		chromaCache.insert(std::pair(color, province));
 	}
 }
+
+std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> Definitions::parseLine(const std::string& line)
+{
+	auto sepLoc = line.find(';');
+	if (sepLoc == std::string::npos)
+		return std::nullopt;
+	auto sepLocSave = sepLoc;
+	auto ID = std::stoi(line.substr(0, sepLoc));
+	sepLoc = line.find(';', sepLocSave + 1);
+	if (sepLoc == std::string::npos)
+		return std::nullopt;
+	auto r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+	sepLocSave = sepLoc;
+	sepLoc = line.find(';', sepLocSave + 1);
+	if (sepLoc == std::string::npos)
+		return std::nullopt;
+	auto g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+	sepLocSave = sepLoc;
+	sepLoc = line.find(';', sepLocSave + 1);
+	if (sepLoc == std::string::npos)
+		return std::nullopt;
+	auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+	sepLocSave = sepLoc;
+	sepLoc = line.find(';', sepLocSave + 1);
+	if (sepLoc == std::string::npos)
+		return std::nullopt;
+	auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+	return std::make_tuple(ID, r, g, b, mapDataName);
+}
+
 
 void Definitions::registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b)
 {
 	Pixel pixel(x, y, r, g, b);
-	const unsigned int chroma = r << 16 | g << 8 | b;
-	const auto& chromaItr = chromaCache.find(chroma);
+	const auto& chromaItr = chromaCache.find(pixelPack(r, g, b));
 	if (chromaItr != chromaCache.end())
-		chromaItr->second->pixels.emplace_back(pixel);
+		chromaItr->second->innerPixels.emplace_back(pixel);
 }
 
 void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b)
 {
 	Pixel pixel(x, y, r, g, b);
-	const unsigned int chroma = r << 16 | g << 8 | b;
-	const auto& chromaItr = chromaCache.find(chroma);
+	const auto& chromaItr = chromaCache.find(pixelPack(r, g, b));
 	if (chromaItr != chromaCache.end())
 		chromaItr->second->borderPixels.emplace_back(pixel);
 }

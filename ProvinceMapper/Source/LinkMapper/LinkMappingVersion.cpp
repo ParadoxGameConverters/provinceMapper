@@ -1,6 +1,7 @@
 #include "LinkMappingVersion.h"
 #include "ParserHelpers.h"
-#include "../Definitions/Definitions.h"
+#include "Definitions/Definitions.h"
+#include <fstream>
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream, std::string theVersionName, const Definitions& sourceDefs, const Definitions& targetDefs):
 	 versionName(std::move(theVersionName)),
@@ -22,7 +23,9 @@ void LinkMappingVersion::registerKeys(const Definitions& sourceDefs, const Defin
 
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion)
 {
+	output << linkMappingVersion.versionName << " = {\n";
 	for (const auto& link: *linkMappingVersion.links)
 		output << *link;
+	output << "}\n";
 	return output;
 }

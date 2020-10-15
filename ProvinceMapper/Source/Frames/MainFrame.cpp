@@ -53,10 +53,10 @@ void MainFrame::initImageFrame(wxCommandEvent& event)
 	Log(LogLevel::Info) << "Registered " << targetImg->GetSize().GetX() << "x" << targetImg->GetSize().GetY() << " target pixels.";
 	
 	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg);
-	wxMenu* menuDropDown = new wxMenu;
+	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
-	menuDropDown->Append(wxID_BOLD, "Toggle The Black");
-	wxMenuBar* imageMenuBar = new wxMenuBar;
+	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
+	auto* imageMenuBar = new wxMenuBar;
 	imageMenuBar->Append(menuDropDown, "&Image");
 	imageFrame->SetMenuBar(imageMenuBar);
 

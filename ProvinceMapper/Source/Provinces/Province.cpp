@@ -1,6 +1,11 @@
 #include "Province.h"
 
-Pixel::Pixel(int tx, int ty, unsigned char tr, unsigned char tg, unsigned char tb): x(tx), y(ty), r(tr), g(tg), b(tb)
+Pixel::Pixel(const int tx, const int ty, const unsigned char tr, const unsigned char tg, const unsigned char tb): x(tx), y(ty), r(tr), g(tg), b(tb)
+{
+}
+
+Province::Province(const int theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
+	 ID(theID), r(tr), g(tg), b(tb), mapDataName(std::move(theName))
 {
 }
 
@@ -24,7 +29,7 @@ bool Province::operator<(const Province& rhs) const
 	return ID < rhs.ID;
 }
 
-bool Province::operator!() const
+unsigned int pixelPack(unsigned char r, unsigned char g, unsigned char b)
 {
-	return !ID;
+	return r << 16 | g << 8 | b;
 }

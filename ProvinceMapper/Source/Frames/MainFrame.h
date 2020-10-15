@@ -4,8 +4,8 @@
 #include <wx/wx.h>
 #endif
 
-#include "../Definitions/Definitions.h"
-#include "../LinkMapper/LinkMapper.h"
+#include "Definitions/Definitions.h"
+#include "LinkMapper/LinkMapper.h"
 #include <wx/splitter.h>
 
 enum class ImageTabSelector;

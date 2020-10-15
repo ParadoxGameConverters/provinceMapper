@@ -1,6 +1,6 @@
 #include "LinksTab.h"
-#include "../../Provinces/Province.h"
-#include "../../LinkMapper/LinkMappingVersion.h"
+#include "Provinces/Province.h"
+#include "LinkMapper/LinkMappingVersion.h"
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, int theID):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), version(std::move(theVersion)), eventListener(parent), ID(theID)
@@ -17,7 +17,7 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	theGrid->SetMinSize(wxSize(600, 900));
 	GetParent()->Layout();
 
-	wxBoxSizer* logBox = new wxBoxSizer(wxVERTICAL);
+	auto* logBox = new wxBoxSizer(wxVERTICAL);
 	logBox->Add(theGrid, wxSizerFlags(1).Expand());
 	SetSizer(logBox);
 	logBox->Fit(this);
@@ -31,13 +31,13 @@ void LinksTab::redrawGrid() const
 
 	for (const auto& link: *version->getLinks())
 	{
-		auto bgcolor = wxColour(240, 240, 240);
+		auto bgColor = wxColour(240, 240, 240);
 		std::string name;
 		std::string comma;
 		if (!link->getComment().empty())
 		{
 			name = link->getComment();
-			bgcolor = wxColour(150, 150, 150);
+			bgColor = wxColour(150, 150, 150);
 		}
 		else
 		{
@@ -66,7 +66,7 @@ void LinksTab::redrawGrid() const
 		theGrid->SetRowSize(rowCounter, 20);
 		theGrid->SetCellValue(rowCounter, 0, name);
 		theGrid->SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
-		theGrid->SetCellBackgroundColour(rowCounter, 0, bgcolor);
+		theGrid->SetCellBackgroundColour(rowCounter, 0, bgColor);
 		theGrid->SetReadOnly(rowCounter, 0);
 		rowCounter++;
 	}

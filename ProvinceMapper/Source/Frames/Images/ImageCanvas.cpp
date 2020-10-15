@@ -1,5 +1,5 @@
 #include "ImageCanvas.h"
-#include "../../LinkMapper/LinkMappingVersion.h"
+#include "LinkMapper/LinkMappingVersion.h"
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -17,9 +17,9 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	selector = theSelector; // We should know which of the images we are.
 }
 
-void ImageCanvas::generateBlackList()
+void ImageCanvas::generateShadedPixels()
 {
-	blackList.clear();
+	shadedPixels.clear();
 	for (const auto& link: *activeVersion->getLinks())
 	{
 		std::vector<std::shared_ptr<Province>> pixelSources;
@@ -28,14 +28,14 @@ void ImageCanvas::generateBlackList()
 		else if (selector == ImageTabSelector::TARGET)
 			pixelSources = link->getTargets();
 		for (const auto& province: pixelSources)
-			for (const auto& pixel: province->pixels)
-				blackList.emplace_back(pixel);
+			for (const auto& pixel: province->innerPixels)
+				shadedPixels.emplace_back(pixel);
 	}
 }
 
-void ImageCanvas::applyBlackList()
+void ImageCanvas::applyShadedPixels()
 {
-	for (const auto& pixel: blackList)
+	for (const auto& pixel: shadedPixels)
 	{
 		const auto offset = (pixel.x + width * pixel.y) * 3;
 		imageData[offset] = 0;

@@ -1,8 +1,8 @@
 #include "LinksFrame.h"
 
 #include "Log.h"
-#include "../../Provinces/Province.h"
-#include "../../LinkMapper/LinkMappingVersion.h"
+#include "Provinces/Province.h"
+#include "LinkMapper/LinkMappingVersion.h"
 
 LinksFrame::LinksFrame(wxWindow* parent,
 	 std::vector<std::shared_ptr<LinkMappingVersion>> theVersions,
@@ -12,14 +12,14 @@ LinksFrame::LinksFrame(wxWindow* parent,
 {
 	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
 
-	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+	auto* vbox = new wxBoxSizer(wxVERTICAL);
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900));
 
 	auto counter = 0;
 	for (const auto& version: versions)
 	{
 		Log(LogLevel::Debug) << "Inserting version: " << version->getName();
-		LinksTab* newTab = new LinksTab(notebook, version, counter);
+		auto* newTab = new LinksTab(notebook, version, counter);
 		newTab->SetBackgroundColour(wxColour(255, 245, 245));
 		notebook->AddPage(newTab, version->getName());
 		pages.insert(std::pair(counter, newTab));

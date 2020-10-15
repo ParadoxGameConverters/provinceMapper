@@ -4,7 +4,7 @@
 #include <wx/wx.h>
 #endif
 
-#include "../../Provinces/Province.h"
+#include "Provinces/Province.h"
 
 enum class ImageTabSelector
 {
@@ -22,9 +22,9 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getWidth() const { return width; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 
-	void clearBlackList() { blackList.clear(); }
-	void generateBlackList();
-	void applyBlackList();
+	void clearShadedPixels() { shadedPixels.clear(); }
+	void generateShadedPixels();
+	void applyShadedPixels();
 	void restoreImageData();
 	
   private:
@@ -33,7 +33,7 @@ class ImageCanvas: public wxScrolledCanvas
 	size_t imageDataSize = 0;
 	int height = 0;
 	int width = 0;
-	std::vector<Pixel> blackList;
+	std::vector<Pixel> shadedPixels;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	ImageTabSelector selector;
 };

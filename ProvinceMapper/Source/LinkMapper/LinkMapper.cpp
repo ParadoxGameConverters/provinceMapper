@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "Log.h"
-#include "../Definitions/Definitions.h"
+#include "Definitions/Definitions.h"
 
 void LinkMapper::loadMappings(const std::string& fileName, const Definitions& sourceDefs, const Definitions& targetDefs)
 {
@@ -29,9 +29,7 @@ void LinkMapper::exportMappings() const
 	std::ofstream linkFile("test_mappings.txt");
 	for (const auto& version: versions)
 	{
-		linkFile << version->getName() << " = {\n";
 		linkFile << *version;
-		linkFile << "}\n";		
 	}
 	linkFile.close();
 }

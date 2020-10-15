@@ -1,8 +1,8 @@
 #include "LinkMapping.h"
 #include "ParserHelpers.h"
 #include "Log.h"
-#include "../Provinces/Province.h"
-#include "../Definitions/Definitions.h"
+#include "Provinces/Province.h"
+#include "Definitions/Definitions.h"
 
 LinkMapping::LinkMapping(std::istream& theStream, const Definitions& sourceDefs, const Definitions& targetDefs)
 {
@@ -16,15 +16,13 @@ void LinkMapping::registerKeys(const Definitions& sourceDefs, const Definitions&
 	registerKeyword("ck3", [this, sourceDefs](const std::string& unused, std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
 		const auto& provinces = sourceDefs.getProvinces();
-		const auto& provItr = provinces.find(id);
-		if (provItr != provinces.end())
+		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
 	registerKeyword("eu4", [this, targetDefs](const std::string& unused, std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
 		const auto& provinces = targetDefs.getProvinces();
-		const auto& provItr = provinces.find(id);
-		if (provItr != provinces.end())
+		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			targets.emplace_back(provItr->second);
 	});
 	registerKeyword("comment", [this](const std::string& unused, std::istream& theStream) {
@@ -36,22 +34,29 @@ void LinkMapping::registerKeys(const Definitions& sourceDefs, const Definitions&
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 {
 	output << "\tlink = { ";
+	// If this is a comment only output the comment.
 	if (!linkMapping.comment.empty())
 	{
 		output << "comment = \"" << linkMapping.comment << "\" }\n";
 		return output;
 	}
+
+	// Dump numbers
 	for (const auto& province: linkMapping.sources)
 	{
-		output << "ck3 = " << province << " ";
+		output << "ck3 = " << province->ID << " ";
 	}
 	for (const auto& province: linkMapping.targets)
 	{
-		output << "eu4 = " << province << " ";
+		output << "eu4 = " << province->ID << " ";
 	}
 	output << "} # ";
+
+	// Comment section, N-to-N
 	if (linkMapping.sources.size() > 1 && linkMapping.targets.size() > 1)
 		output << "MANY-TO-MANY: ";
+
+	// List sources
 	std::string comma;
 	if (!linkMapping.sources.empty())
 		for (const auto& province: linkMapping.sources)
@@ -62,6 +67,8 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		}
 	else
 		output << "NOTHING";
+
+	// List targets
 	output << " -> ";
 	comma.clear();
 	if (!linkMapping.targets.empty())
@@ -73,6 +80,7 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		}
 	else
 		output << "DROPPED";
+	
 	output << "\n";
 	return output;
 }
