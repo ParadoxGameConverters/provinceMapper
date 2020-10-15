@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ProvinceMapper">
+      <UniqueIdentifier>{8bf5443e-c0d0-48fc-b338-955a5a9b4b9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{e4e5c633-3b78-4090-abce-2bba593c3205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="commonItems">
+      <UniqueIdentifier>{969ac4a9-09b8-41ab-90c0-49ad0670d34c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Frames">
+      <UniqueIdentifier>{09fe9420-b6ad-4203-8ee4-168ef6a56fef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\testdata">
+      <UniqueIdentifier>{7d02dd2e-4944-4047-8510-e47cd63a37da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\testdata\test-to">
+      <UniqueIdentifier>{1b885b56-9193-4e91-a94d-4864ba20bbc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\testdata\test-from">
+      <UniqueIdentifier>{94cf4606-8491-4cc9-bf88-7bfed0b16333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\LinkMapper">
+      <UniqueIdentifier>{1e4e1925-6488-42c5-a2f5-aca5830b029c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Provinces">
+      <UniqueIdentifier>{ade7c5a7-2f05-44f5-aa8e-d7a7adfec65d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Definitions">
+      <UniqueIdentifier>{b404327d-b433-434e-a7c4-ade8b87c0a28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Frames\Images">
+      <UniqueIdentifier>{02874f61-4800-4b86-b0b8-ff7ecd002cf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProvinceMapper\Frames\Links">
+      <UniqueIdentifier>{38ec3c3f-d7b2-4699-8433-0963855f1b54}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="commonItems\ParserHelpers.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\Log.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\WinUtils.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\iconvlite.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\MainFrame.cpp">
+      <Filter>ProvinceMapper\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\Parser.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\OSCommonLayer.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\CommonFunctions.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="commonItems\StringUtils.cpp">
+      <Filter>commonItems</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp">
+      <Filter>ProvinceMapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp">
+      <Filter>ProvinceMapper\Provinces</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksFrame.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksTab.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="commonItems\ParserHelpers.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="commonItems\Log.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="commonItems\OSCompatibilityLayer.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="commonItems\iconvlite.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\MainFrame.h">
+      <Filter>ProvinceMapper\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="commonItems\Parser.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="commonItems\CommonFunctions.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="commonItems\StringUtils.h">
+      <Filter>commonItems</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h">
+      <Filter>ProvinceMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h">
+      <Filter>ProvinceMapper\Provinces</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksFrame.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksTab.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\msvcp140_codecvt_ids.dll">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\VC_redist.x64.exe">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\vcruntime140_1.dll">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="wxWidgets\3.1.3\lib\vc14x_x64_dll\wxbase313u_vc14x_x64.dll">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="wxWidgets\3.1.3\lib\vc14x_x64_dll\wxmsw313u_core_vc14x_x64.dll">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\test_mappings.txt">
+      <Filter>Resources\testdata</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\provinces.bmp">
+      <Filter>Resources\testdata\test-to</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\rivers.bmp">
+      <Filter>Resources\testdata\test-to</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.bmp">
+      <Filter>Resources\testdata\test-from</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
+      <Filter>Resources\testdata\test-from</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv">
+      <Filter>Resources\testdata\test-to</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
+      <Filter>Resources\testdata\test-from</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+</Project>
