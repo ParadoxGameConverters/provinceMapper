@@ -74,6 +74,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	if (black == true)
 	{
 		black = false;
+		sourceCanvas->clearBlack();
+		targetCanvas->clearBlack();
 		sourceCanvas->clearShadedPixels();
 		sourceCanvas->restoreImageData();
 		targetCanvas->clearShadedPixels();
@@ -82,6 +84,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	else
 	{
 		black = true;
+		sourceCanvas->setBlack();
+		targetCanvas->setBlack();
 		sourceCanvas->generateShadedPixels();
 		sourceCanvas->applyShadedPixels();
 		targetCanvas->generateShadedPixels();
@@ -96,3 +100,22 @@ void ImageFrame::onClose(wxCloseEvent& event)
 	// We need to kill the app.
 	eventHandler->QueueEvent(event.Clone());
 }
+
+void ImageFrame::activateLink(int row)
+{
+	sourceCanvas->activateLink(row);
+	targetCanvas->activateLink(row);
+	sourceCanvas->applyStrafedPixels();
+	targetCanvas->applyStrafedPixels();
+	render();
+	Refresh();
+}
+
+void ImageFrame::deactivateLink()
+{
+	sourceCanvas->deactivateLink();
+	targetCanvas->deactivateLink();
+	render();
+	Refresh();
+}
+

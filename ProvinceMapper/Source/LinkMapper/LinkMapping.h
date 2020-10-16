@@ -13,7 +13,10 @@ class LinkMapping: commonItems::parser
 		 const Definitions& sourceDefs,
 		 const Definitions& targetDefs,
 		 const std::string& sourceToken,
-		 const std::string& targetToken);
+		 const std::string& targetToken,
+		 int theID);
+
+	bool operator==(const LinkMapping& rhs) const;
 
 	void toggleSource(const std::shared_ptr<Province>& theSource);
 	void toggleTarget(const std::shared_ptr<Province>& theTarget);
@@ -28,6 +31,7 @@ class LinkMapping: commonItems::parser
   private:
 	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
 
+	int ID;
 	std::vector<std::shared_ptr<Province>> sources;
 	std::vector<std::shared_ptr<Province>> targets;
 	std::string comment;

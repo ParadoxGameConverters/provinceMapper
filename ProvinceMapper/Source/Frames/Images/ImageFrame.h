@@ -16,6 +16,8 @@ class ImageFrame: public wxFrame
 	ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theActiveVersion, wxImage* sourceImg, wxImage* targetImg);
 
 	void render();
+	void activateLink(int row);
+	void deactivateLink();
 
   private:
 	void onScrollPaint(wxPaintEvent& event);

@@ -23,7 +23,8 @@ void LinkMappingVersion::registerKeys(const Definitions& sourceDefs,
 	 const std::string& targetToken)
 {
 	registerKeyword("link", [this, sourceDefs, targetDefs, sourceToken, targetToken](const std::string& unused, std::istream& theStream) {
-		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken);
+		++linkCounter;
+		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
@@ -36,4 +37,15 @@ std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMap
 		output << *link;
 	output << "}\n";
 	return output;
+}
+
+void LinkMappingVersion::deactivateLink()
+{
+	activeLink.reset();
+}
+
+void LinkMappingVersion::activateLink(int row)
+{
+	if (row < static_cast<int>(links->size()))
+		activeLink = links->at(row);
 }

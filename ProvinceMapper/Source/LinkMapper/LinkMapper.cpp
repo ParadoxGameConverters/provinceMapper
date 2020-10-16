@@ -38,3 +38,16 @@ void LinkMapper::exportMappings(const std::string& linksFile) const
 	}
 	linkFile.close();
 }
+
+void LinkMapper::deactivateLink()
+{
+	if (activeVersion)
+		activeVersion->deactivateLink();
+}
+
+void LinkMapper::activateLink(int row)
+{
+	if (activeVersion)
+		activeVersion->activateLink(row);
+}
+

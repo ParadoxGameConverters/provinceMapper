@@ -8,7 +8,9 @@ LinkMapping::LinkMapping(std::istream& theStream,
 	 const Definitions& sourceDefs,
 	 const Definitions& targetDefs,
 	 const std::string& sourceToken,
-	 const std::string& targetToken)
+	 const std::string& targetToken,
+	 const int theID):
+	 ID(theID)
 {
 	registerKeys(sourceDefs, targetDefs, sourceToken, targetToken);
 	parseStream(theStream);
@@ -111,4 +113,9 @@ void LinkMapping::toggleTarget(const std::shared_ptr<Province>& theTarget)
 		targets.emplace_back(theTarget);
 	else
 		targets = replacement;
+}
+
+bool LinkMapping::operator==(const LinkMapping& rhs) const
+{
+	return ID == rhs.ID;
 }

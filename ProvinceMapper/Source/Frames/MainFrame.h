@@ -37,6 +37,8 @@ class MainFrame: public wxFrame
 	void onStartButton(wxCommandEvent& evt);
 	void applySanityToButton();
 	void onSaveLinks(wxCommandEvent& evt);
+	void onDeactivateLink(wxCommandEvent& evt);
+	void onActivateLink(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static int coordsToOffset(int x, int y, int width);

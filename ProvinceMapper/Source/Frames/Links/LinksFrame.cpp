@@ -13,7 +13,7 @@ LinksFrame::LinksFrame(wxWindow* parent,
 	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &LinksFrame::onClose, this);
 
-	auto* vbox = new wxBoxSizer(wxVERTICAL);
+	auto* sizer = new wxBoxSizer(wxVERTICAL);
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900));
 
 	auto counter = 0;
@@ -29,8 +29,8 @@ LinksFrame::LinksFrame(wxWindow* parent,
 		newTab->redrawGrid();
 		++counter;
 	}
-	vbox->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
-	this->SetSizer(vbox);
+	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
+	this->SetSizer(sizer);
 	this->Centre();
 
 	

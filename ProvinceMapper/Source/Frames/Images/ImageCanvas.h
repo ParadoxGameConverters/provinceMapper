@@ -13,6 +13,7 @@ enum class ImageTabSelector
 };
 
 class LinkMappingVersion;
+class LinkMapping;
 class ImageCanvas: public wxScrolledCanvas
 {
   public:
@@ -25,7 +26,13 @@ class ImageCanvas: public wxScrolledCanvas
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void generateShadedPixels();
 	void applyShadedPixels();
+	void applyStrafedPixels();
 	void restoreImageData();
+	void setBlack() { black = true; }
+	void clearBlack() { black = false; }
+
+	void activateLink(int row);
+	void deactivateLink();
 	
   private:
 	wxImage* image;
@@ -34,6 +41,10 @@ class ImageCanvas: public wxScrolledCanvas
 	int height = 0;
 	int width = 0;
 	std::vector<Pixel> shadedPixels;
+	std::vector<Pixel> strafedPixels;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	ImageTabSelector selector;
+	bool black;
+
+	std::shared_ptr<LinkMapping> activeLink;
 };
