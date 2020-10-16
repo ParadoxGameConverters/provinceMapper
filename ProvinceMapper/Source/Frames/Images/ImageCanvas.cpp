@@ -4,7 +4,6 @@
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Definitions/Definitions.h"
 #include "Provinces/Province.h"
-#include <wx/tipwin.h>
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -135,8 +134,7 @@ void ImageCanvas::onMouseOver(wxMouseEvent& event)
 			tooltipCache = std::pair(chroma, name);
 		}
 
-		auto* toolTip = new wxTipWindow(this, name);
-		toolTip->Show();		
+		this->SetToolTip(name);
 	}
 	event.Skip();
 }

@@ -6,6 +6,8 @@
 
 #include "Provinces/Province.h"
 
+class wxTipWindow;
+
 enum class ImageTabSelector
 {
 	SOURCE,
