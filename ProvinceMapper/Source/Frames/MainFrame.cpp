@@ -9,6 +9,7 @@
 #include <fstream>
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
+#include "Provinces/Province.h"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
 {
@@ -162,12 +163,15 @@ void MainFrame::initLinksFrame()
 
 void MainFrame::initImageFrame()
 {
-	sourceDefs.loadDefinitions(*configuration.getSourceDir() + "/definition.csv");
-	Log(LogLevel::Info) << "Loaded " << sourceDefs.getProvinces().size() << " source provinces.";
-	targetDefs.loadDefinitions(*configuration.getTargetDir() + "/definition.csv");
-	Log(LogLevel::Info) << "Loaded " << targetDefs.getProvinces().size() << " target provinces.";
+	sourceDefs = std::make_shared<Definitions>();
+	targetDefs = std::make_shared<Definitions>();
+	
+	sourceDefs->loadDefinitions(*configuration.getSourceDir() + "/definition.csv");
+	Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
+	targetDefs->loadDefinitions(*configuration.getTargetDir() + "/definition.csv");
+	Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 
-	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration.getSourceToken(), *configuration.getTargetToken());
+	linkMapper.loadMappings(linksFileString, *sourceDefs, *targetDefs, *configuration.getSourceToken(), *configuration.getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
 	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
@@ -188,7 +192,7 @@ void MainFrame::initImageFrame()
 	readPixels(ImageTabSelector::TARGET, *targetImg);
 	Log(LogLevel::Info) << "Registered " << targetImg->GetSize().GetX() << "x" << targetImg->GetSize().GetY() << " target pixels.";
 
-	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg);
+	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs);
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
@@ -218,7 +222,7 @@ void MainFrame::onSupportUs(wxCommandEvent& event)
 	wxLaunchDefaultBrowser("https://www.patreon.com/ParadoxGameConverters");
 }
 
-void MainFrame::readPixels(ImageTabSelector selector, const wxImage& img)
+void MainFrame::readPixels(const ImageTabSelector selector, const wxImage& img)
 {
 	unsigned char* rgb = img.GetData();
 	for (auto y = 0; y < img.GetSize().GetY(); y++)
@@ -232,13 +236,13 @@ void MainFrame::readPixels(ImageTabSelector selector, const wxImage& img)
 			const auto offs = coordsToOffset(x, y, img.GetSize().GetX());
 
 			if (selector == ImageTabSelector::SOURCE && border == true)
-				sourceDefs.registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
+				sourceDefs->registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 			else if (selector == ImageTabSelector::SOURCE && border == false)
-				sourceDefs.registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
+				sourceDefs->registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 			else if (selector == ImageTabSelector::TARGET && border == true)
-				targetDefs.registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
+				targetDefs->registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 			else if (selector == ImageTabSelector::TARGET && border == false)
-				targetDefs.registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
+				targetDefs->registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 		}
 }
 
@@ -257,11 +261,6 @@ bool MainFrame::isSameColorAtCoords(const int ax, const int ay, const int bx, co
 		return true;
 	else
 		return false;
-}
-
-int MainFrame::coordsToOffset(int x, int y, int width)
-{
-	return (y * width + x) * 3;
 }
 
 void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)

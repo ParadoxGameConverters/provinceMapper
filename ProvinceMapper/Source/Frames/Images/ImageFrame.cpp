@@ -5,7 +5,12 @@
 
 #include "ImageCanvas.h"
 
-ImageFrame::ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theActiveVersion, wxImage* sourceImg, wxImage* targetImg):
+ImageFrame::ImageFrame(wxWindow* parent,
+	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
+	 wxImage* sourceImg,
+	 wxImage* targetImg,
+	 const std::shared_ptr<Definitions>& sourceDefs,
+	 const std::shared_ptr<Definitions>& targetDefs):
 	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
@@ -14,8 +19,8 @@ ImageFrame::ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersio
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
 
-	sourceCanvas = new ImageCanvas(splitter, ImageTabSelector::SOURCE, theActiveVersion, sourceImg);
-	targetCanvas = new ImageCanvas(splitter, ImageTabSelector::TARGET, theActiveVersion, targetImg);
+	sourceCanvas = new ImageCanvas(splitter, ImageTabSelector::SOURCE, theActiveVersion, sourceImg, sourceDefs);
+	targetCanvas = new ImageCanvas(splitter, ImageTabSelector::TARGET, theActiveVersion, targetImg, targetDefs);
 
 	sourceCanvas->SetScrollRate(50, 50);
 	sourceCanvas->SetVirtualSize(sourceCanvas->getWidth(), sourceCanvas->getHeight());
@@ -80,6 +85,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 		sourceCanvas->restoreImageData();
 		targetCanvas->clearShadedPixels();
 		targetCanvas->restoreImageData();
+		sourceCanvas->applyStrafedPixels();
+		targetCanvas->applyStrafedPixels();
 	}
 	else
 	{
@@ -90,6 +97,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 		sourceCanvas->applyShadedPixels();
 		targetCanvas->generateShadedPixels();
 		targetCanvas->applyShadedPixels();
+		sourceCanvas->applyStrafedPixels();
+		targetCanvas->applyStrafedPixels();
 	}
 	render();
 	Refresh();

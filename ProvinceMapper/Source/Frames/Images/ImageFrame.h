@@ -9,11 +9,16 @@ class LinkMappingVersion;
 class wxSplitterWindow;
 class ImageCanvas;
 enum class ImageTabSelector;
-
+class Definitions;
 class ImageFrame: public wxFrame
 {
   public:
-	ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theActiveVersion, wxImage* sourceImg, wxImage* targetImg);
+	ImageFrame(wxWindow* parent,
+		 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
+		 wxImage* sourceImg,
+		 wxImage* targetImg,
+		 const std::shared_ptr<Definitions>& sourceDefs,
+		 const std::shared_ptr<Definitions>& targetDefs);
 
 	void render();
 	void activateLink(int row);

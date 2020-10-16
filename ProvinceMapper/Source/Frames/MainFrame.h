@@ -41,7 +41,6 @@ class MainFrame: public wxFrame
 	void onActivateLink(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
-	static int coordsToOffset(int x, int y, int width);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
 
 	LinksFrame* linksFrame = nullptr;
@@ -65,8 +64,8 @@ class MainFrame: public wxFrame
 
 	wxButton* startButton = nullptr;
 	
-	Definitions sourceDefs;
-	Definitions targetDefs;
+	std::shared_ptr<Definitions> sourceDefs;
+	std::shared_ptr<Definitions> targetDefs;
 	LinkMapper linkMapper;
 	Configuration configuration;
 

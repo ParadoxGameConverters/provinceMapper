@@ -1,12 +1,21 @@
 #include "ImageCanvas.h"
+
+#include "Log.h"
 #include "LinkMapper/LinkMappingVersion.h"
+#include "Definitions/Definitions.h"
+#include "Provinces/Province.h"
+#include <wx/tipwin.h>
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
-	 wxImage* theImage):
-	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL)
+	 wxImage* theImage,
+	 std::shared_ptr<Definitions> theDefinitions):
+	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL),
+	 definitions(std::move(theDefinitions))
 {
+	Bind(wxEVT_MOTION, &ImageCanvas::onMouseOver, this);
+
 	image = theImage;
 	width = image->GetSize().GetX();
 	height = image->GetSize().GetY();
@@ -99,4 +108,35 @@ void ImageCanvas::deactivateLink()
 		}
 	}	
 	strafedPixels.clear();
+}
+
+void ImageCanvas::onMouseOver(wxMouseEvent& event)
+{
+	const auto x = CalcUnscrolledPosition(event.GetPosition()).x;
+	const auto y = CalcUnscrolledPosition(event.GetPosition()).y;
+	const auto offs = coordsToOffset(x, y, width);
+	// We may be out of scope if mouse leaves canvas.
+	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
+	{
+		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
+
+		// cache?
+		std::string name;
+		if (tooltipCache.first == chroma)
+			name = tooltipCache.second;
+		else
+		{
+			// poke the definitions for a chroma name.
+			const auto& provinceName = definitions->getNameForChroma(chroma);
+			if (provinceName)
+				name = *provinceName;
+			else
+				name = "UNDEFINED";
+			tooltipCache = std::pair(chroma, name);
+		}
+
+		auto* toolTip = new wxTipWindow(this, name);
+		toolTip->Show();		
+	}
+	event.Skip();
 }

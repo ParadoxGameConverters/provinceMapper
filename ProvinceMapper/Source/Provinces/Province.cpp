@@ -33,3 +33,8 @@ unsigned int pixelPack(unsigned char r, unsigned char g, unsigned char b)
 {
 	return r << 16 | g << 8 | b;
 }
+
+int coordsToOffset(int x, int y, int width)
+{
+	return (y * width + x) * 3;
+}

@@ -33,5 +33,6 @@ struct Province
 };
 
 unsigned int pixelPack(unsigned char r, unsigned char g, unsigned char b);
+int coordsToOffset(int x, int y, int width);
 
 #endif // PROVINCE_H

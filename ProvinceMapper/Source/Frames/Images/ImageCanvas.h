@@ -14,14 +14,21 @@ enum class ImageTabSelector
 
 class LinkMappingVersion;
 class LinkMapping;
+class Definitions;
 class ImageCanvas: public wxScrolledCanvas
 {
   public:
-	ImageCanvas(wxWindow* parent, ImageTabSelector theSelector, const std::shared_ptr<LinkMappingVersion>& theActiveVersion, wxImage* theImage);
+	ImageCanvas(wxWindow* parent,
+		 ImageTabSelector theSelector,
+		 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
+		 wxImage* theImage,
+		 std::shared_ptr<Definitions> theDefinitions);
 
 	[[nodiscard]] auto getHeight() const { return height; }
 	[[nodiscard]] auto getWidth() const { return width; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
+
+	void onMouseOver(wxMouseEvent& event);
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void generateShadedPixels();
@@ -44,7 +51,9 @@ class ImageCanvas: public wxScrolledCanvas
 	std::vector<Pixel> strafedPixels;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	ImageTabSelector selector;
-	bool black;
-
+	bool black = false;
+	std::shared_ptr<Definitions> definitions;
 	std::shared_ptr<LinkMapping> activeLink;
+
+	std::pair<unsigned int, std::string> tooltipCache;
 };
