@@ -1,6 +1,5 @@
 #ifndef LINK_MAPPING_VERSION_H
 #define LINK_MAPPING_VERSION_H
-
 #include "LinkMapping.h"
 #include "Parser.h"
 
@@ -29,7 +28,7 @@ class LinkMappingVersion: commonItems::parser
 	int linkCounter = 0;
 
 	std::shared_ptr<LinkMapping> activeLink;
-	
+
 	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
 };

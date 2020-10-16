@@ -1,5 +1,4 @@
 #include "LinksFrame.h"
-
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"

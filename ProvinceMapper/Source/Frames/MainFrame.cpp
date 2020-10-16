@@ -5,11 +5,11 @@
 #include "Links/LinksFrame.h"
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
+#include "Provinces/Pixel.h"
 #include "wx/splitter.h"
 #include <fstream>
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
-#include "Provinces/Province.h"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
 {
@@ -143,7 +143,7 @@ void MainFrame::populateFrame()
 		path16 = commonItems::convertUTF8ToUTF16(path);
 		const auto rawFile = trimPath(path);
 		const auto rawPath = path.substr(0, rawFile.size());
-		initialPath = commonItems::convertUTF8ToUTF16(rawPath);		
+		initialPath = commonItems::convertUTF8ToUTF16(rawPath);
 	}
 	linkFilePicker->SetPath(path16);
 	linkFilePicker->SetInitialDirectory(initialPath);
@@ -166,7 +166,7 @@ void MainFrame::initImageFrame()
 {
 	sourceDefs = std::make_shared<Definitions>();
 	targetDefs = std::make_shared<Definitions>();
-	
+
 	sourceDefs->loadDefinitions(*configuration.getSourceDir() + "/definition.csv");
 	Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
 	targetDefs->loadDefinitions(*configuration.getTargetDir() + "/definition.csv");

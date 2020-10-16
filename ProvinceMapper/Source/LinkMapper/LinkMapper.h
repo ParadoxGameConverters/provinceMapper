@@ -1,6 +1,5 @@
 #ifndef LINK_MAPPER_H
 #define LINK_MAPPER_H
-
 #include "LinkMappingVersion.h"
 #include "Parser.h"
 

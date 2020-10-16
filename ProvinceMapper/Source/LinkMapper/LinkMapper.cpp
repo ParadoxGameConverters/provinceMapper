@@ -1,9 +1,8 @@
 #include "LinkMapper.h"
-#include "ParserHelpers.h"
-#include <fstream>
-
 #include "Definitions/Definitions.h"
 #include "Log.h"
+#include "ParserHelpers.h"
+#include <fstream>
 
 void LinkMapper::loadMappings(const std::string& linksFileString,
 	 const Definitions& sourceDefs,

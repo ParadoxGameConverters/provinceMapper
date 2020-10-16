@@ -3,12 +3,11 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-
+#include "Configuration/Configuration.h"
 #include "Definitions/Definitions.h"
 #include "LinkMapper/LinkMapper.h"
-#include "Configuration/Configuration.h"
-#include <wx/splitter.h>
 #include <array>
+#include <wx/splitter.h>
 
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
@@ -24,9 +23,8 @@ class MainFrame: public wxFrame
 	void initFrame();
 
   private:
-
 	void populateFrame();
-	
+
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
@@ -46,7 +44,7 @@ class MainFrame: public wxFrame
 
 	LinksFrame* linksFrame = nullptr;
 	wxFlexGridSizer* sizer = nullptr;
-	
+
 	ImageFrame* imageFrame = nullptr;
 	wxImage* sourceImg = nullptr;
 	wxImage* targetImg = nullptr;
@@ -64,7 +62,7 @@ class MainFrame: public wxFrame
 	wxWindow* targetTokenStatus = nullptr;
 
 	wxButton* startButton = nullptr;
-	
+
 	std::shared_ptr<Definitions> sourceDefs;
 	std::shared_ptr<Definitions> targetDefs;
 	LinkMapper linkMapper;

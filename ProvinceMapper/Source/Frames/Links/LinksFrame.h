@@ -3,10 +3,9 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "LinksTab.h"
 #include <map>
 #include <wx/notebook.h>
-
-#include "LinksTab.h"
 
 class LinkMappingVersion;
 class LinksFrame: public wxFrame
@@ -16,7 +15,7 @@ class LinksFrame: public wxFrame
 
 	void deactivateLink();
 	void activateLinkByID(int ID);
-	
+
   private:
 	wxNotebook* notebook = nullptr;
 

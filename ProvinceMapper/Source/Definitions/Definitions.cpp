@@ -1,7 +1,7 @@
 #include "Definitions.h"
-#include "../Provinces/Province.h"
-#include "Log.h"
 #include "OSCompatibilityLayer.h"
+#include "Provinces/Pixel.h"
+#include "Provinces/Province.h"
 #include <fstream>
 
 void Definitions::loadDefinitions(std::istream& theStream)
@@ -107,7 +107,7 @@ std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 std::shared_ptr<Province> Definitions::getProvinceForChroma(const int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-			return chromaCacheItr->second;
+		return chromaCacheItr->second;
 	else
 		return nullptr;
 }

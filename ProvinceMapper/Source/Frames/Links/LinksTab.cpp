@@ -1,8 +1,7 @@
 #include "LinksTab.h"
-
+#include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
-#include "LinkMapper/LinkMappingVersion.h"
 
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
@@ -11,7 +10,7 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), ID(theID), version(std::move(theVersion)), eventListener(parent)
 {
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::onCellSelect, this);
-	
+
 	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->HideCellEditControl();
@@ -142,9 +141,12 @@ void LinksTab::activateLinkByID(const int theID)
 		{
 			activeRow = rowCounter;
 			activeLink = link;
-			// and make the row visible;
 			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
-			theGrid->MakeCellVisible(rowCounter - 1, 0);
+			const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
+			const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
+			const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
+			const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
+			theGrid->Scroll(offset);														  // and shoo.
 			break;
 		}
 		++rowCounter;

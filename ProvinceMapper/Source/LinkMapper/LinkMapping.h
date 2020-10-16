@@ -1,6 +1,5 @@
 #ifndef LINK_MAPPING_H
 #define LINK_MAPPING_H
-
 #include "Parser.h"
 
 class Province;

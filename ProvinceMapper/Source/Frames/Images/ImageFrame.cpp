@@ -1,9 +1,8 @@
 #include "ImageFrame.h"
+#include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
-
-#include "ImageCanvas.h"
 
 ImageFrame::ImageFrame(wxWindow* parent,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
@@ -11,7 +10,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 wxImage* targetImg,
 	 const std::shared_ptr<Definitions>& sourceDefs,
 	 const std::shared_ptr<Definitions>& targetDefs):
-	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
+	 eventHandler(parent)
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
@@ -137,4 +137,3 @@ void ImageFrame::deactivateLink()
 	render();
 	Refresh();
 }
-

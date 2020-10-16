@@ -1,6 +1,6 @@
 #include "LinkMappingVersion.h"
-#include "ParserHelpers.h"
 #include "Definitions/Definitions.h"
+#include "ParserHelpers.h"
 #include <fstream>
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
