@@ -8,7 +8,7 @@
 #include <wx/notebook.h>
 
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_ACTIVATE_LINK, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 
 class LinkMappingVersion;
 class LinkMapping;
@@ -17,6 +17,9 @@ class LinksTab: public wxNotebookPage
   public:
 	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, int theID);
 	void redrawGrid();
+
+	void deactivateLink();
+	void activateLinkByID(int theID);
 
   private:
 	wxGrid* theGrid = nullptr;

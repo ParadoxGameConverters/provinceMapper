@@ -21,7 +21,8 @@ class ImageFrame: public wxFrame
 		 const std::shared_ptr<Definitions>& targetDefs);
 
 	void render();
-	void activateLink(int row);
+	void activateLinkByIndex(int row);
+	void activateLinkByID(int ID);
 	void deactivateLink();
 
   private:

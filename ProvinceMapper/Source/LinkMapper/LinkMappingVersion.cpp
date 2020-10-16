@@ -44,8 +44,18 @@ void LinkMappingVersion::deactivateLink()
 	activeLink.reset();
 }
 
-void LinkMappingVersion::activateLink(int row)
+void LinkMappingVersion::activateLinkByIndex(const int row)
 {
 	if (row < static_cast<int>(links->size()))
 		activeLink = links->at(row);
+}
+
+void LinkMappingVersion::activateLinkByID(const int ID)
+{
+	for (const auto& link: *links)
+		if (link->getID() == ID)
+		{
+			activeLink = link;
+			break;
+		}
 }

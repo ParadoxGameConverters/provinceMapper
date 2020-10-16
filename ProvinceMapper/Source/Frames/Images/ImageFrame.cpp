@@ -110,10 +110,20 @@ void ImageFrame::onClose(wxCloseEvent& event)
 	eventHandler->QueueEvent(event.Clone());
 }
 
-void ImageFrame::activateLink(int row)
+void ImageFrame::activateLinkByIndex(const int row)
 {
-	sourceCanvas->activateLink(row);
-	targetCanvas->activateLink(row);
+	sourceCanvas->activateLinkByIndex(row);
+	targetCanvas->activateLinkByIndex(row);
+	sourceCanvas->applyStrafedPixels();
+	targetCanvas->applyStrafedPixels();
+	render();
+	Refresh();
+}
+
+void ImageFrame::activateLinkByID(const int ID)
+{
+	sourceCanvas->activateLinkByID(ID);
+	targetCanvas->activateLinkByID(ID);
 	sourceCanvas->applyStrafedPixels();
 	targetCanvas->applyStrafedPixels();
 	render();

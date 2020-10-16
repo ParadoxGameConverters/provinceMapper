@@ -5,7 +5,7 @@
 #include "LinkMapper/LinkMappingVersion.h"
 
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_ACTIVATE_LINK, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, int theID):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), ID(theID), version(std::move(theVersion)), eventListener(parent)
@@ -113,11 +113,41 @@ void LinksTab::onCellSelect(wxGridEvent& event)
 		activeLink = version->getLinks()->at(row);
 		activeRow = row;
 		theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
-		theGrid->MakeCellVisible(*activeRow, 0);
 		Refresh();
 
-		auto* evt = new wxCommandEvent(wxEVT_ACTIVATE_LINK);
+		auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
 		evt->SetInt(row);
 		eventListener->QueueEvent(evt->Clone());
 	}
+}
+
+void LinksTab::deactivateLink()
+{
+	if (activeRow)
+		theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(240, 240, 240));
+	activeLink.reset();
+	activeRow.reset();
+	Refresh();
+}
+
+void LinksTab::activateLinkByID(const int theID)
+{
+	// We need to find not only which link this is, but it's row as well so we can scroll the grid.
+	// Thankfully, we're anal about their order.
+
+	auto rowCounter = 0;
+	for (const auto& link: *version->getLinks())
+	{
+		if (link->getID() == theID)
+		{
+			activeRow = rowCounter;
+			activeLink = link;
+			// and make the row visible;
+			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
+			theGrid->MakeCellVisible(rowCounter - 1, 0);
+			break;
+		}
+		++rowCounter;
+	}
+	Refresh();
 }

@@ -6,6 +6,10 @@
 
 #include "Provinces/Province.h"
 
+wxDECLARE_EVENT(wxEVT_SELECT_PROVINCE, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_DESELECT_PROVINCE, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+
 class wxTipWindow;
 
 enum class ImageTabSelector
@@ -31,7 +35,8 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 
 	void onMouseOver(wxMouseEvent& event);
-
+	void leftUp(wxMouseEvent& event);
+	
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void generateShadedPixels();
 	void applyShadedPixels();
@@ -40,22 +45,35 @@ class ImageCanvas: public wxScrolledCanvas
 	void setBlack() { black = true; }
 	void clearBlack() { black = false; }
 
-	void activateLink(int row);
+	void activateLinkByIndex(int row);
+	void activateLinkByID(int ID);
 	void deactivateLink();
 	
   private:
+	void deselectProvince(std::shared_ptr<Province> province);
+	void selectProvince(std::shared_ptr<Province> province);
+	void selectLink(int linkID);
+
+	void strafeProvinces();
+	
+	bool black = false;
+	ImageTabSelector selector;
+
 	wxImage* image;
 	unsigned char* imageData;
 	size_t imageDataSize = 0;
 	int height = 0;
 	int width = 0;
-	std::vector<Pixel> shadedPixels;
+	
+	std::vector<Pixel> shadedPixels;	
 	std::vector<Pixel> strafedPixels;
+	
 	std::shared_ptr<LinkMappingVersion> activeVersion;
-	ImageTabSelector selector;
-	bool black = false;
 	std::shared_ptr<Definitions> definitions;
 	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;
+
+  protected:
+	wxEvtHandler* eventListener = nullptr;
 };

@@ -22,16 +22,17 @@ class LinkMapping: commonItems::parser
 	void toggleTarget(const std::shared_ptr<Province>& theTarget);
 	void setComment(const std::string& theComment) { comment = theComment; }
 
-	[[nodiscard]] const auto& getComment() const { return comment; }
+	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getSources() const { return sources; }
 	[[nodiscard]] const auto& getTargets() const { return targets; }
+	[[nodiscard]] const auto& getComment() const { return comment; }
 
 	friend std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 
   private:
 	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
 
-	int ID;
+	int ID = 0;
 	std::vector<std::shared_ptr<Province>> sources;
 	std::vector<std::shared_ptr<Province>> targets;
 	std::string comment;

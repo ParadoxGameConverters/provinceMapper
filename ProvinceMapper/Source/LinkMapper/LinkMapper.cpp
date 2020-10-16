@@ -45,9 +45,14 @@ void LinkMapper::deactivateLink()
 		activeVersion->deactivateLink();
 }
 
-void LinkMapper::activateLink(int row)
+void LinkMapper::activateLinkByIndex(const int row)
 {
 	if (activeVersion)
-		activeVersion->activateLink(row);
+		activeVersion->activateLinkByIndex(row);
 }
 
+void LinkMapper::activateLinkByID(const int ID)
+{
+	if (activeVersion)
+		activeVersion->activateLinkByID(ID);
+}

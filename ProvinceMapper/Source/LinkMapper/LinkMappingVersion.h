@@ -19,7 +19,8 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] const auto& getName() const { return versionName; }
 
 	void deactivateLink();
-	void activateLink(int row);
+	void activateLinkByIndex(int row);
+	void activateLinkByID(int ID);
 
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 

@@ -38,7 +38,8 @@ class MainFrame: public wxFrame
 	void applySanityToButton();
 	void onSaveLinks(wxCommandEvent& evt);
 	void onDeactivateLink(wxCommandEvent& evt);
-	void onActivateLink(wxCommandEvent& evt);
+	void onActivateLinkByIndex(wxCommandEvent& evt);
+	void onActivateLinkByID(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);

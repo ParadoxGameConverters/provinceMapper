@@ -104,3 +104,10 @@ std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 		return std::nullopt;
 }
 
+std::shared_ptr<Province> Definitions::getProvinceForChroma(const int chroma)
+{
+	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
+			return chromaCacheItr->second;
+	else
+		return nullptr;
+}
