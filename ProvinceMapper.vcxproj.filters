@@ -37,6 +37,9 @@
     <Filter Include="ProvinceMapper\Frames\Links">
       <UniqueIdentifier>{38ec3c3f-d7b2-4699-8433-0963855f1b54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProvinceMapper\Configuration">
+      <UniqueIdentifier>{e8eae01b-144c-4e84-b34b-9126896c4592}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commonItems\ParserHelpers.cpp">
@@ -96,6 +99,9 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksTab.cpp">
       <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp">
+      <Filter>ProvinceMapper\Configuration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -152,6 +158,9 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksTab.h">
       <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h">
+      <Filter>ProvinceMapper\Configuration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico">
@@ -192,6 +201,9 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
       <Filter>Resources\testdata\test-from</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\configuration.txt">
+      <Filter>Resources\testdata</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

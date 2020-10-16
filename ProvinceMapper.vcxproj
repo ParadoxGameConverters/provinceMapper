@@ -19,6 +19,7 @@
     <ClCompile Include="commonItems\ParserHelpers.cpp" />
     <ClCompile Include="commonItems\StringUtils.cpp" />
     <ClCompile Include="commonItems\WinUtils.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp" />
@@ -39,6 +40,7 @@
     <ClInclude Include="commonItems\Parser.h" />
     <ClInclude Include="commonItems\ParserHelpers.h" />
     <ClInclude Include="commonItems\StringUtils.h" />
+    <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h" />
@@ -103,6 +105,9 @@
       <FileType>Document</FileType>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
     </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\configuration.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

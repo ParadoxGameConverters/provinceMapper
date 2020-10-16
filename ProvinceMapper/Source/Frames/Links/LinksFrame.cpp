@@ -7,10 +7,11 @@
 LinksFrame::LinksFrame(wxWindow* parent,
 	 std::vector<std::shared_ptr<LinkMappingVersion>> theVersions,
 	 std::shared_ptr<LinkMappingVersion> theActiveVersion):
-	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE), versions(std::move(theVersions)), eventListener(parent),
+	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE), versions(std::move(theVersions)), eventHandler(parent),
 	 activeVersion(std::move(theActiveVersion))
 {
 	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
+	Bind(wxEVT_CLOSE_WINDOW, &LinksFrame::onClose, this);
 
 	auto* vbox = new wxBoxSizer(wxVERTICAL);
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900));
@@ -41,4 +42,10 @@ void LinksFrame::onResize(wxSizeEvent& event)
 	notebook->SetVirtualSize(event.GetSize());
 	notebook->Layout();
 	event.Skip();
+}
+
+void LinksFrame::onClose(wxCloseEvent& event)
+{
+	// We need to kill the app.
+	eventHandler->QueueEvent(event.Clone());
 }

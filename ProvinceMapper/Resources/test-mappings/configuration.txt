@@ -1,0 +1,5 @@
+sourceDir = "test-from"
+targetDir = "test-to"
+sourceToken = ck3
+targetToken = eu4
+linkFile = "test_mappings.txt"

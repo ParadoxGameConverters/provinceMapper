@@ -8,13 +8,17 @@ class Definitions;
 class LinkMapper: commonItems::parser
 {
   public:
-	void loadMappings(const std::string& fileName, const Definitions& sourceDefs, const Definitions& targetDefs);
-	void exportMappings() const;
+	void loadMappings(const std::string& linksFileString,
+		 const Definitions& sourceDefs,
+		 const Definitions& targetDefs,
+		 const std::string& sourceToken,
+		 const std::string& targetToken);
+	void exportMappings(const std::string& linksFile) const;
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }
 
   private:
-	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs);
+	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
 	std::vector<std::shared_ptr<LinkMappingVersion>> versions;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 };
