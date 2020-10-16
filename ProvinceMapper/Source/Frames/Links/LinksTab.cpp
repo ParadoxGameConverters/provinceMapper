@@ -84,7 +84,7 @@ void LinksTab::redrawGrid()
 	theGrid->EndBatch();
 	theGrid->AutoSize();
 	if (activeRow)
-		theGrid->MakeCellVisible(*activeRow, 0);
+		focusOnActiveRow();
 	GetParent()->Layout();
 }
 
@@ -141,15 +141,20 @@ void LinksTab::activateLinkByID(const int theID)
 		{
 			activeRow = rowCounter;
 			activeLink = link;
-			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
-			const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
-			const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-			const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
-			const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-			theGrid->Scroll(offset);														  // and shoo.
+			focusOnActiveRow();
 			break;
 		}
 		++rowCounter;
 	}
 	Refresh();
+}
+
+void LinksTab::focusOnActiveRow()
+{
+	theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
+	const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
+	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
+	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
+	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
+	theGrid->Scroll(offset);														  // and shoo.
 }

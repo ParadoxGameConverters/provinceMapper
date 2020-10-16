@@ -28,6 +28,7 @@ class LinksTab: public wxNotebookPage
 	std::shared_ptr<LinkMapping> activeLink;
 
 	void onCellSelect(wxGridEvent& event);
+	void focusOnActiveRow();
 
 	std::shared_ptr<LinkMappingVersion> version;
 

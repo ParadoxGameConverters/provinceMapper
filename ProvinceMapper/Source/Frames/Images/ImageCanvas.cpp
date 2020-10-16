@@ -50,7 +50,7 @@ void ImageCanvas::applyShadedPixels()
 {
 	for (const auto& pixel: shadedPixels)
 	{
-		const auto offset = (pixel.x + width * pixel.y) * 3;
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
 		imageData[offset] = 0;
 		imageData[offset + 1] = 0;
 		imageData[offset + 2] = 0;
@@ -105,7 +105,7 @@ void ImageCanvas::applyStrafedPixels()
 {
 	for (const auto& pixel: strafedPixels)
 	{
-		const auto offset = (pixel.x + width * pixel.y) * 3;
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
 		imageData[offset] = 255;
 		imageData[offset + 1] = 255;
 		imageData[offset + 2] = 255;
@@ -118,7 +118,7 @@ void ImageCanvas::deactivateLink()
 	// restore color
 	for (const auto& pixel: strafedPixels)
 	{
-		const auto offset = (pixel.x + width * pixel.y) * 3;
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
 		if (black)
 		{
 			imageData[offset] = 0;
