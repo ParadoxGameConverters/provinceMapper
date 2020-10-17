@@ -217,5 +217,8 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\configuration.txt">
       <Filter>Resources\testdata</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="README.md">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
