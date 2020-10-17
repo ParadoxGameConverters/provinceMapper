@@ -111,3 +111,11 @@ std::shared_ptr<Province> Definitions::getProvinceForChroma(const int chroma)
 	else
 		return nullptr;
 }
+
+std::shared_ptr<Province> Definitions::getProvinceForID(const int ID)
+{
+	if (const auto& provinceItr = provinces.find(ID); provinceItr != provinces.end())
+		return provinceItr->second;
+	else
+		return nullptr;
+}

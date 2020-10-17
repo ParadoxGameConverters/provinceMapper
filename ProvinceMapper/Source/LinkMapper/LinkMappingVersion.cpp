@@ -1,12 +1,13 @@
 #include "LinkMappingVersion.h"
 #include "Definitions/Definitions.h"
 #include "ParserHelpers.h"
+#include "Provinces/Province.h"
 #include <fstream>
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 std::string theVersionName,
-	 const Definitions& sourceDefs,
-	 const Definitions& targetDefs,
+	 const std::shared_ptr<Definitions>& sourceDefs,
+	 const std::shared_ptr<Definitions>& targetDefs,
 	 const std::string& sourceToken,
 	 const std::string& targetToken):
 	 versionName(std::move(theVersionName)),
@@ -17,8 +18,8 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	clearRegisteredKeywords();
 }
 
-void LinkMappingVersion::registerKeys(const Definitions& sourceDefs,
-	 const Definitions& targetDefs,
+void LinkMappingVersion::registerKeys(const std::shared_ptr<Definitions>& sourceDefs,
+	 const std::shared_ptr<Definitions>& targetDefs,
 	 const std::string& sourceToken,
 	 const std::string& targetToken)
 {
@@ -58,4 +59,15 @@ void LinkMappingVersion::activateLinkByID(const int ID)
 			activeLink = link;
 			break;
 		}
+}
+
+void LinkMappingVersion::toggleProvinceByID(const int provinceID, const bool isSource) const
+{
+	if (activeLink)
+	{
+		if (isSource)
+			activeLink->toggleSource(provinceID);
+		else
+			activeLink->toggleTarget(provinceID);
+	}
 }

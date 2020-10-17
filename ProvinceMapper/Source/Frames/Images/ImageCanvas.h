@@ -5,8 +5,7 @@
 #endif
 #include "Provinces/Pixel.h"
 
-wxDECLARE_EVENT(wxEVT_SELECT_PROVINCE, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_DESELECT_PROVINCE, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 
 class wxTipWindow;
@@ -32,28 +31,34 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getHeight() const { return height; }
 	[[nodiscard]] auto getWidth() const { return width; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
-
-	void onMouseOver(wxMouseEvent& event);
-	void leftUp(wxMouseEvent& event);
+	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void generateShadedPixels();
 	void applyShadedPixels();
 	void applyStrafedPixels();
-	void restoreImageData();
+	void restoreImageData() const;
 	void setBlack() { black = true; }
 	void clearBlack() { black = false; }
 
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
+	void toggleProvinceByID(int ID);
 
   private:
-	void deselectProvince(std::shared_ptr<Province> province);
-	void selectProvince(std::shared_ptr<Province> province);
-	void selectLink(int linkID);
+	void onMouseOver(wxMouseEvent& event);
+	void leftUp(wxMouseEvent& event);
+	void rightUp(wxMouseEvent& event);
 
+	void stageToggleProvinceByID(int provinceID) const;
 	void strafeProvinces();
+	void strafeProvince(const std::shared_ptr<Province>& province);
+	void dismarkProvince(const std::shared_ptr<Province>& province) const;
+	void markProvince(const std::shared_ptr<Province>& province);
+	void selectLink(int linkID) const;
+	
+	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
 	bool black = false;
 	ImageTabSelector selector;

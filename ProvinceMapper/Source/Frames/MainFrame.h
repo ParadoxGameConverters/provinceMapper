@@ -24,20 +24,22 @@ class MainFrame: public wxFrame
 
   private:
 	void populateFrame();
+	void applySanityToButton();
+	void initImageFrame();
+	void initLinksFrame();
 
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
-	void initImageFrame();
-	void initLinksFrame();
 	void onPathChanged(wxFileDirPickerEvent& evt);
 	void onTokenChanged(wxCommandEvent& evt);
 	void onStartButton(wxCommandEvent& evt);
-	void applySanityToButton();
 	void onSaveLinks(wxCommandEvent& evt);
 	void onDeactivateLink(wxCommandEvent& evt);
 	void onActivateLinkByIndex(wxCommandEvent& evt);
 	void onActivateLinkByID(wxCommandEvent& evt);
+	void onToggleProvince(wxCommandEvent& evt);
+	void onCenterMap(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);

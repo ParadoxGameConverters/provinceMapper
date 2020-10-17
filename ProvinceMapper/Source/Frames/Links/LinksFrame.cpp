@@ -50,14 +50,20 @@ void LinksFrame::onClose(wxCloseEvent& event)
 	eventHandler->QueueEvent(event.Clone());
 }
 
-void LinksFrame::deactivateLink()
+void LinksFrame::deactivateLink() const
 {
 	if (activePage.second)
 		activePage.second->deactivateLink();
 }
 
-void LinksFrame::activateLinkByID(const int ID)
+void LinksFrame::activateLinkByID(const int ID) const
 {
 	if (activePage.second)
 		activePage.second->activateLinkByID(ID);
+}
+
+void LinksFrame::refreshActiveLink() const
+{
+	if (activePage.second)
+		activePage.second->refreshActiveLink();
 }

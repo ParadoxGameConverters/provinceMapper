@@ -2,11 +2,12 @@
 #include "Definitions/Definitions.h"
 #include "Log.h"
 #include "ParserHelpers.h"
+#include "Provinces/Province.h"
 #include <fstream>
 
 void LinkMapper::loadMappings(const std::string& linksFileString,
-	 const Definitions& sourceDefs,
-	 const Definitions& targetDefs,
+	 const std::shared_ptr<Definitions>& sourceDefs,
+	 const std::shared_ptr<Definitions>& targetDefs,
 	 const std::string& sourceToken,
 	 const std::string& targetToken)
 {
@@ -18,7 +19,10 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 		activeVersion = versions.front();
 }
 
-void LinkMapper::registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken)
+void LinkMapper::registerKeys(const std::shared_ptr<Definitions>& sourceDefs,
+	 const std::shared_ptr<Definitions>& targetDefs,
+	 const std::string& sourceToken,
+	 const std::string& targetToken)
 {
 	registerRegex(R"(\d+.\d+.\d+)", [this, sourceDefs, targetDefs, sourceToken, targetToken](const std::string& versionName, std::istream& theStream) {
 		const auto version = std::make_shared<LinkMappingVersion>(theStream, versionName, sourceDefs, targetDefs, sourceToken, targetToken);
@@ -38,20 +42,26 @@ void LinkMapper::exportMappings(const std::string& linksFile) const
 	linkFile.close();
 }
 
-void LinkMapper::deactivateLink()
+void LinkMapper::deactivateLink() const
 {
 	if (activeVersion)
 		activeVersion->deactivateLink();
 }
 
-void LinkMapper::activateLinkByIndex(const int row)
+void LinkMapper::activateLinkByIndex(const int row) const
 {
 	if (activeVersion)
 		activeVersion->activateLinkByIndex(row);
 }
 
-void LinkMapper::activateLinkByID(const int ID)
+void LinkMapper::activateLinkByID(const int ID) const
 {
 	if (activeVersion)
 		activeVersion->activateLinkByID(ID);
+}
+
+void LinkMapper::toggleProvinceByID(const int provinceID, const bool isSource) const
+{
+	if (activeVersion)
+		activeVersion->toggleProvinceByID(provinceID, isSource);
 }

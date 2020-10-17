@@ -8,19 +8,23 @@ class LinkMapper: commonItems::parser
 {
   public:
 	void loadMappings(const std::string& linksFileString,
-		 const Definitions& sourceDefs,
-		 const Definitions& targetDefs,
+		 const std::shared_ptr<Definitions>& sourceDefs,
+		 const std::shared_ptr<Definitions>& targetDefs,
 		 const std::string& sourceToken,
 		 const std::string& targetToken);
 	void exportMappings(const std::string& linksFile) const;
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }
-	void deactivateLink();
-	void activateLinkByIndex(int row);
-	void activateLinkByID(int ID);
+	void deactivateLink() const;
+	void activateLinkByIndex(int row) const;
+	void activateLinkByID(int ID) const;
+	void toggleProvinceByID(int provinceID, bool isSource) const;
 
   private:
-	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
+	void registerKeys(const std::shared_ptr<Definitions>& sourceDefs,
+		 const std::shared_ptr<Definitions>& targetDefs,
+		 const std::string& sourceToken,
+		 const std::string& targetToken);
 	std::vector<std::shared_ptr<LinkMappingVersion>> versions;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 };

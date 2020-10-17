@@ -1,9 +1,9 @@
 #ifndef PROVINCE_H
 #define PROVINCE_H
+#include "Pixel.h"
 #include <string>
 #include <vector>
 
-struct Pixel;
 struct Province
 {
 	Province(int theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);

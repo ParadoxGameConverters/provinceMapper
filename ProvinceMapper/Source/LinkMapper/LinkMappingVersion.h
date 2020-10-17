@@ -9,8 +9,8 @@ class LinkMappingVersion: commonItems::parser
   public:
 	LinkMappingVersion(std::istream& theStream,
 		 std::string theVersionName,
-		 const Definitions& sourceDefs,
-		 const Definitions& targetDefs,
+		 const std::shared_ptr<Definitions>& sourceDefs,
+		 const std::shared_ptr<Definitions>& targetDefs,
 		 const std::string& sourceToken,
 		 const std::string& targetToken);
 
@@ -20,6 +20,7 @@ class LinkMappingVersion: commonItems::parser
 	void deactivateLink();
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
+	void toggleProvinceByID(int provinceID, bool isSource) const;
 
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 
@@ -29,7 +30,10 @@ class LinkMappingVersion: commonItems::parser
 
 	std::shared_ptr<LinkMapping> activeLink;
 
-	void registerKeys(const Definitions& sourceDefs, const Definitions& targetDefs, const std::string& sourceToken, const std::string& targetToken);
+	void registerKeys(const std::shared_ptr<Definitions>& sourceDefs,
+		 const std::shared_ptr<Definitions>& targetDefs,
+		 const std::string& sourceToken,
+		 const std::string& targetToken);
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
