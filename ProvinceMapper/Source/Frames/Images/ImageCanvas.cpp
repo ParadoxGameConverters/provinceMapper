@@ -253,9 +253,13 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 
 void ImageCanvas::rightUp(wxMouseEvent& event)
 {
-	// Right up means deselect active link, nothing else.
-	auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-	eventListener->QueueEvent(evt->Clone());
+	// Right up means deselect active link, which is serious stuff.
+	// If our active link is dry, we're not deselecting it, we're deleting it.
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+		eventListener->QueueEvent(evt->Clone());		
+	}
 	event.Skip();
 }
 
@@ -319,6 +323,19 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 	strafeProvinces();
 	applyStrafedPixels();
 }
+
+void ImageCanvas::shadeProvinceByID(int ID)
+{
+	// this is called when we're marking a province outside of a working link. Often a preface to a new link being initialized.
+	// Irrelevant unless we're shading.
+	if (!black)
+		return;
+	
+	const auto& province = definitions->getProvinceForID(ID);
+	if (province)
+		markProvince(province);
+}
+
 
 wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 {

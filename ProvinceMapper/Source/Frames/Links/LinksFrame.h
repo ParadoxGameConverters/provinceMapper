@@ -16,6 +16,7 @@ class LinksFrame: public wxFrame
 	void deactivateLink() const;
 	void activateLinkByID(int ID) const;
 	void refreshActiveLink() const;
+	void createLink(int linkID) const;
 
   private:
 	wxNotebook* notebook = nullptr;

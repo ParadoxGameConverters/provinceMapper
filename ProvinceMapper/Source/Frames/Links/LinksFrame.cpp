@@ -67,3 +67,9 @@ void LinksFrame::refreshActiveLink() const
 	if (activePage.second)
 		activePage.second->refreshActiveLink();
 }
+
+void LinksFrame::createLink(const int linkID) const
+{
+	if (activePage.second)
+		activePage.second->createLink(linkID);
+}

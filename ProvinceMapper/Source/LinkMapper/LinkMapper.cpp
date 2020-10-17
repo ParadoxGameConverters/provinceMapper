@@ -60,8 +60,10 @@ void LinkMapper::activateLinkByID(const int ID) const
 		activeVersion->activateLinkByID(ID);
 }
 
-void LinkMapper::toggleProvinceByID(const int provinceID, const bool isSource) const
+std::optional<int> LinkMapper::toggleProvinceByID(const int provinceID, const bool isSource) const
 {
 	if (activeVersion)
-		activeVersion->toggleProvinceByID(provinceID, isSource);
+		return activeVersion->toggleProvinceByID(provinceID, isSource);
+	else
+		return std::nullopt;
 }

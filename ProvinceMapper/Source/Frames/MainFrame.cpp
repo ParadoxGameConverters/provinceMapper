@@ -433,11 +433,26 @@ void MainFrame::onActivateLinkByID(wxCommandEvent& evt)
 
 void MainFrame::onToggleProvince(wxCommandEvent& evt)
 {
+	// Two things can happen. We're either:
+	// 1. toggling a province within our active link
+	// 2. toggling a province without active link, thus creating one.
+	// In the second case we need to update quite a lot of things.
+	
 	const auto ID = std::abs(evt.GetInt());
 	const auto sourceImage = evt.GetInt() > 0;
-	linkMapper.toggleProvinceByID(ID, sourceImage);
-	linksFrame->refreshActiveLink();
-	imageFrame->toggleProvinceByID(ID, sourceImage);
+	
+	const auto newLinkID = linkMapper.toggleProvinceByID(ID, sourceImage);
+	if (!newLinkID)
+	{
+		linksFrame->refreshActiveLink();
+		imageFrame->toggleProvinceByID(ID, sourceImage);		
+	}
+	else
+	{
+		linksFrame->createLink(*newLinkID);
+		imageFrame->shadeProvinceByID(ID, sourceImage);
+		imageFrame->activateLinkByID(*newLinkID);
+	}
 }
 
 void MainFrame::onCenterMap(wxCommandEvent& evt)

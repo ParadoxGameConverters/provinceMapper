@@ -18,6 +18,10 @@ LinkMapping::LinkMapping(std::istream& theStream,
 	clearRegisteredKeywords();
 }
 
+LinkMapping::LinkMapping(std::shared_ptr<Definitions> theSourceDefs, std::shared_ptr<Definitions> theTargetDefs, int theID):
+	 ID(theID), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs))
+{}
+
 void LinkMapping::registerKeys(const std::string& sourceToken, const std::string& targetToken)
 {
 	registerKeyword(sourceToken, [this](const std::string& unused, std::istream& theStream) {
