@@ -1,9 +1,8 @@
 #include "LinkMapper.h"
-#include "ParserHelpers.h"
-#include <fstream>
-
 #include "Definitions/Definitions.h"
 #include "Log.h"
+#include "ParserHelpers.h"
+#include <fstream>
 
 void LinkMapper::loadMappings(const std::string& linksFileString,
 	 const Definitions& sourceDefs,
@@ -37,4 +36,22 @@ void LinkMapper::exportMappings(const std::string& linksFile) const
 		linkFile << *version;
 	}
 	linkFile.close();
+}
+
+void LinkMapper::deactivateLink()
+{
+	if (activeVersion)
+		activeVersion->deactivateLink();
+}
+
+void LinkMapper::activateLinkByIndex(const int row)
+{
+	if (activeVersion)
+		activeVersion->activateLinkByIndex(row);
+}
+
+void LinkMapper::activateLinkByID(const int ID)
+{
+	if (activeVersion)
+		activeVersion->activateLinkByID(ID);
 }

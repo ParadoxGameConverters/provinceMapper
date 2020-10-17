@@ -3,17 +3,7 @@
 #include <string>
 #include <vector>
 
-struct Pixel
-{
-	Pixel() = default;
-	explicit Pixel(int tx, int ty, unsigned char tr, unsigned char tg, unsigned char tb);
-	int x = 0;
-	int y = 0;
-	unsigned char r = 0; // these colors vary depending on the state of the province.
-	unsigned char g = 0;
-	unsigned char b = 0;
-};
-
+struct Pixel;
 struct Province
 {
 	Province(int theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);
@@ -31,7 +21,5 @@ struct Province
 	std::vector<Pixel> innerPixels; // Not border pixels, just the inner stuff!
 	std::vector<Pixel> borderPixels;
 };
-
-unsigned int pixelPack(unsigned char r, unsigned char g, unsigned char b);
 
 #endif // PROVINCE_H

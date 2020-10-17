@@ -1,12 +1,17 @@
 #include "ImageFrame.h"
+#include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
-#include "ImageCanvas.h"
-
-ImageFrame::ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersion>& theActiveVersion, wxImage* sourceImg, wxImage* targetImg):
-	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
+ImageFrame::ImageFrame(wxWindow* parent,
+	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
+	 wxImage* sourceImg,
+	 wxImage* targetImg,
+	 const std::shared_ptr<Definitions>& sourceDefs,
+	 const std::shared_ptr<Definitions>& targetDefs):
+	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
+	 eventHandler(parent)
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
@@ -14,8 +19,8 @@ ImageFrame::ImageFrame(wxWindow* parent, const std::shared_ptr<LinkMappingVersio
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
 
-	sourceCanvas = new ImageCanvas(splitter, ImageTabSelector::SOURCE, theActiveVersion, sourceImg);
-	targetCanvas = new ImageCanvas(splitter, ImageTabSelector::TARGET, theActiveVersion, targetImg);
+	sourceCanvas = new ImageCanvas(splitter, ImageTabSelector::SOURCE, theActiveVersion, sourceImg, sourceDefs);
+	targetCanvas = new ImageCanvas(splitter, ImageTabSelector::TARGET, theActiveVersion, targetImg, targetDefs);
 
 	sourceCanvas->SetScrollRate(50, 50);
 	sourceCanvas->SetVirtualSize(sourceCanvas->getWidth(), sourceCanvas->getHeight());
@@ -74,18 +79,26 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	if (black == true)
 	{
 		black = false;
+		sourceCanvas->clearBlack();
+		targetCanvas->clearBlack();
 		sourceCanvas->clearShadedPixels();
 		sourceCanvas->restoreImageData();
 		targetCanvas->clearShadedPixels();
 		targetCanvas->restoreImageData();
+		sourceCanvas->applyStrafedPixels();
+		targetCanvas->applyStrafedPixels();
 	}
 	else
 	{
 		black = true;
+		sourceCanvas->setBlack();
+		targetCanvas->setBlack();
 		sourceCanvas->generateShadedPixels();
 		sourceCanvas->applyShadedPixels();
 		targetCanvas->generateShadedPixels();
 		targetCanvas->applyShadedPixels();
+		sourceCanvas->applyStrafedPixels();
+		targetCanvas->applyStrafedPixels();
 	}
 	render();
 	Refresh();
@@ -95,4 +108,32 @@ void ImageFrame::onClose(wxCloseEvent& event)
 {
 	// We need to kill the app.
 	eventHandler->QueueEvent(event.Clone());
+}
+
+void ImageFrame::activateLinkByIndex(const int row)
+{
+	sourceCanvas->activateLinkByIndex(row);
+	targetCanvas->activateLinkByIndex(row);
+	sourceCanvas->applyStrafedPixels();
+	targetCanvas->applyStrafedPixels();
+	render();
+	Refresh();
+}
+
+void ImageFrame::activateLinkByID(const int ID)
+{
+	sourceCanvas->activateLinkByID(ID);
+	targetCanvas->activateLinkByID(ID);
+	sourceCanvas->applyStrafedPixels();
+	targetCanvas->applyStrafedPixels();
+	render();
+	Refresh();
+}
+
+void ImageFrame::deactivateLink()
+{
+	sourceCanvas->deactivateLink();
+	targetCanvas->deactivateLink();
+	render();
+	Refresh();
 }

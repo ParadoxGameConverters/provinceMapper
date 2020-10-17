@@ -3,27 +3,28 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "LinksTab.h"
 #include <map>
 #include <wx/notebook.h>
-
-#include "LinksTab.h"
 
 class LinkMappingVersion;
 class LinksFrame: public wxFrame
 {
   public:
-	LinksFrame(wxWindow* parent, std::vector<std::shared_ptr<LinkMappingVersion>> theVersions, std::shared_ptr<LinkMappingVersion> theActiveVersion);
+	LinksFrame(wxWindow* parent, const std::vector<std::shared_ptr<LinkMappingVersion>>& versions, const std::shared_ptr<LinkMappingVersion>& activeVersion);
+
+	void deactivateLink();
+	void activateLinkByID(int ID);
 
   private:
 	wxNotebook* notebook = nullptr;
 
 	void onResize(wxSizeEvent& evt);
 	void onClose(wxCloseEvent& event);
-	
-	std::vector<std::shared_ptr<LinkMappingVersion>> versions;
-	std::shared_ptr<LinkMappingVersion> activeVersion;
+
 	std::map<int, LinksTab*> pages;
 	std::pair<int, LinksTab*> activePage;
+	std::map<std::string, int> versionToPage;
 
   protected:
 	wxEvtHandler* eventHandler = nullptr;

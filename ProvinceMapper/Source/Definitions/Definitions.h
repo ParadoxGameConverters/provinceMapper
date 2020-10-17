@@ -15,6 +15,8 @@ class Definitions
 	void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);
 	void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b);
 	[[nodiscard]] const auto& getProvinces() const { return provinces; }
+	std::optional<std::string> getNameForChroma(int chroma);
+	std::shared_ptr<Province> getProvinceForChroma(int chroma);
 
   private:
 	void parseStream(std::istream& theStream);

@@ -1,7 +1,7 @@
 #include "Definitions.h"
-#include "../Provinces/Province.h"
-#include "Log.h"
 #include "OSCompatibilityLayer.h"
+#include "Provinces/Pixel.h"
+#include "Provinces/Province.h"
 #include <fstream>
 
 void Definitions::loadDefinitions(std::istream& theStream)
@@ -91,4 +91,23 @@ void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned ch
 	const auto& chromaItr = chromaCache.find(pixelPack(r, g, b));
 	if (chromaItr != chromaCache.end())
 		chromaItr->second->borderPixels.emplace_back(pixel);
+}
+
+std::optional<std::string> Definitions::getNameForChroma(const int chroma)
+{
+	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
+		if (chromaCacheItr->second->locName.empty())
+			return chromaCacheItr->second->mapDataName;
+		else
+			return chromaCacheItr->second->locName;
+	else
+		return std::nullopt;
+}
+
+std::shared_ptr<Province> Definitions::getProvinceForChroma(const int chroma)
+{
+	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
+		return chromaCacheItr->second;
+	else
+		return nullptr;
 }

@@ -102,6 +102,9 @@
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp">
       <Filter>ProvinceMapper\Configuration</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp">
+      <Filter>ProvinceMapper\Provinces</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h">
       <Filter>ProvinceMapper\Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h">
+      <Filter>ProvinceMapper\Provinces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,12 +3,11 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-
+#include "Configuration/Configuration.h"
 #include "Definitions/Definitions.h"
 #include "LinkMapper/LinkMapper.h"
-#include "Configuration/Configuration.h"
-#include <wx/splitter.h>
 #include <array>
+#include <wx/splitter.h>
 
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
@@ -24,9 +23,8 @@ class MainFrame: public wxFrame
 	void initFrame();
 
   private:
-
 	void populateFrame();
-	
+
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
 	void onSupportUs(wxCommandEvent& event);
@@ -37,14 +35,16 @@ class MainFrame: public wxFrame
 	void onStartButton(wxCommandEvent& evt);
 	void applySanityToButton();
 	void onSaveLinks(wxCommandEvent& evt);
+	void onDeactivateLink(wxCommandEvent& evt);
+	void onActivateLinkByIndex(wxCommandEvent& evt);
+	void onActivateLinkByID(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
-	static int coordsToOffset(int x, int y, int width);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
 
 	LinksFrame* linksFrame = nullptr;
 	wxFlexGridSizer* sizer = nullptr;
-	
+
 	ImageFrame* imageFrame = nullptr;
 	wxImage* sourceImg = nullptr;
 	wxImage* targetImg = nullptr;
@@ -62,9 +62,9 @@ class MainFrame: public wxFrame
 	wxWindow* targetTokenStatus = nullptr;
 
 	wxButton* startButton = nullptr;
-	
-	Definitions sourceDefs;
-	Definitions targetDefs;
+
+	std::shared_ptr<Definitions> sourceDefs;
+	std::shared_ptr<Definitions> targetDefs;
 	LinkMapper linkMapper;
 	Configuration configuration;
 

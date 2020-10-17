@@ -30,6 +30,7 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +52,7 @@
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h" />
   </ItemGroup>
   <ItemGroup>
