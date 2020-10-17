@@ -150,7 +150,7 @@ void LinksTab::leftUp(wxGridEvent& event)
 		if (row == lastClickedRow)
 		{
 			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
-			centerEvt->SetInt(row);
+			centerEvt->SetInt(activeLink->getID());
 			eventListener->QueueEvent(centerEvt->Clone());
 		}
 

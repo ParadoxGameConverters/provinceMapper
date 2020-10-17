@@ -405,7 +405,7 @@ void MainFrame::onSaveLinks(wxCommandEvent& evt)
 }
 
 void MainFrame::onDeactivateLink(wxCommandEvent& evt)
-{	
+{
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
 	imageFrame->deactivateLink();

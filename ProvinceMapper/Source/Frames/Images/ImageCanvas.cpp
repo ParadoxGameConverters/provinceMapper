@@ -100,7 +100,7 @@ void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) con
 {
 	// This fires when provinces within link are deselected, we're restoring their original color.
 	// We're not removing pixels from shadedPixels as it's faster to drop them all and regenerate them.
-	
+
 	for (const auto& pixel: province->innerPixels)
 	{
 		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
@@ -114,7 +114,7 @@ void ImageCanvas::markProvince(const std::shared_ptr<Province>& province)
 {
 	// This fires when a province is marked into a link. It should go black if black mode is on.
 	// This happens before shading is applied.
-	
+
 	// This is only relevant in black mode.
 	if (!black)
 		return;
@@ -352,9 +352,9 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 				// And there we have it.
 				toReturn.x = pixel.x;
 				toReturn.y = pixel.y;
-			}			
+			}
 		}
 	}
-	
+
 	return toReturn;
 }
