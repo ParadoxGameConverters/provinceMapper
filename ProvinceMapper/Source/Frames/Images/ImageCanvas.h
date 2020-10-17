@@ -31,9 +31,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getHeight() const { return height; }
 	[[nodiscard]] auto getWidth() const { return width; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
-
-	void onMouseOver(wxMouseEvent& event);
-	void leftUp(wxMouseEvent& event);
+	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void generateShadedPixels();
@@ -49,6 +47,10 @@ class ImageCanvas: public wxScrolledCanvas
 	void toggleProvinceByID(int ID);
 
   private:
+	void onMouseOver(wxMouseEvent& event);
+	void leftUp(wxMouseEvent& event);
+	void rightUp(wxMouseEvent& event);
+
 	void stageToggleProvinceByID(int provinceID) const;
 	void strafeProvinces();
 	void strafeProvince(const std::shared_ptr<Province>& province);

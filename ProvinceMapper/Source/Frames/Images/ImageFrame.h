@@ -24,6 +24,7 @@ class ImageFrame: public wxFrame
 	void activateLinkByID(int ID);
 	void deactivateLink();
 	void toggleProvinceByID(int ID, bool sourceImage);
+	void centerMap(int ID);
 
   private:
 	void onScrollPaint(wxPaintEvent& event);

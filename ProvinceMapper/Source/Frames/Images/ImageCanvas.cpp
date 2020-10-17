@@ -18,6 +18,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 {
 	Bind(wxEVT_MOTION, &ImageCanvas::onMouseOver, this);
 	Bind(wxEVT_LEFT_UP, &ImageCanvas::leftUp, this);
+	Bind(wxEVT_RIGHT_UP, &ImageCanvas::rightUp, this);
 
 	image = theImage;
 	width = image->GetSize().GetX();
@@ -97,6 +98,9 @@ void ImageCanvas::strafeProvince(const std::shared_ptr<Province>& province)
 
 void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) const
 {
+	// This fires when provinces within link are deselected, we're restoring their original color.
+	// We're not removing pixels from shadedPixels as it's faster to drop them all and regenerate them.
+	
 	for (const auto& pixel: province->innerPixels)
 	{
 		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
@@ -108,6 +112,9 @@ void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) con
 
 void ImageCanvas::markProvince(const std::shared_ptr<Province>& province)
 {
+	// This fires when a province is marked into a link. It should go black if black mode is on.
+	// This happens before shading is applied.
+	
 	// This is only relevant in black mode.
 	if (!black)
 		return;
@@ -218,6 +225,7 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 				{
 					// Trigger deselect procedure.
 					stageToggleProvinceByID(province->ID);
+					event.Skip();
 					return;
 				}
 		}
@@ -231,6 +239,7 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 				{
 					// trigger select link procedure.
 					selectLink(link->getID());
+					event.Skip();
 					return;
 				}
 			}
@@ -239,6 +248,15 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		// Case 3: SELECT PROVINCE since it's not linked anywhere.
 		stageToggleProvinceByID(province->ID);
 	}
+	event.Skip();
+}
+
+void ImageCanvas::rightUp(wxMouseEvent& event)
+{
+	// Right up means deselect active link, nothing else.
+	auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+	eventListener->QueueEvent(evt->Clone());
+	event.Skip();
 }
 
 const std::vector<std::shared_ptr<Province>>& ImageCanvas::getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const
@@ -300,4 +318,43 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 	strafedPixels.clear();
 	strafeProvinces();
 	applyStrafedPixels();
+}
+
+wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
+{
+	auto toReturn = wxPoint(0, 0);
+	std::shared_ptr<LinkMapping> link = nullptr;
+	// We're presumably operating on our own activeLink
+	if (activeLink && activeLink->getID() == ID)
+		link = activeLink;
+	else
+	{
+		// But maybe not.
+		for (const auto& otherLink: *activeVersion->getLinks())
+			if (otherLink->getID() == ID)
+			{
+				link = otherLink;
+				break;
+			}
+	}
+
+	// find out first province's pixels.
+	if (link)
+	{
+		const auto& relevantProvinces = getRelevantProvinces(link);
+		if (!relevantProvinces.empty()) // not all links have provinces in them.
+		{
+			const auto& province = relevantProvinces.front();
+			// provinces usually have pixels.
+			if (!province->innerPixels.empty())
+			{
+				const auto& pixel = province->innerPixels.front();
+				// And there we have it.
+				toReturn.x = pixel.x;
+				toReturn.y = pixel.y;
+			}			
+		}
+	}
+	
+	return toReturn;
 }

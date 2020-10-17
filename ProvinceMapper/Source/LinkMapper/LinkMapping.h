@@ -34,7 +34,7 @@ class LinkMapping: commonItems::parser
 	int ID = 0;
 	std::vector<std::shared_ptr<Province>> sources;
 	std::vector<std::shared_ptr<Province>> targets;
-	std::string comment;
+	std::optional<std::string> comment;
 	std::shared_ptr<Definitions> sourceDefs;
 	std::shared_ptr<Definitions> targetDefs;
 };

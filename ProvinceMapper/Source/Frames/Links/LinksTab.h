@@ -9,6 +9,7 @@
 
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 
 class LinkMappingVersion;
 class LinkMapping;
@@ -23,14 +24,19 @@ class LinksTab: public wxNotebookPage
 	void refreshActiveLink();
 
   private:
+	void rightUp(wxGridEvent& event);
+	void leftUp(wxGridEvent& event);
+	void onGridMotion(wxMouseEvent& event);
+	void onUpdateComment(wxCommandEvent& event);
+	
 	int ID = 0;
+	int lastClickedRow = 0;
 
 	wxGrid* theGrid = nullptr;
 	std::optional<int> activeRow;
 	std::shared_ptr<LinkMapping> activeLink;
 	std::shared_ptr<LinkMappingVersion> version;
 
-	void onCellSelect(wxGridEvent& event);
 	void focusOnActiveRow();
 	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);
 

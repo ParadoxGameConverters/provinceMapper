@@ -23,6 +23,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
+	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
 }
 
 void MainFrame::initFrame()
@@ -404,8 +405,9 @@ void MainFrame::onSaveLinks(wxCommandEvent& evt)
 }
 
 void MainFrame::onDeactivateLink(wxCommandEvent& evt)
-{
+{	
 	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
 	imageFrame->deactivateLink();
 }
 
@@ -436,4 +438,9 @@ void MainFrame::onToggleProvince(wxCommandEvent& evt)
 	linkMapper.toggleProvinceByID(ID, sourceImage);
 	linksFrame->refreshActiveLink();
 	imageFrame->toggleProvinceByID(ID, sourceImage);
+}
+
+void MainFrame::onCenterMap(wxCommandEvent& evt)
+{
+	imageFrame->centerMap(evt.GetInt());
 }

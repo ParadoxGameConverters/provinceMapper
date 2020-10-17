@@ -42,9 +42,9 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 {
 	output << "\tlink = { ";
 	// If this is a comment only output the comment.
-	if (!linkMapping.comment.empty())
+	if (linkMapping.comment)
 	{
-		output << "comment = \"" << linkMapping.comment << "\" }\n";
+		output << "comment = \"" << *linkMapping.comment << "\" }\n";
 		return output;
 	}
 
