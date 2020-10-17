@@ -5,8 +5,7 @@
 #include "Log.h"
 #include "Provinces/Province.h"
 
-wxDEFINE_EVENT(wxEVT_SELECT_PROVINCE, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_DESELECT_PROVINCE, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
@@ -35,12 +34,7 @@ void ImageCanvas::generateShadedPixels()
 	shadedPixels.clear();
 	for (const auto& link: *activeVersion->getLinks())
 	{
-		std::vector<std::shared_ptr<Province>> pixelSources;
-		if (selector == ImageTabSelector::SOURCE)
-			pixelSources = link->getSources();
-		else if (selector == ImageTabSelector::TARGET)
-			pixelSources = link->getTargets();
-		for (const auto& province: pixelSources)
+		for (const auto& province: getRelevantProvinces(link))
 			for (const auto& pixel: province->innerPixels)
 				shadedPixels.emplace_back(pixel);
 	}
@@ -57,7 +51,7 @@ void ImageCanvas::applyShadedPixels()
 	}
 }
 
-void ImageCanvas::restoreImageData()
+void ImageCanvas::restoreImageData() const
 {
 	memcpy(imageData, image->GetData(), imageDataSize);
 }
@@ -90,15 +84,42 @@ void ImageCanvas::activateLinkByID(const int ID)
 
 void ImageCanvas::strafeProvinces()
 {
-	std::vector<std::shared_ptr<Province>> pixelSources;
-	if (selector == ImageTabSelector::SOURCE)
-		pixelSources = activeLink->getSources();
-	else if (selector == ImageTabSelector::TARGET)
-		pixelSources = activeLink->getTargets();
-	for (const auto& province: pixelSources)
-		for (const auto& pixel: province->innerPixels)
-			if ((pixel.x + pixel.y) % 8 == 0)
-				strafedPixels.emplace_back(pixel);
+	for (const auto& province: getRelevantProvinces(activeLink))
+		strafeProvince(province);
+}
+
+void ImageCanvas::strafeProvince(const std::shared_ptr<Province>& province)
+{
+	for (const auto& pixel: province->innerPixels)
+		if ((pixel.x + pixel.y) % 8 == 0)
+			strafedPixels.emplace_back(pixel);
+}
+
+void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) const
+{
+	for (const auto& pixel: province->innerPixels)
+	{
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		imageData[offset] = province->r;
+		imageData[offset + 1] = province->g;
+		imageData[offset + 2] = province->b;
+	}
+}
+
+void ImageCanvas::markProvince(const std::shared_ptr<Province>& province)
+{
+	// This is only relevant in black mode.
+	if (!black)
+		return;
+
+	for (const auto& pixel: province->innerPixels)
+	{
+		shadedPixels.emplace_back(pixel);
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		imageData[offset] = 0;
+		imageData[offset + 1] = 0;
+		imageData[offset + 2] = 0;
+	}
 }
 
 void ImageCanvas::applyStrafedPixels()
@@ -192,16 +213,11 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		// Case 1: DESELECT PROVINCE if we have an active link with this province inside.
 		if (activeLink)
 		{
-			std::vector<std::shared_ptr<Province>> interestingProvinces;
-			if (selector == ImageTabSelector::SOURCE)
-				interestingProvinces = activeLink->getSources();
-			else
-				interestingProvinces = activeLink->getTargets();
-			for (const auto& interestingProvince: interestingProvinces)
-				if (*interestingProvince == *province)
+			for (const auto& relevantProvince: getRelevantProvinces(activeLink))
+				if (*relevantProvince == *province)
 				{
 					// Trigger deselect procedure.
-					deselectProvince(province);
+					stageToggleProvinceByID(province->ID);
 					return;
 				}
 		}
@@ -209,14 +225,9 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		// Case 2: SELECT LINK if province is linked elsewhere.
 		for (const auto& link: *activeVersion->getLinks())
 		{
-			std::vector<std::shared_ptr<Province>> interestingProvinces;
-			if (selector == ImageTabSelector::SOURCE)
-				interestingProvinces = link->getSources();
-			else
-				interestingProvinces = link->getTargets();
-			for (const auto& interestingProvince: interestingProvinces)
+			for (const auto& relevantProvince: getRelevantProvinces(link))
 			{
-				if (*interestingProvince == *province)
+				if (*relevantProvince == *province)
 				{
 					// trigger select link procedure.
 					selectLink(link->getID());
@@ -226,23 +237,67 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		}
 
 		// Case 3: SELECT PROVINCE since it's not linked anywhere.
-		selectProvince(province);
+		stageToggleProvinceByID(province->ID);
 	}
 }
 
-void ImageCanvas::selectLink(int linkID)
+const std::vector<std::shared_ptr<Province>>& ImageCanvas::getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const
+{
+	if (selector == ImageTabSelector::SOURCE)
+		return link->getSources();
+	else // if (selector == ImageTabSelector::TARGET)
+		return link->getTargets();
+}
+
+
+void ImageCanvas::selectLink(const int linkID) const
 {
 	auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_ID);
 	evt->SetInt(linkID);
 	eventListener->QueueEvent(evt->Clone());
 }
 
-void ImageCanvas::selectProvince(std::shared_ptr<Province> province)
+void ImageCanvas::stageToggleProvinceByID(const int provinceID) const
 {
-	Log(LogLevel::Debug) << "Select Province";
+	wxCommandEvent evt(wxEVT_TOGGLE_PROVINCE);
+
+	// We have a single Int as a common data field, so, be creative with least fuss.
+	// Fortunately there are no provinces with ID 0 in any of PDX games.
+	if (selector == ImageTabSelector::SOURCE)
+		evt.SetInt(provinceID);
+	else if (selector == ImageTabSelector::TARGET)
+		evt.SetInt(-provinceID);
+
+	// Notify authorities.
+	eventListener->QueueEvent(evt.Clone());
 }
 
-void ImageCanvas::deselectProvince(std::shared_ptr<Province> province)
+void ImageCanvas::toggleProvinceByID(const int ID)
 {
-	Log(LogLevel::Debug) << "Deselect Province";
+	if (!activeLink)
+		return;
+
+	// Do we have this province in our link?
+	for (const auto& province: getRelevantProvinces(activeLink))
+	{
+		if (province->ID == ID)
+		{
+			// mark the province as black if needed.
+			markProvince(province);
+			// We need to add this province to strafe.
+			strafeProvince(province);
+			applyStrafedPixels();
+			return;
+		}
+	}
+
+	// This province was removed, so its previous pixels needs to go back to full color... But where are they...
+	const auto& province = definitions->getProvinceForID(ID);
+	if (province)
+		dismarkProvince(province);
+
+	// Easiest way about strafe change is to restrafe all, instead of hunting and pecking dismarked pixels.
+	strafedPixels.clear();
+	strafeProvinces();
+	applyStrafedPixels();
 }

@@ -6,6 +6,7 @@
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
+#include "Provinces/Province.h"
 #include "wx/splitter.h"
 #include <fstream>
 #include <wx/filepicker.h>
@@ -21,6 +22,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
+	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 }
 
 void MainFrame::initFrame()
@@ -172,7 +174,7 @@ void MainFrame::initImageFrame()
 	targetDefs->loadDefinitions(*configuration.getTargetDir() + "/definition.csv");
 	Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 
-	linkMapper.loadMappings(linksFileString, *sourceDefs, *targetDefs, *configuration.getSourceToken(), *configuration.getTargetToken());
+	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration.getSourceToken(), *configuration.getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
 	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
@@ -425,4 +427,13 @@ void MainFrame::onActivateLinkByID(wxCommandEvent& evt)
 	linkMapper.activateLinkByID(evt.GetInt());
 	imageFrame->activateLinkByID(evt.GetInt());
 	linksFrame->activateLinkByID(evt.GetInt());
+}
+
+void MainFrame::onToggleProvince(wxCommandEvent& evt)
+{
+	const auto ID = std::abs(evt.GetInt());
+	const auto sourceImage = evt.GetInt() > 0;
+	linkMapper.toggleProvinceByID(ID, sourceImage);
+	linksFrame->refreshActiveLink();
+	imageFrame->toggleProvinceByID(ID, sourceImage);
 }

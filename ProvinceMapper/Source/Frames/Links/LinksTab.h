@@ -20,17 +20,19 @@ class LinksTab: public wxNotebookPage
 
 	void deactivateLink();
 	void activateLinkByID(int theID);
+	void refreshActiveLink();
 
   private:
-	wxGrid* theGrid = nullptr;
 	int ID = 0;
+
+	wxGrid* theGrid = nullptr;
 	std::optional<int> activeRow;
 	std::shared_ptr<LinkMapping> activeLink;
+	std::shared_ptr<LinkMappingVersion> version;
 
 	void onCellSelect(wxGridEvent& event);
 	void focusOnActiveRow();
-
-	std::shared_ptr<LinkMappingVersion> version;
+	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

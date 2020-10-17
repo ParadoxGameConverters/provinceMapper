@@ -13,8 +13,9 @@ class LinksFrame: public wxFrame
   public:
 	LinksFrame(wxWindow* parent, const std::vector<std::shared_ptr<LinkMappingVersion>>& versions, const std::shared_ptr<LinkMappingVersion>& activeVersion);
 
-	void deactivateLink();
-	void activateLinkByID(int ID);
+	void deactivateLink() const;
+	void activateLinkByID(int ID) const;
+	void refreshActiveLink() const;
 
   private:
 	wxNotebook* notebook = nullptr;

@@ -23,6 +23,7 @@ class ImageFrame: public wxFrame
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
+	void toggleProvinceByID(int ID, bool sourceImage);
 
   private:
 	void onScrollPaint(wxPaintEvent& event);

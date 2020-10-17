@@ -137,3 +137,13 @@ void ImageFrame::deactivateLink()
 	render();
 	Refresh();
 }
+
+void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
+{
+	if (sourceImage)
+		sourceCanvas->toggleProvinceByID(ID);
+	else
+		targetCanvas->toggleProvinceByID(ID);
+	render();
+	Refresh();
+}

@@ -52,26 +52,7 @@ void LinksTab::redrawGrid()
 				bgColor = wxColour(150, 250, 150);
 				activeRow = rowCounter;
 			}
-			for (const auto& source: link->getSources())
-			{
-				name += comma;
-				if (source->mapDataName.empty())
-					name += "(No Name)";
-				else
-					name += source->mapDataName;
-				comma = ", ";
-			}
-			name += " -> ";
-			comma.clear();
-			for (const auto& target: link->getTargets())
-			{
-				name += comma;
-				if (target->mapDataName.empty())
-					name += "(No Name)";
-				else
-					name += target->mapDataName;
-				comma = ", ";
-			}
+			name = linkToString(link);
 		}
 		theGrid->AppendRows(1, false);
 		theGrid->SetRowSize(rowCounter, 20);
@@ -86,6 +67,37 @@ void LinksTab::redrawGrid()
 	if (activeRow)
 		focusOnActiveRow();
 	GetParent()->Layout();
+}
+
+std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
+{
+	std::string name;
+	std::string comma;
+	for (const auto& source: link->getSources())
+	{
+		name += comma;
+		if (!source->locName.empty())
+			name += source->locName;
+		else if (!source->mapDataName.empty())
+			name += source->mapDataName;
+		else
+			name += "(No Name)";
+		comma = ", ";
+	}
+	name += " -> ";
+	comma.clear();
+	for (const auto& target: link->getTargets())
+	{
+		name += comma;
+		if (!target->locName.empty())
+			name += target->locName;
+		if (!target->mapDataName.empty())
+			name += target->mapDataName;
+		else
+			name += "(No Name)";
+		comma = ", ";
+	}
+	return name;
 }
 
 void LinksTab::onCellSelect(wxGridEvent& event)
@@ -157,4 +169,14 @@ void LinksTab::focusOnActiveRow()
 	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
 	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
 	theGrid->Scroll(offset);														  // and shoo.
+}
+
+void LinksTab::refreshActiveLink()
+{
+	if (activeRow && activeLink)
+	{
+		const auto& name = linkToString(activeLink);
+		theGrid->SetCellValue(*activeRow, 0, name);
+		Refresh();
+	}
 }
