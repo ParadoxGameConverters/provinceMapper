@@ -6,24 +6,21 @@
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 std::string theVersionName,
-	 const std::shared_ptr<Definitions>& sourceDefs,
-	 const std::shared_ptr<Definitions>& targetDefs,
+	 std::shared_ptr<Definitions> theSourceDefs,
+	 std::shared_ptr<Definitions> theTargetDefs,
 	 const std::string& sourceToken,
 	 const std::string& targetToken):
 	 versionName(std::move(theVersionName)),
-	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
-	registerKeys(sourceDefs, targetDefs, sourceToken, targetToken);
+	registerKeys(sourceToken, targetToken);
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-void LinkMappingVersion::registerKeys(const std::shared_ptr<Definitions>& sourceDefs,
-	 const std::shared_ptr<Definitions>& targetDefs,
-	 const std::string& sourceToken,
-	 const std::string& targetToken)
+void LinkMappingVersion::registerKeys(const std::string& sourceToken, const std::string& targetToken)
 {
-	registerKeyword("link", [this, sourceDefs, targetDefs, sourceToken, targetToken](const std::string& unused, std::istream& theStream) {
+	registerKeyword("link", [this, sourceToken, targetToken](const std::string& unused, std::istream& theStream) {
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
@@ -42,26 +39,53 @@ std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMap
 
 void LinkMappingVersion::deactivateLink()
 {
+	if (activeLink)
+	{
+		if (activeLink->getSources().empty() && activeLink->getTargets().empty())
+		{
+			auto counter = 0;
+			for (const auto& link: *links)
+			{
+				if (*link == *activeLink)
+				{
+					// we're deleting it.
+					links->erase((*links).begin() + counter);
+					if (lastActiveLinkIndex > 0)
+						--lastActiveLinkIndex;
+					break;
+				}
+				++counter;
+			}
+		}
+	}
 	activeLink.reset();
 }
 
 void LinkMappingVersion::activateLinkByIndex(const int row)
 {
 	if (row < static_cast<int>(links->size()))
+	{
 		activeLink = links->at(row);
+		lastActiveLinkIndex = row;
+	}
 }
 
 void LinkMappingVersion::activateLinkByID(const int ID)
 {
+	auto counter = 0;
 	for (const auto& link: *links)
+	{
 		if (link->getID() == ID)
 		{
 			activeLink = link;
+			lastActiveLinkIndex = counter;
 			break;
 		}
+		++counter;
+	}
 }
 
-void LinkMappingVersion::toggleProvinceByID(const int provinceID, const bool isSource) const
+std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, const bool isSource)
 {
 	if (activeLink)
 	{
@@ -69,5 +93,21 @@ void LinkMappingVersion::toggleProvinceByID(const int provinceID, const bool isS
 			activeLink->toggleSource(provinceID);
 		else
 			activeLink->toggleTarget(provinceID);
+		return std::nullopt;
+	}
+	else
+	{
+		// Create a new link and activate it.
+		const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, linkCounter);
+		if (isSource)
+			link->toggleSource(provinceID);
+		else
+			link->toggleTarget(provinceID);
+		++linkCounter;
+		const auto& positionItr = links->begin() + lastActiveLinkIndex + 1;
+		links->insert(positionItr, link);
+		activeLink = link;
+		++lastActiveLinkIndex;
+		return link->getID();
 	}
 }

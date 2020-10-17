@@ -18,7 +18,7 @@ class LinkMapper: commonItems::parser
 	void deactivateLink() const;
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
-	void toggleProvinceByID(int provinceID, bool isSource) const;
+	[[nodiscard]] std::optional<int> toggleProvinceByID(int provinceID, bool isSource) const;
 
   private:
 	void registerKeys(const std::shared_ptr<Definitions>& sourceDefs,

@@ -113,6 +113,11 @@
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\configuration.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="README.md">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{D4E43E3D-E131-466D-9AA7-704C2298EACC}</ProjectGuid>

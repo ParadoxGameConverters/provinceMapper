@@ -148,6 +148,16 @@ void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 	Refresh();
 }
 
+void ImageFrame::shadeProvinceByID(int ID, bool sourceImage)
+{
+	if (sourceImage)
+		sourceCanvas->shadeProvinceByID(ID);
+	else
+		targetCanvas->shadeProvinceByID(ID);
+	render();
+	Refresh();
+}
+
 void ImageFrame::centerMap(int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);

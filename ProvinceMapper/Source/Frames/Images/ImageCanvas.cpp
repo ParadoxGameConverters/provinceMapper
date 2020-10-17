@@ -100,7 +100,7 @@ void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) con
 {
 	// This fires when provinces within link are deselected, we're restoring their original color.
 	// We're not removing pixels from shadedPixels as it's faster to drop them all and regenerate them.
-	
+
 	for (const auto& pixel: province->innerPixels)
 	{
 		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
@@ -114,7 +114,7 @@ void ImageCanvas::markProvince(const std::shared_ptr<Province>& province)
 {
 	// This fires when a province is marked into a link. It should go black if black mode is on.
 	// This happens before shading is applied.
-	
+
 	// This is only relevant in black mode.
 	if (!black)
 		return;
@@ -253,9 +253,13 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 
 void ImageCanvas::rightUp(wxMouseEvent& event)
 {
-	// Right up means deselect active link, nothing else.
-	auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-	eventListener->QueueEvent(evt->Clone());
+	// Right up means deselect active link, which is serious stuff.
+	// If our active link is dry, we're not deselecting it, we're deleting it.
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+		eventListener->QueueEvent(evt->Clone());		
+	}
 	event.Skip();
 }
 
@@ -320,6 +324,19 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 	applyStrafedPixels();
 }
 
+void ImageCanvas::shadeProvinceByID(int ID)
+{
+	// this is called when we're marking a province outside of a working link. Often a preface to a new link being initialized.
+	// Irrelevant unless we're shading.
+	if (!black)
+		return;
+	
+	const auto& province = definitions->getProvinceForID(ID);
+	if (province)
+		markProvince(province);
+}
+
+
 wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
@@ -352,9 +369,9 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 				// And there we have it.
 				toReturn.x = pixel.x;
 				toReturn.y = pixel.y;
-			}			
+			}
 		}
 	}
-	
+
 	return toReturn;
 }

@@ -22,6 +22,7 @@ class LinksTab: public wxNotebookPage
 	void deactivateLink();
 	void activateLinkByID(int theID);
 	void refreshActiveLink();
+	void createLink(int linkID);
 
   private:
 	void rightUp(wxGridEvent& event);

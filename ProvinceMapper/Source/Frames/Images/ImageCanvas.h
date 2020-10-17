@@ -45,6 +45,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void activateLinkByID(int ID);
 	void deactivateLink();
 	void toggleProvinceByID(int ID);
+	void shadeProvinceByID(int ID);
 
   private:
 	void onMouseOver(wxMouseEvent& event);

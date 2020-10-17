@@ -150,7 +150,7 @@ void LinksTab::leftUp(wxGridEvent& event)
 		if (row == lastClickedRow)
 		{
 			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
-			centerEvt->SetInt(row);
+			centerEvt->SetInt(activeLink->getID());
 			eventListener->QueueEvent(centerEvt->Clone());
 		}
 
@@ -161,7 +161,21 @@ void LinksTab::leftUp(wxGridEvent& event)
 void LinksTab::deactivateLink()
 {
 	if (activeRow)
-		theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(240, 240, 240));
+	{
+		// Active link may have been deleted by linkmapper. Check our records.
+		if (static_cast<int>(version->getLinks()->size()) == theGrid->GetNumberRows())
+		{
+			// all is well, just deactivate.
+			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(240, 240, 240));
+		}
+		else
+		{
+			// We have a row too many. This is unacceptable.
+			theGrid->DeleteRows(*activeRow, 1, false);
+			if (lastClickedRow > 0)
+				--lastClickedRow;
+		}		
+	}
 	activeLink.reset();
 	activeRow.reset();
 	Refresh();
@@ -201,6 +215,7 @@ void LinksTab::refreshActiveLink()
 {
 	if (activeRow && activeLink)
 	{
+		// we're toggling a province within the active link
 		const auto& name = linkToString(activeLink);
 		theGrid->SetCellValue(*activeRow, 0, name);
 		Refresh();
@@ -209,7 +224,8 @@ void LinksTab::refreshActiveLink()
 
 void LinksTab::rightUp(wxGridEvent& event)
 {
-	// Right up means deselect active link, nothing else.
+	// Right up means deselect active link, which is serious stuff.
+	// If our active link is dry, we're not deselecting it, we're deleting it.
 	auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 	eventListener->QueueEvent(evt->Clone());
 	event.Skip();
@@ -233,4 +249,27 @@ void LinksTab::onUpdateComment(wxCommandEvent& event)
 		theGrid->SetCellValue(index, 0, comment);
 		Refresh();
 	}
+}
+
+void LinksTab::createLink(const int linkID)
+{
+	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
+	
+	// Where is this new row?
+	auto rowCounter = 0;
+	for (const auto& link: *version->getLinks())
+	{
+		if (link->getID() == linkID)
+		{
+			activeLink = link;
+			// let's insert it.
+			theGrid->InsertRows(rowCounter, 1, false);
+			theGrid->SetCellValue(rowCounter, 0, linkToString(link));
+			activeRow = rowCounter;
+			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
+			break;
+		}
+		++rowCounter;
+	}
+	Refresh();
 }

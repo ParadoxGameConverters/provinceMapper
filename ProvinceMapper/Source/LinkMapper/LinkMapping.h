@@ -14,6 +14,7 @@ class LinkMapping: commonItems::parser
 		 const std::string& sourceToken,
 		 const std::string& targetToken,
 		 int theID);
+	explicit LinkMapping(std::shared_ptr<Definitions> theSourceDefs, std::shared_ptr<Definitions> theTargetDefs, int theID);
 
 	bool operator==(const LinkMapping& rhs) const;
 
