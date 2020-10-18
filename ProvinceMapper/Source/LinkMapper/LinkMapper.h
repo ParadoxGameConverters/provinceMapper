@@ -17,6 +17,7 @@ class LinkMapper: commonItems::parser
 	void deactivateLink() const;
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
+	void deleteActiveLink() const;
 
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }

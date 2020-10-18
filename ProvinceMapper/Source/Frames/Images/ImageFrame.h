@@ -26,6 +26,7 @@ class ImageFrame: public wxFrame
 	void toggleProvinceByID(int ID, bool sourceImage);
 	void shadeProvinceByID(int ID, bool sourceImage);
 	void centerMap(int ID);
+	void deleteActiveLink();
 
   private:
 	void onScrollPaint(wxPaintEvent& event);

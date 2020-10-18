@@ -138,6 +138,15 @@ void ImageFrame::deactivateLink()
 	Refresh();
 }
 
+void ImageFrame::deleteActiveLink()
+{
+	sourceCanvas->deleteActiveLink();
+	targetCanvas->deleteActiveLink();
+	render();
+	Refresh();
+}
+
+
 void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 {
 	if (sourceImage)

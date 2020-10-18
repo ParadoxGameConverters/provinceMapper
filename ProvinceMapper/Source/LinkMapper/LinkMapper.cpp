@@ -82,3 +82,9 @@ std::optional<int> LinkMapper::addCommentByIndex(const std::string& comment, con
 	else
 		return std::nullopt;
 }
+
+void LinkMapper::deleteActiveLink() const
+{
+	if (activeVersion)
+		activeVersion->deleteActiveLink();
+}

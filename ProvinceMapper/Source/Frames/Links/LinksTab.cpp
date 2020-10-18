@@ -4,6 +4,7 @@
 #include "Log.h"
 #include "Provinces/Province.h"
 
+wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
@@ -15,9 +16,10 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this);
 	Bind(wxEVT_UPDATE_COMMENT, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
-	
-	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE|wxEXPAND);
+
+	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
+	theGrid->EnableEditing(false);
 	theGrid->HideCellEditControl();
 	theGrid->HideRowLabels();
 	theGrid->HideColLabels();
@@ -53,19 +55,21 @@ void LinksTab::redrawGrid()
 		}
 		else
 		{
-			if (activeLink && *link == *activeLink)
-			{
-				bgColor = wxColour(150, 250, 150);
-				activeRow = rowCounter;
-			}
 			name = linkToString(link);
+		}
+		if (activeLink && *link == *activeLink)
+		{
+			if (link->getComment())
+				bgColor = wxColour(50, 180, 50); // dark green for selected links
+			else
+				bgColor = wxColour(150, 250, 150); // bright green for selected links.
+			activeRow = rowCounter;
 		}
 		theGrid->AppendRows(1, false);
 		theGrid->SetRowSize(rowCounter, 20);
 		theGrid->SetCellValue(rowCounter, 0, name);
 		theGrid->SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
 		theGrid->SetCellBackgroundColour(rowCounter, 0, bgColor);
-		theGrid->SetReadOnly(rowCounter, 0);
 		rowCounter++;
 	}
 	theGrid->SetColMinimalWidth(0, 600);
@@ -122,45 +126,62 @@ void LinksTab::leftUp(wxGridEvent& event)
 		// Case 3: This is a comment.
 		if (version->getLinks()->at(row)->getComment())
 		{
-			// deactivate any potential working link.
-			auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-			eventListener->QueueEvent(evt->Clone());
-			if (row == lastClickedRow)
+			// and we're altering it.
+			if (activeRow && *activeRow == row)
 			{
-				// spawn a dialog to change the name.
+				// spawn a dialog to change the name.				
 				auto* dialog = new DialogComment(this, "Edit Comment", *version->getLinks()->at(row)->getComment(), row);
 				dialog->ShowModal();
+				return;
 			}
-			lastClickedRow = row;
-			return;
 		}
 
+		// Case 2: if we already clicked here, center the map.
+		if (activeRow && *activeRow == row)
+		{
+			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
+			centerEvt->SetInt(activeLink->getID());
+			eventListener->QueueEvent(centerEvt->Clone());
+			return;
+		}
+		
 		// Case 1: Selecting a new row.
-		// Deselect existing working link
+		// Restore existing working link color
 		if (activeRow)
-			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(240, 240, 240));
+			restoreRowColor(*activeRow);
 
 		// And mark the new working row.
 		activeLink = version->getLinks()->at(row);
 		activeRow = row;
-		theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
+		activateRowColor(row);
 		Refresh();
 
 		auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
 		evt->SetInt(row);
 		eventListener->QueueEvent(evt->Clone());
 
-		// Case 2: if we already clicked here, center the map.
-		if (row == lastClickedRow)
-		{
-			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
-			centerEvt->SetInt(activeLink->getID());
-			eventListener->QueueEvent(centerEvt->Clone());
-		}
-
 		lastClickedRow = row;
 	}
 }
+
+void LinksTab::restoreRowColor(int row) const
+{
+	const auto& link = version->getLinks()->at(row);
+	if (link->getComment())
+		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 150, 150));  // comment regular
+	else
+		theGrid->SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
+}
+
+void LinksTab::activateRowColor(int row) const
+{
+	const auto& link = version->getLinks()->at(row);
+	if (link->getComment())
+		theGrid->SetCellBackgroundColour(row, 0, wxColour(50, 180, 50)); // comment highlight
+	else
+		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 250, 150)); // link highlight
+}
+
 
 void LinksTab::deactivateLink()
 {
@@ -170,7 +191,7 @@ void LinksTab::deactivateLink()
 		if (static_cast<int>(version->getLinks()->size()) == theGrid->GetNumberRows())
 		{
 			// all is well, just deactivate.
-			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(240, 240, 240));
+			restoreRowColor(*activeRow);
 		}
 		else
 		{
@@ -178,7 +199,7 @@ void LinksTab::deactivateLink()
 			theGrid->DeleteRows(*activeRow, 1, false);
 			if (lastClickedRow > 0)
 				--lastClickedRow;
-		}		
+		}
 	}
 	activeLink.reset();
 	activeRow.reset();
@@ -190,6 +211,10 @@ void LinksTab::activateLinkByID(const int theID)
 	// We need to find not only which link this is, but it's row as well so we can scroll the grid.
 	// Thankfully, we're anal about their order.
 
+	// If we're already active, restore color.
+	if (activeRow)
+		restoreRowColor(*activeRow);
+	
 	auto rowCounter = 0;
 	for (const auto& link: *version->getLinks())
 	{
@@ -197,17 +222,18 @@ void LinksTab::activateLinkByID(const int theID)
 		{
 			activeRow = rowCounter;
 			activeLink = link;
+			activateRowColor(rowCounter);
 			focusOnActiveRow();
+			lastClickedRow = rowCounter;
 			break;
 		}
 		++rowCounter;
-	}
+	}	
 	theGrid->ForceRefresh();
 }
 
 void LinksTab::focusOnActiveRow()
 {
-	theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
 	const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
 	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
 	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
@@ -218,9 +244,10 @@ void LinksTab::focusOnActiveRow()
 
 void LinksTab::refreshActiveLink()
 {
+	// this is called when we're toggling a province within the active link
+	
 	if (activeRow && activeLink)
 	{
-		// we're toggling a province within the active link
 		const auto& name = linkToString(activeLink);
 		theGrid->SetCellValue(*activeRow, 0, name);
 		theGrid->AutoSize();
@@ -269,24 +296,18 @@ void LinksTab::createLink(const int linkID)
 		if (link->getID() == linkID)
 		{
 			theGrid->InsertRows(rowCounter, 1, false);
-			// is this a comment?
-			if (link->getComment())
-			{
+			if (link->getComment()) // this is a comment.
 				theGrid->SetCellValue(rowCounter, 0, *link->getComment());
-				theGrid->SetCellBackgroundColour(rowCounter, 0, wxColour(150, 150, 150));
-				if (activeRow)
-					++(*activeRow);
-			}
-			else
-			{
-				// new active link
+			else // new active link
 				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
-				theGrid->SetCellBackgroundColour(rowCounter, 0, wxColour(150, 250, 150));
-				activeLink = link;
-				activeRow = rowCounter;
-			}
+			activateRowColor(rowCounter);
+			activeLink = link;
+			// If we have an active link, restore its color.
+			if (activeRow)
+				restoreRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+			activeRow = rowCounter;
+			lastClickedRow = rowCounter;
 			// let's insert it.
-			theGrid->SetReadOnly(rowCounter, 0);
 			theGrid->SetColMinimalWidth(0, 600);
 			theGrid->AutoSize();
 			theGrid->ForceRefresh();
@@ -297,7 +318,7 @@ void LinksTab::createLink(const int linkID)
 }
 
 void LinksTab::onKeyDown(wxKeyEvent& event)
-{	
+{
 	switch (event.GetKeyCode())
 	{
 		case WXK_F4:
@@ -306,7 +327,7 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
-			// pass.
+			stageDeleteLink();
 			break;
 		default:
 			event.Skip();
@@ -317,4 +338,15 @@ void LinksTab::stageAddComment()
 {
 	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
 	dialog->ShowModal();
+}
+
+void LinksTab::stageDeleteLink() const
+{
+	// Do nothing unless working on active link. Don't want accidents here.
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+		eventListener->QueueEvent(evt->Clone());
+		return;
+	}
 }

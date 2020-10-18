@@ -207,13 +207,16 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+		// Override when we have an active link at a comment
+		if (activeLink && activeLink->getComment())
+			return;
+		
 		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
 		// Province may not even be defined/instanced, let alone linked. Tread carefully.
 		const auto province = definitions->getProvinceForChroma(chroma);
 		if (!province || !activeVersion) // Do we have an active version? If not, we're in boo-boo. Same for undefined province.
 		{
 			// Play dead.
-			event.Skip();
 			return;
 		}
 
@@ -225,7 +228,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 				{
 					// Trigger deselect procedure.
 					stageToggleProvinceByID(province->ID);
-					event.Skip();
 					return;
 				}
 		}
@@ -239,7 +241,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 				{
 					// trigger select link procedure.
 					selectLink(link->getID());
-					event.Skip();
 					return;
 				}
 			}
@@ -248,7 +249,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		// Case 3: SELECT PROVINCE since it's not linked anywhere.
 		stageToggleProvinceByID(province->ID);
 	}
-	event.Skip();
 }
 
 void ImageCanvas::rightUp(wxMouseEvent& event)
@@ -374,4 +374,15 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 	}
 
 	return toReturn;
+}
+void ImageCanvas::deleteActiveLink()
+{
+	if (activeLink)
+	{
+		// We need to restore full color to our provinces.
+		for (const auto& province: getRelevantProvinces(activeLink))
+			dismarkProvince(province);
+		strafedPixels.clear();
+		activeLink.reset();
+	}
 }

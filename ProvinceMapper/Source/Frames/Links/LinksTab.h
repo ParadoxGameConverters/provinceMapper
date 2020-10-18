@@ -7,6 +7,7 @@
 #include <wx/grid.h>
 #include <wx/notebook.h>
 
+wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
@@ -30,7 +31,12 @@ class LinksTab: public wxNotebookPage
 	void onGridMotion(wxMouseEvent& event);
 	void onUpdateComment(wxCommandEvent& event);
 	void onKeyDown(wxKeyEvent& event);
+
+	void restoreRowColor(int row) const;
+	void activateRowColor(int row) const;
 	void stageAddComment();
+	void stageDeleteLink() const;
+	
 	int ID = 0;
 	int lastClickedRow = 0;
 

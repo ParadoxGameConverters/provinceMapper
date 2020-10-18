@@ -53,22 +53,8 @@ void LinkMappingVersion::deactivateLink()
 {
 	if (activeLink)
 	{
-		if (activeLink->getSources().empty() && activeLink->getTargets().empty())
-		{
-			auto counter = 0;
-			for (const auto& link: *links)
-			{
-				if (*link == *activeLink)
-				{
-					// we're deleting it.
-					links->erase((*links).begin() + counter);
-					if (lastActiveLinkIndex > 0)
-						--lastActiveLinkIndex;
-					break;
-				}
-				++counter;
-			}
-		}
+		if (activeLink->getSources().empty() && activeLink->getTargets().empty() && !activeLink->getComment())
+			deleteActiveLink();
 	}
 	activeLink.reset();
 }
@@ -132,6 +118,26 @@ int LinkMappingVersion::addCommentByIndex(const std::string& comment, const int 
 	++linkCounter;
 	const auto& positionItr = links->begin() + index;
 	links->insert(positionItr, link);
+	activeLink = link;
 	lastActiveLinkIndex = index;
 	return link->getID();
+}
+
+void LinkMappingVersion::deleteActiveLink()
+{
+	if (activeLink)
+	{
+		auto counter = 0;
+		for (const auto& link: *links)
+		{
+			if (*link == *activeLink)
+			{
+				// we're deleting it.
+				links->erase((*links).begin() + counter);
+				break;
+			}
+			++counter;
+		}
+		activeLink.reset();		
+	}
 }
