@@ -141,3 +141,26 @@ void LinkMappingVersion::deleteActiveLink()
 		activeLink.reset();		
 	}
 }
+
+int LinkMappingVersion::addRawLink()
+{
+	// Create a new link
+	const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
+	++linkCounter;
+	const auto& positionItr = links->begin() + lastActiveLinkIndex;
+	links->insert(positionItr, link);
+	activeLink = link;
+	return link->getID();
+}
+
+int LinkMappingVersion::addRawComment()
+{
+	// Create a new link with the comment.
+	const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
+	link->setComment("");
+	++linkCounter;
+	const auto& positionItr = links->begin() + lastActiveLinkIndex;
+	links->insert(positionItr, link);
+	activeLink = link;
+	return link->getID();
+}

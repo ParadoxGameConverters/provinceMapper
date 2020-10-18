@@ -17,12 +17,14 @@ class LinkMapper: commonItems::parser
 	void deactivateLink() const;
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
-	void deleteActiveLink() const;
+	void deleteActiveLink() const;	
 
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }
 	[[nodiscard]] std::optional<int> toggleProvinceByID(int provinceID, bool isSource) const;
 	[[nodiscard]] std::optional<int> addCommentByIndex(const std::string& comment, int index) const;
+	[[nodiscard]] std::optional<int> addRawLink() const;
+	[[nodiscard]] std::optional<int> addRawComment() const;
 
   private:
 	void registerKeys();

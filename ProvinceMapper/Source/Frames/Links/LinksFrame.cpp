@@ -61,6 +61,12 @@ void LinksFrame::activateLinkByID(const int ID) const
 		activePage.second->activateLinkByID(ID);
 }
 
+void LinksFrame::activateLinkByIndex(const int index) const
+{
+	if (activePage.second)
+		activePage.second->activateLinkByIndex(index);
+}
+
 void LinksFrame::refreshActiveLink() const
 {
 	if (activePage.second)

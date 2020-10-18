@@ -22,6 +22,7 @@ class LinksTab: public wxNotebookPage
 
 	void deactivateLink();
 	void activateLinkByID(int theID);
+	void activateLinkByIndex(int index);
 	void refreshActiveLink();
 	void createLink(int linkID);
 

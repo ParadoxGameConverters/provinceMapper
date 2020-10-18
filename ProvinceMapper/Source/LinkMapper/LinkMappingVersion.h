@@ -30,6 +30,8 @@ class LinkMappingVersion: commonItems::parser
 	
 	[[nodiscard]] std::optional<int> toggleProvinceByID(int provinceID, bool isSource);
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);
+	[[nodiscard]] int addRawLink();
+	[[nodiscard]] int addRawComment();
 
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 

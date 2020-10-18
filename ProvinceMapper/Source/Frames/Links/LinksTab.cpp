@@ -232,6 +232,21 @@ void LinksTab::activateLinkByID(const int theID)
 	theGrid->ForceRefresh();
 }
 
+void LinksTab::activateLinkByIndex(const int index)
+{
+	// If we're already active, restore color.
+	if (activeRow)
+		restoreRowColor(*activeRow);
+
+	const auto& link = version->getLinks()->at(index);
+	activeRow = index;
+	activeLink = link;
+	activateRowColor(index);
+	focusOnActiveRow();
+	lastClickedRow = index;
+	theGrid->ForceRefresh();
+}
+
 void LinksTab::focusOnActiveRow()
 {
 	const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.

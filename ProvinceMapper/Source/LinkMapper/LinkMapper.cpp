@@ -88,3 +88,19 @@ void LinkMapper::deleteActiveLink() const
 	if (activeVersion)
 		activeVersion->deleteActiveLink();
 }
+
+std::optional<int> LinkMapper::addRawLink() const
+{
+	if (activeVersion)
+		return activeVersion->addRawLink();
+	else
+		return std::nullopt;
+}
+
+std::optional<int> LinkMapper::addRawComment() const
+{
+	if (activeVersion)
+		return activeVersion->addRawComment();
+	else
+		return std::nullopt;
+}
