@@ -2,6 +2,7 @@
 #include "CommonFunctions.h"
 #include "Images/ImageCanvas.h"
 #include "Images/ImageFrame.h"
+#include "Links/DialogComment.h"
 #include "Links/LinksFrame.h"
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
@@ -11,7 +12,6 @@
 #include <fstream>
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
-#include "Links/DialogComment.h"
 
 wxDEFINE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
@@ -172,11 +172,11 @@ void MainFrame::initLinksFrame()
 	linksDropDown->Append(wxMENU_ADD_LINK, "Add Link\tCtrl-L");
 	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment\tCtrl-C");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected\tCtrl-D");
-	
+
 	auto* linksMenuBar = new wxMenuBar;
 	linksMenuBar->Append(saveDropDown, "&Save");
 	linksMenuBar->Append(linksDropDown, "&Links/Comments");
-	
+
 	linksFrame->SetMenuBar(linksMenuBar);
 	linksFrame->Show();
 }
@@ -345,9 +345,9 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
 			auto bootEvent4 = wxCommandEvent(wxEVT_NULL, 4);
-			onTokenChanged(bootEvent4);			
+			onTokenChanged(bootEvent4);
 		}
-		else 
+		else
 		{
 			linkFileStatus->SetBackgroundColour(red);
 			linksFileString.clear();
@@ -442,7 +442,7 @@ void MainFrame::onDeactivateLink(wxCommandEvent& evt)
 }
 
 void MainFrame::onActivateLinkByIndex(wxCommandEvent& evt)
-{	
+{
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
 	imageFrame->deactivateLink();
@@ -468,15 +468,15 @@ void MainFrame::onToggleProvince(wxCommandEvent& evt)
 	// 1. toggling a province within our active link
 	// 2. toggling a province without active link, thus creating one.
 	// In the second case we need to update quite a lot of things.
-	
+
 	const auto ID = std::abs(evt.GetInt());
 	const auto sourceImage = evt.GetInt() > 0;
-	
+
 	const auto newLinkID = linkMapper.toggleProvinceByID(ID, sourceImage);
 	if (!newLinkID)
 	{
 		linksFrame->refreshActiveLink();
-		imageFrame->toggleProvinceByID(ID, sourceImage);		
+		imageFrame->toggleProvinceByID(ID, sourceImage);
 	}
 	else
 	{
@@ -499,7 +499,7 @@ void MainFrame::onAddComment(wxCommandEvent& evt)
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
 		imageFrame->activateLinkByID(*newLinkID);
-	}	
+	}
 }
 
 void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)

@@ -37,7 +37,7 @@ class LinksTab: public wxNotebookPage
 	void activateRowColor(int row) const;
 	void stageAddComment();
 	void stageDeleteLink() const;
-	
+
 	int ID = 0;
 	int lastClickedRow = 0;
 

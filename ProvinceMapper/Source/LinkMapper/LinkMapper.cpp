@@ -9,13 +9,13 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 	 std::shared_ptr<Definitions> theSourceDefs,
 	 std::shared_ptr<Definitions> theTargetDefs,
 	 std::string theSourceToken,
-	 std::string theTargetToken)	 
+	 std::string theTargetToken)
 {
 	sourceDefs = std::move(theSourceDefs);
 	targetDefs = std::move(theTargetDefs);
 	sourceToken = std::move(theSourceToken);
 	targetToken = std::move(theTargetToken);
-	
+
 	registerKeys();
 	std::stringstream linksStream(linksFileString);
 	parseStream(linksStream);

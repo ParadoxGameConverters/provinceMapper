@@ -146,7 +146,6 @@ void ImageFrame::deleteActiveLink()
 	Refresh();
 }
 
-
 void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 {
 	if (sourceImage)
@@ -177,11 +176,11 @@ void ImageFrame::centerMap(int ID)
 	auto units = wxPoint(pt1.x / 10, pt1.y / 10);
 	auto offset = wxPoint(units.x - scrollPageSizeX / 2, units.y - scrollPageSizeY / 2);
 	sourceCanvas->Scroll(offset);
-	
+
 	units = wxPoint(pt2.x / 10, pt2.y / 10);
 	offset = wxPoint(units.x - scrollPageSizeX / 2, units.y - scrollPageSizeY / 2);
 	targetCanvas->Scroll(offset);
-	
+
 	render();
 	Refresh();
 }

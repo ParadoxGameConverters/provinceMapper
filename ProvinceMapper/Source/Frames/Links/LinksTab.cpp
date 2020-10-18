@@ -60,7 +60,7 @@ void LinksTab::redrawGrid()
 		if (activeLink && *link == *activeLink)
 		{
 			if (link->getComment())
-				bgColor = wxColour(50, 180, 50); // dark green for selected links
+				bgColor = wxColour(50, 180, 50); // dark green for selected comments
 			else
 				bgColor = wxColour(150, 250, 150); // bright green for selected links.
 			activeRow = rowCounter;
@@ -129,7 +129,7 @@ void LinksTab::leftUp(wxGridEvent& event)
 			// and we're altering it.
 			if (activeRow && *activeRow == row)
 			{
-				// spawn a dialog to change the name.				
+				// spawn a dialog to change the name.
 				auto* dialog = new DialogComment(this, "Edit Comment", *version->getLinks()->at(row)->getComment(), row);
 				dialog->ShowModal();
 				return;
@@ -144,7 +144,7 @@ void LinksTab::leftUp(wxGridEvent& event)
 			eventListener->QueueEvent(centerEvt->Clone());
 			return;
 		}
-		
+
 		// Case 1: Selecting a new row.
 		// Restore existing working link color
 		if (activeRow)
@@ -168,7 +168,7 @@ void LinksTab::restoreRowColor(int row) const
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 150, 150));  // comment regular
+		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 150, 150)); // comment regular
 	else
 		theGrid->SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
 }
@@ -214,7 +214,7 @@ void LinksTab::activateLinkByID(const int theID)
 	// If we're already active, restore color.
 	if (activeRow)
 		restoreRowColor(*activeRow);
-	
+
 	auto rowCounter = 0;
 	for (const auto& link: *version->getLinks())
 	{
@@ -228,7 +228,7 @@ void LinksTab::activateLinkByID(const int theID)
 			break;
 		}
 		++rowCounter;
-	}	
+	}
 	theGrid->ForceRefresh();
 }
 
@@ -260,7 +260,7 @@ void LinksTab::focusOnActiveRow()
 void LinksTab::refreshActiveLink()
 {
 	// this is called when we're toggling a province within the active link
-	
+
 	if (activeRow && activeLink)
 	{
 		const auto& name = linkToString(activeLink);
@@ -303,7 +303,7 @@ void LinksTab::onUpdateComment(wxCommandEvent& event)
 void LinksTab::createLink(const int linkID)
 {
 	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
-	
+
 	// Where is this new row?
 	auto rowCounter = 0;
 	for (const auto& link: *version->getLinks())

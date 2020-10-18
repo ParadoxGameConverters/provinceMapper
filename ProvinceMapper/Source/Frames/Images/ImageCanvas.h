@@ -62,13 +62,13 @@ class ImageCanvas: public wxScrolledCanvas
 	void dismarkProvince(const std::shared_ptr<Province>& province) const;
 	void markProvince(const std::shared_ptr<Province>& province);
 	void selectLink(int linkID) const;
-	
+
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
 	bool black = false;
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
-	
+
 	wxImage* image;
 	unsigned char* imageData;
 	size_t imageDataSize = 0;

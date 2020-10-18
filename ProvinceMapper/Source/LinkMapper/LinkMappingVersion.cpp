@@ -138,7 +138,7 @@ void LinkMappingVersion::deleteActiveLink()
 			}
 			++counter;
 		}
-		activeLink.reset();		
+		activeLink.reset();
 	}
 }
 

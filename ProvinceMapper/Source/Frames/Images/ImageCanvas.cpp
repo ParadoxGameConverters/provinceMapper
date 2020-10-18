@@ -1,9 +1,9 @@
 #include "ImageCanvas.h"
 #include "Definitions/Definitions.h"
+#include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
-#include "Frames/Links/DialogComment.h"
 #include "Provinces/Province.h"
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
@@ -216,7 +216,7 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		// Override when we have an active link at a comment
 		if (activeLink && activeLink->getComment())
 			return;
-		
+
 		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
 		// Province may not even be defined/instanced, let alone linked. Tread carefully.
 		const auto province = definitions->getProvinceForChroma(chroma);
@@ -264,7 +264,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 	if (activeLink)
 	{
 		auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-		eventListener->QueueEvent(evt->Clone());		
+		eventListener->QueueEvent(evt->Clone());
 	}
 	event.Skip();
 }
@@ -336,7 +336,7 @@ void ImageCanvas::shadeProvinceByID(int ID)
 	// Irrelevant unless we're shading.
 	if (!black)
 		return;
-	
+
 	const auto& province = definitions->getProvinceForID(ID);
 	if (province)
 		markProvince(province);

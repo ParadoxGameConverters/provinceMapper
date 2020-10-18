@@ -12,12 +12,12 @@ class LinkMapper: commonItems::parser
 		 std::shared_ptr<Definitions> theTargetDefs,
 		 std::string theSourceToken,
 		 std::string theTargetToken);
-	
+
 	void exportMappings(const std::string& linksFile) const;
 	void deactivateLink() const;
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
-	void deleteActiveLink() const;	
+	void deleteActiveLink() const;
 
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }
