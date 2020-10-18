@@ -26,7 +26,8 @@ class LinkMappingVersion: commonItems::parser
 	void deactivateLink();
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
-	std::optional<int> toggleProvinceByID(int provinceID, bool isSource);
+	[[nodiscard]] std::optional<int> toggleProvinceByID(int provinceID, bool isSource);
+	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);
 
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 

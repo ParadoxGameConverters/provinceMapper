@@ -116,19 +116,22 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 		else
 			link->toggleTarget(provinceID);
 		++linkCounter;
-		if (lastActiveLinkIndex + 1 <= static_cast<int>(links->size()))
-		{
-			const auto& positionItr = links->begin() + lastActiveLinkIndex + 1;
-			links->insert(positionItr, link);
-			activeLink = link;
-			++lastActiveLinkIndex;			
-		}
-		else
-		{
-			const auto& positionItr = links->begin() + lastActiveLinkIndex;
-			links->insert(positionItr, link);
-			activeLink = link;
-		}
+		// We're positioning the new link above the last clicked one.
+		const auto& positionItr = links->begin() + lastActiveLinkIndex;
+		links->insert(positionItr, link);
+		activeLink = link;
 		return link->getID();
 	}
+}
+
+int LinkMappingVersion::addCommentByIndex(const std::string& comment, const int index)
+{
+	// Create a new link with the comment.
+	const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
+	link->setComment(comment);
+	++linkCounter;
+	const auto& positionItr = links->begin() + index;
+	links->insert(positionItr, link);
+	lastActiveLinkIndex = index;
+	return link->getID();
 }

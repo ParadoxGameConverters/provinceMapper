@@ -29,7 +29,8 @@ class LinksTab: public wxNotebookPage
 	void leftUp(wxGridEvent& event);
 	void onGridMotion(wxMouseEvent& event);
 	void onUpdateComment(wxCommandEvent& event);
-	
+	void onKeyDown(wxKeyEvent& event);
+	void stageAddComment();
 	int ID = 0;
 	int lastClickedRow = 0;
 

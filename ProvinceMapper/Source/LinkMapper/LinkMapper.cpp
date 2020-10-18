@@ -74,3 +74,11 @@ std::optional<int> LinkMapper::toggleProvinceByID(const int provinceID, const bo
 	else
 		return std::nullopt;
 }
+
+std::optional<int> LinkMapper::addCommentByIndex(const std::string& comment, const int index) const
+{
+	if (activeVersion)
+		return activeVersion->addCommentByIndex(comment, index);
+	else
+		return std::nullopt;
+}

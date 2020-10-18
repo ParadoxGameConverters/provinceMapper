@@ -14,7 +14,8 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this);
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this);
 	Bind(wxEVT_UPDATE_COMMENT, &LinksTab::onUpdateComment, this);
-
+	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
+	
 	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE|wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->HideCellEditControl();
@@ -267,13 +268,25 @@ void LinksTab::createLink(const int linkID)
 	{
 		if (link->getID() == linkID)
 		{
-			activeLink = link;
-			// let's insert it.
 			theGrid->InsertRows(rowCounter, 1, false);
-			theGrid->SetCellValue(rowCounter, 0, linkToString(link));
+			// is this a comment?
+			if (link->getComment())
+			{
+				theGrid->SetCellValue(rowCounter, 0, *link->getComment());
+				theGrid->SetCellBackgroundColour(rowCounter, 0, wxColour(150, 150, 150));
+				if (activeRow)
+					++(*activeRow);
+			}
+			else
+			{
+				// new active link
+				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
+				theGrid->SetCellBackgroundColour(rowCounter, 0, wxColour(150, 250, 150));
+				activeLink = link;
+				activeRow = rowCounter;
+			}
+			// let's insert it.
 			theGrid->SetReadOnly(rowCounter, 0);
-			activeRow = rowCounter;
-			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
 			theGrid->SetColMinimalWidth(0, 600);
 			theGrid->AutoSize();
 			theGrid->ForceRefresh();
@@ -281,4 +294,27 @@ void LinksTab::createLink(const int linkID)
 		}
 		++rowCounter;
 	}
+}
+
+void LinksTab::onKeyDown(wxKeyEvent& event)
+{	
+	switch (event.GetKeyCode())
+	{
+		case WXK_F4:
+			// spawn a dialog to name it.
+			stageAddComment();
+			break;
+		case WXK_DELETE:
+		case WXK_NUMPAD_DELETE:
+			// pass.
+			break;
+		default:
+			event.Skip();
+	}
+}
+
+void LinksTab::stageAddComment()
+{
+	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
+	dialog->ShowModal();
 }

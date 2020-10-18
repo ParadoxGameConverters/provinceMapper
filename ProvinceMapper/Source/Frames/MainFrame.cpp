@@ -11,6 +11,7 @@
 #include <fstream>
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
+#include "Links/DialogComment.h"
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
 {
@@ -24,6 +25,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
+	Bind(wxEVT_ADD_COMMENT, &MainFrame::onAddComment, this);
 }
 
 void MainFrame::initFrame()
@@ -411,7 +413,10 @@ void MainFrame::onStartButton(wxCommandEvent& evt)
 
 void MainFrame::onSaveLinks(wxCommandEvent& evt)
 {
-	linkMapper.exportMappings(*configuration.getLinkFile());
+	if (!configuration.getLinkFile()->empty())
+		linkMapper.exportMappings(*configuration.getLinkFile());
+	else
+		linkMapper.exportMappings("province_mappings.txt");
 	wxMessageBox("Links saved.", "Save");
 }
 
@@ -469,4 +474,11 @@ void MainFrame::onToggleProvince(wxCommandEvent& evt)
 void MainFrame::onCenterMap(wxCommandEvent& evt)
 {
 	imageFrame->centerMap(evt.GetInt());
+}
+
+void MainFrame::onAddComment(wxCommandEvent& evt)
+{
+	const auto newLinkID = linkMapper.addCommentByIndex(evt.GetString().ToStdString(), evt.GetInt());
+	if (newLinkID)
+		linksFrame->createLink(*newLinkID);
 }

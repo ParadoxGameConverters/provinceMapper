@@ -41,7 +41,7 @@ In the Provinces window select orientation that suits your monitor setup.
 
 #### Creating links
 
-1. To position the new link at a proper location in the Links tab, activate any existing link or comment you want the new link to go beneath.
+1. To position the new link at a proper location in the Links tab, activate any existing link or comment you want the new link to go above.
 2. Deactivate the link by right clicking.
 3. Click a province. If it's not already linked and you're not working in an active link, this creates a new link with that province inside.
 
@@ -76,7 +76,7 @@ In the Provinces window select orientation that suits your monitor setup.
 
 #### Adding a comment
 
-1. Position the comment by clicking a link or comment above the place you with it to go.
+1. Position the comment by clicking a link or comment below the place you with it to go.
 2. Press F4
 
 #### Editing a comment
