@@ -3,6 +3,7 @@
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
+#include "Frames/Links/DialogComment.h"
 #include "Provinces/Province.h"
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
@@ -19,6 +20,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	Bind(wxEVT_MOTION, &ImageCanvas::onMouseOver, this);
 	Bind(wxEVT_LEFT_UP, &ImageCanvas::leftUp, this);
 	Bind(wxEVT_RIGHT_UP, &ImageCanvas::rightUp, this);
+	Bind(wxEVT_KEY_DOWN, &ImageCanvas::onKeyDown, this);
 
 	image = theImage;
 	width = image->GetSize().GetX();
@@ -62,6 +64,7 @@ void ImageCanvas::activateLinkByIndex(const int row)
 	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
 	{
 		activeLink = activeVersion->getLinks()->at(row);
+		lastClickedRow = row;
 		// Strafe our provinces' pixels.
 		strafeProvinces();
 	}
@@ -71,15 +74,18 @@ void ImageCanvas::activateLinkByID(const int ID)
 {
 	if (!activeVersion)
 		return;
+	auto counter = 0;
 	for (const auto& link: *activeVersion->getLinks())
 	{
 		if (link->getID() == ID)
 		{
 			activeLink = link;
+			lastClickedRow = counter;
 			// Strafe our provinces' pixels.
 			strafeProvinces();
 			break;
 		}
+		++counter;
 	}
 }
 
@@ -384,5 +390,38 @@ void ImageCanvas::deleteActiveLink()
 			dismarkProvince(province);
 		strafedPixels.clear();
 		activeLink.reset();
+	}
+}
+
+void ImageCanvas::onKeyDown(wxKeyEvent& event)
+{
+	switch (event.GetKeyCode())
+	{
+		case WXK_F4:
+			// spawn a dialog to name the comment.
+			stageAddComment();
+			break;
+		case WXK_DELETE:
+		case WXK_NUMPAD_DELETE:
+			stageDeleteLink();
+			break;
+		default:
+			event.Skip();
+	}
+}
+
+void ImageCanvas::stageAddComment()
+{
+	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
+	dialog->ShowModal();
+}
+
+void ImageCanvas::stageDeleteLink() const
+{
+	// Do nothing unless working on active link. Don't want accidents here.
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+		eventListener->QueueEvent(evt->Clone());
 	}
 }

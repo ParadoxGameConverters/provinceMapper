@@ -52,7 +52,10 @@ class ImageCanvas: public wxScrolledCanvas
 	void onMouseOver(wxMouseEvent& event);
 	void leftUp(wxMouseEvent& event);
 	void rightUp(wxMouseEvent& event);
+	void onKeyDown(wxKeyEvent& event);
 
+	void stageAddComment();
+	void stageDeleteLink() const;
 	void stageToggleProvinceByID(int provinceID) const;
 	void strafeProvinces();
 	void strafeProvince(const std::shared_ptr<Province>& province);
@@ -64,7 +67,8 @@ class ImageCanvas: public wxScrolledCanvas
 
 	bool black = false;
 	ImageTabSelector selector;
-
+	int lastClickedRow = 0;
+	
 	wxImage* image;
 	unsigned char* imageData;
 	size_t imageDataSize = 0;

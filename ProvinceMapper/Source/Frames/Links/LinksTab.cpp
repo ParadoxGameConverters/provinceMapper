@@ -322,7 +322,7 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 	switch (event.GetKeyCode())
 	{
 		case WXK_F4:
-			// spawn a dialog to name it.
+			// spawn a dialog to name the comment.
 			stageAddComment();
 			break;
 		case WXK_DELETE:
@@ -347,6 +347,5 @@ void LinksTab::stageDeleteLink() const
 	{
 		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
-		return;
 	}
 }
