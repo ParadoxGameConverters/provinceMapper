@@ -320,7 +320,18 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 			auto bootEvent4 = wxCommandEvent(wxEVT_NULL, 4);
 			onTokenChanged(bootEvent4);
 		}
-		else
+		else if (result.empty())
+		{
+			// We allow for nothing.
+			linkFileStatus->SetBackgroundColour(green);
+			linksFileString.clear();
+			sanity[2] = true;
+			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
+			onTokenChanged(bootEvent3);
+			auto bootEvent4 = wxCommandEvent(wxEVT_NULL, 4);
+			onTokenChanged(bootEvent4);			
+		}
+		else 
 		{
 			linkFileStatus->SetBackgroundColour(red);
 			linksFileString.clear();
@@ -347,7 +358,7 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 	{
 		const auto input = sourceTokenField->GetValue();
 		const auto rawinput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawinput.empty() && rawinput.size() >= 2 && linksFileString.find(rawinput) != std::string::npos)
+		if (!rawinput.empty() && rawinput.size() >= 2 && (linksFileString.find(rawinput) != std::string::npos || linksFileString.empty()))
 		{
 			sourceTokenStatus->SetBackgroundColour(green);
 			sanity[3] = true;
@@ -364,7 +375,7 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 	{
 		const auto input = targetTokenField->GetValue();
 		const auto rawinput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawinput.empty() && rawinput.size() >= 2 && linksFileString.find(rawinput) != std::string::npos)
+		if (!rawinput.empty() && rawinput.size() >= 2 && (linksFileString.find(rawinput) != std::string::npos || linksFileString.empty()))
 		{
 			targetTokenStatus->SetBackgroundColour(green);
 			sanity[4] = true;

@@ -7,22 +7,28 @@
 LinkMapping::LinkMapping(std::istream& theStream,
 	 std::shared_ptr<Definitions> theSourceDefs,
 	 std::shared_ptr<Definitions> theTargetDefs,
-	 const std::string& sourceToken,
-	 const std::string& targetToken,
+	 std::string theSourceToken,
+	 std::string theTargetToken,
 	 const int theID):
 	 ID(theID),
-	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs))
+	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
 {
-	registerKeys(sourceToken, targetToken);
+	registerKeys();
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-LinkMapping::LinkMapping(std::shared_ptr<Definitions> theSourceDefs, std::shared_ptr<Definitions> theTargetDefs, int theID):
-	 ID(theID), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs))
-{}
+LinkMapping::LinkMapping(std::shared_ptr<Definitions> theSourceDefs,
+	 std::shared_ptr<Definitions> theTargetDefs,
+	 std::string theSourceToken,
+	 std::string theTargetToken,
+	 int theID):
+	 ID(theID),
+	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
+{
+}
 
-void LinkMapping::registerKeys(const std::string& sourceToken, const std::string& targetToken)
+void LinkMapping::registerKeys()
 {
 	registerKeyword(sourceToken, [this](const std::string& unused, std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
@@ -55,11 +61,11 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 	// Dump numbers
 	for (const auto& province: linkMapping.sources)
 	{
-		output << "ck3 = " << province->ID << " ";
+		output << linkMapping.sourceToken << " = " << province->ID << " ";
 	}
 	for (const auto& province: linkMapping.targets)
 	{
-		output << "eu4 = " << province->ID << " ";
+		output << linkMapping.targetToken << " = " << province->ID << " ";
 	}
 	output << "} # ";
 

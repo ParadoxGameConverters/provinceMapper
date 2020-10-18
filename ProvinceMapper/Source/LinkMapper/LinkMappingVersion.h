@@ -9,10 +9,16 @@ class LinkMappingVersion: commonItems::parser
   public:
 	LinkMappingVersion(std::istream& theStream,
 		 std::string theVersionName,
+		 std::shared_ptr<Definitions> theSourceToken,
+		 std::shared_ptr<Definitions> theTargetToken,
+		 std::string sourceToken,
+		 std::string targetToken);
+
+	LinkMappingVersion(std::string theVersionName,
 		 std::shared_ptr<Definitions> sourceDefs,
 		 std::shared_ptr<Definitions> targetDefs,
-		 const std::string& sourceToken,
-		 const std::string& targetToken);
+		 std::string theSourceToken,
+		 std::string theTargetToken);
 
 	[[nodiscard]] const auto& getLinks() const { return links; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
@@ -30,10 +36,12 @@ class LinkMappingVersion: commonItems::parser
 	int lastActiveLinkIndex = 0;
 	std::shared_ptr<Definitions> sourceDefs;
 	std::shared_ptr<Definitions> targetDefs;
+	std::string sourceToken;
+	std::string targetToken;
 
 	std::shared_ptr<LinkMapping> activeLink;
 
-	void registerKeys(const std::string& sourceToken, const std::string& targetToken);
+	void registerKeys();
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);

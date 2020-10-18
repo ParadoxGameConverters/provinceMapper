@@ -15,22 +15,23 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this);
 	Bind(wxEVT_UPDATE_COMMENT, &LinksTab::onUpdateComment, this);
 
-	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE);
+	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE|wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->HideCellEditControl();
 	theGrid->HideRowLabels();
-	theGrid->SetColLabelValue(0, version->getName());
-	theGrid->SetColLabelAlignment(wxLEFT, wxCENTER);
+	theGrid->HideColLabels();
 	theGrid->SetScrollRate(0, 20);
-	theGrid->SetColLabelSize(20);
 	theGrid->SetMinSize(wxSize(600, 900));
 	theGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
+	theGrid->AutoSize();
+	theGrid->SetColMinimalWidth(0, 600);
 	GetParent()->Layout();
 
 	auto* logBox = new wxBoxSizer(wxVERTICAL);
 	logBox->Add(theGrid, wxSizerFlags(1).Expand());
 	SetSizer(logBox);
 	logBox->Fit(this);
+	theGrid->ForceRefresh();
 }
 
 void LinksTab::redrawGrid()
@@ -66,11 +67,13 @@ void LinksTab::redrawGrid()
 		theGrid->SetReadOnly(rowCounter, 0);
 		rowCounter++;
 	}
+	theGrid->SetColMinimalWidth(0, 600);
 	theGrid->EndBatch();
 	theGrid->AutoSize();
 	if (activeRow)
 		focusOnActiveRow();
 	GetParent()->Layout();
+	theGrid->ForceRefresh();
 }
 
 std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
@@ -178,7 +181,7 @@ void LinksTab::deactivateLink()
 	}
 	activeLink.reset();
 	activeRow.reset();
-	Refresh();
+	theGrid->ForceRefresh();
 }
 
 void LinksTab::activateLinkByID(const int theID)
@@ -198,7 +201,7 @@ void LinksTab::activateLinkByID(const int theID)
 		}
 		++rowCounter;
 	}
-	Refresh();
+	theGrid->ForceRefresh();
 }
 
 void LinksTab::focusOnActiveRow()
@@ -209,6 +212,7 @@ void LinksTab::focusOnActiveRow()
 	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
 	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
 	theGrid->Scroll(offset);														  // and shoo.
+	theGrid->ForceRefresh();
 }
 
 void LinksTab::refreshActiveLink()
@@ -218,7 +222,8 @@ void LinksTab::refreshActiveLink()
 		// we're toggling a province within the active link
 		const auto& name = linkToString(activeLink);
 		theGrid->SetCellValue(*activeRow, 0, name);
-		Refresh();
+		theGrid->AutoSize();
+		theGrid->ForceRefresh();
 	}
 }
 
@@ -247,7 +252,8 @@ void LinksTab::onUpdateComment(wxCommandEvent& event)
 		link->setComment(comment);
 		// also update screen.
 		theGrid->SetCellValue(index, 0, comment);
-		Refresh();
+		theGrid->AutoSize();
+		theGrid->ForceRefresh();
 	}
 }
 
@@ -265,11 +271,14 @@ void LinksTab::createLink(const int linkID)
 			// let's insert it.
 			theGrid->InsertRows(rowCounter, 1, false);
 			theGrid->SetCellValue(rowCounter, 0, linkToString(link));
+			theGrid->SetReadOnly(rowCounter, 0);
 			activeRow = rowCounter;
 			theGrid->SetCellBackgroundColour(*activeRow, 0, wxColour(150, 250, 150));
+			theGrid->SetColMinimalWidth(0, 600);
+			theGrid->AutoSize();
+			theGrid->ForceRefresh();
 			break;
 		}
 		++rowCounter;
 	}
-	Refresh();
 }
