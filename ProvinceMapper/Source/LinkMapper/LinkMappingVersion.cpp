@@ -8,19 +8,31 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 std::string theVersionName,
 	 std::shared_ptr<Definitions> theSourceDefs,
 	 std::shared_ptr<Definitions> theTargetDefs,
-	 const std::string& sourceToken,
-	 const std::string& targetToken):
+	 std::string theSourceToken,
+	 std::string theTargetToken):
 	 versionName(std::move(theVersionName)),
-	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken)),
+	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
-	registerKeys(sourceToken, targetToken);
+	registerKeys();
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-void LinkMappingVersion::registerKeys(const std::string& sourceToken, const std::string& targetToken)
+LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
+	 std::shared_ptr<Definitions> theSourceDefs,
+	 std::shared_ptr<Definitions> theTargetDefs,
+	 std::string theSourceToken,
+	 std::string theTargetToken):
+	 versionName(std::move(theVersionName)),
+	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken)),
+	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
-	registerKeyword("link", [this, sourceToken, targetToken](const std::string& unused, std::istream& theStream) {
+}
+
+void LinkMappingVersion::registerKeys()
+{
+	registerKeyword("link", [this](const std::string& unused, std::istream& theStream) {
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
@@ -41,22 +53,8 @@ void LinkMappingVersion::deactivateLink()
 {
 	if (activeLink)
 	{
-		if (activeLink->getSources().empty() && activeLink->getTargets().empty())
-		{
-			auto counter = 0;
-			for (const auto& link: *links)
-			{
-				if (*link == *activeLink)
-				{
-					// we're deleting it.
-					links->erase((*links).begin() + counter);
-					if (lastActiveLinkIndex > 0)
-						--lastActiveLinkIndex;
-					break;
-				}
-				++counter;
-			}
-		}
+		if (activeLink->getSources().empty() && activeLink->getTargets().empty() && !activeLink->getComment())
+			deleteActiveLink();
 	}
 	activeLink.reset();
 }
@@ -98,16 +96,71 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 	else
 	{
 		// Create a new link and activate it.
-		const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, linkCounter);
+		const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		if (isSource)
 			link->toggleSource(provinceID);
 		else
 			link->toggleTarget(provinceID);
 		++linkCounter;
-		const auto& positionItr = links->begin() + lastActiveLinkIndex + 1;
+		// We're positioning the new link above the last clicked one.
+		const auto& positionItr = links->begin() + lastActiveLinkIndex;
 		links->insert(positionItr, link);
 		activeLink = link;
-		++lastActiveLinkIndex;
 		return link->getID();
 	}
+}
+
+int LinkMappingVersion::addCommentByIndex(const std::string& comment, const int index)
+{
+	// Create a new link with the comment.
+	const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
+	link->setComment(comment);
+	++linkCounter;
+	const auto& positionItr = links->begin() + index;
+	links->insert(positionItr, link);
+	activeLink = link;
+	lastActiveLinkIndex = index;
+	return link->getID();
+}
+
+void LinkMappingVersion::deleteActiveLink()
+{
+	if (activeLink)
+	{
+		auto counter = 0;
+		for (const auto& link: *links)
+		{
+			if (*link == *activeLink)
+			{
+				// we're deleting it.
+				links->erase((*links).begin() + counter);
+				break;
+			}
+			++counter;
+		}
+		activeLink.reset();
+	}
+}
+
+int LinkMappingVersion::addRawLink()
+{
+	// Create a new link
+	const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
+	++linkCounter;
+	const auto& positionItr = links->begin() + lastActiveLinkIndex;
+	links->insert(positionItr, link);
+	activeLink = link;
+	return link->getID();
+}
+
+int LinkMappingVersion::addRawComment()
+{
+	// Create a new link with the comment.
+	const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
+	link->setComment("");
+	++linkCounter;
+	const auto& positionItr = links->begin() + lastActiveLinkIndex;
+	links->insert(positionItr, link);
+	activeLink = link;
+	return link->getID();
 }

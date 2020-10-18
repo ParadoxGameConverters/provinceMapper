@@ -15,6 +15,7 @@ class LinksFrame: public wxFrame
 
 	void deactivateLink() const;
 	void activateLinkByID(int ID) const;
+	void activateLinkByIndex(int index) const;
 	void refreshActiveLink() const;
 	void createLink(int linkID) const;
 

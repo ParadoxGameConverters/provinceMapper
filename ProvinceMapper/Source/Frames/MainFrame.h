@@ -9,6 +9,9 @@
 #include <array>
 #include <wx/splitter.h>
 
+wxDECLARE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
+
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
 class wxFileDirPickerEvent;
@@ -40,6 +43,10 @@ class MainFrame: public wxFrame
 	void onActivateLinkByID(wxCommandEvent& evt);
 	void onToggleProvince(wxCommandEvent& evt);
 	void onCenterMap(wxCommandEvent& evt);
+	void onAddComment(wxCommandEvent& evt);
+	void onDeleteActiveLink(wxCommandEvent& evt);
+	void onLinksAddLink(wxCommandEvent& evt);
+	void onLinksAddComment(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);

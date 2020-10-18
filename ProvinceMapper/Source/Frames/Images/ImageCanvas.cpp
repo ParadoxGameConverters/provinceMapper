@@ -1,5 +1,6 @@
 #include "ImageCanvas.h"
 #include "Definitions/Definitions.h"
+#include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
@@ -19,6 +20,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	Bind(wxEVT_MOTION, &ImageCanvas::onMouseOver, this);
 	Bind(wxEVT_LEFT_UP, &ImageCanvas::leftUp, this);
 	Bind(wxEVT_RIGHT_UP, &ImageCanvas::rightUp, this);
+	Bind(wxEVT_KEY_DOWN, &ImageCanvas::onKeyDown, this);
 
 	image = theImage;
 	width = image->GetSize().GetX();
@@ -62,6 +64,7 @@ void ImageCanvas::activateLinkByIndex(const int row)
 	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
 	{
 		activeLink = activeVersion->getLinks()->at(row);
+		lastClickedRow = row;
 		// Strafe our provinces' pixels.
 		strafeProvinces();
 	}
@@ -71,15 +74,18 @@ void ImageCanvas::activateLinkByID(const int ID)
 {
 	if (!activeVersion)
 		return;
+	auto counter = 0;
 	for (const auto& link: *activeVersion->getLinks())
 	{
 		if (link->getID() == ID)
 		{
 			activeLink = link;
+			lastClickedRow = counter;
 			// Strafe our provinces' pixels.
 			strafeProvinces();
 			break;
 		}
+		++counter;
 	}
 }
 
@@ -207,13 +213,16 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+		// Override when we have an active link at a comment
+		if (activeLink && activeLink->getComment())
+			return;
+
 		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
 		// Province may not even be defined/instanced, let alone linked. Tread carefully.
 		const auto province = definitions->getProvinceForChroma(chroma);
 		if (!province || !activeVersion) // Do we have an active version? If not, we're in boo-boo. Same for undefined province.
 		{
 			// Play dead.
-			event.Skip();
 			return;
 		}
 
@@ -225,7 +234,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 				{
 					// Trigger deselect procedure.
 					stageToggleProvinceByID(province->ID);
-					event.Skip();
 					return;
 				}
 		}
@@ -239,7 +247,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 				{
 					// trigger select link procedure.
 					selectLink(link->getID());
-					event.Skip();
 					return;
 				}
 			}
@@ -248,7 +255,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		// Case 3: SELECT PROVINCE since it's not linked anywhere.
 		stageToggleProvinceByID(province->ID);
 	}
-	event.Skip();
 }
 
 void ImageCanvas::rightUp(wxMouseEvent& event)
@@ -258,7 +264,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 	if (activeLink)
 	{
 		auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-		eventListener->QueueEvent(evt->Clone());		
+		eventListener->QueueEvent(evt->Clone());
 	}
 	event.Skip();
 }
@@ -330,7 +336,7 @@ void ImageCanvas::shadeProvinceByID(int ID)
 	// Irrelevant unless we're shading.
 	if (!black)
 		return;
-	
+
 	const auto& province = definitions->getProvinceForID(ID);
 	if (province)
 		markProvince(province);
@@ -374,4 +380,48 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 	}
 
 	return toReturn;
+}
+void ImageCanvas::deleteActiveLink()
+{
+	if (activeLink)
+	{
+		// We need to restore full color to our provinces.
+		for (const auto& province: getRelevantProvinces(activeLink))
+			dismarkProvince(province);
+		strafedPixels.clear();
+		activeLink.reset();
+	}
+}
+
+void ImageCanvas::onKeyDown(wxKeyEvent& event)
+{
+	switch (event.GetKeyCode())
+	{
+		case WXK_F4:
+			// spawn a dialog to name the comment.
+			stageAddComment();
+			break;
+		case WXK_DELETE:
+		case WXK_NUMPAD_DELETE:
+			stageDeleteLink();
+			break;
+		default:
+			event.Skip();
+	}
+}
+
+void ImageCanvas::stageAddComment()
+{
+	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
+	dialog->ShowModal();
+}
+
+void ImageCanvas::stageDeleteLink() const
+{
+	// Do nothing unless working on active link. Don't want accidents here.
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+		eventListener->QueueEvent(evt->Clone());
+	}
 }

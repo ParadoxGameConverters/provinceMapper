@@ -11,10 +11,14 @@ class LinkMapping: commonItems::parser
 	explicit LinkMapping(std::istream& theStream,
 		 std::shared_ptr<Definitions> theSourceDefs,
 		 std::shared_ptr<Definitions> theTargetDefs,
-		 const std::string& sourceToken,
-		 const std::string& targetToken,
+		 std::string theSourceToken,
+		 std::string theTargetToken,
 		 int theID);
-	explicit LinkMapping(std::shared_ptr<Definitions> theSourceDefs, std::shared_ptr<Definitions> theTargetDefs, int theID);
+	explicit LinkMapping(std::shared_ptr<Definitions> theSourceDefs,
+		 std::shared_ptr<Definitions> theTargetDefs,
+		 std::string theSourceToken,
+		 std::string theTargetToken,
+		 int theID);
 
 	bool operator==(const LinkMapping& rhs) const;
 
@@ -30,7 +34,7 @@ class LinkMapping: commonItems::parser
 	friend std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 
   private:
-	void registerKeys(const std::string& sourceToken, const std::string& targetToken);
+	void registerKeys();
 
 	int ID = 0;
 	std::vector<std::shared_ptr<Province>> sources;
@@ -38,6 +42,8 @@ class LinkMapping: commonItems::parser
 	std::optional<std::string> comment;
 	std::shared_ptr<Definitions> sourceDefs;
 	std::shared_ptr<Definitions> targetDefs;
+	std::string sourceToken;
+	std::string targetToken;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 #endif // LINK_MAPPING_H

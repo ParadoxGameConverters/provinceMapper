@@ -20,7 +20,6 @@ LinksFrame::LinksFrame(wxWindow* parent,
 	for (const auto& version: versions)
 	{
 		auto* newTab = new LinksTab(notebook, version, counter);
-		newTab->SetBackgroundColour(wxColour(255, 245, 245));
 		notebook->AddPage(newTab, version->getName());
 		versionToPage.insert(std::pair(version->getName(), counter));
 		pages.insert(std::pair(counter, newTab));
@@ -60,6 +59,12 @@ void LinksFrame::activateLinkByID(const int ID) const
 {
 	if (activePage.second)
 		activePage.second->activateLinkByID(ID);
+}
+
+void LinksFrame::activateLinkByIndex(const int index) const
+{
+	if (activePage.second)
+		activePage.second->activateLinkByIndex(index);
 }
 
 void LinksFrame::refreshActiveLink() const

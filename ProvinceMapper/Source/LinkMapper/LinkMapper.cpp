@@ -6,25 +6,32 @@
 #include <fstream>
 
 void LinkMapper::loadMappings(const std::string& linksFileString,
-	 const std::shared_ptr<Definitions>& sourceDefs,
-	 const std::shared_ptr<Definitions>& targetDefs,
-	 const std::string& sourceToken,
-	 const std::string& targetToken)
+	 std::shared_ptr<Definitions> theSourceDefs,
+	 std::shared_ptr<Definitions> theTargetDefs,
+	 std::string theSourceToken,
+	 std::string theTargetToken)
 {
-	registerKeys(sourceDefs, targetDefs, sourceToken, targetToken);
+	sourceDefs = std::move(theSourceDefs);
+	targetDefs = std::move(theTargetDefs);
+	sourceToken = std::move(theSourceToken);
+	targetToken = std::move(theTargetToken);
+
+	registerKeys();
 	std::stringstream linksStream(linksFileString);
 	parseStream(linksStream);
 	clearRegisteredKeywords();
-	if (!versions.empty())
-		activeVersion = versions.front();
+	if (versions.empty())
+	{
+		auto newVersion = std::make_shared<LinkMappingVersion>("0.0.0", sourceDefs, targetDefs, sourceToken, targetToken);
+		versions.emplace_back(newVersion);
+		Log(LogLevel::Info) << "Generated version " << newVersion->getName() << ", " << newVersion->getLinks()->size() << " links.";
+	}
+	activeVersion = versions.front();
 }
 
-void LinkMapper::registerKeys(const std::shared_ptr<Definitions>& sourceDefs,
-	 const std::shared_ptr<Definitions>& targetDefs,
-	 const std::string& sourceToken,
-	 const std::string& targetToken)
+void LinkMapper::registerKeys()
 {
-	registerRegex(R"(\d+.\d+.\d+)", [this, sourceDefs, targetDefs, sourceToken, targetToken](const std::string& versionName, std::istream& theStream) {
+	registerRegex(R"(\d+.\d+.\d+)", [this](const std::string& versionName, std::istream& theStream) {
 		const auto version = std::make_shared<LinkMappingVersion>(theStream, versionName, sourceDefs, targetDefs, sourceToken, targetToken);
 		versions.emplace_back(version);
 		Log(LogLevel::Info) << "Version " << version->getName() << ", " << version->getLinks()->size() << " links.";
@@ -64,6 +71,36 @@ std::optional<int> LinkMapper::toggleProvinceByID(const int provinceID, const bo
 {
 	if (activeVersion)
 		return activeVersion->toggleProvinceByID(provinceID, isSource);
+	else
+		return std::nullopt;
+}
+
+std::optional<int> LinkMapper::addCommentByIndex(const std::string& comment, const int index) const
+{
+	if (activeVersion)
+		return activeVersion->addCommentByIndex(comment, index);
+	else
+		return std::nullopt;
+}
+
+void LinkMapper::deleteActiveLink() const
+{
+	if (activeVersion)
+		activeVersion->deleteActiveLink();
+}
+
+std::optional<int> LinkMapper::addRawLink() const
+{
+	if (activeVersion)
+		return activeVersion->addRawLink();
+	else
+		return std::nullopt;
+}
+
+std::optional<int> LinkMapper::addRawComment() const
+{
+	if (activeVersion)
+		return activeVersion->addRawComment();
 	else
 		return std::nullopt;
 }
