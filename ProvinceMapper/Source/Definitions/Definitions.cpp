@@ -22,7 +22,7 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 	while (!theStream.eof())
 	{
 		getline(theStream, line);
-		if (line[0] == '#' || line[1] == '#' || line.length() < 4)
+		if (!isdigit(line[0]) || line.length() < 4)
 			continue;
 
 		try

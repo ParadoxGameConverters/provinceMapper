@@ -184,7 +184,9 @@ void MainFrame::initLinksFrame()
 void MainFrame::initImageFrame()
 {
 	localizationMapper.scrapeSourceDir(*configuration.getSourceDir());
+	Log(LogLevel::Info) << "Source Localizations Loaded.";
 	localizationMapper.scrapeTargetDir(*configuration.getTargetDir());
+	Log(LogLevel::Info) << "Target Localizations Loaded.";
 
 	sourceDefs = std::make_shared<Definitions>();
 	targetDefs = std::make_shared<Definitions>();
