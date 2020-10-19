@@ -39,7 +39,7 @@ void MainFrame::initFrame()
 {
 	configuration.load();
 	SetBackgroundColour(wxColour(230, 230, 230));
-	sizer = new wxFlexGridSizer(3, 2, 5);
+	sizer = new wxFlexGridSizer(4, 3, 5);
 	SetSizer(sizer);
 
 	// Source directory
@@ -47,20 +47,42 @@ void MainFrame::initFrame()
 	sourceDirPicker = new wxDirPickerCtrl(this, 0, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	sourceDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	sourceDirStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	reverseSourceCheck = new wxCheckBox(this, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	if (configuration.isSourceReversed())
+		reverseSourceCheck->SetValue(true);
+	reverseSourceCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (reverseSourceCheck->GetValue())
+			configuration.setSourceReversed(true);
+		else
+			configuration.setSourceReversed(false);
+		configuration.save();
+	});
 
 	sizer->Add(sdirText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
 	sizer->Add(sourceDirPicker, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5);
 	sizer->Add(sourceDirStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(reverseSourceCheck, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
 
 	// Target Directory
 	auto* tdirText = new wxStaticText(this, wxID_ANY, "Target Directory", wxDefaultPosition);
 	targetDirPicker = new wxDirPickerCtrl(this, 1, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	targetDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	targetDirStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	reverseTargetCheck = new wxCheckBox(this, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	if (configuration.isTargetReversed())
+		reverseTargetCheck->SetValue(true);
+	reverseTargetCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (reverseTargetCheck->GetValue())
+			configuration.setTargetReversed(true);
+		else
+			configuration.setTargetReversed(false);
+		configuration.save();
+	});
 
 	sizer->Add(tdirText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(targetDirPicker, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(targetDirStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(reverseTargetCheck, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
 
 	// Link File
 	auto* linkFileText = new wxStaticText(this, wxID_ANY, "Link File", wxDefaultPosition);
@@ -72,6 +94,7 @@ void MainFrame::initFrame()
 	sizer->Add(linkFileText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(linkFilePicker, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(linkFileStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->AddStretchSpacer(0);
 
 	// Source Token
 	auto* sourceTokenText = new wxStaticText(this, wxID_ANY, "Source Token", wxDefaultPosition);
@@ -82,6 +105,7 @@ void MainFrame::initFrame()
 	sizer->Add(sourceTokenText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(sourceTokenField, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(sourceTokenStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->AddStretchSpacer(0);
 
 	// Target Token
 	auto* targetTokenText = new wxStaticText(this, wxID_ANY, "Target Token", wxDefaultPosition);
@@ -92,6 +116,7 @@ void MainFrame::initFrame()
 	sizer->Add(targetTokenText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(targetTokenField, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
 	sizer->Add(targetTokenStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->AddStretchSpacer(0);
 
 	// The Button
 	startButton = new wxButton(this, wxID_ANY, "Begin!", wxDefaultPosition, wxDefaultSize);
@@ -100,6 +125,7 @@ void MainFrame::initFrame()
 
 	sizer->AddStretchSpacer(0);
 	sizer->Add(startButton, wxSizerFlags(1).Top().CenterHorizontal());
+	sizer->AddStretchSpacer(0);
 	sizer->AddStretchSpacer(0);
 
 	populateFrame();
@@ -206,6 +232,8 @@ void MainFrame::initImageFrame()
 		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.bmp", wxBITMAP_TYPE_BMP);
 	else if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/provinces.png"))
 		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.png", wxBITMAP_TYPE_PNG);
+	if (configuration.isSourceReversed())
+		*sourceImg = sourceImg->Mirror(false);
 	readPixels(ImageTabSelector::SOURCE, *sourceImg);
 	Log(LogLevel::Info) << "Registered " << sourceImg->GetSize().GetX() << "x" << sourceImg->GetSize().GetY() << " source pixels.";
 
@@ -214,6 +242,8 @@ void MainFrame::initImageFrame()
 		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.bmp", wxBITMAP_TYPE_BMP);
 	else if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.png"))
 		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.png", wxBITMAP_TYPE_PNG);
+	if (configuration.isTargetReversed())
+		*targetImg = targetImg->Mirror(false);
 	readPixels(ImageTabSelector::TARGET, *targetImg);
 	Log(LogLevel::Info) << "Registered " << targetImg->GetSize().GetX() << "x" << targetImg->GetSize().GetY() << " target pixels.";
 

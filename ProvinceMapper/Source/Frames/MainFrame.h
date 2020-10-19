@@ -64,6 +64,8 @@ class MainFrame: public wxFrame
 	wxFilePickerCtrl* linkFilePicker = nullptr;
 	wxTextCtrl* sourceTokenField = nullptr;
 	wxTextCtrl* targetTokenField = nullptr;
+	wxCheckBox* reverseSourceCheck = nullptr;
+	wxCheckBox* reverseTargetCheck = nullptr;
 
 	wxWindow* sourceDirStatus = nullptr;
 	wxWindow* targetDirStatus = nullptr;

@@ -1,7 +1,7 @@
 #include "Configuration.h"
+#include "OSCompatibilityLayer.h"
 #include "ParserHelpers.h"
 #include <fstream>
-#include "OSCompatibilityLayer.h"
 
 void Configuration::registerKeys()
 {
@@ -20,6 +20,12 @@ void Configuration::registerKeys()
 	registerKeyword("linkFile", [this](const std::string& unused, std::istream& theStream) {
 		linkFile = commonItems::singleString(theStream).getString();
 	});
+	registerKeyword("reverseSource", [this](const std::string& unused, std::istream& theStream) {
+		reverseSource = commonItems::singleString(theStream).getString() == "true";
+	});
+	registerKeyword("reverseTarget", [this](const std::string& unused, std::istream& theStream) {
+		reverseTarget = commonItems::singleString(theStream).getString() == "true";
+	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
@@ -27,8 +33,12 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 {
 	if (configuration.sourceDir)
 		output << "sourceDir = \"" << *configuration.sourceDir << "\"\n";
+	if (configuration.reverseSource)
+		output << "reverseSource = true\n";
 	if (configuration.targetDir)
 		output << "targetDir = \"" << *configuration.targetDir << "\"\n";
+	if (configuration.reverseTarget)
+		output << "reverseTarget = true\n";
 	if (configuration.sourceToken)
 		output << "sourceToken = \"" << *configuration.sourceToken << "\"\n";
 	if (configuration.targetToken)
