@@ -8,29 +8,31 @@ void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 {
 	std::string actualPath;
 	// our dirpath is a path to the map folder. locs are elsewhere.
-	if (commonItems::DoesFolderExist(dirPath + "../localisation")) // ck2, eu4, vic2
-		actualPath = dirPath + "../localisation";
-	if (commonItems::DoesFolderExist(dirPath + "../localization/english")) // ck3, imp
-		actualPath = dirPath + "../localization/english";
+	if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
+		actualPath = dirPath + "/../localisation";
+	if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
+		actualPath = dirPath + "/../localization/english";
+	Log(LogLevel::Debug) << "dirpath " << dirPath << " actual " << actualPath;
 	if (actualPath.empty())
 		return;
 
-	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(dirPath))
-		scrapeFile(dirPath + "/" + fileName, LocType::SOURCE);
+	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
+		scrapeFile(actualPath + "/" + fileName, LocType::SOURCE);
 }
 
 void LocalizationMapper::scrapeTargetDir(const std::string& dirPath)
 {
 	std::string actualPath;
-	if (commonItems::DoesFolderExist(dirPath + "../localisation")) // ck2, eu4, vic2
-		actualPath = dirPath + "../localisation";
-	if (commonItems::DoesFolderExist(dirPath + "../localization/english")) // ck3, imp
-		actualPath = dirPath + "../localization/english";
+	if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
+		actualPath = dirPath + "/../localisation";
+	if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
+		actualPath = dirPath + "/../localization/english";
+	Log(LogLevel::Debug) << "dirpath " << dirPath << " actual " << actualPath;
 	if (actualPath.empty())
 		return;
 
-	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(dirPath))
-		scrapeFile(dirPath + "/" + fileName, LocType::TARGET);
+	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
+		scrapeFile(actualPath + "/" + fileName, LocType::TARGET);
 }
 
 void LocalizationMapper::scrapeFile(const std::string& filePath, LocType locType)

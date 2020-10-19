@@ -103,7 +103,7 @@ std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
 		name += comma;
 		if (target->locName)
 			name += *target->locName;
-		if (!target->mapDataName.empty())
+		else if (!target->mapDataName.empty())
 			name += target->mapDataName;
 		else
 			name += "(No Name)";

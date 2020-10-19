@@ -186,11 +186,14 @@ void ImageCanvas::onMouseOver(wxMouseEvent& event)
 		else
 		{
 			// poke the definitions for a chroma name.
+			const auto provID = definitions->getIDForChroma(chroma);
+			if (provID)
+				name = std::to_string(*provID) + " - ";
 			const auto& provinceName = definitions->getNameForChroma(chroma);
 			if (provinceName)
-				name = *provinceName;
+				name += *provinceName;
 			else
-				name = "UNDEFINED";
+				name += "UNDEFINED";
 			tooltipCache = std::pair(chroma, name);
 		}
 
