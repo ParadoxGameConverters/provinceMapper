@@ -19,10 +19,14 @@ void CsvScraper::scrapeStream(std::istream& theStream)
 		if (line[0] == '#' || line.length() < 4)
 			continue;
 
-		auto sepLoc = line.find_first_of(';');
+		auto sepLoc = line.find(';');
+		if (sepLoc == std::string::npos)
+			continue;
 		auto key = line.substr(0, sepLoc);
 		auto newLine = line.substr(sepLoc + 1, line.length());
-		sepLoc = newLine.find_first_of(';');
+		sepLoc = newLine.find(';');
+		if (sepLoc == std::string::npos)
+			continue;
 		const auto english = newLine.substr(0, sepLoc);
 
 		localizations[key] = english;

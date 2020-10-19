@@ -21,6 +21,14 @@ void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 
 void LocalizationMapper::scrapeTargetDir(const std::string& dirPath)
 {
+	std::string actualPath;
+	if (commonItems::DoesFolderExist(dirPath + "../localisation")) // ck2, eu4, vic2
+		actualPath = dirPath + "../localisation";
+	if (commonItems::DoesFolderExist(dirPath + "../localization/english")) // ck3, imp
+		actualPath = dirPath + "../localization/english";
+	if (actualPath.empty())
+		return;
+
 	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(dirPath))
 		scrapeFile(dirPath + "/" + fileName, LocType::TARGET);
 }
