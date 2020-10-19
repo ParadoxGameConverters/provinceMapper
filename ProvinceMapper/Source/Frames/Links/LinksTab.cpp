@@ -88,8 +88,8 @@ std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
 	for (const auto& source: link->getSources())
 	{
 		name += comma;
-		if (!source->locName.empty())
-			name += source->locName;
+		if (source->locName)
+			name += *source->locName;
 		else if (!source->mapDataName.empty())
 			name += source->mapDataName;
 		else
@@ -101,8 +101,8 @@ std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
 	for (const auto& target: link->getTargets())
 	{
 		name += comma;
-		if (!target->locName.empty())
-			name += target->locName;
+		if (target->locName)
+			name += *target->locName;
 		if (!target->mapDataName.empty())
 			name += target->mapDataName;
 		else

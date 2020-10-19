@@ -40,6 +40,9 @@
     <Filter Include="ProvinceMapper\Configuration">
       <UniqueIdentifier>{e8eae01b-144c-4e84-b34b-9126896c4592}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProvinceMapper\Localization">
+      <UniqueIdentifier>{adf4dbd0-a4d2-4627-bd66-a7f9f3cffa4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commonItems\ParserHelpers.cpp">
@@ -108,6 +111,15 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\DialogComment.cpp">
       <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Localization\CsvScraper.cpp">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Localization\LocalizationMapper.cpp">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Localization\YmlScraper.cpp">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -172,6 +184,15 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\DialogComment.h">
       <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Localization\CsvScraper.h">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Localization\LocalizationMapper.h">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Localization\YmlScraper.h">
+      <Filter>ProvinceMapper\Localization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

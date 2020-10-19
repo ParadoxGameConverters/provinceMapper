@@ -6,6 +6,7 @@
 #include "Configuration/Configuration.h"
 #include "Definitions/Definitions.h"
 #include "LinkMapper/LinkMapper.h"
+#include "Localization/LocalizationMapper.h"
 #include <array>
 #include <wx/splitter.h>
 
@@ -76,6 +77,7 @@ class MainFrame: public wxFrame
 	std::shared_ptr<Definitions> targetDefs;
 	LinkMapper linkMapper;
 	Configuration configuration;
+	LocalizationMapper localizationMapper;
 
 	std::string linksFileString;
 

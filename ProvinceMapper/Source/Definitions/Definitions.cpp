@@ -4,22 +4,17 @@
 #include "Provinces/Province.h"
 #include <fstream>
 
-void Definitions::loadDefinitions(std::istream& theStream)
-{
-	parseStream(theStream);
-}
-
-void Definitions::loadDefinitions(const std::string& fileName)
+void Definitions::loadDefinitions(const std::string& fileName, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
 	if (!commonItems::DoesFileExist(fileName))
 		throw std::runtime_error("Definitions file cannot be found!");
 
 	std::ifstream definitionsFile(fileName);
-	parseStream(definitionsFile);
+	parseStream(definitionsFile, localizationMapper, locType);
 	definitionsFile.close();
 }
 
-void Definitions::parseStream(std::istream& theStream)
+void Definitions::parseStream(std::istream& theStream, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
 	std::string line;
 	getline(theStream, line); // discard first line.
@@ -37,6 +32,37 @@ void Definitions::parseStream(std::istream& theStream)
 			{
 				const auto [ID, r, g, b, mapDataName] = *parsedLine;
 				auto province = std::make_shared<Province>(ID, r, g, b, mapDataName);
+				if (locType == LocalizationMapper::LocType::SOURCE)
+				{
+					// can we get a locname? Probe for PROV first.
+					auto locName = localizationMapper.getLocForSourceKey("PROV" + std::to_string(ID));
+					if (locName)
+					{
+						province->locName = locName;
+					}
+					else
+					{
+						// maybe mapdataname as key.
+						locName = localizationMapper.getLocForSourceKey(mapDataName);
+						if (locName)
+							province->locName = locName;
+					}
+				}
+				else
+				{
+					// ditto for the other defs.
+					auto locName = localizationMapper.getLocForTargetKey("PROV" + std::to_string(ID));
+					if (locName)
+					{
+						province->locName = locName;
+					}
+					else
+					{
+						locName = localizationMapper.getLocForTargetKey(mapDataName);
+						if (locName)
+							province->locName = locName;
+					}
+				}
 				provinces.insert(std::pair(province->ID, province));
 				chromaCache.insert(std::pair(pixelPack(province->r, province->g, province->b), province));
 			}
@@ -96,10 +122,10 @@ void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned ch
 std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		if (chromaCacheItr->second->locName.empty())
+		if (!chromaCacheItr->second->locName)
 			return chromaCacheItr->second->mapDataName;
 		else
-			return chromaCacheItr->second->locName;
+			return *chromaCacheItr->second->locName;
 	else
 		return std::nullopt;
 }

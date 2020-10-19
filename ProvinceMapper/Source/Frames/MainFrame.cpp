@@ -183,12 +183,15 @@ void MainFrame::initLinksFrame()
 
 void MainFrame::initImageFrame()
 {
+	localizationMapper.scrapeSourceDir(*configuration.getSourceDir());
+	localizationMapper.scrapeTargetDir(*configuration.getTargetDir());
+
 	sourceDefs = std::make_shared<Definitions>();
 	targetDefs = std::make_shared<Definitions>();
 
-	sourceDefs->loadDefinitions(*configuration.getSourceDir() + "/definition.csv");
+	sourceDefs->loadDefinitions(*configuration.getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
 	Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
-	targetDefs->loadDefinitions(*configuration.getTargetDir() + "/definition.csv");
+	targetDefs->loadDefinitions(*configuration.getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
 	Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 
 	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration.getSourceToken(), *configuration.getTargetToken());
