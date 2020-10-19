@@ -223,12 +223,6 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\rivers.bmp">
       <Filter>Resources\testdata\test-to</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.bmp">
-      <Filter>Resources\testdata\test-from</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
-      <Filter>Resources\testdata\test-from</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv">
       <Filter>Resources\testdata\test-to</Filter>
     </CopyFileToFolders>
@@ -240,6 +234,12 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="README.md">
       <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.png">
+      <Filter>Resources\testdata\test-from</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.png">
+      <Filter>Resources\testdata\test-from</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

@@ -229,7 +229,6 @@ void LinksTab::activateLinkByID(const int theID)
 		}
 		++rowCounter;
 	}
-	theGrid->ForceRefresh();
 }
 
 void LinksTab::activateLinkByIndex(const int index)
@@ -244,7 +243,6 @@ void LinksTab::activateLinkByIndex(const int index)
 	activateRowColor(index);
 	focusOnActiveRow();
 	lastClickedRow = index;
-	theGrid->ForceRefresh();
 }
 
 void LinksTab::focusOnActiveRow()
@@ -265,8 +263,6 @@ void LinksTab::refreshActiveLink()
 	{
 		const auto& name = linkToString(activeLink);
 		theGrid->SetCellValue(*activeRow, 0, name);
-		theGrid->AutoSize();
-		theGrid->ForceRefresh();
 	}
 }
 

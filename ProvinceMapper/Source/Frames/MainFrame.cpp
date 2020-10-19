@@ -227,21 +227,36 @@ void MainFrame::initImageFrame()
 	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
 	// Import pixels.
+	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
+	sourceRiversImg = new wxImage();
 	if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/provinces.bmp"))
-		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.bmp", wxBITMAP_TYPE_BMP);
+		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.bmp");
 	else if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/provinces.png"))
-		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.png", wxBITMAP_TYPE_PNG);
+		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.png");
+	if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/rivers.bmp"))
+		sourceRiversImg->LoadFile(*configuration.getSourceDir() + "/rivers.bmp");
+	else if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/rivers.png"))
+		sourceRiversImg->LoadFile(*configuration.getSourceDir() + "/rivers.png");
+
+	targetImg = new wxImage();
+	targetRiversImg = new wxImage();
+	if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.bmp"))
+		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.png"))
+		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.png");
+	if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/rivers.bmp"))
+		targetRiversImg->LoadFile(*configuration.getTargetDir() + "/rivers.bmp");
+	else if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/rivers.png"))
+		targetRiversImg->LoadFile(*configuration.getTargetDir() + "/rivers.png");
+
+	mergeRivers();
+
 	if (configuration.isSourceReversed())
 		*sourceImg = sourceImg->Mirror(false);
 	readPixels(ImageTabSelector::SOURCE, *sourceImg);
 	Log(LogLevel::Info) << "Registered " << sourceImg->GetSize().GetX() << "x" << sourceImg->GetSize().GetY() << " source pixels.";
 
-	targetImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.bmp"))
-		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.bmp", wxBITMAP_TYPE_BMP);
-	else if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.png"))
-		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.png", wxBITMAP_TYPE_PNG);
 	if (configuration.isTargetReversed())
 		*targetImg = targetImg->Mirror(false);
 	readPixels(ImageTabSelector::TARGET, *targetImg);
@@ -567,4 +582,50 @@ void MainFrame::onLinksAddComment(wxCommandEvent& evt)
 		imageFrame->deactivateLink();
 		imageFrame->activateLinkByID(*newLinkID);
 	}
+}
+
+void MainFrame::mergeRivers()
+{
+	if (sourceRiversImg->IsOk())
+	{
+		Log(LogLevel::Info) << "Merging source rivers";
+		auto* imageData = sourceImg->GetData();
+		const auto imageDataSize = sourceImg->GetSize().x * sourceImg->GetSize().y * 3;
+		auto* riverData = sourceRiversImg->GetData();
+		const auto riverDataSize = sourceRiversImg->GetSize().x * sourceRiversImg->GetSize().y * 3;
+		if (riverDataSize == imageDataSize)
+			mergeRiverData(imageData, riverData, imageDataSize);
+	}
+	if (targetRiversImg->IsOk())
+	{
+		Log(LogLevel::Info) << "Merging target rivers";
+		auto* imageData = targetImg->GetData();
+		const auto imageDataSize = targetImg->GetSize().x * targetImg->GetSize().y * 3;
+		auto* riverData = targetRiversImg->GetData();
+		const auto riverDataSize = targetRiversImg->GetSize().x * targetRiversImg->GetSize().y * 3;
+		if (riverDataSize == imageDataSize)
+			mergeRiverData(imageData, riverData, imageDataSize);
+	}
+}
+
+void MainFrame::mergeRiverData(unsigned char* imgData, unsigned char* riverData, const int size)
+{
+	for (auto offset = 0; offset < size; offset = offset + 3)
+	{
+		if (!isRiverMask(riverData[offset], riverData[offset + 1], riverData[offset + 2]))
+		{
+			imgData[offset] = 200;
+			imgData[offset + 1] = 200;
+			imgData[offset + 2] = 200;
+		}
+	}
+}
+
+bool MainFrame::isRiverMask(const unsigned char r, const unsigned char g, const unsigned char b)
+{
+	// eu4 and hoi4 use gray, ck2/3/vic2 use pink for sea, white is always land.
+	if (r == 255 && g == 0 && b == 128 || r == 122 && g == 122 && b == 122 || r == 255 && g == 255 && b == 255)
+		return true;
+	else
+		return false;
 }

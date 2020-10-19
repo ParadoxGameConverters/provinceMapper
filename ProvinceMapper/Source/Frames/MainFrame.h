@@ -31,6 +31,9 @@ class MainFrame: public wxFrame
 	void applySanityToButton();
 	void initImageFrame();
 	void initLinksFrame();
+	void mergeRivers();
+	static void mergeRiverData(unsigned char* imgData, unsigned char* riverData, int size);
+	static bool isRiverMask(unsigned char r, unsigned char g, unsigned char b);
 
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
@@ -58,6 +61,8 @@ class MainFrame: public wxFrame
 	ImageFrame* imageFrame = nullptr;
 	wxImage* sourceImg = nullptr;
 	wxImage* targetImg = nullptr;
+	wxImage* sourceRiversImg = nullptr;
+	wxImage* targetRiversImg = nullptr;
 
 	wxDirPickerCtrl* sourceDirPicker = nullptr;
 	wxDirPickerCtrl* targetDirPicker = nullptr;
