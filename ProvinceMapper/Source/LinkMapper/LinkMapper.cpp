@@ -32,7 +32,7 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 
 void LinkMapper::registerKeys()
 {
-	registerRegex(R"(\d+.\d+.\d+)", [this](const std::string& versionName, std::istream& theStream) {
+	registerRegex(R"(\d+.\d+.\d+.*)", [this](const std::string& versionName, std::istream& theStream) {
 		const auto version = std::make_shared<LinkMappingVersion>(theStream, versionName, sourceDefs, targetDefs, sourceToken, targetToken, versionCounter);
 		++versionCounter;
 		versions.emplace_back(version);

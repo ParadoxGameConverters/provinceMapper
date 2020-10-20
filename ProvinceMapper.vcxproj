@@ -84,42 +84,8 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\test_mappings.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\provinces.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-to</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\rivers.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-to</DestinationFolders>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
-      <FileType>Document</FileType>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv">
-      <FileType>Document</FileType>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-to</DestinationFolders>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\configuration.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <CopyFileToFolders Include="README.md">
       <FileType>Document</FileType>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.png">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.png">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <PropertyGroup Label="Globals">
