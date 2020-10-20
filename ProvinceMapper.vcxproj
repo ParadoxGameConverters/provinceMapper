@@ -30,6 +30,9 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\CsvScraper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\LocalizationMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\YmlScraper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
@@ -53,6 +56,9 @@
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\CsvScraper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\LocalizationMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\YmlScraper.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h" />
@@ -91,16 +97,6 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-from</DestinationFolders>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.bmp">
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
-      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/test-from</DestinationFolders>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
       <FileType>Document</FileType>
       <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
@@ -116,6 +112,14 @@
   <ItemGroup>
     <CopyFileToFolders Include="README.md">
       <FileType>Document</FileType>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.png">
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)test-from</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <PropertyGroup Label="Globals">

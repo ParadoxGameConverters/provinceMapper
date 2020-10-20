@@ -6,6 +6,7 @@
 #include "Configuration/Configuration.h"
 #include "Definitions/Definitions.h"
 #include "LinkMapper/LinkMapper.h"
+#include "Localization/LocalizationMapper.h"
 #include <array>
 #include <wx/splitter.h>
 
@@ -30,6 +31,9 @@ class MainFrame: public wxFrame
 	void applySanityToButton();
 	void initImageFrame();
 	void initLinksFrame();
+	void mergeRivers();
+	static void mergeRiverData(unsigned char* imgData, unsigned char* riverData, int size);
+	static bool isRiverMask(unsigned char r, unsigned char g, unsigned char b);
 
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
@@ -57,12 +61,16 @@ class MainFrame: public wxFrame
 	ImageFrame* imageFrame = nullptr;
 	wxImage* sourceImg = nullptr;
 	wxImage* targetImg = nullptr;
+	wxImage* sourceRiversImg = nullptr;
+	wxImage* targetRiversImg = nullptr;
 
 	wxDirPickerCtrl* sourceDirPicker = nullptr;
 	wxDirPickerCtrl* targetDirPicker = nullptr;
 	wxFilePickerCtrl* linkFilePicker = nullptr;
 	wxTextCtrl* sourceTokenField = nullptr;
 	wxTextCtrl* targetTokenField = nullptr;
+	wxCheckBox* reverseSourceCheck = nullptr;
+	wxCheckBox* reverseTargetCheck = nullptr;
 
 	wxWindow* sourceDirStatus = nullptr;
 	wxWindow* targetDirStatus = nullptr;
@@ -76,6 +84,7 @@ class MainFrame: public wxFrame
 	std::shared_ptr<Definitions> targetDefs;
 	LinkMapper linkMapper;
 	Configuration configuration;
+	LocalizationMapper localizationMapper;
 
 	std::string linksFileString;
 

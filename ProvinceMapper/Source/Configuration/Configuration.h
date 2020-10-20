@@ -13,21 +13,27 @@ class Configuration: commonItems::parser
 	[[nodiscard]] const auto& getSourceToken() const { return sourceToken; }
 	[[nodiscard]] const auto& getTargetToken() const { return targetToken; }
 	[[nodiscard]] const auto& getLinkFile() const { return linkFile; }
+	[[nodiscard]] const auto& isSourceReversed() const { return reverseSource; }
+	[[nodiscard]] const auto& isTargetReversed() const { return reverseTarget; }
 
 	void setSourceDir(const std::string& dir) { sourceDir = dir; }
 	void setTargetDir(const std::string& dir) { targetDir = dir; }
 	void setSourceToken(const std::string& token) { sourceToken = token; }
 	void setTargetToken(const std::string& token) { targetToken = token; }
 	void setLinkFile(const std::string& file) { linkFile = file; }
+	void setSourceReversed(bool reversed) { reverseSource = reversed; }
+	void setTargetReversed(bool reversed) { reverseTarget = reversed; }
 
 	void save() const;
 	void load();
-	
+
 	friend std::ostream& operator<<(std::ostream& output, const Configuration& configuration);
 
   private:
 	void registerKeys();
 
+	bool reverseSource = false;
+	bool reverseTarget = false;
 	std::optional<std::string> sourceDir;
 	std::optional<std::string> targetDir;
 	std::optional<std::string> sourceToken;

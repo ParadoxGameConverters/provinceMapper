@@ -79,7 +79,10 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		for (const auto& province: linkMapping.sources)
 		{
 			output << comma;
-			output << province->mapDataName;
+			if (province->locName)
+				output << *province->locName;
+			else
+				output << province->mapDataName;
 			comma = ", ";
 		}
 	else
@@ -92,7 +95,10 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 		for (const auto& province: linkMapping.targets)
 		{
 			output << comma;
-			output << province->mapDataName;
+			if (province->locName)
+				output << *province->locName;
+			else
+				output << province->mapDataName;
 			comma = ", ";
 		}
 	else
