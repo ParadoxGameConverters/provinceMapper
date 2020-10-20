@@ -118,7 +118,6 @@ void LinksFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	{
 		// we have it at this page.
 		const auto page = static_cast<int>(std::distance(versionIDs.begin(), idItr));
-		Log(LogLevel::Debug) << "changing active page to : " << page;
 		notebook->ChangeSelection(page);
 		activePage = pages[version->getID()];
 	}
@@ -131,4 +130,16 @@ void LinksFrame::updateActiveVersionName(const std::string& theName) const
 	{
 		notebook->SetPageText(page, theName);
 	}
+}
+
+void LinksFrame::moveActiveLinkUp() const
+{
+	if (activePage)
+		activePage->moveActiveLinkUp();
+}
+
+void LinksFrame::moveActiveLinkDown() const
+{
+	if (activePage)
+		activePage->moveActiveLinkDown();
 }

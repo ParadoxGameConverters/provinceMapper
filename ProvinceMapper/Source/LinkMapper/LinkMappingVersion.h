@@ -33,6 +33,8 @@ class LinkMappingVersion: commonItems::parser
 	void setName(const std::string& theName) { versionName = theName; }
 	void setID(int theID) { ID = theID; }
 	void copyLinks(const std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>>& theLinks) const { *links = *theLinks; }
+	void moveActiveLinkUp() const;
+	void moveActiveLinkDown() const;
 
 	[[nodiscard]] std::optional<int> toggleProvinceByID(int provinceID, bool isSource);
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);

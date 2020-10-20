@@ -13,7 +13,6 @@
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
 
-wxDEFINE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
@@ -26,13 +25,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
 	Bind(wxEVT_MENU, &MainFrame::onSupportUs, this, wxID_NETWORK);
 	Bind(wxEVT_MENU, &MainFrame::onSaveLinks, this, wxID_SAVE);
-	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxMENU_ADD_LINK);
+	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxEVT_ADD_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveLink, this, wxEVT_DELETE_ACTIVE_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddComment, this, wxMENU_ADD_COMMENT);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsAddVersion, this, wxMENU_ADD_VERSION);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsCopyVersion, this, wxMENU_COPY_VERSION);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsDeleteVersion, this, wxMENU_DELETE_VERSION);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsRenameVersion, this, wxMENU_RENAME_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onLinksMoveUp, this, wxEVT_MOVE_ACTIVE_LINK_UP);
+	Bind(wxEVT_MENU, &MainFrame::onLinksMoveDown, this, wxEVT_MOVE_ACTIVE_LINK_DOWN);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
@@ -43,6 +44,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_ADD_COMMENT, &MainFrame::onAddComment, this);
 	Bind(wxEVT_UPDATE_NAME, &MainFrame::onRenameVersion, this);
 	Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &MainFrame::onChangeTab, this);
+	Bind(wxEVT_MOVE_ACTIVE_LINK_UP, &MainFrame::onLinksMoveUp, this);
+	Bind(wxEVT_MOVE_ACTIVE_LINK_DOWN, &MainFrame::onLinksMoveDown, this);
+	Bind(wxEVT_SAVE_LINKS, &MainFrame::onSaveLinks, this);
+	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
 }
 
 void MainFrame::initFrame()
@@ -202,24 +207,27 @@ void MainFrame::populateFrame()
 void MainFrame::initLinksFrame()
 {
 	linksFrame = new LinksFrame(this, linkMapper.getVersions(), linkMapper.getActiveVersion());
+
+	// menubar is the thing uptop with links for actions.
 	auto* saveDropDown = new wxMenu;
-	saveDropDown->Append(wxID_SAVE);
+	saveDropDown->Append(wxID_SAVE, "Save Links [F5]\tCtrl-S");
 	auto* linksDropDown = new wxMenu;
-	linksDropDown->Append(wxMENU_ADD_LINK, "Add Link\tCtrl-L");
-	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment\tCtrl-C");
-	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected\tCtrl-D");
+	linksDropDown->Append(wxEVT_ADD_LINK, "Add Link [F3]\tCtrl-L");
+	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment [F4]\tCtrl-C");
+	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected [Del]\tCtrl-D");
+	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum-");
+	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum+");
 	auto* versionsDropDown = new wxMenu;
 	versionsDropDown->Append(wxMENU_ADD_VERSION, "New Version");
 	versionsDropDown->Append(wxMENU_COPY_VERSION, "Copy Version");
 	versionsDropDown->Append(wxMENU_RENAME_VERSION, "Rename Version");
 	versionsDropDown->Append(wxMENU_DELETE_VERSION, "Delete (Danger!)");
-
 	auto* linksMenuBar = new wxMenuBar;
 	linksMenuBar->Append(saveDropDown, "&File");
 	linksMenuBar->Append(linksDropDown, "&Links/Comments");
 	linksMenuBar->Append(versionsDropDown, "&Versions");
-
 	linksFrame->SetMenuBar(linksMenuBar);
+
 	linksFrame->Show();
 }
 
@@ -723,4 +731,16 @@ void MainFrame::onChangeTab(wxBookCtrlEvent& event)
 	const auto& activeVersion = linkMapper.activateVersionByIndex(event.GetSelection());
 	linksFrame->setVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
+}
+
+void MainFrame::onLinksMoveUp(wxCommandEvent& evt)
+{
+	linkMapper.moveActiveLinkUp();
+	linksFrame->moveActiveLinkUp();
+}
+
+void MainFrame::onLinksMoveDown(wxCommandEvent& evt)
+{
+	linkMapper.moveActiveLinkDown();
+	linksFrame->moveActiveLinkDown();
 }

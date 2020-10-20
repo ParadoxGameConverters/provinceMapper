@@ -404,13 +404,25 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 {
 	switch (event.GetKeyCode())
 	{
+		case WXK_F3:
+			stageAddLink();
+			break;
 		case WXK_F4:
 			// spawn a dialog to name the comment.
 			stageAddComment();
 			break;
+		case WXK_F5:
+			stageSave();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
+			break;
+		case WXK_NUMPAD_SUBTRACT:
+			stageMoveUp();
+			break;
+		case WXK_NUMPAD_ADD:
+			stageMoveDown();
 			break;
 		default:
 			event.Skip();
@@ -509,4 +521,34 @@ void ImageCanvas::stageRefresh() const
 	else if (selector == ImageTabSelector::TARGET)
 		evt.SetInt(1);
 	eventListener->QueueEvent(evt.Clone());
+}
+
+void ImageCanvas::stageMoveUp() const
+{
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
+		eventListener->QueueEvent(evt->Clone());
+	}
+}
+
+void ImageCanvas::stageMoveDown() const
+{
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
+		eventListener->QueueEvent(evt->Clone());
+	}
+}
+
+void ImageCanvas::stageSave() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageAddLink() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
 }

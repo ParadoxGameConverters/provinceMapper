@@ -22,6 +22,8 @@ class LinksFrame: public wxFrame
 	void deleteActiveAndSwapToVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void updateActiveVersionName(const std::string& theName) const;
+	void moveActiveLinkUp() const;
+	void moveActiveLinkDown() const;
 
   private:
 	wxNotebook* notebook = nullptr;

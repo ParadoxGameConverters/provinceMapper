@@ -8,16 +8,20 @@ wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
-	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), version(std::move(theVersion)), eventListener(parent)
+	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxSize(600, 900)), version(std::move(theVersion)), eventListener(parent)
 {
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this);
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this);
 	Bind(wxEVT_UPDATE_NAME, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
-	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
+	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900), wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->EnableEditing(false);
 	theGrid->HideCellEditControl();
@@ -25,15 +29,15 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	theGrid->HideColLabels();
 	theGrid->SetScrollRate(0, 20);
 	theGrid->SetMinSize(wxSize(600, 900));
+	theGrid->SetColMinimalAcceptableWidth(600);
 	theGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
-	theGrid->AutoSize();
 	theGrid->SetColMinimalWidth(0, 600);
 	GetParent()->Layout();
 
-	auto* logBox = new wxBoxSizer(wxVERTICAL);
-	logBox->Add(theGrid, wxSizerFlags(1).Expand());
-	SetSizer(logBox);
-	logBox->Fit(this);
+	auto* gridBox = new wxBoxSizer(wxVERTICAL);
+	gridBox->Add(theGrid, wxSizerFlags(1).Expand());
+	SetSizer(gridBox);
+	gridBox->Fit(this);
 	theGrid->ForceRefresh();
 }
 
@@ -72,9 +76,8 @@ void LinksTab::redrawGrid()
 		theGrid->SetCellBackgroundColour(rowCounter, 0, bgColor);
 		rowCounter++;
 	}
-	theGrid->SetColMinimalWidth(0, 600);
+	theGrid->AutoSizeColumn(0, false);
 	theGrid->EndBatch();
-	theGrid->AutoSize();
 	if (activeRow)
 		focusOnActiveRow();
 	GetParent()->Layout();
@@ -292,7 +295,6 @@ void LinksTab::onUpdateComment(wxCommandEvent& event)
 		link->setComment(comment);
 		// also update screen.
 		theGrid->SetCellValue(index, 0, comment);
-		theGrid->AutoSize();
 		theGrid->ForceRefresh();
 	}
 }
@@ -321,7 +323,6 @@ void LinksTab::createLink(const int linkID)
 			lastClickedRow = rowCounter;
 			// let's insert it.
 			theGrid->SetColMinimalWidth(0, 600);
-			theGrid->AutoSize();
 			theGrid->ForceRefresh();
 			break;
 		}
@@ -333,13 +334,25 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 {
 	switch (event.GetKeyCode())
 	{
+		case WXK_F3:
+			stageAddLink();
+			break;
 		case WXK_F4:
 			// spawn a dialog to name the comment.
 			stageAddComment();
 			break;
+		case WXK_F5:
+			stageSave();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
+			break;
+		case WXK_NUMPAD_SUBTRACT:
+			stageMoveUp();
+			break;
+		case WXK_NUMPAD_ADD:
+			stageMoveDown();
 			break;
 		default:
 			event.Skip();
@@ -360,4 +373,62 @@ void LinksTab::stageDeleteLink() const
 		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
 	}
+}
+
+void LinksTab::stageMoveUp() const
+{
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
+		eventListener->QueueEvent(evt->Clone());
+	}
+}
+
+void LinksTab::stageMoveDown() const
+{
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
+		eventListener->QueueEvent(evt->Clone());
+	}
+}
+
+void LinksTab::moveActiveLinkUp()
+{
+	if (activeLink && activeRow && *activeRow > 0)
+	{
+		const auto text = theGrid->GetCellValue(*activeRow, 0);
+		const auto color = theGrid->GetCellBackgroundColour(*activeRow, 0);
+		theGrid->DeleteRows(*activeRow, 1, false);
+		--*activeRow;
+		theGrid->InsertRows(*activeRow, 1, false);
+		theGrid->SetCellValue(*activeRow, 0, text);
+		theGrid->SetCellBackgroundColour(*activeRow, 0, color);
+	}
+}
+
+void LinksTab::moveActiveLinkDown()
+{
+	if (activeLink && activeRow && *activeRow < theGrid->GetNumberRows() - 1)
+	{
+		const auto text = theGrid->GetCellValue(*activeRow, 0);
+		const auto color = theGrid->GetCellBackgroundColour(*activeRow, 0);
+		theGrid->DeleteRows(*activeRow, 1, false);
+		++*activeRow;
+		theGrid->InsertRows(*activeRow, 1, false);
+		theGrid->SetCellValue(*activeRow, 0, text);
+		theGrid->SetCellBackgroundColour(*activeRow, 0, color);
+	}
+}
+
+void LinksTab::stageSave() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void LinksTab::stageAddLink() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
 }

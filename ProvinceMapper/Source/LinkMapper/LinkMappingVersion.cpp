@@ -166,3 +166,33 @@ int LinkMappingVersion::addRawComment()
 	activeLink = link;
 	return link->getID();
 }
+
+void LinkMappingVersion::moveActiveLinkUp() const
+{
+	size_t counter = 0;
+	if (activeLink)
+		for (const auto& link: *links)
+		{
+			if (*link == *activeLink && counter > 0)
+			{
+				std::swap((*links)[counter], (*links)[counter - 1]);
+				break;
+			}
+			++counter;
+		}
+}
+
+void LinkMappingVersion::moveActiveLinkDown() const
+{
+	size_t counter = 0;
+	if (activeLink)
+		for (const auto& link: *links)
+		{
+			if (*link == *activeLink && counter < links->size() - 1)
+			{
+				std::swap((*links)[counter], (*links)[counter + 1]);
+				break;
+			}
+			++counter;
+		}
+}

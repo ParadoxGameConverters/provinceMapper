@@ -11,7 +11,6 @@
 #include <wx/splitter.h>
 
 class wxBookCtrlEvent;
-wxDECLARE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
@@ -62,6 +61,8 @@ class MainFrame: public wxFrame
 	void onVersionsRenameVersion(wxCommandEvent& evt);
 	void onRenameVersion(wxCommandEvent& evt);
 	void onChangeTab(wxBookCtrlEvent& event);
+	void onLinksMoveUp(wxCommandEvent& evt);
+	void onLinksMoveDown(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);

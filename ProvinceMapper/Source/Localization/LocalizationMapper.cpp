@@ -12,7 +12,6 @@ void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 		actualPath = dirPath + "/../localisation";
 	if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
 		actualPath = dirPath + "/../localization/english";
-	Log(LogLevel::Debug) << "dirpath " << dirPath << " actual " << actualPath;
 	if (actualPath.empty())
 		return;
 
@@ -27,7 +26,6 @@ void LocalizationMapper::scrapeTargetDir(const std::string& dirPath)
 		actualPath = dirPath + "/../localisation";
 	if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
 		actualPath = dirPath + "/../localization/english";
-	Log(LogLevel::Debug) << "dirpath " << dirPath << " actual " << actualPath;
 	if (actualPath.empty())
 		return;
 

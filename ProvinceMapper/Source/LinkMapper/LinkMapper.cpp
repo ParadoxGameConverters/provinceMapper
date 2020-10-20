@@ -182,3 +182,15 @@ const std::shared_ptr<LinkMappingVersion>& LinkMapper::activateVersionByIndex(co
 	activeVersion = versions[index];
 	return activeVersion;
 }
+
+void LinkMapper::moveActiveLinkUp() const
+{
+	if (activeVersion)
+		activeVersion->moveActiveLinkUp();
+}
+
+void LinkMapper::moveActiveLinkDown() const
+{
+	if (activeVersion)
+		activeVersion->moveActiveLinkDown();
+}
