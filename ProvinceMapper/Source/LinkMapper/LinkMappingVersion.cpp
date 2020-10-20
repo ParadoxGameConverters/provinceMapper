@@ -169,8 +169,9 @@ int LinkMappingVersion::addRawComment()
 
 void LinkMappingVersion::moveActiveLinkUp() const
 {
-	size_t counter = 0;
 	if (activeLink)
+	{
+		size_t counter = 0;
 		for (const auto& link: *links)
 		{
 			if (*link == *activeLink && counter > 0)
@@ -180,12 +181,14 @@ void LinkMappingVersion::moveActiveLinkUp() const
 			}
 			++counter;
 		}
+	}
 }
 
 void LinkMappingVersion::moveActiveLinkDown() const
 {
-	size_t counter = 0;
 	if (activeLink)
+	{
+		size_t counter = 0;
 		for (const auto& link: *links)
 		{
 			if (*link == *activeLink && counter < links->size() - 1)
@@ -195,4 +198,5 @@ void LinkMappingVersion::moveActiveLinkDown() const
 			}
 			++counter;
 		}
+	}
 }
