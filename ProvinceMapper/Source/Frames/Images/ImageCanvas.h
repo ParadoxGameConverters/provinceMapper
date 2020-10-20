@@ -34,6 +34,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
 
 	void clearShadedPixels() { shadedPixels.clear(); }
+	void clearStrafedPixels() { strafedPixels.clear(); }
 	void generateShadedPixels();
 	void applyShadedPixels();
 	void applyStrafedPixels();
@@ -47,6 +48,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void toggleProvinceByID(int ID);
 	void shadeProvinceByID(int ID);
 	void deleteActiveLink();
+	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
 
   private:
 	void onMouseOver(wxMouseEvent& event);

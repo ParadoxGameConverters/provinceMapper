@@ -15,6 +15,10 @@
 
 wxDEFINE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
 {
@@ -25,6 +29,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxMENU_ADD_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveLink, this, wxEVT_DELETE_ACTIVE_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddComment, this, wxMENU_ADD_COMMENT);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsAddVersion, this, wxMENU_ADD_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsCopyVersion, this, wxMENU_COPY_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsDeleteVersion, this, wxMENU_DELETE_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsRenameVersion, this, wxMENU_RENAME_VERSION);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
@@ -33,6 +41,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
 	Bind(wxEVT_ADD_COMMENT, &MainFrame::onAddComment, this);
+	Bind(wxEVT_UPDATE_NAME, &MainFrame::onRenameVersion, this);
+	Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &MainFrame::onChangeTab, this);
 }
 
 void MainFrame::initFrame()
@@ -198,10 +208,16 @@ void MainFrame::initLinksFrame()
 	linksDropDown->Append(wxMENU_ADD_LINK, "Add Link\tCtrl-L");
 	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment\tCtrl-C");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected\tCtrl-D");
+	auto* versionsDropDown = new wxMenu;
+	versionsDropDown->Append(wxMENU_ADD_VERSION, "New Version");
+	versionsDropDown->Append(wxMENU_COPY_VERSION, "Copy Version");
+	versionsDropDown->Append(wxMENU_RENAME_VERSION, "Rename Version");
+	versionsDropDown->Append(wxMENU_DELETE_VERSION, "Delete (Danger!)");
 
 	auto* linksMenuBar = new wxMenuBar;
-	linksMenuBar->Append(saveDropDown, "&Save");
+	linksMenuBar->Append(saveDropDown, "&File");
 	linksMenuBar->Append(linksDropDown, "&Links/Comments");
+	linksMenuBar->Append(versionsDropDown, "&Versions");
 
 	linksFrame->SetMenuBar(linksMenuBar);
 	linksFrame->Show();
@@ -628,4 +644,70 @@ bool MainFrame::isRiverMask(const unsigned char r, const unsigned char g, const 
 		return true;
 	else
 		return false;
+}
+
+void MainFrame::onVersionsAddVersion(wxCommandEvent& evt)
+{
+	// Turn off any active links.
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	// Create new version
+	const auto& newVersion = linkMapper.addVersion();
+	linksFrame->addVersion(newVersion);
+	imageFrame->setVersion(newVersion);
+}
+
+void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
+{
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	const auto& newVersion = linkMapper.copyVersion();
+	linksFrame->addVersion(newVersion);
+	imageFrame->setVersion(newVersion);
+}
+
+void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
+{
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	const auto& activeVersion = linkMapper.deleteVersion();
+	linksFrame->deleteActiveAndSwapToVersion(activeVersion);
+	imageFrame->setVersion(activeVersion);
+}
+
+void MainFrame::onVersionsRenameVersion(wxCommandEvent& evt)
+{
+	const auto& version = linkMapper.getActiveVersion();
+	if (version)
+	{
+		auto* dialog = new DialogComment(this, "Edit Name", version->getName(), version->getID());
+		dialog->ShowModal();
+	}
+}
+
+void MainFrame::onRenameVersion(wxCommandEvent& evt)
+{
+	const auto versionName = evt.GetString().ToStdString();
+
+	linkMapper.updateActiveVersionName(versionName);
+	linksFrame->updateActiveVersionName(versionName);
+}
+
+void MainFrame::onChangeTab(wxBookCtrlEvent& event)
+{
+	// linksTab has changed tab to another set. We need to update everything.
+
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	const auto& activeVersion = linkMapper.activateVersionByIndex(event.GetSelection());
+	linksFrame->setVersion(activeVersion);
+	imageFrame->setVersion(activeVersion);
 }

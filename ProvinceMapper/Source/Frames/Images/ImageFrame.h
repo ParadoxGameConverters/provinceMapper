@@ -27,6 +27,7 @@ class ImageFrame: public wxFrame
 	void shadeProvinceByID(int ID, bool sourceImage);
 	void centerMap(int ID);
 	void deleteActiveLink();
+	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 
   private:
 	void onScrollPaint(wxPaintEvent& event);

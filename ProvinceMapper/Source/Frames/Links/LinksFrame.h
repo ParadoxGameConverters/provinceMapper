@@ -18,6 +18,10 @@ class LinksFrame: public wxFrame
 	void activateLinkByIndex(int index) const;
 	void refreshActiveLink() const;
 	void createLink(int linkID) const;
+	void addVersion(const std::shared_ptr<LinkMappingVersion>& version);
+	void deleteActiveAndSwapToVersion(const std::shared_ptr<LinkMappingVersion>& version);
+	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
+	void updateActiveVersionName(const std::string& theName) const;
 
   private:
 	wxNotebook* notebook = nullptr;
@@ -25,9 +29,9 @@ class LinksFrame: public wxFrame
 	void onResize(wxSizeEvent& evt);
 	void onClose(wxCloseEvent& event);
 
-	std::map<int, LinksTab*> pages;
-	std::pair<int, LinksTab*> activePage;
-	std::map<std::string, int> versionToPage;
+	std::map<int, LinksTab*> pages; // version ID, page it's on.
+	LinksTab* activePage = nullptr;
+	std::vector<int> versionIDs; // this mirrors our pages so first page holds a version with first ID in this vector.
 
   protected:
 	wxEvtHandler* eventHandler = nullptr;

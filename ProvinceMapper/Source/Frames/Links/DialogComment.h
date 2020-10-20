@@ -4,7 +4,7 @@
 #include <wx/wx.h>
 #endif
 
-wxDECLARE_EVENT(wxEVT_UPDATE_COMMENT, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_UPDATE_NAME, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_COMMENT, wxCommandEvent);
 
 class DialogComment: public wxDialog

@@ -1,7 +1,7 @@
 #include "DialogComment.h"
 #include "Log.h"
 
-wxDEFINE_EVENT(wxEVT_UPDATE_COMMENT, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_UPDATE_NAME, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_COMMENT, wxCommandEvent);
 
 DialogComment::DialogComment(wxWindow* parent, const wxString& title, const std::string& theComment, const int row):
@@ -27,7 +27,7 @@ void DialogComment::initFrame()
 	auto* vbox = new wxBoxSizer(wxVERTICAL);
 	auto* hbox = new wxBoxSizer(wxHORIZONTAL);
 
-	auto* st = new wxStaticBox(panel, -1, "Comment", wxPoint(5, 5), wxSize(220, 50));
+	auto* st = new wxStaticBox(panel, -1, "Edit Text:", wxPoint(5, 5), wxSize(220, 50));
 	tc = new wxTextCtrl(st, -1, wxEmptyString, wxPoint(20, 20), wxSize(180, 20), wxTE_PROCESS_ENTER);
 	tc->Bind(wxEVT_KEY_DOWN, &DialogComment::onKeyDown, this);
 	tc->Bind(wxEVT_COMMAND_TEXT_ENTER, &DialogComment::onEnter, this);
@@ -64,7 +64,7 @@ void DialogComment::onAdd(wxCommandEvent& evt)
 
 void DialogComment::executeUpdate()
 {
-	auto* event = new wxCommandEvent(wxEVT_UPDATE_COMMENT);
+	auto* event = new wxCommandEvent(wxEVT_UPDATE_NAME);
 	event->SetString(tc->GetValue());
 	event->SetInt(ID);
 	eventHandler->QueueEvent(event->Clone());

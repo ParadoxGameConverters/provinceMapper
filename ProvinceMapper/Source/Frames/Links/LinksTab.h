@@ -17,7 +17,7 @@ class LinkMapping;
 class LinksTab: public wxNotebookPage
 {
   public:
-	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, int theID);
+	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
 	void redrawGrid();
 
 	void deactivateLink();
@@ -38,7 +38,6 @@ class LinksTab: public wxNotebookPage
 	void stageAddComment();
 	void stageDeleteLink() const;
 
-	int ID = 0;
 	int lastClickedRow = 0;
 
 	wxGrid* theGrid = nullptr;

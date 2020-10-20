@@ -22,7 +22,8 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 	clearRegisteredKeywords();
 	if (versions.empty())
 	{
-		auto newVersion = std::make_shared<LinkMappingVersion>("0.0.0", sourceDefs, targetDefs, sourceToken, targetToken);
+		auto newVersion = std::make_shared<LinkMappingVersion>("0.0.0", sourceDefs, targetDefs, sourceToken, targetToken, versionCounter);
+		++versionCounter;
 		versions.emplace_back(newVersion);
 		Log(LogLevel::Info) << "Generated version " << newVersion->getName() << ", " << newVersion->getLinks()->size() << " links.";
 	}
@@ -32,7 +33,8 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 void LinkMapper::registerKeys()
 {
 	registerRegex(R"(\d+.\d+.\d+)", [this](const std::string& versionName, std::istream& theStream) {
-		const auto version = std::make_shared<LinkMappingVersion>(theStream, versionName, sourceDefs, targetDefs, sourceToken, targetToken);
+		const auto version = std::make_shared<LinkMappingVersion>(theStream, versionName, sourceDefs, targetDefs, sourceToken, targetToken, versionCounter);
+		++versionCounter;
 		versions.emplace_back(version);
 		Log(LogLevel::Info) << "Version " << version->getName() << ", " << version->getLinks()->size() << " links.";
 	});
@@ -103,4 +105,80 @@ std::optional<int> LinkMapper::addRawComment() const
 		return activeVersion->addRawComment();
 	else
 		return std::nullopt;
+}
+
+const std::shared_ptr<LinkMappingVersion>& LinkMapper::addVersion()
+{
+	std::string name = "0.0.0";
+	// Naming matters. Do we have a version named "0.0.0"?
+	for (const auto& version: versions)
+		if (version->getName() == "0.0.0")
+		{
+			name += "-(RENAME ME " + std::to_string(versionCounter) + ")";
+			break;
+		}
+	const auto newVersion = std::make_shared<LinkMappingVersion>(name, sourceDefs, targetDefs, sourceToken, targetToken, versionCounter);
+	++versionCounter;
+	versions.insert(versions.begin(), newVersion); // Yes, Front!
+	activeVersion = newVersion;
+	return activeVersion;
+}
+
+const std::shared_ptr<LinkMappingVersion>& LinkMapper::copyVersion()
+{
+	if (activeVersion)
+	{
+		auto name = activeVersion->getName();
+		name += "-(RENAME ME " + std::to_string(versionCounter) + ")";
+		const auto newVersion = std::make_shared<LinkMappingVersion>(name, sourceDefs, targetDefs, sourceToken, targetToken, versionCounter);
+		++versionCounter;
+		newVersion->copyLinks(activeVersion->getLinks());
+		versions.insert(versions.begin(), newVersion);
+		activeVersion = newVersion;
+	}
+	else
+	{
+		return addVersion();
+	}
+	return activeVersion;
+}
+
+const std::shared_ptr<LinkMappingVersion>& LinkMapper::deleteVersion()
+{
+	if (activeVersion)
+	{
+		auto counter = 0;
+		for (const auto& version: versions)
+		{
+			if (version->getID() == activeVersion->getID())
+			{
+				versions.erase(versions.begin() + counter);
+				break;
+			}
+			++counter;
+		}
+	}
+	if (versions.empty())
+	{
+		return addVersion();
+	}
+	else
+	{
+		activeVersion = versions.front();
+		return activeVersion;
+	}
+}
+
+void LinkMapper::updateActiveVersionName(const std::string& theName) const
+{
+	if (activeVersion)
+	{
+		activeVersion->setName(theName);
+	}
+}
+
+const std::shared_ptr<LinkMappingVersion>& LinkMapper::activateVersionByIndex(const int index)
+{
+	activeVersion = versions[index];
+	return activeVersion;
 }

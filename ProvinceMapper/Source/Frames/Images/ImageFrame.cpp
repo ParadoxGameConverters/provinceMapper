@@ -184,3 +184,23 @@ void ImageFrame::centerMap(int ID)
 	render();
 	Refresh();
 }
+
+void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
+{
+	sourceCanvas->setVersion(version);
+	targetCanvas->setVersion(version);
+	sourceCanvas->clearStrafedPixels();
+	targetCanvas->clearStrafedPixels();
+	sourceCanvas->restoreImageData();
+	targetCanvas->restoreImageData();
+
+	if (black == true)
+	{
+		sourceCanvas->generateShadedPixels();
+		targetCanvas->generateShadedPixels();
+		sourceCanvas->applyShadedPixels();
+		targetCanvas->applyShadedPixels();
+	}
+	render();
+	Refresh();
+}

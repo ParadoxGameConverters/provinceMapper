@@ -18,6 +18,7 @@ class LinkMapper: commonItems::parser
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
 	void deleteActiveLink() const;
+	void updateActiveVersionName(const std::string& theName) const;
 
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }
@@ -25,6 +26,10 @@ class LinkMapper: commonItems::parser
 	[[nodiscard]] std::optional<int> addCommentByIndex(const std::string& comment, int index) const;
 	[[nodiscard]] std::optional<int> addRawLink() const;
 	[[nodiscard]] std::optional<int> addRawComment() const;
+	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& addVersion();
+	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& copyVersion();
+	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& deleteVersion();
+	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& activateVersionByIndex(int index);
 
   private:
 	void registerKeys();
@@ -35,6 +40,8 @@ class LinkMapper: commonItems::parser
 	std::string targetToken;
 	std::vector<std::shared_ptr<LinkMappingVersion>> versions;
 	std::shared_ptr<LinkMappingVersion> activeVersion;
+
+	int versionCounter = 0; // This is an internal counter that is used when assigning new version names and IDs.
 };
 
 #endif // LINK_MAPPER_H
