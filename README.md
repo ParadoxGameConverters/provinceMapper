@@ -129,7 +129,7 @@ Note: Do NOT alter old versions while you have newer province maps loaded! Rever
 ### Edit version name
 
 1.  Select a version you wish to edit.
-2.	In Links menu under "Versions" choose "Rename".
+2.  In Links menu under "Versions" choose "Rename".
 
 ### Delete a version
 
