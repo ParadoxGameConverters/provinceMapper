@@ -59,6 +59,11 @@ Creating (first is prefered):
  2. Click unmapped provinces to add them to the active link.
  3. Click already mapped provinces in the same link to remove them from the link.
 
+#### Moving Links
+
+ 1. Press Num+ to move a link down one row.
+ 2. Press Num- to move a link up one row.
+
 #### Swapping to another link
 
  1. See "Selecting (activating) a link"
@@ -99,6 +104,11 @@ Creating:
 #### Editing a comment
 
  1. Click the comment twice and enter new content in edit dialog.
+
+#### Moving comments
+
+ 1. Press Num+ to move a comment down one row.
+ 2. Press Num- to move a comment up one row.
 
 #### Deleting a comment
 
