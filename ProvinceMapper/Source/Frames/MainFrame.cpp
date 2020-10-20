@@ -343,6 +343,14 @@ bool MainFrame::isSameColorAtCoords(const int ax, const int ay, const int bx, co
 	const auto offsetA = coordsToOffset(ax, ay, width);
 	const auto offsetB = coordsToOffset(bx, by, width);
 	unsigned char* rgb = img.GetData();
+
+	// Override for river colors which are hardcoded at 200/200/200. They are always true so adjacent pixels are not border pixels.
+	if (rgb[offsetA] == 200 && rgb[offsetA + 1] == 200 && rgb[offsetA + 2] == 200)
+		return true;
+	if (rgb[offsetB] == 200 && rgb[offsetB + 1] == 200 && rgb[offsetB + 2] == 200)
+		return true;
+
+	// Otherwise compare them normally.
 	if (rgb[offsetA] == rgb[offsetB] && rgb[offsetA + 1] == rgb[offsetB + 1] && rgb[offsetA + 2] == rgb[offsetB + 2])
 		return true;
 	else
@@ -630,6 +638,11 @@ void MainFrame::mergeRiverData(unsigned char* imgData, unsigned char* riverData,
 	{
 		if (!isRiverMask(riverData[offset], riverData[offset + 1], riverData[offset + 2]))
 		{
+			// We're using 200/200/200 for river color because it's a tolerable shade not usually used for any province.
+			// (PDX appears not to be using shades of gray for provinces).
+			// We're overwriting original map's pixels with this, so those pixels will not be a part of any defined province.
+			// However, as undefined pixels are unmappable, no harm done.
+			// Still, user beware.
 			imgData[offset] = 200;
 			imgData[offset + 1] = 200;
 			imgData[offset + 2] = 200;

@@ -34,6 +34,7 @@ class ImageFrame: public wxFrame
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
 	void onClose(wxCloseEvent& event);
+	void onRefresh(wxCommandEvent& event);
 
 	ImageCanvas* sourceCanvas;
 	ImageCanvas* targetCanvas;

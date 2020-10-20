@@ -7,6 +7,7 @@
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 
 class wxTipWindow;
 struct Province;
@@ -30,6 +31,8 @@ class ImageCanvas: public wxScrolledCanvas
 
 	[[nodiscard]] auto getHeight() const { return height; }
 	[[nodiscard]] auto getWidth() const { return width; }
+	[[nodiscard]] auto getScale() const { return scaleFactor; }
+	[[nodiscard]] auto getOldScale() const { return oldScaleFactor; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
 
@@ -41,6 +44,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void restoreImageData() const;
 	void setBlack() { black = true; }
 	void clearBlack() { black = false; }
+	void clearScale() { oldScaleFactor = scaleFactor; }
 
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
@@ -55,6 +59,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void leftUp(wxMouseEvent& event);
 	void rightUp(wxMouseEvent& event);
 	void onKeyDown(wxKeyEvent& event);
+	void onMouseWheel(wxMouseEvent& event);
 
 	void stageAddComment();
 	void stageDeleteLink() const;
@@ -64,6 +69,9 @@ class ImageCanvas: public wxScrolledCanvas
 	void dismarkProvince(const std::shared_ptr<Province>& province) const;
 	void markProvince(const std::shared_ptr<Province>& province);
 	void selectLink(int linkID) const;
+	void zoomIn();
+	void zoomOut();
+	void stageRefresh() const;
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
@@ -76,6 +84,9 @@ class ImageCanvas: public wxScrolledCanvas
 	size_t imageDataSize = 0;
 	int height = 0;
 	int width = 0;
+	double oldScaleFactor = 1.0;
+	double scaleFactor = 1.0;
+	int rotationDelta = 0;
 
 	std::vector<Pixel> shadedPixels;
 	std::vector<Pixel> strafedPixels;

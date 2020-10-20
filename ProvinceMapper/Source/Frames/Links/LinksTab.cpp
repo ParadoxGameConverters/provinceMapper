@@ -241,7 +241,8 @@ void LinksTab::activateLinkByIndex(const int index)
 	activeRow = index;
 	activeLink = link;
 	activateRowColor(index);
-	focusOnActiveRow();
+	if (!theGrid->IsVisible(index, 0))
+		focusOnActiveRow();
 	lastClickedRow = index;
 }
 
