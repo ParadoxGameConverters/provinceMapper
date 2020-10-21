@@ -27,12 +27,14 @@ class ImageFrame: public wxFrame
 	void shadeProvinceByID(int ID, bool sourceImage);
 	void centerMap(int ID);
 	void deleteActiveLink();
+	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 
   private:
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
 	void onClose(wxCloseEvent& event);
+	void onRefresh(wxCommandEvent& event);
 
 	ImageCanvas* sourceCanvas;
 	ImageCanvas* targetCanvas;

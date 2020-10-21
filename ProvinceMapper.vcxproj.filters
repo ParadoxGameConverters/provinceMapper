@@ -13,15 +13,6 @@
     <Filter Include="ProvinceMapper\Frames">
       <UniqueIdentifier>{09fe9420-b6ad-4203-8ee4-168ef6a56fef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources\testdata">
-      <UniqueIdentifier>{7d02dd2e-4944-4047-8510-e47cd63a37da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\testdata\test-to">
-      <UniqueIdentifier>{1b885b56-9193-4e91-a94d-4864ba20bbc6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\testdata\test-from">
-      <UniqueIdentifier>{94cf4606-8491-4cc9-bf88-7bfed0b16333}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ProvinceMapper\LinkMapper">
       <UniqueIdentifier>{1e4e1925-6488-42c5-a2f5-aca5830b029c}</UniqueIdentifier>
     </Filter>
@@ -214,32 +205,8 @@
     <CopyFileToFolders Include="wxWidgets\3.1.3\lib\vc14x_x64_dll\wxmsw313u_core_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\test_mappings.txt">
-      <Filter>Resources\testdata</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\provinces.bmp">
-      <Filter>Resources\testdata\test-to</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\rivers.bmp">
-      <Filter>Resources\testdata\test-to</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-to\definition.csv">
-      <Filter>Resources\testdata\test-to</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\definition.csv">
-      <Filter>Resources\testdata\test-from</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-mappings\configuration.txt">
-      <Filter>Resources\testdata</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="README.md">
       <Filter>Resources</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\provinces.png">
-      <Filter>Resources\testdata\test-from</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\test-from\rivers.png">
-      <Filter>Resources\testdata\test-from</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

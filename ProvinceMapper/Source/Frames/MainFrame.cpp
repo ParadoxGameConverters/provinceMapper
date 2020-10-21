@@ -13,8 +13,11 @@
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
 
-wxDEFINE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
 {
@@ -22,9 +25,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
 	Bind(wxEVT_MENU, &MainFrame::onSupportUs, this, wxID_NETWORK);
 	Bind(wxEVT_MENU, &MainFrame::onSaveLinks, this, wxID_SAVE);
-	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxMENU_ADD_LINK);
+	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxEVT_ADD_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveLink, this, wxEVT_DELETE_ACTIVE_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddComment, this, wxMENU_ADD_COMMENT);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsAddVersion, this, wxMENU_ADD_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsCopyVersion, this, wxMENU_COPY_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsDeleteVersion, this, wxMENU_DELETE_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onVersionsRenameVersion, this, wxMENU_RENAME_VERSION);
+	Bind(wxEVT_MENU, &MainFrame::onLinksMoveUp, this, wxEVT_MOVE_ACTIVE_LINK_UP);
+	Bind(wxEVT_MENU, &MainFrame::onLinksMoveDown, this, wxEVT_MOVE_ACTIVE_LINK_DOWN);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
@@ -33,6 +42,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
 	Bind(wxEVT_ADD_COMMENT, &MainFrame::onAddComment, this);
+	Bind(wxEVT_UPDATE_NAME, &MainFrame::onRenameVersion, this);
+	Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &MainFrame::onChangeTab, this);
+	Bind(wxEVT_MOVE_ACTIVE_LINK_UP, &MainFrame::onLinksMoveUp, this);
+	Bind(wxEVT_MOVE_ACTIVE_LINK_DOWN, &MainFrame::onLinksMoveDown, this);
+	Bind(wxEVT_SAVE_LINKS, &MainFrame::onSaveLinks, this);
+	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
 }
 
 void MainFrame::initFrame()
@@ -192,18 +207,27 @@ void MainFrame::populateFrame()
 void MainFrame::initLinksFrame()
 {
 	linksFrame = new LinksFrame(this, linkMapper.getVersions(), linkMapper.getActiveVersion());
+
+	// menubar is the thing uptop with links for actions.
 	auto* saveDropDown = new wxMenu;
-	saveDropDown->Append(wxID_SAVE);
+	saveDropDown->Append(wxID_SAVE, "Save Links [F5]\tCtrl-S");
 	auto* linksDropDown = new wxMenu;
-	linksDropDown->Append(wxMENU_ADD_LINK, "Add Link\tCtrl-L");
-	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment\tCtrl-C");
-	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected\tCtrl-D");
-
+	linksDropDown->Append(wxEVT_ADD_LINK, "Add Link [F3]\tCtrl-L");
+	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment [F4]\tCtrl-C");
+	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected [Del]\tCtrl-D");
+	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum-");
+	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum+");
+	auto* versionsDropDown = new wxMenu;
+	versionsDropDown->Append(wxMENU_ADD_VERSION, "New Version");
+	versionsDropDown->Append(wxMENU_COPY_VERSION, "Copy Version");
+	versionsDropDown->Append(wxMENU_RENAME_VERSION, "Rename Version");
+	versionsDropDown->Append(wxMENU_DELETE_VERSION, "Delete (Danger!)");
 	auto* linksMenuBar = new wxMenuBar;
-	linksMenuBar->Append(saveDropDown, "&Save");
+	linksMenuBar->Append(saveDropDown, "&File");
 	linksMenuBar->Append(linksDropDown, "&Links/Comments");
-
+	linksMenuBar->Append(versionsDropDown, "&Versions");
 	linksFrame->SetMenuBar(linksMenuBar);
+
 	linksFrame->Show();
 }
 
@@ -327,6 +351,14 @@ bool MainFrame::isSameColorAtCoords(const int ax, const int ay, const int bx, co
 	const auto offsetA = coordsToOffset(ax, ay, width);
 	const auto offsetB = coordsToOffset(bx, by, width);
 	unsigned char* rgb = img.GetData();
+
+	// Override for river colors which are hardcoded at 200/200/200. They are always true so adjacent pixels are not border pixels.
+	if (rgb[offsetA] == 200 && rgb[offsetA + 1] == 200 && rgb[offsetA + 2] == 200)
+		return true;
+	if (rgb[offsetB] == 200 && rgb[offsetB + 1] == 200 && rgb[offsetB + 2] == 200)
+		return true;
+
+	// Otherwise compare them normally.
 	if (rgb[offsetA] == rgb[offsetB] && rgb[offsetA + 1] == rgb[offsetB + 1] && rgb[offsetA + 2] == rgb[offsetB + 2])
 		return true;
 	else
@@ -614,6 +646,11 @@ void MainFrame::mergeRiverData(unsigned char* imgData, unsigned char* riverData,
 	{
 		if (!isRiverMask(riverData[offset], riverData[offset + 1], riverData[offset + 2]))
 		{
+			// We're using 200/200/200 for river color because it's a tolerable shade not usually used for any province.
+			// (PDX appears not to be using shades of gray for provinces).
+			// We're overwriting original map's pixels with this, so those pixels will not be a part of any defined province.
+			// However, as undefined pixels are unmappable, no harm done.
+			// Still, user beware.
 			imgData[offset] = 200;
 			imgData[offset + 1] = 200;
 			imgData[offset + 2] = 200;
@@ -628,4 +665,82 @@ bool MainFrame::isRiverMask(const unsigned char r, const unsigned char g, const 
 		return true;
 	else
 		return false;
+}
+
+void MainFrame::onVersionsAddVersion(wxCommandEvent& evt)
+{
+	// Turn off any active links.
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	// Create new version
+	const auto& newVersion = linkMapper.addVersion();
+	linksFrame->addVersion(newVersion);
+	imageFrame->setVersion(newVersion);
+}
+
+void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
+{
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	const auto& newVersion = linkMapper.copyVersion();
+	linksFrame->addVersion(newVersion);
+	imageFrame->setVersion(newVersion);
+}
+
+void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
+{
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	const auto& activeVersion = linkMapper.deleteVersion();
+	linksFrame->deleteActiveAndSwapToVersion(activeVersion);
+	imageFrame->setVersion(activeVersion);
+}
+
+void MainFrame::onVersionsRenameVersion(wxCommandEvent& evt)
+{
+	const auto& version = linkMapper.getActiveVersion();
+	if (version)
+	{
+		auto* dialog = new DialogComment(this, "Edit Name", version->getName(), version->getID());
+		dialog->ShowModal();
+	}
+}
+
+void MainFrame::onRenameVersion(wxCommandEvent& evt)
+{
+	const auto versionName = evt.GetString().ToStdString();
+
+	linkMapper.updateActiveVersionName(versionName);
+	linksFrame->updateActiveVersionName(versionName);
+}
+
+void MainFrame::onChangeTab(wxBookCtrlEvent& event)
+{
+	// linksTab has changed tab to another set. We need to update everything.
+
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
+
+	const auto& activeVersion = linkMapper.activateVersionByIndex(event.GetSelection());
+	linksFrame->setVersion(activeVersion);
+	imageFrame->setVersion(activeVersion);
+}
+
+void MainFrame::onLinksMoveUp(wxCommandEvent& evt)
+{
+	linkMapper.moveActiveLinkUp();
+	linksFrame->moveActiveLinkUp();
+}
+
+void MainFrame::onLinksMoveDown(wxCommandEvent& evt)
+{
+	linkMapper.moveActiveLinkDown();
+	linksFrame->moveActiveLinkDown();
 }

@@ -8,6 +8,7 @@
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -21,6 +22,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	Bind(wxEVT_LEFT_UP, &ImageCanvas::leftUp, this);
 	Bind(wxEVT_RIGHT_UP, &ImageCanvas::rightUp, this);
 	Bind(wxEVT_KEY_DOWN, &ImageCanvas::onKeyDown, this);
+	Bind(wxEVT_MOUSEWHEEL, &ImageCanvas::onMouseWheel, this);
 
 	image = theImage;
 	width = image->GetSize().GetX();
@@ -171,8 +173,10 @@ void ImageCanvas::deactivateLink()
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)
 {
-	const auto x = CalcUnscrolledPosition(event.GetPosition()).x;
-	const auto y = CalcUnscrolledPosition(event.GetPosition()).y;
+	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
+	auto y = CalcUnscrolledPosition(event.GetPosition()).y;
+	x = static_cast<int>(x / scaleFactor);
+	y = static_cast<int>(y / scaleFactor);
 	const auto offs = coordsToOffset(x, y, width);
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
@@ -196,7 +200,6 @@ void ImageCanvas::onMouseOver(wxMouseEvent& event)
 				name += "UNDEFINED";
 			tooltipCache = std::pair(chroma, name);
 		}
-
 		this->SetToolTip(name);
 	}
 	event.Skip();
@@ -210,8 +213,10 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 	// 3. remove it from active mapping.
 
 	// What province have we clicked?
-	const auto x = CalcUnscrolledPosition(event.GetPosition()).x;
-	const auto y = CalcUnscrolledPosition(event.GetPosition()).y;
+	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
+	auto y = CalcUnscrolledPosition(event.GetPosition()).y;
+	x = static_cast<int>(x / scaleFactor);
+	y = static_cast<int>(y / scaleFactor);
 	const auto offs = coordsToOffset(x, y, width);
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
@@ -345,7 +350,6 @@ void ImageCanvas::shadeProvinceByID(int ID)
 		markProvince(province);
 }
 
-
 wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
@@ -400,13 +404,25 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 {
 	switch (event.GetKeyCode())
 	{
+		case WXK_F3:
+			stageAddLink();
+			break;
 		case WXK_F4:
 			// spawn a dialog to name the comment.
 			stageAddComment();
 			break;
+		case WXK_F5:
+			stageSave();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
+			break;
+		case WXK_NUMPAD_SUBTRACT:
+			stageMoveUp();
+			break;
+		case WXK_NUMPAD_ADD:
+			stageMoveDown();
 			break;
 		default:
 			event.Skip();
@@ -427,4 +443,112 @@ void ImageCanvas::stageDeleteLink() const
 		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
 	}
+}
+
+void ImageCanvas::onMouseWheel(wxMouseEvent& event)
+{
+	if (event.GetWheelRotation() != 0)
+	{
+		rotationDelta += event.GetWheelRotation();
+		if (rotationDelta > 5)
+		{
+			rotationDelta = 0;
+			zoomIn();
+		}
+		else if (rotationDelta < -5)
+		{
+			rotationDelta = 0;
+			zoomOut();
+		}
+	}
+}
+
+void ImageCanvas::zoomIn()
+{
+	auto needRefresh = false;
+	oldScaleFactor = scaleFactor;
+	if (scaleFactor < 1)
+	{
+		scaleFactor += 0.1;
+		needRefresh = true;
+	}
+	else if (scaleFactor < 3)
+	{
+		scaleFactor += 0.5;
+		needRefresh = true;
+	}
+	else if (scaleFactor < 10)
+	{
+		scaleFactor += 1;
+		needRefresh = true;
+	}
+	// else nothing. Not going over 10.
+
+	if (needRefresh)
+		stageRefresh();
+}
+
+void ImageCanvas::zoomOut()
+{
+	auto needRefresh = false;
+	oldScaleFactor = scaleFactor;
+	if (scaleFactor >= 4)
+	{
+		scaleFactor -= 1;
+		needRefresh = true;
+	}
+	else if (scaleFactor >= 1.5)
+	{
+		scaleFactor -= 0.5;
+		needRefresh = true;
+	}
+	else if (scaleFactor >= 0.2)
+	{
+		scaleFactor -= 0.1;
+		needRefresh = true;
+	}
+	// not going below 0.1.
+
+	if (needRefresh)
+		stageRefresh();
+}
+
+void ImageCanvas::stageRefresh() const
+{
+	wxCommandEvent evt(wxEVT_REFRESH);
+	if (selector == ImageTabSelector::SOURCE)
+		evt.SetInt(0);
+	else if (selector == ImageTabSelector::TARGET)
+		evt.SetInt(1);
+	eventListener->QueueEvent(evt.Clone());
+}
+
+void ImageCanvas::stageMoveUp() const
+{
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
+		eventListener->QueueEvent(evt->Clone());
+	}
+}
+
+void ImageCanvas::stageMoveDown() const
+{
+	if (activeLink)
+	{
+		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
+		eventListener->QueueEvent(evt->Clone());
+	}
+}
+
+void ImageCanvas::stageSave() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageAddLink() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
 }

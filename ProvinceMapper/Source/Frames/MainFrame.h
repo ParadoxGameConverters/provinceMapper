@@ -10,8 +10,12 @@
 #include <array>
 #include <wx/splitter.h>
 
-wxDECLARE_EVENT(wxMENU_ADD_LINK, wxCommandEvent);
+class wxBookCtrlEvent;
 wxDECLARE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
@@ -51,6 +55,14 @@ class MainFrame: public wxFrame
 	void onDeleteActiveLink(wxCommandEvent& evt);
 	void onLinksAddLink(wxCommandEvent& evt);
 	void onLinksAddComment(wxCommandEvent& evt);
+	void onVersionsAddVersion(wxCommandEvent& evt);
+	void onVersionsCopyVersion(wxCommandEvent& evt);
+	void onVersionsDeleteVersion(wxCommandEvent& evt);
+	void onVersionsRenameVersion(wxCommandEvent& evt);
+	void onRenameVersion(wxCommandEvent& evt);
+	void onChangeTab(wxBookCtrlEvent& event);
+	void onLinksMoveUp(wxCommandEvent& evt);
+	void onLinksMoveDown(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
@@ -88,5 +100,6 @@ class MainFrame: public wxFrame
 
 	std::string linksFileString;
 
-	std::array<bool, 5> sanity = {false, false, false, false, false}; // source/target pickers, links, source/target tokens
+	// source/target pickers, links, source/target tokens
+	std::array<bool, 5> sanity = {false, false, false, false, false};
 };

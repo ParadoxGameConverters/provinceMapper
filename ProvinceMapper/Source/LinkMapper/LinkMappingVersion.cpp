@@ -9,10 +9,11 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 std::shared_ptr<Definitions> theSourceDefs,
 	 std::shared_ptr<Definitions> theTargetDefs,
 	 std::string theSourceToken,
-	 std::string theTargetToken):
-	 versionName(std::move(theVersionName)),
-	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken)),
-	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 std::string theTargetToken,
+	 int theID):
+	 ID(theID),
+	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
+	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
 	registerKeys();
 	parseStream(theStream);
@@ -23,10 +24,11 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 std::shared_ptr<Definitions> theSourceDefs,
 	 std::shared_ptr<Definitions> theTargetDefs,
 	 std::string theSourceToken,
-	 std::string theTargetToken):
-	 versionName(std::move(theVersionName)),
-	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken)),
-	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 std::string theTargetToken,
+	 int theID):
+	 ID(theID),
+	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
+	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
 }
 
@@ -68,12 +70,12 @@ void LinkMappingVersion::activateLinkByIndex(const int row)
 	}
 }
 
-void LinkMappingVersion::activateLinkByID(const int ID)
+void LinkMappingVersion::activateLinkByID(const int theID)
 {
 	auto counter = 0;
 	for (const auto& link: *links)
 	{
-		if (link->getID() == ID)
+		if (link->getID() == theID)
 		{
 			activeLink = link;
 			lastActiveLinkIndex = counter;
@@ -163,4 +165,38 @@ int LinkMappingVersion::addRawComment()
 	links->insert(positionItr, link);
 	activeLink = link;
 	return link->getID();
+}
+
+void LinkMappingVersion::moveActiveLinkUp() const
+{
+	if (activeLink)
+	{
+		size_t counter = 0;
+		for (const auto& link: *links)
+		{
+			if (*link == *activeLink && counter > 0)
+			{
+				std::swap((*links)[counter], (*links)[counter - 1]);
+				break;
+			}
+			++counter;
+		}
+	}
+}
+
+void LinkMappingVersion::moveActiveLinkDown() const
+{
+	if (activeLink)
+	{
+		size_t counter = 0;
+		for (const auto& link: *links)
+		{
+			if (*link == *activeLink && counter < links->size() - 1)
+			{
+				std::swap((*links)[counter], (*links)[counter + 1]);
+				break;
+			}
+			++counter;
+		}
+	}
 }
