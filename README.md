@@ -133,8 +133,8 @@ Note: Do NOT alter old versions while you have newer province maps loaded! Rever
 
 ### Organizing versions
 
-1. To move the active version left, press Num /.
-2. To move the active version right, press Num *.
+1.  To move the active version left, press Num /.
+2.  To move the active version right, press Num *.
 
 When outputting versions, lefternmost version goes first.
 
