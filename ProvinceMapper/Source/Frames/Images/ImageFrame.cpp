@@ -48,39 +48,36 @@ void ImageFrame::onScrollPaint(wxPaintEvent& event)
 void ImageFrame::onRefresh(wxCommandEvent& event)
 {
 	// force refresh comes from zooming. We need to store and then recalculate scroll position.
-	auto refreshSource = false;
-	auto refreshTarget = false;
-	if (std::abs(sourceCanvas->getScale() - sourceCanvas->getOldScale()) > 0.001)
-		refreshSource = true;
-	if (std::abs(targetCanvas->getScale() - targetCanvas->getOldScale()) > 0.001)
-		refreshTarget = true;
-
-	const auto sourceHalfScreenX = static_cast<int>(sourceCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
-	const auto sourceHalfScreenY = static_cast<int>(sourceCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
-	const auto targetHalfScreenX = static_cast<int>(targetCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
-	const auto targetHalfScreenY = static_cast<int>(targetCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
-	const auto sourceScrollX = sourceCanvas->GetViewStart().x;
-	const auto sourceScrollY = sourceCanvas->GetViewStart().y;
-	const auto targetScrollX = targetCanvas->GetViewStart().x;
-	const auto targetScrollY = targetCanvas->GetViewStart().y;
-	const auto sourceCenterX = (sourceHalfScreenX + sourceScrollX) / sourceCanvas->getOldScale();
-	const auto sourceCenterY = (sourceHalfScreenY + sourceScrollY) / sourceCanvas->getOldScale();
-	const auto targetCenterX = (targetHalfScreenX + targetScrollX) / targetCanvas->getOldScale();
-	const auto targetCenterY = (targetHalfScreenY + targetScrollY) / targetCanvas->getOldScale();
-
-	render(); // render will change virtual size of the image thus setting scrollbars to random junk.
-
-	const auto sourceUnits = wxPoint(static_cast<int>(sourceCenterX * sourceCanvas->getScale()), static_cast<int>(sourceCenterY * sourceCanvas->getScale()));
-	const auto targetUnits = wxPoint(static_cast<int>(targetCenterX * targetCanvas->getScale()), static_cast<int>(targetCenterY * targetCanvas->getScale()));
-	const auto sourceOffset = wxPoint(sourceUnits.x - sourceHalfScreenX, sourceUnits.y - sourceHalfScreenY);
-	const auto targetOffset = wxPoint(targetUnits.x - targetHalfScreenX, targetUnits.y - targetHalfScreenY);
-	if (refreshSource)
+	if (event.GetInt() == 0)
 	{
+		const auto sourceHalfScreenX = static_cast<int>(sourceCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
+		const auto sourceHalfScreenY = static_cast<int>(sourceCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
+		const auto sourceScrollX = sourceCanvas->GetViewStart().x;
+		const auto sourceScrollY = sourceCanvas->GetViewStart().y;
+		const auto sourceCenterX = (sourceHalfScreenX + sourceScrollX) / sourceCanvas->getOldScale();
+		const auto sourceCenterY = (sourceHalfScreenY + sourceScrollY) / sourceCanvas->getOldScale();
+
+		renderSource(); // render will change virtual size of the image thus setting scrollbars to random junk.
+
+		const auto sourceUnits = wxPoint(static_cast<int>(sourceCenterX * sourceCanvas->getScale()), static_cast<int>(sourceCenterY * sourceCanvas->getScale()));
+		const auto sourceOffset = wxPoint(sourceUnits.x - sourceHalfScreenX, sourceUnits.y - sourceHalfScreenY);
+
 		sourceCanvas->Scroll(sourceOffset);
 		sourceCanvas->clearScale();
 	}
-	if (refreshTarget)
+	else if (event.GetInt() == 1)
 	{
+		const auto targetHalfScreenX = static_cast<int>(targetCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
+		const auto targetHalfScreenY = static_cast<int>(targetCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
+		const auto targetScrollX = targetCanvas->GetViewStart().x;
+		const auto targetScrollY = targetCanvas->GetViewStart().y;
+		const auto targetCenterX = (targetHalfScreenX + targetScrollX) / targetCanvas->getOldScale();
+		const auto targetCenterY = (targetHalfScreenY + targetScrollY) / targetCanvas->getOldScale();
+
+		renderTarget();
+
+		const auto targetUnits = wxPoint(static_cast<int>(targetCenterX * targetCanvas->getScale()), static_cast<int>(targetCenterY * targetCanvas->getScale()));
+		const auto targetOffset = wxPoint(targetUnits.x - targetHalfScreenX, targetUnits.y - targetHalfScreenY);
 		targetCanvas->Scroll(targetOffset);
 		targetCanvas->clearScale();
 	}
@@ -88,10 +85,16 @@ void ImageFrame::onRefresh(wxCommandEvent& event)
 	Refresh();
 }
 
-void ImageFrame::render()
+void ImageFrame::render() const
 {
-	auto newWidth = static_cast<int>(sourceCanvas->getWidth() * sourceCanvas->getScale());
-	auto newHeight = static_cast<int>(sourceCanvas->getHeight() * sourceCanvas->getScale());
+	renderSource();
+	renderTarget();
+}
+
+void ImageFrame::renderSource() const
+{
+	const auto newWidth = static_cast<int>(sourceCanvas->getWidth() * sourceCanvas->getScale());
+	const auto newHeight = static_cast<int>(sourceCanvas->getHeight() * sourceCanvas->getScale());
 	sourceCanvas->SetVirtualSize(newWidth, newHeight);
 	sourceCanvas->SetScale(sourceCanvas->getScale(), sourceCanvas->getScale());
 
@@ -100,9 +103,12 @@ void ImageFrame::render()
 	sourceDC.Clear();
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
+}
 
-	newWidth = static_cast<int>(targetCanvas->getWidth() * targetCanvas->getScale());
-	newHeight = static_cast<int>(targetCanvas->getHeight() * targetCanvas->getScale());
+void ImageFrame::renderTarget() const
+{
+	const auto newWidth = static_cast<int>(targetCanvas->getWidth() * targetCanvas->getScale());
+	const auto newHeight = static_cast<int>(targetCanvas->getHeight() * targetCanvas->getScale());
 	targetCanvas->SetVirtualSize(newWidth, newHeight);
 	targetCanvas->SetScale(targetCanvas->getScale(), targetCanvas->getScale());
 
@@ -204,20 +210,30 @@ void ImageFrame::deleteActiveLink()
 void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 {
 	if (sourceImage)
+	{
 		sourceCanvas->toggleProvinceByID(ID);
+		renderSource();
+	}
 	else
+	{
 		targetCanvas->toggleProvinceByID(ID);
-	render();
+		renderTarget();
+	}
 	Refresh();
 }
 
 void ImageFrame::shadeProvinceByID(int ID, bool sourceImage)
 {
 	if (sourceImage)
+	{
 		sourceCanvas->shadeProvinceByID(ID);
+		renderSource();
+	}
 	else
+	{
 		targetCanvas->shadeProvinceByID(ID);
-	render();
+		renderTarget();
+	}
 	Refresh();
 }
 
