@@ -200,3 +200,8 @@ void LinkMappingVersion::moveActiveLinkDown() const
 		}
 	}
 }
+
+bool LinkMappingVersion::operator==(const LinkMappingVersion& rhs) const
+{
+	return ID == rhs.ID;
+}

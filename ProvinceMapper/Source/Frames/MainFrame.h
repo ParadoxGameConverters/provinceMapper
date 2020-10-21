@@ -63,6 +63,8 @@ class MainFrame: public wxFrame
 	void onChangeTab(wxBookCtrlEvent& event);
 	void onLinksMoveUp(wxCommandEvent& evt);
 	void onLinksMoveDown(wxCommandEvent& evt);
+	void onLinksMoveVersionLeft(wxCommandEvent& evt);
+	void onLinksMoveVersionRight(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);

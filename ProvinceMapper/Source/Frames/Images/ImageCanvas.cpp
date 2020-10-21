@@ -424,6 +424,12 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 		case WXK_NUMPAD_ADD:
 			stageMoveDown();
 			break;
+		case WXK_NUMPAD_MULTIPLY:
+			stageMoveVersionRight();
+			break;
+		case WXK_NUMPAD_DIVIDE:
+			stageMoveVersionLeft();
+			break;
 		default:
 			event.Skip();
 	}
@@ -550,5 +556,17 @@ void ImageCanvas::stageSave() const
 void ImageCanvas::stageAddLink() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageMoveVersionLeft() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageMoveVersionRight() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventListener->QueueEvent(evt->Clone());
 }

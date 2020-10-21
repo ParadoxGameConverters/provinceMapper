@@ -34,6 +34,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onVersionsRenameVersion, this, wxMENU_RENAME_VERSION);
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveUp, this, wxEVT_MOVE_ACTIVE_LINK_UP);
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveDown, this, wxEVT_MOVE_ACTIVE_LINK_DOWN);
+	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionLeft, this, wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionRight, this, wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
@@ -48,6 +50,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MOVE_ACTIVE_LINK_DOWN, &MainFrame::onLinksMoveDown, this);
 	Bind(wxEVT_SAVE_LINKS, &MainFrame::onSaveLinks, this);
 	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
+	Bind(wxEVT_MOVE_ACTIVE_VERSION_LEFT, &MainFrame::onLinksMoveVersionLeft, this);
+	Bind(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, &MainFrame::onLinksMoveVersionRight, this);
 }
 
 void MainFrame::initFrame()
@@ -215,12 +219,14 @@ void MainFrame::initLinksFrame()
 	linksDropDown->Append(wxEVT_ADD_LINK, "Add Link [F3]\tCtrl-L");
 	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment [F4]\tCtrl-C");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected [Del]\tCtrl-D");
-	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum-");
-	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum+");
+	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum -");
+	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum +");
 	auto* versionsDropDown = new wxMenu;
 	versionsDropDown->Append(wxMENU_ADD_VERSION, "New Version");
 	versionsDropDown->Append(wxMENU_COPY_VERSION, "Copy Version");
 	versionsDropDown->Append(wxMENU_RENAME_VERSION, "Rename Version");
+	versionsDropDown->Append(wxEVT_MOVE_ACTIVE_VERSION_LEFT, "Move Left\tNum /");
+	versionsDropDown->Append(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, "Move Right\tNum *");
 	versionsDropDown->Append(wxMENU_DELETE_VERSION, "Delete (Danger!)");
 	auto* linksMenuBar = new wxMenuBar;
 	linksMenuBar->Append(saveDropDown, "&File");
@@ -743,4 +749,16 @@ void MainFrame::onLinksMoveDown(wxCommandEvent& evt)
 {
 	linkMapper.moveActiveLinkDown();
 	linksFrame->moveActiveLinkDown();
+}
+
+void MainFrame::onLinksMoveVersionLeft(wxCommandEvent& evt)
+{
+	linkMapper.moveActiveVersionLeft();
+	linksFrame->moveActiveVersionLeft();
+}
+
+void MainFrame::onLinksMoveVersionRight(wxCommandEvent& evt)
+{
+	linkMapper.moveActiveVersionRight();
+	linksFrame->moveActiveVersionRight();
 }

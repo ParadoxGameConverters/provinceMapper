@@ -24,12 +24,18 @@ class LinksFrame: public wxFrame
 	void updateActiveVersionName(const std::string& theName) const;
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;
+	void moveActiveVersionLeft();
+	void moveActiveVersionRight();
 
   private:
 	wxNotebook* notebook = nullptr;
 
 	void onResize(wxSizeEvent& evt);
 	void onClose(wxCloseEvent& event);
+	void onKeyDown(wxKeyEvent& event);
+
+	void stageMoveVersionLeft() const;
+	void stageMoveVersionRight() const;
 
 	std::map<int, LinksTab*> pages; // version ID, page it's on.
 	LinksTab* activePage = nullptr;

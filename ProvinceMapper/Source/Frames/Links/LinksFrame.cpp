@@ -8,13 +8,14 @@ LinksFrame::LinksFrame(wxWindow* parent,
 	 const std::shared_ptr<LinkMappingVersion>& activeVersion):
 	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE),
 	 eventHandler(parent)
-
 {
 	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &LinksFrame::onClose, this);
+	Bind(wxEVT_KEY_DOWN, &LinksFrame::onKeyDown, this);
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900));
+	notebook->Bind(wxEVT_KEY_DOWN, &LinksFrame::onKeyDown, this);
 
 	for (const auto& version: versions)
 	{
@@ -142,4 +143,63 @@ void LinksFrame::moveActiveLinkDown() const
 {
 	if (activePage)
 		activePage->moveActiveLinkDown();
+}
+
+void LinksFrame::moveActiveVersionLeft()
+{
+	if (activePage)
+	{
+		const auto originalPage = static_cast<size_t>(notebook->GetSelection());
+		const auto name = notebook->GetPageText(originalPage);
+		if (originalPage > 0)
+		{
+			notebook->InsertPage(originalPage - 1, activePage, name, false);
+			std::swap(versionIDs[originalPage], versionIDs[originalPage - 1]);
+			notebook->RemovePage(originalPage + 1);
+			notebook->SetSelection(originalPage - 1);
+		}
+	}
+}
+
+void LinksFrame::moveActiveVersionRight()
+{
+	if (activePage)
+	{
+		const auto originalPage = static_cast<size_t>(notebook->GetSelection());
+		const auto name = notebook->GetPageText(originalPage);
+		if (originalPage < versionIDs.size() - 1)
+		{
+			notebook->InsertPage(originalPage + 2, activePage, name, false);
+			std::swap(versionIDs[originalPage], versionIDs[originalPage + 1]);
+			notebook->RemovePage(originalPage);
+			notebook->SetSelection(originalPage + 1);
+		}
+	}
+}
+
+void LinksFrame::onKeyDown(wxKeyEvent& event)
+{
+	switch (event.GetKeyCode())
+	{
+		case WXK_NUMPAD_MULTIPLY:
+			stageMoveVersionRight();
+			break;
+		case WXK_NUMPAD_DIVIDE:
+			stageMoveVersionLeft();
+			break;
+		default:
+			event.Skip();
+	}
+}
+
+void LinksFrame::stageMoveVersionLeft() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	eventHandler->QueueEvent(evt->Clone());
+}
+
+void LinksFrame::stageMoveVersionRight() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
+	eventHandler->QueueEvent(evt->Clone());
 }

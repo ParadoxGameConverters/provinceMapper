@@ -12,6 +12,8 @@ wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxSize(600, 900)), version(std::move(theVersion)), eventListener(parent)
@@ -354,6 +356,12 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 		case WXK_NUMPAD_ADD:
 			stageMoveDown();
 			break;
+		case WXK_NUMPAD_MULTIPLY:
+			stageMoveVersionRight();
+			break;
+		case WXK_NUMPAD_DIVIDE:
+			stageMoveVersionLeft();
+			break;
 		default:
 			event.Skip();
 	}
@@ -430,5 +438,17 @@ void LinksTab::stageSave() const
 void LinksTab::stageAddLink() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void LinksTab::stageMoveVersionLeft() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void LinksTab::stageMoveVersionRight() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventListener->QueueEvent(evt->Clone());
 }

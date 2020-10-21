@@ -194,3 +194,37 @@ void LinkMapper::moveActiveLinkDown() const
 	if (activeVersion)
 		activeVersion->moveActiveLinkDown();
 }
+
+void LinkMapper::moveActiveVersionLeft()
+{
+	if (activeVersion)
+	{
+		size_t counter = 0;
+		for (const auto& version: versions)
+		{
+			if (*version == *activeVersion && counter > 0)
+			{
+				std::swap(versions[counter], versions[counter - 1]);
+				break;
+			}
+			++counter;
+		}
+	}
+}
+
+void LinkMapper::moveActiveVersionRight()
+{
+	if (activeVersion)
+	{
+		size_t counter = 0;
+		for (const auto& version: versions)
+		{
+			if (*version == *activeVersion && counter < versions.size() - 1)
+			{
+				std::swap(versions[counter], versions[counter + 1]);
+				break;
+			}
+			++counter;
+		}
+	}
+}

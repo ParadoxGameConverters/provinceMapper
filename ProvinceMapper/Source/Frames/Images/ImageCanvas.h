@@ -76,6 +76,8 @@ class ImageCanvas: public wxScrolledCanvas
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageMoveVersionLeft() const;
+	void stageMoveVersionRight() const;
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
