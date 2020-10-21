@@ -131,6 +131,13 @@ Note: Do NOT alter old versions while you have newer province maps loaded! Rever
 1.  Select a version you wish to edit.
 2.  In Links menu under "Versions" choose "Rename".
 
+### Organizing versions
+
+1. To move the active version left, press Num /.
+2. To move the active version right, press Num *.
+
+When outputting versions, lefternmost version goes first.
+
 ### Delete a version
 
 Note: Do NOT delete obsolete versions, even if the converter does not support multiple versions presently.
