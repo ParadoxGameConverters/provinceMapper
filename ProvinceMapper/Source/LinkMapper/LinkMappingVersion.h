@@ -41,6 +41,8 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
 
+	bool operator==(const LinkMappingVersion& rhs) const;
+
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 
   private:

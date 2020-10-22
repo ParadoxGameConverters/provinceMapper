@@ -21,6 +21,8 @@ class LinkMapper: commonItems::parser
 	void updateActiveVersionName(const std::string& theName) const;
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;
+	void moveActiveVersionLeft();
+	void moveActiveVersionRight();
 
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }

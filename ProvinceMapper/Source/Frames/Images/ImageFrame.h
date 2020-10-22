@@ -19,7 +19,6 @@ class ImageFrame: public wxFrame
 		 const std::shared_ptr<Definitions>& sourceDefs,
 		 const std::shared_ptr<Definitions>& targetDefs);
 
-	void render();
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
@@ -35,6 +34,10 @@ class ImageFrame: public wxFrame
 	void onToggleBlack(wxCommandEvent& event);
 	void onClose(wxCloseEvent& event);
 	void onRefresh(wxCommandEvent& event);
+
+	void render() const;
+	void renderSource() const;
+	void renderTarget() const;
 
 	ImageCanvas* sourceCanvas;
 	ImageCanvas* targetCanvas;

@@ -15,6 +15,8 @@ wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 
 class LinkMappingVersion;
 class LinkMapping;
@@ -47,6 +49,8 @@ class LinksTab: public wxNotebookPage
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageMoveVersionLeft() const;
+	void stageMoveVersionRight() const;
 
 	int lastClickedRow = 0;
 

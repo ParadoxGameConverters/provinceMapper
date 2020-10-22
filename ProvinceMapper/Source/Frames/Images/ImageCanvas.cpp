@@ -221,10 +221,6 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
-		// Override when we have an active link at a comment
-		if (activeLink && activeLink->getComment())
-			return;
-
 		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
 		// Province may not even be defined/instanced, let alone linked. Tread carefully.
 		const auto province = definitions->getProvinceForChroma(chroma);
@@ -260,8 +256,9 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 			}
 		}
 
-		// Case 3: SELECT PROVINCE since it's not linked anywhere.
-		stageToggleProvinceByID(province->ID);
+		// Case 3: SELECT PROVINCE since it's not linked anywhere, unless we're operating on a comment.
+		if (!(activeLink && activeLink->getComment()))
+			stageToggleProvinceByID(province->ID);
 	}
 }
 
@@ -424,6 +421,12 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 		case WXK_NUMPAD_ADD:
 			stageMoveDown();
 			break;
+		case WXK_NUMPAD_MULTIPLY:
+			stageMoveVersionRight();
+			break;
+		case WXK_NUMPAD_DIVIDE:
+			stageMoveVersionLeft();
+			break;
 		default:
 			event.Skip();
 	}
@@ -550,5 +553,17 @@ void ImageCanvas::stageSave() const
 void ImageCanvas::stageAddLink() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageMoveVersionLeft() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageMoveVersionRight() const
+{
+	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventListener->QueueEvent(evt->Clone());
 }
