@@ -23,6 +23,7 @@
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Images\StatusBar.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\DialogComment.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksTab.cpp" />
@@ -49,6 +50,7 @@
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Images\StatusBar.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\DialogComment.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksTab.h" />

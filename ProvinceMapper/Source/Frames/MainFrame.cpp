@@ -19,7 +19,8 @@ wxDEFINE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size): wxFrame(nullptr, wxID_ANY, title, pos, size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
+	 wxFrame(nullptr, wxID_ANY, title, pos, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL)
 {
 	Bind(wxEVT_MENU, &MainFrame::onExit, this, wxID_EXIT);
 	Bind(wxEVT_MENU, &MainFrame::onAbout, this, wxID_ABOUT);
@@ -57,16 +58,18 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 void MainFrame::initFrame()
 {
 	configuration.load();
-	SetBackgroundColour(wxColour(230, 230, 230));
+	auto* holderPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxEXPAND);
+	holderPanel->SetBackgroundColour(wxColour(230, 230, 230));
 	sizer = new wxFlexGridSizer(4, 3, 5);
-	SetSizer(sizer);
+	holderPanel->SetSizer(sizer);
 
 	// Source directory
-	auto* sdirText = new wxStaticText(this, wxID_ANY, "Source Directory", wxDefaultPosition);
-	sourceDirPicker = new wxDirPickerCtrl(this, 0, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
+	auto* sdirText = new wxStaticText(holderPanel, wxID_ANY, "Source Directory", wxDefaultPosition);
+	sourceDirPicker =
+		 new wxDirPickerCtrl(holderPanel, 0, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	sourceDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
-	sourceDirStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	reverseSourceCheck = new wxCheckBox(this, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	sourceDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	reverseSourceCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
 	if (configuration.isSourceReversed())
 		reverseSourceCheck->SetValue(true);
 	reverseSourceCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
@@ -77,17 +80,18 @@ void MainFrame::initFrame()
 		configuration.save();
 	});
 
-	sizer->Add(sdirText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
-	sizer->Add(sourceDirPicker, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5);
-	sizer->Add(sourceDirStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
-	sizer->Add(reverseSourceCheck, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(sdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
+	sizer->Add(sourceDirPicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
+	sizer->Add(sourceDirStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
+	sizer->Add(reverseSourceCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
 
 	// Target Directory
-	auto* tdirText = new wxStaticText(this, wxID_ANY, "Target Directory", wxDefaultPosition);
-	targetDirPicker = new wxDirPickerCtrl(this, 1, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
+	auto* tdirText = new wxStaticText(holderPanel, wxID_ANY, "Target Directory", wxDefaultPosition);
+	targetDirPicker =
+		 new wxDirPickerCtrl(holderPanel, 1, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	targetDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
-	targetDirStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	reverseTargetCheck = new wxCheckBox(this, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	targetDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	reverseTargetCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
 	if (configuration.isTargetReversed())
 		reverseTargetCheck->SetValue(true);
 	reverseTargetCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
@@ -98,54 +102,59 @@ void MainFrame::initFrame()
 		configuration.save();
 	});
 
-	sizer->Add(tdirText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(targetDirPicker, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(targetDirStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
-	sizer->Add(reverseTargetCheck, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(tdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(targetDirPicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(targetDirStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(reverseTargetCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
 
 	// Link File
-	auto* linkFileText = new wxStaticText(this, wxID_ANY, "Link File", wxDefaultPosition);
+	auto* linkFileText = new wxStaticText(holderPanel, wxID_ANY, "Link File", wxDefaultPosition);
 	linkFilePicker =
-		 new wxFilePickerCtrl(this, 2, wxEmptyString, "BROWSE", "*.txt", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
+		 new wxFilePickerCtrl(holderPanel, 2, wxEmptyString, "BROWSE", "*.txt", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	linkFilePicker->Bind(wxEVT_FILEPICKER_CHANGED, &MainFrame::onPathChanged, this);
-	linkFileStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	linkFileStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
-	sizer->Add(linkFileText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(linkFilePicker, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(linkFileStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(linkFileText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(linkFilePicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(linkFileStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
 	sizer->AddStretchSpacer(0);
 
 	// Source Token
-	auto* sourceTokenText = new wxStaticText(this, wxID_ANY, "Source Token", wxDefaultPosition);
-	sourceTokenField = new wxTextCtrl(this, 3, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_DEFAULT);
+	auto* sourceTokenText = new wxStaticText(holderPanel, wxID_ANY, "Source Token", wxDefaultPosition);
+	sourceTokenField = new wxTextCtrl(holderPanel, 3, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_DEFAULT);
 	sourceTokenField->Bind(wxEVT_TEXT, &MainFrame::onTokenChanged, this);
-	sourceTokenStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	sourceTokenStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
-	sizer->Add(sourceTokenText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(sourceTokenField, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(sourceTokenStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(sourceTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(sourceTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(sourceTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
 	sizer->AddStretchSpacer(0);
 
 	// Target Token
-	auto* targetTokenText = new wxStaticText(this, wxID_ANY, "Target Token", wxDefaultPosition);
-	targetTokenField = new wxTextCtrl(this, 4, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_DEFAULT);
+	auto* targetTokenText = new wxStaticText(holderPanel, wxID_ANY, "Target Token", wxDefaultPosition);
+	targetTokenField = new wxTextCtrl(holderPanel, 4, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxBORDER_DEFAULT);
 	targetTokenField->Bind(wxEVT_TEXT, &MainFrame::onTokenChanged, this);
-	targetTokenStatus = new wxWindow(this, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	targetTokenStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
-	sizer->Add(targetTokenText, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(targetTokenField, 0, wxLEFT | wxRIGHT | wxEXPAND | wxALIGN_CENTER_VERTICAL, 5, nullptr);
-	sizer->Add(targetTokenStatus, 0, wxLEFT | wxRIGHT | wxALIGN_CENTER_VERTICAL, 5);
+	sizer->Add(targetTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(targetTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(targetTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
 	sizer->AddStretchSpacer(0);
 
 	// The Button
-	startButton = new wxButton(this, wxID_ANY, "Begin!", wxDefaultPosition, wxDefaultSize);
+	startButton = new wxButton(holderPanel, wxID_ANY, "Begin!", wxDefaultPosition, wxDefaultSize);
 	startButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrame::onStartButton, this);
 	startButton->Disable();
 
 	sizer->AddStretchSpacer(0);
-	sizer->Add(startButton, wxSizerFlags(1).Top().CenterHorizontal());
+	sizer->Add(startButton, wxSizerFlags(1).Top().CenterHorizontal().Border(wxBOTTOM, 10));
 	sizer->AddStretchSpacer(0);
 	sizer->AddStretchSpacer(0);
+
+	auto* boxSizer = new wxBoxSizer(wxHORIZONTAL);
+	boxSizer->Add(holderPanel, wxSizerFlags(1).Align(wxCENTER).Expand());
+	SetSizer(boxSizer);
+
 
 	populateFrame();
 }

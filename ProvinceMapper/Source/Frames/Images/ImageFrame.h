@@ -4,6 +4,7 @@
 #include <wx/wx.h>
 #endif
 
+class StatusBar;
 class LinkMappingVersion;
 class wxSplitterWindow;
 class ImageCanvas;
@@ -39,9 +40,10 @@ class ImageFrame: public wxFrame
 	void renderSource() const;
 	void renderTarget() const;
 
-	ImageCanvas* sourceCanvas;
-	ImageCanvas* targetCanvas;
-	wxSplitterWindow* splitter;
+	ImageCanvas* sourceCanvas = nullptr;
+	ImageCanvas* targetCanvas = nullptr;
+	wxSplitterWindow* splitter = nullptr;
+	StatusBar* statusBar = nullptr;
 
 	bool black = false;
 

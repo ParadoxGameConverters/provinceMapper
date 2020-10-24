@@ -16,7 +16,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	 wxImage* theImage,
 	 std::shared_ptr<Definitions> theDefinitions):
 	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL),
-	 definitions(std::move(theDefinitions)), eventListener(parent)
+	 definitions(std::move(theDefinitions)), eventHandler(parent)
 {
 	Bind(wxEVT_MOTION, &ImageCanvas::onMouseOver, this);
 	Bind(wxEVT_LEFT_UP, &ImageCanvas::leftUp, this);
@@ -269,7 +269,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 	if (activeLink)
 	{
 		auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-		eventListener->QueueEvent(evt->Clone());
+		eventHandler->QueueEvent(evt->Clone());
 	}
 	event.Skip();
 }
@@ -287,7 +287,7 @@ void ImageCanvas::selectLink(const int linkID) const
 {
 	auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_ID);
 	evt->SetInt(linkID);
-	eventListener->QueueEvent(evt->Clone());
+	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageToggleProvinceByID(const int provinceID) const
@@ -302,7 +302,7 @@ void ImageCanvas::stageToggleProvinceByID(const int provinceID) const
 		evt.SetInt(-provinceID);
 
 	// Notify authorities.
-	eventListener->QueueEvent(evt.Clone());
+	eventHandler->QueueEvent(evt.Clone());
 }
 
 void ImageCanvas::toggleProvinceByID(const int ID)
@@ -444,7 +444,7 @@ void ImageCanvas::stageDeleteLink() const
 	if (activeLink)
 	{
 		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
-		eventListener->QueueEvent(evt->Clone());
+		eventHandler->QueueEvent(evt->Clone());
 	}
 }
 
@@ -520,10 +520,10 @@ void ImageCanvas::stageRefresh() const
 {
 	wxCommandEvent evt(wxEVT_REFRESH);
 	if (selector == ImageTabSelector::SOURCE)
-		evt.SetInt(0);
+		evt.SetId(0);
 	else if (selector == ImageTabSelector::TARGET)
-		evt.SetInt(1);
-	eventListener->QueueEvent(evt.Clone());
+		evt.SetId(1);
+	eventHandler->QueueEvent(evt.Clone());
 }
 
 void ImageCanvas::stageMoveUp() const
@@ -531,7 +531,7 @@ void ImageCanvas::stageMoveUp() const
 	if (activeLink)
 	{
 		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
-		eventListener->QueueEvent(evt->Clone());
+		eventHandler->QueueEvent(evt->Clone());
 	}
 }
 
@@ -540,30 +540,36 @@ void ImageCanvas::stageMoveDown() const
 	if (activeLink)
 	{
 		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
-		eventListener->QueueEvent(evt->Clone());
+		eventHandler->QueueEvent(evt->Clone());
 	}
 }
 
 void ImageCanvas::stageSave() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
-	eventListener->QueueEvent(evt->Clone());
+	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageAddLink() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
-	eventListener->QueueEvent(evt->Clone());
+	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageMoveVersionLeft() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
-	eventListener->QueueEvent(evt->Clone());
+	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageMoveVersionRight() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
-	eventListener->QueueEvent(evt->Clone());
+	eventHandler->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::pushZoomLevel(const int zoomLevel)
+{
+	oldScaleFactor = scaleFactor;
+	scaleFactor = zoomLevel / 100.0;
 }

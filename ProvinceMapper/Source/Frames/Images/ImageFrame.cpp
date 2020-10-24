@@ -1,6 +1,7 @@
 #include "ImageFrame.h"
 #include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
+#include "StatusBar.h"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
@@ -18,7 +19,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
 
-	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE);
+	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
 
 	sourceCanvas = new ImageCanvas(splitter, ImageTabSelector::SOURCE, theActiveVersion, sourceImg, sourceDefs);
 	targetCanvas = new ImageCanvas(splitter, ImageTabSelector::TARGET, theActiveVersion, targetImg, targetDefs);
@@ -37,6 +38,9 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	splitter->SetSashGravity(0.5);
 	splitter->SplitVertically(sourceCanvas, targetCanvas);
 
+	statusBar = new StatusBar(this);
+	statusBar->Show();
+
 	SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 }
 
@@ -48,12 +52,16 @@ void ImageFrame::onScrollPaint(wxPaintEvent& event)
 void ImageFrame::onRefresh(wxCommandEvent& event)
 {
 	// force refresh comes from zooming. We need to store and then recalculate scroll position.
-	if (event.GetInt() == 0)
+	if (event.GetId() == 0)
 	{
+		if (event.GetInt())
+			sourceCanvas->pushZoomLevel(event.GetInt());
+		else
+			statusBar->setSourceZoom(static_cast<int>(sourceCanvas->getScale() * 100));
 		const auto sourceHalfScreenX = static_cast<int>(sourceCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
 		const auto sourceHalfScreenY = static_cast<int>(sourceCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
-		const auto sourceScrollX = sourceCanvas->GetViewStart().x;
-		const auto sourceScrollY = sourceCanvas->GetViewStart().y;
+		const auto sourceScrollX = static_cast<double>(sourceCanvas->GetViewStart().x);
+		const auto sourceScrollY = static_cast<double>(sourceCanvas->GetViewStart().y);
 		const auto sourceCenterX = (sourceHalfScreenX + sourceScrollX) / sourceCanvas->getOldScale();
 		const auto sourceCenterY = (sourceHalfScreenY + sourceScrollY) / sourceCanvas->getOldScale();
 
@@ -65,12 +73,16 @@ void ImageFrame::onRefresh(wxCommandEvent& event)
 		sourceCanvas->Scroll(sourceOffset);
 		sourceCanvas->clearScale();
 	}
-	else if (event.GetInt() == 1)
+	else if (event.GetId() == 1)
 	{
+		if (event.GetInt())
+			targetCanvas->pushZoomLevel(event.GetInt());
+		else
+			statusBar->setTargetZoom(static_cast<int>(targetCanvas->getScale() * 100));
 		const auto targetHalfScreenX = static_cast<int>(targetCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
 		const auto targetHalfScreenY = static_cast<int>(targetCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
-		const auto targetScrollX = targetCanvas->GetViewStart().x;
-		const auto targetScrollY = targetCanvas->GetViewStart().y;
+		const auto targetScrollX = static_cast<double>(targetCanvas->GetViewStart().x);
+		const auto targetScrollY = static_cast<double>(targetCanvas->GetViewStart().y);
 		const auto targetCenterX = (targetHalfScreenX + targetScrollX) / targetCanvas->getOldScale();
 		const auto targetCenterY = (targetHalfScreenY + targetScrollY) / targetCanvas->getOldScale();
 
