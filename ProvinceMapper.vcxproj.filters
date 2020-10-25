@@ -111,6 +111,9 @@
     <ClCompile Include="ProvinceMapper\Source\Localization\YmlScraper.cpp">
       <Filter>ProvinceMapper\Localization</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Images\StatusBar.cpp">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -184,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Localization\YmlScraper.h">
       <Filter>ProvinceMapper\Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Images\StatusBar.h">
+      <Filter>ProvinceMapper\Frames\Images</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

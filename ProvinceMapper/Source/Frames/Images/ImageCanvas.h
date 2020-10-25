@@ -53,6 +53,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void shadeProvinceByID(int ID);
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
+	void pushZoomLevel(int zoomLevel);
 
   private:
 	void onMouseOver(wxMouseEvent& event);
@@ -104,5 +105,5 @@ class ImageCanvas: public wxScrolledCanvas
 	std::pair<unsigned int, std::string> tooltipCache;
 
   protected:
-	wxEvtHandler* eventListener = nullptr;
+	wxEvtHandler* eventHandler = nullptr;
 };

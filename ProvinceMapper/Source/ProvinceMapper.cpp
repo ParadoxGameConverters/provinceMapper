@@ -10,7 +10,7 @@ bool ProvinceMapper::OnInit()
 	try
 	{
 		wxInitAllImageHandlers();
-		auto* frame = new MainFrame("ProvinceMapper", wxPoint(50, 50), wxSize(600, 300));
+		auto* frame = new MainFrame("ProvinceMapper", wxPoint(50, 50), wxSize(630, 250));
 		frame->initFrame();
 		frame->SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 
