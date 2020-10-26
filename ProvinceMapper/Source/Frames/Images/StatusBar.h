@@ -13,6 +13,10 @@ class StatusBar: public wxFrame
 
 	void setSourceZoom(int zoomLevel) const;
 	void setTargetZoom(int zoomLevel) const;
+	void setPointPlaced(int pointID);
+	void setTriangulationSane(bool sane);
+
+	[[nodiscard]] auto isTriangulate() const { return triangulate; }
 
   private:
 	bool triangulate = false;
@@ -27,6 +31,7 @@ class StatusBar: public wxFrame
 	wxWindow* tTriangulate1 = nullptr;
 	wxWindow* tTriangulate2 = nullptr;
 	wxWindow* tTriangulate3 = nullptr;
+	wxStaticText* triangulateText = nullptr;
 
 	void onZoomChanged(wxCommandEvent& evt);
 	void onZoomResetButton(wxCommandEvent& evt);

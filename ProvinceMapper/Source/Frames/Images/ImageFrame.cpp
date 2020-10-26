@@ -18,6 +18,9 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
+	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
+	Bind(wxEVT_POINT_PLACED, &ImageFrame::onPointPlaced, this);
+	Bind(wxEVT_MOUSE_AT, &ImageFrame::triangulateAtPoint, this);
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
 
@@ -115,6 +118,41 @@ void ImageFrame::renderSource() const
 	sourceDC.Clear();
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
+
+	if (statusBar->isTriangulate())
+	{
+		wxPen pen = sourceDC.GetPen();
+		pen.SetColour("white");
+		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+		sourceDC.SetPen(pen);
+		sourceDC.SetBrush(*wxRED_BRUSH);
+		// triangulation points
+		for (const auto& point: sourceCanvas->getPoints())
+		{
+			sourceDC.DrawCircle(point, static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
+		}
+	}
+
+	if (sourcePointer)
+	{
+		wxPen pen = sourceDC.GetPen();
+		pen.SetColour("red");
+		sourceDC.SetPen(pen);
+		sourceDC.DrawLine(sourcePointer->x - static_cast<int>(std::round(20 / sourceCanvas->getScale())),
+			 sourcePointer->y,
+			 sourcePointer->x + static_cast<int>(std::round(20 / sourceCanvas->getScale())),
+			 sourcePointer->y);
+		sourceDC.DrawLine(sourcePointer->x,
+			 sourcePointer->y - static_cast<int>(std::round(20 / sourceCanvas->getScale())),
+			 sourcePointer->x,
+			 sourcePointer->y + static_cast<int>(std::round(20 / sourceCanvas->getScale())));
+		const auto name = sourceCanvas->nameAtCoords(*sourcePointer);
+		sourceDC.SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+		sourceDC.SetTextForeground(*wxYELLOW);
+		sourceDC.DrawText(name, sourcePointer->x + 10, sourcePointer->y + 10);
+		sourceDC.SetBrush(*wxTRANSPARENT_BRUSH);
+		sourceDC.DrawRectangle(sourceRect);
+	}
 }
 
 void ImageFrame::renderTarget() const
@@ -129,6 +167,41 @@ void ImageFrame::renderTarget() const
 	targetDC.Clear();
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
+
+	if (statusBar->isTriangulate())
+	{
+		wxPen pen = targetDC.GetPen();
+		pen.SetColour("white");
+		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+		targetDC.SetPen(pen);
+		targetDC.SetBrush(*wxRED_BRUSH);
+		// triangulation points
+		for (const auto& point: targetCanvas->getPoints())
+		{
+			targetDC.DrawCircle(point, static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
+		}
+	}
+
+	if (targetPointer)
+	{
+		wxPen pen = targetDC.GetPen();
+		pen.SetColour("red");
+		targetDC.SetPen(pen);
+		targetDC.DrawLine(targetPointer->x - static_cast<int>(std::round(20 / targetCanvas->getScale())),
+			 targetPointer->y,
+			 targetPointer->x + static_cast<int>(std::round(20 / targetCanvas->getScale())),
+			 targetPointer->y);
+		targetDC.DrawLine(targetPointer->x,
+			 targetPointer->y - static_cast<int>(std::round(20 / targetCanvas->getScale())),
+			 targetPointer->x,
+			 targetPointer->y + static_cast<int>(std::round(20 / targetCanvas->getScale())));
+		const auto name = targetCanvas->nameAtCoords(*targetPointer);
+		targetDC.SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+		targetDC.SetTextForeground(*wxYELLOW);
+		targetDC.DrawText(name, targetPointer->x + 10, targetPointer->y + 10);
+		targetDC.SetBrush(*wxTRANSPARENT_BRUSH);
+		targetDC.DrawRectangle(targetRect);
+	}
 }
 
 void ImageFrame::onToggleOrientation(wxCommandEvent& event)
@@ -291,4 +364,183 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 void ImageFrame::showToolbar() const
 {
 	statusBar->Show();
+}
+
+void ImageFrame::onTriangulate(wxCommandEvent& event)
+{
+	sourceCanvas->toggleTriangulate();
+	targetCanvas->toggleTriangulate();
+	determineTriangulationSanity();
+	render();
+	Refresh();
+}
+
+void ImageFrame::onPointPlaced(wxCommandEvent& event)
+{
+	statusBar->setPointPlaced(event.GetInt());
+	if (event.GetInt() <= 3)
+		renderSource();
+	else
+		renderTarget();
+	determineTriangulationSanity();
+	Refresh();
+}
+
+void ImageFrame::determineTriangulationSanity()
+{
+	if (statusBar->isTriangulate() && sourceCanvas->getPoints().size() == 3 && targetCanvas->getPoints().size() == 3)
+	{
+		triangulationIsSane = true;
+		statusBar->setTriangulationSane(true);
+		buildBounds();
+	}
+	else
+	{
+		statusBar->setTriangulationSane(false);
+		triangulationIsSane = false;
+	}
+}
+
+void ImageFrame::buildBounds()
+{
+	// these bounds are the limits in which our triangulation will work.
+
+	double maxX = -1;
+	double minX = sourceCanvas->getWidth();
+	double maxY = -1;
+	double minY = sourceCanvas->getHeight();
+	for (const auto& point: sourceCanvas->getPoints())
+	{
+		if (point.x < minX)
+			minX = point.x;
+		if (point.x > maxX)
+			maxX = point.x;
+		if (point.y < minY)
+			minY = point.y;
+		if (point.y > maxY)
+			maxY = point.y;
+	}
+	// expand by 20% for convenience.
+	if (minX - (maxX - minX) * 0.2 > 0)
+		minX = minX - (maxX - minX) * 0.2;
+	if (minY - (maxY - minY) * 0.2 > 0)
+		minY = minY - (maxY - minY) * 0.2;
+	if (maxX + (maxX - minX) * 0.2 < sourceCanvas->getWidth())
+		maxX = maxX + (maxX - minX) * 0.2;
+	if (maxY + (maxY - minY) * 0.2 < sourceCanvas->getHeight())
+		maxY = maxY + (maxY - minY) * 0.2;
+	minX = std::round(minX);
+	minY = std::round(minY);
+	maxX = std::round(maxX);
+	maxY = std::round(maxY);
+	sourceRect = wxRect(wxPoint(static_cast<int>(minX), static_cast<int>(minY)), wxPoint(static_cast<int>(maxX), static_cast<int>(maxY)));
+
+	maxX = -1;
+	minX = targetCanvas->getWidth();
+	maxY = -1;
+	minY = targetCanvas->getHeight();
+	for (const auto& point: targetCanvas->getPoints())
+	{
+		if (point.x < minX)
+			minX = point.x;
+		if (point.x > maxX)
+			maxX = point.x;
+		if (point.y < minY)
+			minY = point.y;
+		if (point.y > maxY)
+			maxY = point.y;
+	}
+	if (minX - (maxX - minX) * 0.2 > 0)
+		minX = minX - (maxX - minX) * 0.2;
+	if (minY - (maxY - minY) * 0.2 > 0)
+		minY = minY - (maxY - minY) * 0.2;
+	if (maxX + (maxX - minX) * 0.2 < targetCanvas->getWidth())
+		maxX = maxX + (maxX - minX) * 0.2;
+	if (maxY + (maxY - minY) * 0.2 < targetCanvas->getHeight())
+		maxY = maxY + (maxY - minY) * 0.2;
+	targetRect = wxRect(wxPoint(static_cast<int>(minX), static_cast<int>(minY)), wxPoint(static_cast<int>(maxX), static_cast<int>(maxY)));
+}
+
+void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
+{
+	if (!triangulationIsSane)
+		return;
+
+	wxPoint currentPosition;
+	if (event.GetId() < 0)
+		currentPosition.x = -event.GetId();
+	else
+		currentPosition.x = event.GetId();
+	currentPosition.y = event.GetInt();
+
+	if (event.GetId() < 0) // this comes from target canvas.
+	{
+		if (targetRect.Contains(currentPosition))
+		{
+			sourcePointer = triangulate(targetCanvas->getPoints(), sourceCanvas->getPoints(), sourceRect, currentPosition);
+			renderSource();
+		}
+		else
+		{
+			sourcePointer.reset();
+		}
+	}
+	else
+	{
+		if (sourceRect.Contains(currentPosition))
+		{
+			targetPointer = triangulate(sourceCanvas->getPoints(), targetCanvas->getPoints(), targetRect, currentPosition);
+			renderTarget();
+		}
+		else
+		{
+			targetPointer.reset();
+		}
+	}
+	Refresh();
+}
+
+double ImageFrame::pointDistance(const wxPoint& point1, const wxPoint& point2)
+{
+	const auto sum = std::pow(point1.x - point2.x, 2) + std::pow(point1.y - point2.y, 2);
+	return std::sqrt(sum);
+}
+
+wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxRect& targetRect, const wxPoint& sourcePoint)
+{
+	const auto distance1 = pointDistance(sourcePoint, sources[0]);
+	const auto distance2 = pointDistance(sourcePoint, sources[1]);
+	const auto distance3 = pointDistance(sourcePoint, sources[2]);
+	auto result = wxPoint(0, 0);
+	if (distance1 == 0.0 || distance2 == 0.0 || distance3 == 0.0)
+		return result;
+	const auto dd1 = distance1 / distance2;
+	const auto dd2 = distance2 / distance3;
+	const auto dd3 = distance3 / distance1;
+	const auto dd4 = distance1 / distance3;
+	const auto dd5 = distance2 / distance1;
+	const auto dd6 = distance3 / distance2;
+
+	for (auto ix = 0; ix < targetRect.width; ix++)
+	{
+		for (auto iy = 0; iy < targetRect.height; iy++)
+		{
+			const auto point = wxPoint(ix + targetRect.x, iy + targetRect.y);
+			const auto tdist1 = pointDistance(point, targets[0]);
+			const auto tdist2 = pointDistance(point, targets[1]);
+			const auto tdist3 = pointDistance(point, targets[2]);
+			if (tdist1 == 0.0 || tdist2 == 0.0 || tdist3 == 0.0)
+				continue;
+
+			if (std::abs(tdist1 / tdist2 - dd1) < 0.01 && std::abs(tdist2 / tdist3 - dd2) < 0.01 && std::abs(tdist3 / tdist1 - dd3) < 0.01 &&
+				 std::abs(tdist1 / tdist3 - dd4) < 0.01 && std::abs(tdist2 / tdist1 - dd5) < 0.01 && std::abs(tdist3 / tdist2 - dd6) < 0.01)
+			{
+				result = point;
+				break;
+			}
+		}
+		if (result.x)
+			break;
+	}
+	return result;
 }

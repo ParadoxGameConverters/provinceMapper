@@ -27,7 +27,7 @@ StatusBar::StatusBar(wxWindow* parent):
 	auto* targetResetButton = new wxButton(holderPanel, 1, "Reset", wxDefaultPosition, wxDefaultSize);
 	targetResetButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onZoomResetButton, this);
 
-	auto* triangulateText = new wxStaticText(holderPanel, wxID_ANY, "Triangulate:", wxDefaultPosition, wxDefaultSize);
+	triangulateText = new wxStaticText(holderPanel, wxID_ANY, "Triangulate:", wxDefaultPosition, wxDefaultSize);
 	triangulateButton = new wxButton(holderPanel, wxID_ANY, "Enable", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Toggle Triangulation");
 	triangulateButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onTriangulate, this);
 
@@ -165,6 +165,7 @@ void StatusBar::onTriangulate(wxCommandEvent& evt)
 		tTriangulate2->SetBackgroundColour("gray");
 		tTriangulate3->SetBackgroundColour("gray");
 		triangulateButton->SetLabelText("Enable");
+		triangulateText->SetBackgroundColour(wxColor(230, 230, 230));
 	}
 	else
 	{
@@ -176,6 +177,7 @@ void StatusBar::onTriangulate(wxCommandEvent& evt)
 		tTriangulate2->SetBackgroundColour("red");
 		tTriangulate3->SetBackgroundColour("red");
 		triangulateButton->SetLabelText("Disable");
+		triangulateText->SetBackgroundColour("red");
 	}
 	const wxCommandEvent event(wxEVT_TOGGLE_TRIANGULATE);
 	eventHandler->QueueEvent(event.Clone());
@@ -185,4 +187,48 @@ void StatusBar::onTriangulate(wxCommandEvent& evt)
 void StatusBar::onClose(wxCloseEvent& event)
 {
 	Hide();
+}
+
+void StatusBar::setPointPlaced(const int pointID)
+{
+	switch (pointID)
+	{
+		case 1:
+			sTriangulate1->SetBackgroundColour("green");
+			break;
+		case 2:
+			sTriangulate2->SetBackgroundColour("green");
+			break;
+		case 3:
+			sTriangulate3->SetBackgroundColour("green");
+			break;
+		case 4:
+			tTriangulate1->SetBackgroundColour("green");
+			break;
+		case 5:
+			tTriangulate2->SetBackgroundColour("green");
+			break;
+		case 6:
+			tTriangulate3->SetBackgroundColour("green");
+			break;
+		default:
+			break;
+	}
+	Refresh();
+}
+
+void StatusBar::setTriangulationSane(const bool sane)
+{
+	if (triangulate)
+	{
+		if (sane)
+			triangulateText->SetBackgroundColour("green");
+		else
+			triangulateText->SetBackgroundColour("red");
+	}
+	else
+	{
+		triangulateText->SetBackgroundColour(wxColor(230, 230, 230));
+	}
+	Refresh();
 }

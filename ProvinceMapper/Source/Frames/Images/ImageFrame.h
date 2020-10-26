@@ -3,6 +3,7 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include <optional>
 
 class StatusBar;
 class LinkMappingVersion;
@@ -36,10 +37,20 @@ class ImageFrame: public wxFrame
 	void onToggleBlack(wxCommandEvent& event);
 	void onClose(wxCloseEvent& event);
 	void onRefresh(wxCommandEvent& event);
+	void onTriangulate(wxCommandEvent& event);
+	void onPointPlaced(wxCommandEvent& event);
+	void triangulateAtPoint(wxCommandEvent& event);
 
 	void render() const;
 	void renderSource() const;
 	void renderTarget() const;
+
+	void determineTriangulationSanity();
+	void buildBounds();
+	wxRect sourceRect;
+	wxRect targetRect;
+	std::optional<wxPoint> sourcePointer;
+	std::optional<wxPoint> targetPointer;
 
 	ImageCanvas* sourceCanvas = nullptr;
 	ImageCanvas* targetCanvas = nullptr;
@@ -47,6 +58,10 @@ class ImageFrame: public wxFrame
 	StatusBar* statusBar = nullptr;
 
 	bool black = false;
+	bool triangulationIsSane = false;
+
+	static double pointDistance(const wxPoint& point1, const wxPoint& point2);
+	static wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxRect& targetRect, const wxPoint& sourcePoint);
 
   protected:
 	wxEvtHandler* eventHandler;

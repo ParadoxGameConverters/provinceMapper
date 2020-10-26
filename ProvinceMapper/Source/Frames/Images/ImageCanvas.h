@@ -8,6 +8,8 @@
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_REFRESH, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 
 class wxTipWindow;
 struct Province;
@@ -35,6 +37,8 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getOldScale() const { return oldScaleFactor; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
+	[[nodiscard]] const auto& getPoints() const { return points; }
+	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
@@ -54,6 +58,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
 	void pushZoomLevel(int zoomLevel);
+	void toggleTriangulate();
 
   private:
 	void onMouseOver(wxMouseEvent& event);
@@ -79,12 +84,16 @@ class ImageCanvas: public wxScrolledCanvas
 	void stageAddLink() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
+	void stagePointPlaced() const;
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
 	bool black = false;
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
+
+	bool triangulate = false;
+	std::vector<wxPoint> points;
 
 	wxImage* image;
 	unsigned char* imageData;
