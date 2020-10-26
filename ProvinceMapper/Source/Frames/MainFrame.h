@@ -10,13 +10,14 @@
 #include <array>
 #include <wx/splitter.h>
 
-class wxBookCtrlEvent;
 wxDECLARE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_SHOW_TOOLBAR, wxCommandEvent);
 
+class wxBookCtrlEvent;
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
 class wxFileDirPickerEvent;
@@ -35,7 +36,7 @@ class MainFrame: public wxFrame
 	void applySanityToButton();
 	void initImageFrame();
 	void initLinksFrame();
-	void mergeRivers();
+	void mergeRivers() const;
 	static void mergeRiverData(unsigned char* imgData, unsigned char* riverData, int size);
 	static bool isRiverMask(unsigned char r, unsigned char g, unsigned char b);
 
@@ -65,6 +66,7 @@ class MainFrame: public wxFrame
 	void onLinksMoveDown(wxCommandEvent& evt);
 	void onLinksMoveVersionLeft(wxCommandEvent& evt);
 	void onLinksMoveVersionRight(wxCommandEvent& evt);
+	void onShowToolbar(wxCommandEvent& evt);
 
 	void readPixels(ImageTabSelector selector, const wxImage& img);
 	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);

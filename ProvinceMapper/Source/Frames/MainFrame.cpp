@@ -18,6 +18,7 @@ wxDEFINE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_SHOW_TOOLBAR, wxCommandEvent);
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 	 wxFrame(nullptr, wxID_ANY, title, pos, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL)
@@ -37,6 +38,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveDown, this, wxEVT_MOVE_ACTIVE_LINK_DOWN);
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionLeft, this, wxEVT_MOVE_ACTIVE_VERSION_LEFT);
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionRight, this, wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
+	Bind(wxEVT_MENU, &MainFrame::onShowToolbar, this, wxMENU_SHOW_TOOLBAR);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
@@ -154,7 +156,6 @@ void MainFrame::initFrame()
 	auto* boxSizer = new wxBoxSizer(wxHORIZONTAL);
 	boxSizer->Add(holderPanel, wxSizerFlags(1).Align(wxCENTER).Expand());
 	SetSizer(boxSizer);
-
 
 	populateFrame();
 }
@@ -302,11 +303,15 @@ void MainFrame::initImageFrame()
 	Log(LogLevel::Info) << "Registered " << targetImg->GetSize().GetX() << "x" << targetImg->GetSize().GetY() << " target pixels.";
 
 	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs);
+
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
+	auto* toolbarDropDown = new wxMenu;
+	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");
 	auto* imageMenuBar = new wxMenuBar;
 	imageMenuBar->Append(menuDropDown, "&Image");
+	imageMenuBar->Append(toolbarDropDown, "&Toolbar");
 	imageFrame->SetMenuBar(imageMenuBar);
 
 	imageFrame->Show();
@@ -631,7 +636,7 @@ void MainFrame::onLinksAddComment(wxCommandEvent& evt)
 	}
 }
 
-void MainFrame::mergeRivers()
+void MainFrame::mergeRivers() const
 {
 	if (sourceRiversImg->IsOk())
 	{
@@ -770,4 +775,9 @@ void MainFrame::onLinksMoveVersionRight(wxCommandEvent& evt)
 {
 	linkMapper.moveActiveVersionRight();
 	linksFrame->moveActiveVersionRight();
+}
+
+void MainFrame::onShowToolbar(wxCommandEvent& evt)
+{
+	imageFrame->showToolbar();
 }

@@ -4,6 +4,8 @@
 #include <wx/wx.h>
 #endif
 
+wxDECLARE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
+
 class StatusBar: public wxFrame
 {
   public:
@@ -13,10 +15,23 @@ class StatusBar: public wxFrame
 	void setTargetZoom(int zoomLevel) const;
 
   private:
+	bool triangulate = false;
+
 	wxTextCtrl* sourceZoomField = nullptr;
 	wxTextCtrl* targetZoomField = nullptr;
+	wxButton* triangulateButton = nullptr;
+
+	wxWindow* sTriangulate1 = nullptr;
+	wxWindow* sTriangulate2 = nullptr;
+	wxWindow* sTriangulate3 = nullptr;
+	wxWindow* tTriangulate1 = nullptr;
+	wxWindow* tTriangulate2 = nullptr;
+	wxWindow* tTriangulate3 = nullptr;
 
 	void onZoomChanged(wxCommandEvent& evt);
+	void onZoomResetButton(wxCommandEvent& evt);
+	void onTriangulate(wxCommandEvent& evt);
+	void onClose(wxCloseEvent& event);
 
   protected:
 	wxEvtHandler* eventHandler = nullptr;

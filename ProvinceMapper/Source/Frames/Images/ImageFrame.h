@@ -28,6 +28,7 @@ class ImageFrame: public wxFrame
 	void centerMap(int ID);
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
+	void showToolbar() const;
 
   private:
 	void onScrollPaint(wxPaintEvent& event);

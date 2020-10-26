@@ -287,3 +287,8 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	render();
 	Refresh();
 }
+
+void ImageFrame::showToolbar() const
+{
+	statusBar->Show();
+}

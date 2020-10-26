@@ -1,14 +1,17 @@
 #include "StatusBar.h"
-
 #include "ImageCanvas.h"
 #include "Log.h"
 
+wxDEFINE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
+
 StatusBar::StatusBar(wxWindow* parent):
-	 wxFrame(parent, wxID_ANY, "Image Toolbar", wxDefaultPosition, wxSize(350, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Image Toolbar", wxDefaultPosition, wxSize(420, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
 {
+	Bind(wxEVT_CLOSE_WINDOW, &StatusBar::onClose, this);
+
 	auto* holderPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxEXPAND);
 	holderPanel->SetBackgroundColour(wxColour(230, 230, 230));
-	auto* sizer = new wxFlexGridSizer(2, 2, 5);
+	auto* sizer = new wxFlexGridSizer(7, 5, 5);
 	holderPanel->SetSizer(sizer);
 
 	auto* sZoomText = new wxStaticText(holderPanel, wxID_ANY, "Source Zoom:", wxDefaultPosition, wxDefaultSize);
@@ -16,15 +19,46 @@ StatusBar::StatusBar(wxWindow* parent):
 
 	sourceZoomField = new wxTextCtrl(holderPanel, 0, "100", wxDefaultPosition, wxSize(50, 20), wxBORDER_DEFAULT | wxTE_PROCESS_ENTER);
 	sourceZoomField->Bind(wxEVT_TEXT_ENTER, &StatusBar::onZoomChanged, this);
-
 	targetZoomField = new wxTextCtrl(holderPanel, 1, "100", wxDefaultPosition, wxSize(50, 20), wxBORDER_DEFAULT | wxTE_PROCESS_ENTER);
 	targetZoomField->Bind(wxEVT_TEXT_ENTER, &StatusBar::onZoomChanged, this);
 
-	sizer->Add(sZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
-	sizer->Add(sourceZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
+	auto* sourceResetButton = new wxButton(holderPanel, 0, "Reset", wxDefaultPosition, wxDefaultSize);
+	sourceResetButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onZoomResetButton, this);
+	auto* targetResetButton = new wxButton(holderPanel, 1, "Reset", wxDefaultPosition, wxDefaultSize);
+	targetResetButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onZoomResetButton, this);
 
-	sizer->Add(tZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxBOTTOM, 5));
-	sizer->Add(targetZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxBOTTOM, 5));
+	auto* triangulateText = new wxStaticText(holderPanel, wxID_ANY, "Triangulate:", wxDefaultPosition, wxDefaultSize);
+	triangulateButton = new wxButton(holderPanel, wxID_ANY, "Enable", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Toggle Triangulation");
+	triangulateButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onTriangulate, this);
+
+	sTriangulate1 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	sTriangulate1->SetBackgroundColour("gray");
+	sTriangulate2 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	sTriangulate2->SetBackgroundColour("gray");
+	sTriangulate3 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	sTriangulate3->SetBackgroundColour("gray");
+	tTriangulate1 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	tTriangulate1->SetBackgroundColour("gray");
+	tTriangulate2 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	tTriangulate2->SetBackgroundColour("gray");
+	tTriangulate3 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
+	tTriangulate3->SetBackgroundColour("gray");
+
+	sizer->Add(sZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sourceZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sourceResetButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(triangulateText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sTriangulate1, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sTriangulate2, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sTriangulate3, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
+
+	sizer->Add(tZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(targetZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(targetResetButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(triangulateButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(tTriangulate1, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(tTriangulate2, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(tTriangulate3, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 
 	auto* boxSizer = new wxBoxSizer(wxHORIZONTAL);
 	boxSizer->Add(holderPanel, wxSizerFlags(1).Expand());
@@ -81,6 +115,7 @@ void StatusBar::onZoomChanged(wxCommandEvent& evt)
 		{
 			zoomLevel = 10;
 		}
+		targetZoomField->ChangeValue(std::to_string(zoomLevel));
 		wxCommandEvent event(wxEVT_REFRESH);
 		event.SetId(1);
 		event.SetInt(zoomLevel);
@@ -97,4 +132,57 @@ void StatusBar::setSourceZoom(const int zoomLevel) const
 void StatusBar::setTargetZoom(const int zoomLevel) const
 {
 	targetZoomField->ChangeValue(std::to_string(zoomLevel));
+}
+
+void StatusBar::onZoomResetButton(wxCommandEvent& evt)
+{
+	const auto zoomLevel = 100;
+	wxCommandEvent event(wxEVT_REFRESH);
+	if (evt.GetId() == 0)
+	{
+		sourceZoomField->ChangeValue(std::to_string(zoomLevel));
+		event.SetId(0);
+	}
+	else if (evt.GetId() == 1)
+	{
+		targetZoomField->ChangeValue(std::to_string(zoomLevel));
+		event.SetId(1);
+	}
+	event.SetInt(zoomLevel);
+	eventHandler->QueueEvent(event.Clone());
+	Refresh();
+}
+
+void StatusBar::onTriangulate(wxCommandEvent& evt)
+{
+	if (triangulate)
+	{
+		triangulate = false;
+		sTriangulate1->SetBackgroundColour("gray");
+		sTriangulate2->SetBackgroundColour("gray");
+		sTriangulate3->SetBackgroundColour("gray");
+		tTriangulate1->SetBackgroundColour("gray");
+		tTriangulate2->SetBackgroundColour("gray");
+		tTriangulate3->SetBackgroundColour("gray");
+		triangulateButton->SetLabelText("Enable");
+	}
+	else
+	{
+		triangulate = true;
+		sTriangulate1->SetBackgroundColour("red");
+		sTriangulate2->SetBackgroundColour("red");
+		sTriangulate3->SetBackgroundColour("red");
+		tTriangulate1->SetBackgroundColour("red");
+		tTriangulate2->SetBackgroundColour("red");
+		tTriangulate3->SetBackgroundColour("red");
+		triangulateButton->SetLabelText("Disable");
+	}
+	const wxCommandEvent event(wxEVT_TOGGLE_TRIANGULATE);
+	eventHandler->QueueEvent(event.Clone());
+	Refresh();
+}
+
+void StatusBar::onClose(wxCloseEvent& event)
+{
+	Hide();
 }
