@@ -223,6 +223,12 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 		if (triangulate && points.size() < 3)
 		{
 			// we're initing a point here.
+			const auto point = wxPoint(x, y);
+			// do we have this point already?
+			for (const auto& knownPoint: points)
+				if (knownPoint == point)
+					return;
+			// insert and ping.
 			points.emplace_back(wxPoint(x, y));
 			stagePointPlaced();
 			return;
