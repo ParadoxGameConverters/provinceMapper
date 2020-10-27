@@ -477,7 +477,7 @@ void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
 	{
 		if (targetRect.Contains(currentPosition))
 		{
-			sourcePointer = triangulate(targetCanvas->getPoints(), sourceCanvas->getPoints(), sourceRect, currentPosition);
+			sourcePointer = triangulate(targetCanvas->getPoints(), sourceCanvas->getPoints(), currentPosition);
 			renderSource();
 		}
 		else
@@ -489,7 +489,7 @@ void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
 	{
 		if (sourceRect.Contains(currentPosition))
 		{
-			targetPointer = triangulate(sourceCanvas->getPoints(), targetCanvas->getPoints(), targetRect, currentPosition);
+			targetPointer = triangulate(sourceCanvas->getPoints(), targetCanvas->getPoints(), currentPosition);
 			renderTarget();
 		}
 		else
@@ -506,48 +506,48 @@ double ImageFrame::pointDistance(const wxPoint& point1, const wxPoint& point2)
 	return std::sqrt(sum);
 }
 
-wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxRect& targetRect, const wxPoint& sourcePoint)
+wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint)
 {
 	// move the source point in reference to the source origin
-	auto movedSource = sourcePoint - sources[0];
+	const auto movedSource = sourcePoint - sources[0];
 
 	// construct a basis matrix for the source triangle:
 	// ( A B ) = ( x1 x2 )
 	// ( C D ) = ( y1 y2 )
-	float sourceA = sources[1].x - sources[0].x;
-	float sourceB = sources[2].x - sources[0].x;
-	float sourceC = sources[1].y - sources[0].y;
-	float sourceD = sources[2].y - sources[0].y;
+	const auto sourceA = static_cast<float>(sources[1].x) - static_cast<float>(sources[0].x);
+	const auto sourceB = static_cast<float>(sources[2].x) - static_cast<float>(sources[0].x);
+	const auto sourceC = static_cast<float>(sources[1].y) - static_cast<float>(sources[0].y);
+	const auto sourceD = static_cast<float>(sources[2].y) - static_cast<float>(sources[0].y);
 
 	// construct the inverse of the source basis matrix:
 	// ___1___ ( d -b )
 	// ad - bc (-c  a )
-	auto sourceDeterminant = 1 / (sourceA * sourceD - sourceB * sourceC);
-	auto inverseA = sourceDeterminant *  sourceD;
-	auto inverseB = sourceDeterminant * -sourceB;
-	auto inverseC = sourceDeterminant * -sourceC;
-	auto inverseD = sourceDeterminant *  sourceA;
+	const auto sourceDeterminant = 1 / (sourceA * sourceD - sourceB * sourceC);
+	const auto inverseA = sourceDeterminant * sourceD;
+	const auto inverseB = sourceDeterminant * -sourceB;
+	const auto inverseC = sourceDeterminant * -sourceC;
+	const auto inverseD = sourceDeterminant * sourceA;
 
 	// transform the source point into the source triangle basis
-	auto sourceU = movedSource.x * inverseA + movedSource.y * inverseB;
-	auto sourceV = movedSource.x * inverseC + movedSource.y * inverseD;
+	const auto sourceU = static_cast<float>(movedSource.x) * inverseA + static_cast<float>(movedSource.y) * inverseB;
+	const auto sourceV = static_cast<float>(movedSource.x) * inverseC + static_cast<float>(movedSource.y) * inverseD;
 
 	// silently move from source triangle basis to destination triangle basis
-	auto targetU = sourceU;
-	auto targetV = sourceV;
+	const auto targetU = sourceU;
+	const auto targetV = sourceV;
 
 	// construct a basis matrix for the target triangle:
 	// ( A B ) = ( x1 x2 )
 	// ( C D ) = ( y1 y2 )
-	float targetA = targets[1].x - targets[0].x;
-	float targetB = targets[2].x - targets[0].x;
-	float targetC = targets[1].y - targets[0].y;
-	float targetD = targets[2].y - targets[0].y;
+	const auto targetA = static_cast<float>(targets[1].x) - static_cast<float>(targets[0].x);
+	const auto targetB = static_cast<float>(targets[2].x) - static_cast<float>(targets[0].x);
+	const auto targetC = static_cast<float>(targets[1].y) - static_cast<float>(targets[0].y);
+	const auto targetD = static_cast<float>(targets[2].y) - static_cast<float>(targets[0].y);
 
 	// transform the target point from the destination triangle basis
 	wxPoint target;
-	target.x = targetU * targetA + targetV * targetB;
-	target.y = targetU * targetC + targetV * targetD;
+	target.x = static_cast<int>(std::round(targetU * targetA + targetV * targetB));
+	target.y = static_cast<int>(std::round(targetU * targetC + targetV * targetD));
 
 	// move the target point in reference to the source origin
 	return target + targets[0];

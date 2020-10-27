@@ -61,7 +61,7 @@ class ImageFrame: public wxFrame
 	bool triangulationIsSane = false;
 
 	static double pointDistance(const wxPoint& point1, const wxPoint& point2);
-	static wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxRect& targetRect, const wxPoint& sourcePoint);
+	static wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint);
 
   protected:
 	wxEvtHandler* eventHandler;
