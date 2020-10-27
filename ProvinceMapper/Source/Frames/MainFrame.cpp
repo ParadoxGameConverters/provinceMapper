@@ -227,6 +227,7 @@ void MainFrame::initLinksFrame()
 	auto size = wxSize(600, 900);
 	if (configuration->getLinksFrameSize())
 		size = wxSize(configuration->getLinksFrameSize()->x, configuration->getLinksFrameSize()->y);
+	const auto maximize = configuration->isLinksFrameMaximized();
 	linksFrame = new LinksFrame(this, position, size, linkMapper.getVersions(), linkMapper.getActiveVersion(), configuration);
 
 	// menubar is the thing uptop with links for actions.
@@ -252,6 +253,8 @@ void MainFrame::initLinksFrame()
 	linksFrame->SetMenuBar(linksMenuBar);
 
 	linksFrame->Show();
+	if (maximize)
+		linksFrame->Maximize(true);
 }
 
 void MainFrame::initImageFrame()
@@ -320,6 +323,7 @@ void MainFrame::initImageFrame()
 	auto size = wxSize(1200, 800);
 	if (configuration->getImageFrameSize())
 		size = wxSize(configuration->getImageFrameSize()->x, configuration->getImageFrameSize()->y);
+	const auto maximize = configuration->isImageFrameMaximized();
 	imageFrame = new ImageFrame(this, position, size, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs, configuration);
 
 	auto* menuDropDown = new wxMenu;
@@ -333,6 +337,8 @@ void MainFrame::initImageFrame()
 	imageFrame->SetMenuBar(imageMenuBar);
 
 	imageFrame->Show();
+	if (maximize)
+		imageFrame->Maximize(true);
 }
 
 void MainFrame::onExit(wxCommandEvent& event)

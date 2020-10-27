@@ -36,6 +36,9 @@ void Configuration::registerKeys()
 		if (vect.size() == 2)
 			imageFrameSize = Rect(vect[0], vect[1]);
 	});
+	registerKeyword("imageFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
+		imageFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+	});
 	registerKeyword("linksFramePos", [this](const std::string& unused, std::istream& theStream) {
 		auto vect = commonItems::intList(theStream).getInts();
 		if (vect.size() == 2)
@@ -45,6 +48,9 @@ void Configuration::registerKeys()
 		auto vect = commonItems::intList(theStream).getInts();
 		if (vect.size() == 2)
 			linksFrameSize = Rect(vect[0], vect[1]);
+	});
+	registerKeyword("linksFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
+		linksFrameMaximized = commonItems::singleString(theStream).getString() == "true";
 	});
 	registerKeyword("statusBarPos", [this](const std::string& unused, std::istream& theStream) {
 		auto vect = commonItems::intList(theStream).getInts();
@@ -77,10 +83,18 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "imageFramePos = { " << configuration.imageFramePos->x << " " << configuration.imageFramePos->y << " }\n";
 	if (configuration.imageFrameSize)
 		output << "imageFrameSize = { " << configuration.imageFrameSize->x << " " << configuration.imageFrameSize->y << " }\n";
+	if (configuration.imageFrameMaximized)
+		output << "imageFrameMaximized = true\n";
+	else
+		output << "imageFrameMaximized = false\n";
 	if (configuration.linksFramePos)
 		output << "linksFramePos = { " << configuration.linksFramePos->x << " " << configuration.linksFramePos->y << " }\n";
 	if (configuration.linksFrameSize)
 		output << "linksFrameSize = { " << configuration.linksFrameSize->x << " " << configuration.linksFrameSize->y << " }\n";
+	if (configuration.linksFrameMaximized)
+		output << "linksFrameMaximized = true\n";
+	else
+		output << "linksFrameMaximized = false\n";
 	if (configuration.statusBarPos)
 		output << "statusBarPos = { " << configuration.statusBarPos->x << " " << configuration.statusBarPos->y << " }\n";
 	if (configuration.statusBarOn)

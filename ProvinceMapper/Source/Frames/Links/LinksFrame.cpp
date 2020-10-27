@@ -42,8 +42,11 @@ LinksFrame::LinksFrame(wxWindow* parent,
 void LinksFrame::onResize(wxSizeEvent& event)
 {
 	const auto size = event.GetSize();
-	configuration->setLinksFrameSize(size.x, size.y);
-	configuration->save();
+	if (!IsMaximized())
+	{
+		configuration->setLinksFrameSize(size.x, size.y);
+		configuration->save();
+	}
 	notebook->SetVirtualSize(event.GetSize());
 	notebook->Layout();
 	event.Skip();
@@ -213,8 +216,16 @@ void LinksFrame::stageMoveVersionRight() const
 
 void LinksFrame::onMove(wxMoveEvent& event)
 {
-	const auto position = event.GetPosition();
-	configuration->setLinksFramePos(position.x - 8, position.y - 51);
+	if (IsMaximized())
+	{
+		configuration->setLinksFrameMaximized(true);
+	}
+	else
+	{
+		const auto position = GetPosition();
+		configuration->setLinksFramePos(position.x, position.y);
+		configuration->setLinksFrameMaximized(false);
+	}
 	configuration->save();
 	event.Skip();
 }

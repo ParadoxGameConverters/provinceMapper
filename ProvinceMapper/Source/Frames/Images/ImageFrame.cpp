@@ -558,16 +558,27 @@ wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::
 
 void ImageFrame::onResize(wxSizeEvent& event)
 {
-	const auto size = event.GetSize();
-	configuration->setImageFrameSize(size.x, size.y);
-	configuration->save();
+	if (!IsMaximized())
+	{
+		const auto size = event.GetSize();
+		configuration->setImageFrameSize(size.x, size.y);
+		configuration->save();
+	}
 	event.Skip();
 }
 
 void ImageFrame::onMove(wxMoveEvent& event)
 {
-	const auto position = event.GetPosition();
-	configuration->setImageFramePos(position.x - 8, position.y - 51);
+	if (IsMaximized())
+	{
+		configuration->setImageFrameMaximized(true);
+	}
+	else
+	{
+		const auto position = GetPosition();
+		configuration->setImageFramePos(position.x, position.y);
+		configuration->setImageFrameMaximized(false);
+	}
 	configuration->save();
 	event.Skip();
 }

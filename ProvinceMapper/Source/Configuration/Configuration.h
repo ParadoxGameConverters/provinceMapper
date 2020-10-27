@@ -28,8 +28,10 @@ class Configuration: commonItems::parser
 	[[nodiscard]] const auto& isTargetReversed() const { return reverseTarget; }
 	[[nodiscard]] const auto& getImageFramePos() const { return imageFramePos; }
 	[[nodiscard]] const auto& getImageFrameSize() const { return imageFrameSize; }
+	[[nodiscard]] const auto& isImageFrameMaximized() const { return imageFrameMaximized; }
 	[[nodiscard]] const auto& getLinksFramePos() const { return linksFramePos; }
 	[[nodiscard]] const auto& getLinksFrameSize() const { return linksFrameSize; }
+	[[nodiscard]] const auto& isLinksFrameMaximized() const { return linksFrameMaximized; }
 	[[nodiscard]] const auto& getStatusBarPos() const { return statusBarPos; }
 	[[nodiscard]] const auto& isStatusBarOn() const { return statusBarOn; }
 
@@ -42,8 +44,10 @@ class Configuration: commonItems::parser
 	void setTargetReversed(bool reversed) { reverseTarget = reversed; }
 	void setImageFramePos(const int x, const int y) { imageFramePos = Rect(x, y); }
 	void setImageFrameSize(const int x, const int y) { imageFrameSize = Rect(x, y); }
+	void setImageFrameMaximized(const bool on) { imageFrameMaximized = on; }
 	void setLinksFramePos(const int x, const int y) { linksFramePos = Rect(x, y); }
 	void setLinksFrameSize(const int x, const int y) { linksFrameSize = Rect(x, y); }
+	void setLinksFrameMaximized(const bool on) { linksFrameMaximized = on; }
 	void setStatusBarPos(const int x, const int y) { statusBarPos = Rect(x, y); }
 	void setStatusBarOn(const bool on) { statusBarOn = on; }
 
@@ -64,8 +68,10 @@ class Configuration: commonItems::parser
 	std::optional<std::string> linkFile;
 	std::optional<Rect> imageFramePos;
 	std::optional<Rect> imageFrameSize;
+	bool imageFrameMaximized = false;
 	std::optional<Rect> linksFramePos;
 	std::optional<Rect> linksFrameSize;
+	bool linksFrameMaximized = false;
 	std::optional<Rect> statusBarPos;
 	bool statusBarOn = true;
 };

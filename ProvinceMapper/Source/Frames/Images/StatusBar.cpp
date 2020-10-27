@@ -240,8 +240,8 @@ void StatusBar::setTriangulationSane(const bool sane)
 
 void StatusBar::onMove(wxMoveEvent& event)
 {
-	const auto position = event.GetPosition();
-	configuration->setStatusBarPos(position.x - 8, position.y - 31);
+	const auto position = GetPosition();
+	configuration->setStatusBarPos(position.x, position.y);
 	configuration->save();
 	event.Skip();
 }
