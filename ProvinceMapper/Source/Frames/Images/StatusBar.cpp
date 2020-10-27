@@ -1,13 +1,16 @@
 #include "StatusBar.h"
+#include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
 #include "Log.h"
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
 
-StatusBar::StatusBar(wxWindow* parent):
-	 wxFrame(parent, wxID_ANY, "Image Toolbar", wxDefaultPosition, wxSize(420, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), eventHandler(parent)
+StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<Configuration> theConfiguration):
+	 wxFrame(parent, wxID_ANY, "Image Toolbar", position, wxSize(420, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), configuration(std::move(theConfiguration)),
+	 eventHandler(parent)
 {
 	Bind(wxEVT_CLOSE_WINDOW, &StatusBar::onClose, this);
+	Bind(wxEVT_MOVE, &StatusBar::onMove, this);
 
 	auto* holderPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxEXPAND);
 	holderPanel->SetBackgroundColour(wxColour(230, 230, 230));
@@ -186,6 +189,8 @@ void StatusBar::onTriangulate(wxCommandEvent& evt)
 
 void StatusBar::onClose(wxCloseEvent& event)
 {
+	configuration->setStatusBarOn(false);
+	configuration->save();
 	Hide();
 }
 
@@ -231,4 +236,12 @@ void StatusBar::setTriangulationSane(const bool sane)
 		triangulateText->SetBackgroundColour(wxColor(230, 230, 230));
 	}
 	Refresh();
+}
+
+void StatusBar::onMove(wxMoveEvent& event)
+{
+	const auto position = event.GetPosition();
+	configuration->setStatusBarPos(position.x - 8, position.y - 31);
+	configuration->save();
+	event.Skip();
 }

@@ -16,21 +16,20 @@ wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
-	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxSize(600, 900)), version(std::move(theVersion)), eventListener(parent)
+	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), version(std::move(theVersion)), eventListener(parent)
 {
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this);
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this);
 	Bind(wxEVT_UPDATE_NAME, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
-	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900), wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
+	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->EnableEditing(false);
 	theGrid->HideCellEditControl();
 	theGrid->HideRowLabels();
 	theGrid->HideColLabels();
 	theGrid->SetScrollRate(0, 20);
-	theGrid->SetMinSize(wxSize(600, 900));
 	theGrid->SetColMinimalAcceptableWidth(600);
 	theGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
 	theGrid->SetColMinimalWidth(0, 600);

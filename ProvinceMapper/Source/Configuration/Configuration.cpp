@@ -26,6 +26,34 @@ void Configuration::registerKeys()
 	registerKeyword("reverseTarget", [this](const std::string& unused, std::istream& theStream) {
 		reverseTarget = commonItems::singleString(theStream).getString() == "true";
 	});
+	registerKeyword("imageFramePos", [this](const std::string& unused, std::istream& theStream) {
+		auto vect = commonItems::intList(theStream).getInts();
+		if (vect.size() == 2)
+			imageFramePos = Rect(vect[0], vect[1]);
+	});
+	registerKeyword("imageFrameSize", [this](const std::string& unused, std::istream& theStream) {
+		auto vect = commonItems::intList(theStream).getInts();
+		if (vect.size() == 2)
+			imageFrameSize = Rect(vect[0], vect[1]);
+	});
+	registerKeyword("linksFramePos", [this](const std::string& unused, std::istream& theStream) {
+		auto vect = commonItems::intList(theStream).getInts();
+		if (vect.size() == 2)
+			linksFramePos = Rect(vect[0], vect[1]);
+	});
+	registerKeyword("linksFrameSize", [this](const std::string& unused, std::istream& theStream) {
+		auto vect = commonItems::intList(theStream).getInts();
+		if (vect.size() == 2)
+			linksFrameSize = Rect(vect[0], vect[1]);
+	});
+	registerKeyword("statusBarPos", [this](const std::string& unused, std::istream& theStream) {
+		auto vect = commonItems::intList(theStream).getInts();
+		if (vect.size() == 2)
+			statusBarPos = Rect(vect[0], vect[1]);
+	});
+	registerKeyword("statusBarOn", [this](const std::string& unused, std::istream& theStream) {
+		statusBarOn = commonItems::singleString(theStream).getString() == "true";
+	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
@@ -45,6 +73,20 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "targetToken = \"" << *configuration.targetToken << "\"\n";
 	if (configuration.linkFile)
 		output << "linkFile = \"" << *configuration.linkFile << "\"\n";
+	if (configuration.imageFramePos)
+		output << "imageFramePos = { " << configuration.imageFramePos->x << " " << configuration.imageFramePos->y << " }\n";
+	if (configuration.imageFrameSize)
+		output << "imageFrameSize = { " << configuration.imageFrameSize->x << " " << configuration.imageFrameSize->y << " }\n";
+	if (configuration.linksFramePos)
+		output << "linksFramePos = { " << configuration.linksFramePos->x << " " << configuration.linksFramePos->y << " }\n";
+	if (configuration.linksFrameSize)
+		output << "linksFrameSize = { " << configuration.linksFrameSize->x << " " << configuration.linksFrameSize->y << " }\n";
+	if (configuration.statusBarPos)
+		output << "statusBarPos = { " << configuration.statusBarPos->x << " " << configuration.statusBarPos->y << " }\n";
+	if (configuration.statusBarOn)
+		output << "statusBarOn = true\n";
+	else
+		output << "statusBarOn = false\n";
 
 	return output;
 }

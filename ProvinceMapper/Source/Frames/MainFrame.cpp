@@ -59,7 +59,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 void MainFrame::initFrame()
 {
-	configuration.load();
+	configuration = std::make_shared<Configuration>();
+	configuration->load();
 	auto* holderPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxEXPAND);
 	holderPanel->SetBackgroundColour(wxColour(230, 230, 230));
 	sizer = new wxFlexGridSizer(4, 3, 5);
@@ -72,14 +73,14 @@ void MainFrame::initFrame()
 	sourceDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	sourceDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 	reverseSourceCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
-	if (configuration.isSourceReversed())
+	if (configuration->isSourceReversed())
 		reverseSourceCheck->SetValue(true);
 	reverseSourceCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
 		if (reverseSourceCheck->GetValue())
-			configuration.setSourceReversed(true);
+			configuration->setSourceReversed(true);
 		else
-			configuration.setSourceReversed(false);
-		configuration.save();
+			configuration->setSourceReversed(false);
+		configuration->save();
 	});
 
 	sizer->Add(sdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
@@ -94,14 +95,14 @@ void MainFrame::initFrame()
 	targetDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	targetDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 	reverseTargetCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
-	if (configuration.isTargetReversed())
+	if (configuration->isTargetReversed())
 		reverseTargetCheck->SetValue(true);
 	reverseTargetCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
 		if (reverseTargetCheck->GetValue())
-			configuration.setTargetReversed(true);
+			configuration->setTargetReversed(true);
 		else
-			configuration.setTargetReversed(false);
-		configuration.save();
+			configuration->setTargetReversed(false);
+		configuration->save();
 	});
 
 	sizer->Add(tdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
@@ -166,9 +167,9 @@ void MainFrame::populateFrame()
 	std::wstring path16;
 
 	// Source path
-	if (configuration.getSourceDir())
+	if (configuration->getSourceDir())
 	{
-		path = *configuration.getSourceDir();
+		path = *configuration->getSourceDir();
 		path16 = commonItems::convertUTF8ToUTF16(path);
 	}
 	sourceDirPicker->SetPath(path16);
@@ -177,9 +178,9 @@ void MainFrame::populateFrame()
 	onPathChanged(bootEvent0);
 
 	// target path
-	if (configuration.getTargetDir())
+	if (configuration->getTargetDir())
 	{
-		path = *configuration.getTargetDir();
+		path = *configuration->getTargetDir();
 		path16 = commonItems::convertUTF8ToUTF16(path);
 	}
 	targetDirPicker->SetPath(path16);
@@ -189,24 +190,24 @@ void MainFrame::populateFrame()
 
 	// source token
 	std::string token;
-	if (configuration.getSourceToken())
-		token = *configuration.getSourceToken();
+	if (configuration->getSourceToken())
+		token = *configuration->getSourceToken();
 	sourceTokenField->SetValue(token);
 	auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 	onTokenChanged(bootEvent3);
 
 	// target token
-	if (configuration.getTargetToken())
-		token = *configuration.getTargetToken();
+	if (configuration->getTargetToken())
+		token = *configuration->getTargetToken();
 	targetTokenField->SetValue(token);
 	auto bootEvent4 = wxCommandEvent(wxEVT_NULL, 4);
 	onTokenChanged(bootEvent4);
 
 	// links file goes last, because it can overwrite tokens if those aren't already loaded.
 	std::wstring initialPath;
-	if (configuration.getLinkFile())
+	if (configuration->getLinkFile())
 	{
-		path = *configuration.getLinkFile();
+		path = *configuration->getLinkFile();
 		path16 = commonItems::convertUTF8ToUTF16(path);
 		const auto rawFile = trimPath(path);
 		const auto rawPath = path.substr(0, rawFile.size());
@@ -220,7 +221,13 @@ void MainFrame::populateFrame()
 
 void MainFrame::initLinksFrame()
 {
-	linksFrame = new LinksFrame(this, linkMapper.getVersions(), linkMapper.getActiveVersion());
+	auto position = wxDefaultPosition;
+	if (configuration->getLinksFramePos())
+		position = wxPoint(configuration->getLinksFramePos()->x, configuration->getLinksFramePos()->y);
+	auto size = wxSize(600, 900);
+	if (configuration->getLinksFrameSize())
+		size = wxSize(configuration->getLinksFrameSize()->x, configuration->getLinksFrameSize()->y);
+	linksFrame = new LinksFrame(this, position, size, linkMapper.getVersions(), linkMapper.getActiveVersion(), configuration);
 
 	// menubar is the thing uptop with links for actions.
 	auto* saveDropDown = new wxMenu;
@@ -249,20 +256,20 @@ void MainFrame::initLinksFrame()
 
 void MainFrame::initImageFrame()
 {
-	localizationMapper.scrapeSourceDir(*configuration.getSourceDir());
+	localizationMapper.scrapeSourceDir(*configuration->getSourceDir());
 	Log(LogLevel::Info) << "Source Localizations Loaded.";
-	localizationMapper.scrapeTargetDir(*configuration.getTargetDir());
+	localizationMapper.scrapeTargetDir(*configuration->getTargetDir());
 	Log(LogLevel::Info) << "Target Localizations Loaded.";
 
 	sourceDefs = std::make_shared<Definitions>();
 	targetDefs = std::make_shared<Definitions>();
 
-	sourceDefs->loadDefinitions(*configuration.getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
+	sourceDefs->loadDefinitions(*configuration->getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
 	Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
-	targetDefs->loadDefinitions(*configuration.getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
+	targetDefs->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
 	Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 
-	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration.getSourceToken(), *configuration.getTargetToken());
+	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
 	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
@@ -270,31 +277,31 @@ void MainFrame::initImageFrame()
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
 	sourceRiversImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/provinces.bmp"))
-		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.bmp");
-	else if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/provinces.png"))
-		sourceImg->LoadFile(*configuration.getSourceDir() + "/provinces.png");
-	if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/rivers.bmp"))
-		sourceRiversImg->LoadFile(*configuration.getSourceDir() + "/rivers.bmp");
-	else if (commonItems::DoesFileExist(*configuration.getSourceDir() + "/rivers.png"))
-		sourceRiversImg->LoadFile(*configuration.getSourceDir() + "/rivers.png");
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.bmp"))
+		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.png"))
+		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.png");
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.bmp"))
+		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.png"))
+		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.png");
 
 	targetImg = new wxImage();
 	targetRiversImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.bmp"))
-		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.bmp");
-	else if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/provinces.png"))
-		targetImg->LoadFile(*configuration.getTargetDir() + "/provinces.png");
-	if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/rivers.bmp"))
-		targetRiversImg->LoadFile(*configuration.getTargetDir() + "/rivers.bmp");
-	else if (commonItems::DoesFileExist(*configuration.getTargetDir() + "/rivers.png"))
-		targetRiversImg->LoadFile(*configuration.getTargetDir() + "/rivers.png");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.bmp"))
+		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.png"))
+		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.png");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.bmp"))
+		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.png"))
+		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.png");
 
 	mergeRivers();
 
-	if (configuration.isSourceReversed())
+	if (configuration->isSourceReversed())
 		*sourceImg = sourceImg->Mirror(false);
-	if (configuration.isTargetReversed())
+	if (configuration->isTargetReversed())
 		*targetImg = targetImg->Mirror(false);
 
 	// Multithreading where it counts!
@@ -307,7 +314,13 @@ void MainFrame::initImageFrame()
 	pixelReader2->Create();
 	pixelReader2->Run();
 
-	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs);
+	auto position = wxDefaultPosition;
+	if (configuration->getImageFramePos())
+		position = wxPoint(configuration->getImageFramePos()->x, configuration->getImageFramePos()->y);
+	auto size = wxSize(1200, 800);
+	if (configuration->getImageFrameSize())
+		size = wxSize(configuration->getImageFrameSize()->x, configuration->getImageFrameSize()->y);
+	imageFrame = new ImageFrame(this, position, size, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs, configuration);
 
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
@@ -361,7 +374,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 			sourceDirStatus->SetBackgroundColour(red);
 			sanity[0] = false;
 		}
-		configuration.setSourceDir(result);
+		configuration->setSourceDir(result);
 	}
 	// target path
 	else if (evt.GetId() == 1)
@@ -376,7 +389,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 			targetDirStatus->SetBackgroundColour(red);
 			sanity[1] = false;
 		}
-		configuration.setTargetDir(result);
+		configuration->setTargetDir(result);
 	}
 	// links file
 	else if (evt.GetId() == 2)
@@ -415,9 +428,9 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 			auto bootEvent4 = wxCommandEvent(wxEVT_NULL, 4);
 			onTokenChanged(bootEvent4);
 		}
-		configuration.setLinkFile(result);
+		configuration->setLinkFile(result);
 	}
-	configuration.save();
+	configuration->save();
 	applySanityToButton();
 	Refresh();
 }
@@ -442,7 +455,7 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 			sourceTokenStatus->SetBackgroundColour(red);
 			sanity[3] = false;
 		}
-		configuration.setSourceToken(rawInput);
+		configuration->setSourceToken(rawInput);
 	}
 	// target token
 	else if (evt.GetId() == 4)
@@ -459,9 +472,9 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 			targetTokenStatus->SetBackgroundColour(red);
 			sanity[4] = false;
 		}
-		configuration.setTargetToken(rawInput);
+		configuration->setTargetToken(rawInput);
 	}
-	configuration.save();
+	configuration->save();
 	applySanityToButton();
 	Refresh();
 }
@@ -485,8 +498,8 @@ void MainFrame::onStartButton(wxCommandEvent& evt)
 
 void MainFrame::onSaveLinks(wxCommandEvent& evt)
 {
-	if (!configuration.getLinkFile()->empty())
-		linkMapper.exportMappings(*configuration.getLinkFile());
+	if (!configuration->getLinkFile()->empty())
+		linkMapper.exportMappings(*configuration->getLinkFile());
 	else
 		linkMapper.exportMappings("province_mappings.txt");
 	wxMessageBox("Links saved.", "Save");

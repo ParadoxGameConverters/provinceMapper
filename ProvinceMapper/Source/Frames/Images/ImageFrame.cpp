@@ -1,4 +1,5 @@
 #include "ImageFrame.h"
+#include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
 #include "StatusBar.h"
@@ -6,13 +7,16 @@
 #include <wx/splitter.h>
 
 ImageFrame::ImageFrame(wxWindow* parent,
+	 const wxPoint& position,
+	 const wxSize& size,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 	 wxImage* sourceImg,
 	 wxImage* targetImg,
 	 const std::shared_ptr<Definitions>& sourceDefs,
-	 const std::shared_ptr<Definitions>& targetDefs):
-	 wxFrame(parent, wxID_ANY, "Provinces", wxDefaultPosition, wxSize(1200, 800), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
-	 eventHandler(parent)
+	 const std::shared_ptr<Definitions>& targetDefs,
+	 std::shared_ptr<Configuration> theConfiguration):
+	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
+	 configuration(std::move(theConfiguration)), eventHandler(parent)
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
@@ -21,6 +25,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
 	Bind(wxEVT_POINT_PLACED, &ImageFrame::onPointPlaced, this);
 	Bind(wxEVT_MOUSE_AT, &ImageFrame::triangulateAtPoint, this);
+	Bind(wxEVT_SIZE, &ImageFrame::onResize, this);
+	Bind(wxEVT_MOVE, &ImageFrame::onMove, this);
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
 
@@ -41,10 +47,15 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	splitter->SetSashGravity(0.5);
 	splitter->SplitVertically(sourceCanvas, targetCanvas);
 
-	statusBar = new StatusBar(this);
-	statusBar->Show();
+	auto sbPosition = wxDefaultPosition;
+	if (configuration->getStatusBarPos())
+		sbPosition = wxPoint(configuration->getStatusBarPos()->x, configuration->getStatusBarPos()->y);
 
 	SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
+
+	statusBar = new StatusBar(this, sbPosition, configuration);
+	if (configuration->isStatusBarOn())
+		statusBar->Show();
 }
 
 void ImageFrame::onScrollPaint(wxPaintEvent& event)
@@ -359,6 +370,8 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 
 void ImageFrame::showToolbar() const
 {
+	configuration->setStatusBarOn(true);
+	configuration->save();
 	statusBar->Show();
 }
 
@@ -541,4 +554,20 @@ wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::
 
 	// move the target point in reference to the source origin
 	return target + targets[0];
+}
+
+void ImageFrame::onResize(wxSizeEvent& event)
+{
+	const auto size = event.GetSize();
+	configuration->setImageFrameSize(size.x, size.y);
+	configuration->save();
+	event.Skip();
+}
+
+void ImageFrame::onMove(wxMoveEvent& event)
+{
+	const auto position = event.GetPosition();
+	configuration->setImageFramePos(position.x - 8, position.y - 51);
+	configuration->save();
+	event.Skip();
 }

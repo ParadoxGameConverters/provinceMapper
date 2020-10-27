@@ -1,20 +1,25 @@
 #include "LinksFrame.h"
+#include "Configuration/Configuration.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 
 LinksFrame::LinksFrame(wxWindow* parent,
+	 const wxPoint& position,
+	 const wxSize& size,
 	 const std::vector<std::shared_ptr<LinkMappingVersion>>& versions,
-	 const std::shared_ptr<LinkMappingVersion>& activeVersion):
-	 wxFrame(parent, wxID_ANY, "Links", wxDefaultPosition, wxSize(600, 900), wxDEFAULT_FRAME_STYLE),
-	 eventHandler(parent)
+	 const std::shared_ptr<LinkMappingVersion>& activeVersion,
+	 std::shared_ptr<Configuration> theConfiguration):
+	 wxFrame(parent, wxID_ANY, "Links", position, size, wxDEFAULT_FRAME_STYLE),
+	 configuration(std::move(theConfiguration)), eventHandler(parent)
 {
 	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &LinksFrame::onClose, this);
 	Bind(wxEVT_KEY_DOWN, &LinksFrame::onKeyDown, this);
+	Bind(wxEVT_MOVE, &LinksFrame::onMove, this);
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
-	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxSize(600, 900));
+	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	notebook->Bind(wxEVT_KEY_DOWN, &LinksFrame::onKeyDown, this);
 
 	for (const auto& version: versions)
@@ -30,13 +35,15 @@ LinksFrame::LinksFrame(wxWindow* parent,
 	notebook->ChangeSelection(0); // silently swap to first page.
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
 	this->SetSizer(sizer);
-	this->Centre();
 
 	SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 }
 
 void LinksFrame::onResize(wxSizeEvent& event)
 {
+	const auto size = event.GetSize();
+	configuration->setLinksFrameSize(size.x, size.y);
+	configuration->save();
 	notebook->SetVirtualSize(event.GetSize());
 	notebook->Layout();
 	event.Skip();
@@ -202,4 +209,12 @@ void LinksFrame::stageMoveVersionRight() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventHandler->QueueEvent(evt->Clone());
+}
+
+void LinksFrame::onMove(wxMoveEvent& event)
+{
+	const auto position = event.GetPosition();
+	configuration->setLinksFramePos(position.x - 8, position.y - 51);
+	configuration->save();
+	event.Skip();
 }

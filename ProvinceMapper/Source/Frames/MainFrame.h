@@ -96,7 +96,7 @@ class MainFrame: public wxFrame
 	std::shared_ptr<Definitions> sourceDefs;
 	std::shared_ptr<Definitions> targetDefs;
 	LinkMapper linkMapper;
-	Configuration configuration;
+	std::shared_ptr<Configuration> configuration;
 	LocalizationMapper localizationMapper;
 
 	std::string linksFileString;
