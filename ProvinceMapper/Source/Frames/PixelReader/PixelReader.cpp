@@ -1,11 +1,11 @@
 #include "PixelReader.h"
 #include "Definitions/Definitions.h"
+#include "Log.h"
 
 void* PixelReader::Entry()
 {
 	unsigned char* rgb = image->GetData();
 	for (auto y = 0; y < image->GetSize().GetY(); y++)
-	{
 		for (auto x = 0; x < image->GetSize().GetX(); x++)
 		{
 			auto border = true;
@@ -20,7 +20,7 @@ void* PixelReader::Entry()
 			else
 				definitions->registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 		}
-	}
+	Log(LogLevel::Info) << "Parsed " << image->GetSize().GetX() << "x" << image->GetSize().GetY() << " source pixels.";
 	return nullptr;
 }
 
