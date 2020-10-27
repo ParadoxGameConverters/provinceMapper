@@ -496,12 +496,6 @@ void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
 	Refresh();
 }
 
-double ImageFrame::pointDistance(const wxPoint& point1, const wxPoint& point2)
-{
-	const auto sum = std::pow(point1.x - point2.x, 2) + std::pow(point1.y - point2.y, 2);
-	return std::sqrt(sum);
-}
-
 wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint)
 {
 	// move the source point in reference to the source origin

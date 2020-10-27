@@ -6,7 +6,7 @@
 #include "Links/LinksFrame.h"
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
-#include "Provinces/Pixel.h"
+#include "PixelReader/PixelReader.h"
 #include "Provinces/Province.h"
 #include "wx/splitter.h"
 #include <fstream>
@@ -82,10 +82,10 @@ void MainFrame::initFrame()
 		configuration.save();
 	});
 
-	sizer->Add(sdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
-	sizer->Add(sourceDirPicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
-	sizer->Add(sourceDirStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
-	sizer->Add(reverseSourceCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5));
+	sizer->Add(sdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sourceDirPicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sourceDirStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(reverseSourceCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
 
 	// Target Directory
 	auto* tdirText = new wxStaticText(holderPanel, wxID_ANY, "Target Directory", wxDefaultPosition);
@@ -104,10 +104,10 @@ void MainFrame::initFrame()
 		configuration.save();
 	});
 
-	sizer->Add(tdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(targetDirPicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(targetDirStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(reverseTargetCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(tdirText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(targetDirPicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(targetDirStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(reverseTargetCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 
 	// Link File
 	auto* linkFileText = new wxStaticText(holderPanel, wxID_ANY, "Link File", wxDefaultPosition);
@@ -116,9 +116,9 @@ void MainFrame::initFrame()
 	linkFilePicker->Bind(wxEVT_FILEPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	linkFileStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
-	sizer->Add(linkFileText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(linkFilePicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(linkFileStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(linkFileText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(linkFilePicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(linkFileStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->AddStretchSpacer(0);
 
 	// Source Token
@@ -127,9 +127,9 @@ void MainFrame::initFrame()
 	sourceTokenField->Bind(wxEVT_TEXT, &MainFrame::onTokenChanged, this);
 	sourceTokenStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
-	sizer->Add(sourceTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(sourceTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(sourceTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(sourceTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(sourceTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(sourceTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->AddStretchSpacer(0);
 
 	// Target Token
@@ -138,18 +138,18 @@ void MainFrame::initFrame()
 	targetTokenField->Bind(wxEVT_TEXT, &MainFrame::onTokenChanged, this);
 	targetTokenStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
-	sizer->Add(targetTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(targetTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
-	sizer->Add(targetTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5));
+	sizer->Add(targetTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(targetTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
+	sizer->Add(targetTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->AddStretchSpacer(0);
 
 	// The Button
-	startButton = new wxButton(holderPanel, wxID_ANY, "Begin!", wxDefaultPosition, wxDefaultSize);
+	startButton = new wxButton(holderPanel, wxID_ANY, "Begin!", wxDefaultPosition, wxDefaultSize, wxEXPAND);
 	startButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrame::onStartButton, this);
 	startButton->Disable();
 
 	sizer->AddStretchSpacer(0);
-	sizer->Add(startButton, wxSizerFlags(1).Top().CenterHorizontal().Border(wxBOTTOM, 10));
+	sizer->Add(startButton, wxSizerFlags(1).Expand().Top().CenterHorizontal().Border(wxBOTTOM, 10).Center());
 	sizer->AddStretchSpacer(0);
 	sizer->AddStretchSpacer(0);
 
@@ -294,13 +294,18 @@ void MainFrame::initImageFrame()
 
 	if (configuration.isSourceReversed())
 		*sourceImg = sourceImg->Mirror(false);
-	readPixels(ImageTabSelector::SOURCE, *sourceImg);
-	Log(LogLevel::Info) << "Registered " << sourceImg->GetSize().GetX() << "x" << sourceImg->GetSize().GetY() << " source pixels.";
-
 	if (configuration.isTargetReversed())
 		*targetImg = targetImg->Mirror(false);
-	readPixels(ImageTabSelector::TARGET, *targetImg);
-	Log(LogLevel::Info) << "Registered " << targetImg->GetSize().GetX() << "x" << targetImg->GetSize().GetY() << " target pixels.";
+
+	// Multithreading where it counts!
+	auto* const pixelReader = new PixelReader(this);
+	pixelReader->prepare(sourceImg, sourceDefs);
+	pixelReader->Create();
+	pixelReader->Run();
+	auto* const pixelReader2 = new PixelReader(this);
+	pixelReader2->prepare(targetImg, targetDefs);
+	pixelReader2->Create();
+	pixelReader2->Run();
 
 	imageFrame = new ImageFrame(this, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs);
 
@@ -334,55 +339,6 @@ void MainFrame::onAbout(wxCommandEvent& event)
 void MainFrame::onSupportUs(wxCommandEvent& event)
 {
 	wxLaunchDefaultBrowser("https://www.patreon.com/ParadoxGameConverters");
-}
-
-void MainFrame::readPixels(const ImageTabSelector selector, const wxImage& img)
-{
-	unsigned char* rgb = img.GetData();
-	for (auto y = 0; y < img.GetSize().GetY(); y++)
-		for (auto x = 0; x < img.GetSize().GetX(); x++)
-		{
-			auto border = true;
-			// border or regular pixel?
-			if (isSameColorAtCoords(x, y, x - 1, y, img) && isSameColorAtCoords(x, y, x + 1, y, img) && isSameColorAtCoords(x, y, x, y - 1, img) &&
-				 isSameColorAtCoords(x, y, x, y + 1, img))
-				border = false;
-			const auto offs = coordsToOffset(x, y, img.GetSize().GetX());
-
-			if (selector == ImageTabSelector::SOURCE && border == true)
-				sourceDefs->registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
-			else if (selector == ImageTabSelector::SOURCE && border == false)
-				sourceDefs->registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
-			else if (selector == ImageTabSelector::TARGET && border == true)
-				targetDefs->registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
-			else if (selector == ImageTabSelector::TARGET && border == false)
-				targetDefs->registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
-		}
-}
-
-bool MainFrame::isSameColorAtCoords(const int ax, const int ay, const int bx, const int by, const wxImage& img)
-{
-	const auto height = img.GetSize().GetY();
-	const auto width = img.GetSize().GetX();
-	if (ax > width - 1 || ax < 0 || bx > width - 1 || bx < 0)
-		return false;
-	if (ay > height - 1 || ay < 0 || by > height - 1 || by < 0)
-		return false;
-	const auto offsetA = coordsToOffset(ax, ay, width);
-	const auto offsetB = coordsToOffset(bx, by, width);
-	unsigned char* rgb = img.GetData();
-
-	// Override for river colors which are hardcoded at 200/200/200. They are always true so adjacent pixels are not border pixels.
-	if (rgb[offsetA] == 200 && rgb[offsetA + 1] == 200 && rgb[offsetA + 2] == 200)
-		return true;
-	if (rgb[offsetB] == 200 && rgb[offsetB + 1] == 200 && rgb[offsetB + 2] == 200)
-		return true;
-
-	// Otherwise compare them normally.
-	if (rgb[offsetA] == rgb[offsetB] && rgb[offsetA + 1] == rgb[offsetB + 1] && rgb[offsetA + 2] == rgb[offsetB + 2])
-		return true;
-	else
-		return false;
 }
 
 void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
@@ -475,8 +431,8 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 	if (evt.GetId() == 3)
 	{
 		const auto input = sourceTokenField->GetValue();
-		const auto rawinput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawinput.empty() && rawinput.size() >= 2 && (linksFileString.find(rawinput) != std::string::npos || linksFileString.empty()))
+		const auto rawInput = commonItems::UTF16ToUTF8(input.ToStdWstring());
+		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFileString.find(rawInput) != std::string::npos || linksFileString.empty()))
 		{
 			sourceTokenStatus->SetBackgroundColour(green);
 			sanity[3] = true;
@@ -486,14 +442,14 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 			sourceTokenStatus->SetBackgroundColour(red);
 			sanity[3] = false;
 		}
-		configuration.setSourceToken(rawinput);
+		configuration.setSourceToken(rawInput);
 	}
 	// target token
 	else if (evt.GetId() == 4)
 	{
 		const auto input = targetTokenField->GetValue();
-		const auto rawinput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawinput.empty() && rawinput.size() >= 2 && (linksFileString.find(rawinput) != std::string::npos || linksFileString.empty()))
+		const auto rawInput = commonItems::UTF16ToUTF8(input.ToStdWstring());
+		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFileString.find(rawInput) != std::string::npos || linksFileString.empty()))
 		{
 			targetTokenStatus->SetBackgroundColour(green);
 			sanity[4] = true;
@@ -503,7 +459,7 @@ void MainFrame::onTokenChanged(wxCommandEvent& evt)
 			targetTokenStatus->SetBackgroundColour(red);
 			sanity[4] = false;
 		}
-		configuration.setTargetToken(rawinput);
+		configuration.setTargetToken(rawInput);
 	}
 	configuration.save();
 	applySanityToButton();

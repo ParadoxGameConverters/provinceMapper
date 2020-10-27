@@ -68,9 +68,6 @@ class MainFrame: public wxFrame
 	void onLinksMoveVersionRight(wxCommandEvent& evt);
 	void onShowToolbar(wxCommandEvent& evt);
 
-	void readPixels(ImageTabSelector selector, const wxImage& img);
-	static bool isSameColorAtCoords(int ax, int ay, int bx, int by, const wxImage& img);
-
 	LinksFrame* linksFrame = nullptr;
 	wxFlexGridSizer* sizer = nullptr;
 
