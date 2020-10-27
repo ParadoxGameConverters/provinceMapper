@@ -150,8 +150,6 @@ void ImageFrame::renderSource() const
 		sourceDC.SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 		sourceDC.SetTextForeground(*wxYELLOW);
 		sourceDC.DrawText(name, sourcePointer->x + 10, sourcePointer->y + 10);
-		sourceDC.SetBrush(*wxTRANSPARENT_BRUSH);
-		sourceDC.DrawRectangle(sourceRect);
 	}
 }
 
@@ -199,8 +197,6 @@ void ImageFrame::renderTarget() const
 		targetDC.SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 		targetDC.SetTextForeground(*wxYELLOW);
 		targetDC.DrawText(name, targetPointer->x + 10, targetPointer->y + 10);
-		targetDC.SetBrush(*wxTRANSPARENT_BRUSH);
-		targetDC.DrawRectangle(targetRect);
 	}
 }
 
@@ -420,15 +416,15 @@ void ImageFrame::buildBounds()
 		if (point.y > maxY)
 			maxY = point.y;
 	}
-	// expand by 20% for convenience.
-	if (minX - (maxX - minX) * 0.2 > 0)
-		minX = minX - (maxX - minX) * 0.2;
-	if (minY - (maxY - minY) * 0.2 > 0)
-		minY = minY - (maxY - minY) * 0.2;
-	if (maxX + (maxX - minX) * 0.2 < sourceCanvas->getWidth())
-		maxX = maxX + (maxX - minX) * 0.2;
-	if (maxY + (maxY - minY) * 0.2 < sourceCanvas->getHeight())
-		maxY = maxY + (maxY - minY) * 0.2;
+	// expand by 50% for convenience.
+	if (minX - (maxX - minX) * 0.5 > 0)
+		minX = minX - (maxX - minX) * 0.5;
+	if (minY - (maxY - minY) * 0.5 > 0)
+		minY = minY - (maxY - minY) * 0.5;
+	if (maxX + (maxX - minX) * 0.5 < sourceCanvas->getWidth())
+		maxX = maxX + (maxX - minX) * 0.5;
+	if (maxY + (maxY - minY) * 0.5 < sourceCanvas->getHeight())
+		maxY = maxY + (maxY - minY) * 0.5;
 	minX = std::round(minX);
 	minY = std::round(minY);
 	maxX = std::round(maxX);
@@ -450,14 +446,14 @@ void ImageFrame::buildBounds()
 		if (point.y > maxY)
 			maxY = point.y;
 	}
-	if (minX - (maxX - minX) * 0.2 > 0)
-		minX = minX - (maxX - minX) * 0.2;
-	if (minY - (maxY - minY) * 0.2 > 0)
-		minY = minY - (maxY - minY) * 0.2;
-	if (maxX + (maxX - minX) * 0.2 < targetCanvas->getWidth())
-		maxX = maxX + (maxX - minX) * 0.2;
-	if (maxY + (maxY - minY) * 0.2 < targetCanvas->getHeight())
-		maxY = maxY + (maxY - minY) * 0.2;
+	if (minX - (maxX - minX) * 0.5 > 0)
+		minX = minX - (maxX - minX) * 0.5;
+	if (minY - (maxY - minY) * 0.5 > 0)
+		minY = minY - (maxY - minY) * 0.5;
+	if (maxX + (maxX - minX) * 0.5 < targetCanvas->getWidth())
+		maxX = maxX + (maxX - minX) * 0.5;
+	if (maxY + (maxY - minY) * 0.5 < targetCanvas->getHeight())
+		maxY = maxY + (maxY - minY) * 0.5;
 	targetRect = wxRect(wxPoint(static_cast<int>(minX), static_cast<int>(minY)), wxPoint(static_cast<int>(maxX), static_cast<int>(maxY)));
 }
 
