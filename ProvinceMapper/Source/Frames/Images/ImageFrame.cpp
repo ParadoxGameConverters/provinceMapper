@@ -508,39 +508,47 @@ double ImageFrame::pointDistance(const wxPoint& point1, const wxPoint& point2)
 
 wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxRect& targetRect, const wxPoint& sourcePoint)
 {
-	const auto distance1 = pointDistance(sourcePoint, sources[0]);
-	const auto distance2 = pointDistance(sourcePoint, sources[1]);
-	const auto distance3 = pointDistance(sourcePoint, sources[2]);
-	auto result = wxPoint(0, 0);
-	if (distance1 == 0.0 || distance2 == 0.0 || distance3 == 0.0)
-		return result;
-	const auto dd1 = distance1 / distance2;
-	const auto dd2 = distance2 / distance3;
-	const auto dd3 = distance3 / distance1;
-	const auto dd4 = distance1 / distance3;
-	const auto dd5 = distance2 / distance1;
-	const auto dd6 = distance3 / distance2;
+	// move the source point in reference to the source origin
+	auto movedSource = sourcePoint - sources[0];
 
-	for (auto ix = 0; ix < targetRect.width; ix++)
-	{
-		for (auto iy = 0; iy < targetRect.height; iy++)
-		{
-			const auto point = wxPoint(ix + targetRect.x, iy + targetRect.y);
-			const auto tdist1 = pointDistance(point, targets[0]);
-			const auto tdist2 = pointDistance(point, targets[1]);
-			const auto tdist3 = pointDistance(point, targets[2]);
-			if (tdist1 == 0.0 || tdist2 == 0.0 || tdist3 == 0.0)
-				continue;
+	// construct a basis matrix for the source triangle:
+	// ( A B ) = ( x1 x2 )
+	// ( C D ) = ( y1 y2 )
+	float sourceA = sources[1].x - sources[0].x;
+	float sourceB = sources[2].x - sources[0].x;
+	float sourceC = sources[1].y - sources[0].y;
+	float sourceD = sources[2].y - sources[0].y;
 
-			if (std::abs(tdist1 / tdist2 - dd1) < 0.01 && std::abs(tdist2 / tdist3 - dd2) < 0.01 && std::abs(tdist3 / tdist1 - dd3) < 0.01 &&
-				 std::abs(tdist1 / tdist3 - dd4) < 0.01 && std::abs(tdist2 / tdist1 - dd5) < 0.01 && std::abs(tdist3 / tdist2 - dd6) < 0.01)
-			{
-				result = point;
-				break;
-			}
-		}
-		if (result.x)
-			break;
-	}
-	return result;
+	// construct the inverse of the source basis matrix:
+	// ___1___ ( d -b )
+	// ad - bc (-c  a )
+	auto sourceDeterminant = 1 / (sourceA * sourceD - sourceB * sourceC);
+	auto inverseA = sourceDeterminant *  sourceD;
+	auto inverseB = sourceDeterminant * -sourceB;
+	auto inverseC = sourceDeterminant * -sourceC;
+	auto inverseD = sourceDeterminant *  sourceA;
+
+	// transform the source point into the source triangle basis
+	auto sourceU = movedSource.x * inverseA + movedSource.y * inverseB;
+	auto sourceV = movedSource.x * inverseC + movedSource.y * inverseD;
+
+	// silently move from source triangle basis to destination triangle basis
+	auto targetU = sourceU;
+	auto targetV = sourceV;
+
+	// construct a basis matrix for the target triangle:
+	// ( A B ) = ( x1 x2 )
+	// ( C D ) = ( y1 y2 )
+	float targetA = targets[1].x - targets[0].x;
+	float targetB = targets[2].x - targets[0].x;
+	float targetC = targets[1].y - targets[0].y;
+	float targetD = targets[2].y - targets[0].y;
+
+	// transform the target point from the destination triangle basis
+	wxPoint target;
+	target.x = targetU * targetA + targetV * targetB;
+	target.y = targetU * targetC + targetV * targetD;
+
+	// move the target point in reference to the source origin
+	return target + targets[0];
 }
