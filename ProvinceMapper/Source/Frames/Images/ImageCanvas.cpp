@@ -9,6 +9,8 @@
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_REFRESH, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -177,29 +179,24 @@ void ImageCanvas::onMouseOver(wxMouseEvent& event)
 	auto y = CalcUnscrolledPosition(event.GetPosition()).y;
 	x = static_cast<int>(x / scaleFactor);
 	y = static_cast<int>(y / scaleFactor);
-	const auto offs = coordsToOffset(x, y, width);
+
+	// before we go on, if we have triangulation going on, notify the other canvas.
+	if (triangulate)
+	{
+		wxCommandEvent evt(wxEVT_MOUSE_AT);
+		// get creative, again.
+		if (selector == ImageTabSelector::SOURCE)
+			evt.SetId(x);
+		else
+			evt.SetId(-x);
+		evt.SetInt(y);
+		eventHandler->QueueEvent(evt.Clone());
+	}
+
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
-		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
-
-		// cache?
-		std::string name;
-		if (tooltipCache.first == chroma)
-			name = tooltipCache.second;
-		else
-		{
-			// poke the definitions for a chroma name.
-			const auto provID = definitions->getIDForChroma(chroma);
-			if (provID)
-				name = std::to_string(*provID) + " - ";
-			const auto& provinceName = definitions->getNameForChroma(chroma);
-			if (provinceName)
-				name += *provinceName;
-			else
-				name += "UNDEFINED";
-			tooltipCache = std::pair(chroma, name);
-		}
+		const auto name = nameAtCoords(wxPoint(x, y));
 		this->SetToolTip(name);
 	}
 	event.Skip();
@@ -211,6 +208,7 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 	// 1. select a mapping, or
 	// 2. add a province to the existing mapping, or
 	// 3. remove it from active mapping.
+	// 4 - special: if we're initing triangulation, we need raw points.
 
 	// What province have we clicked?
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -221,6 +219,21 @@ void ImageCanvas::leftUp(wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+		// case 4: special.
+		if (triangulate && points.size() < 3)
+		{
+			// we're initing a point here.
+			const auto point = wxPoint(x, y);
+			// do we have this point already?
+			for (const auto& knownPoint: points)
+				if (knownPoint == point)
+					return;
+			// insert and ping.
+			points.emplace_back(wxPoint(x, y));
+			stagePointPlaced();
+			return;
+		}
+
 		const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
 		// Province may not even be defined/instanced, let alone linked. Tread carefully.
 		const auto province = definitions->getProvinceForChroma(chroma);
@@ -281,7 +294,6 @@ const std::vector<std::shared_ptr<Province>>& ImageCanvas::getRelevantProvinces(
 	else // if (selector == ImageTabSelector::TARGET)
 		return link->getTargets();
 }
-
 
 void ImageCanvas::selectLink(const int linkID) const
 {
@@ -526,6 +538,16 @@ void ImageCanvas::stageRefresh() const
 	eventHandler->QueueEvent(evt.Clone());
 }
 
+void ImageCanvas::stagePointPlaced() const
+{
+	wxCommandEvent evt(wxEVT_POINT_PLACED);
+	if (selector == ImageTabSelector::SOURCE)
+		evt.SetInt(static_cast<int>(points.size()));
+	else if (selector == ImageTabSelector::TARGET)
+		evt.SetInt(3 + static_cast<int>(points.size())); // gotta be creative.
+	eventHandler->QueueEvent(evt.Clone());
+}
+
 void ImageCanvas::stageMoveUp() const
 {
 	if (activeLink)
@@ -572,4 +594,42 @@ void ImageCanvas::pushZoomLevel(const int zoomLevel)
 {
 	oldScaleFactor = scaleFactor;
 	scaleFactor = zoomLevel / 100.0;
+}
+
+void ImageCanvas::toggleTriangulate()
+{
+	if (triangulate)
+	{
+		triangulate = false;
+	}
+	else
+	{
+		triangulate = true;
+		points.clear();
+	}
+}
+
+std::string ImageCanvas::nameAtCoords(const wxPoint& point)
+{
+	const auto offs = coordsToOffset(point.x, point.y, width);
+	const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
+
+	// cache?
+	std::string name;
+	if (tooltipCache.first == chroma)
+		name = tooltipCache.second;
+	else
+	{
+		// poke the definitions for a chroma name.
+		const auto provID = definitions->getIDForChroma(chroma);
+		if (provID)
+			name = std::to_string(*provID) + " - ";
+		const auto& provinceName = definitions->getNameForChroma(chroma);
+		if (provinceName)
+			name += *provinceName;
+		else
+			name += "UNDEFINED";
+		tooltipCache = std::pair(chroma, name);
+	}
+	return name;
 }

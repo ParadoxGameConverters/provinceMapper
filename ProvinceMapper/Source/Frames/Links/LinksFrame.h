@@ -8,10 +8,16 @@
 #include <wx/notebook.h>
 
 class LinkMappingVersion;
+class Configuration;
 class LinksFrame: public wxFrame
 {
   public:
-	LinksFrame(wxWindow* parent, const std::vector<std::shared_ptr<LinkMappingVersion>>& versions, const std::shared_ptr<LinkMappingVersion>& activeVersion);
+	LinksFrame(wxWindow* parent,
+		 const wxPoint& position,
+		 const wxSize& size,
+		 const std::vector<std::shared_ptr<LinkMappingVersion>>& versions,
+		 const std::shared_ptr<LinkMappingVersion>& activeVersion,
+		 std::shared_ptr<Configuration> theConfiguration);
 
 	void deactivateLink() const;
 	void activateLinkByID(int ID) const;
@@ -33,6 +39,7 @@ class LinksFrame: public wxFrame
 	void onResize(wxSizeEvent& evt);
 	void onClose(wxCloseEvent& event);
 	void onKeyDown(wxKeyEvent& event);
+	void onMove(wxMoveEvent& event);
 
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
@@ -40,6 +47,8 @@ class LinksFrame: public wxFrame
 	std::map<int, LinksTab*> pages; // version ID, page it's on.
 	LinksTab* activePage = nullptr;
 	std::vector<int> versionIDs; // this mirrors our pages so first page holds a version with first ID in this vector.
+
+	std::shared_ptr<Configuration> configuration;
 
   protected:
 	wxEvtHandler* eventHandler = nullptr;
