@@ -112,7 +112,7 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 	return output;
 }
 
-void LinkMapping::toggleSource(const int sourceID)
+Mapping LinkMapping::toggleSource(const int sourceID)
 {
 	std::vector<std::shared_ptr<Province>> replacement;
 	for (const auto& province: sources)
@@ -123,13 +123,23 @@ void LinkMapping::toggleSource(const int sourceID)
 		// We need to find the province in sourceDefs and import it.
 		auto province = sourceDefs->getProvinceForID(sourceID);
 		if (province)
+		{
 			sources.emplace_back(province);
+			return Mapping::MAPPED;
+		}
+		else
+		{
+			return Mapping::FAIL;
+		}
 	}
 	else
+	{
 		sources = replacement;
+		return Mapping::UNMAPPED;
+	}
 }
 
-void LinkMapping::toggleTarget(const int targetID)
+Mapping LinkMapping::toggleTarget(const int targetID)
 {
 	std::vector<std::shared_ptr<Province>> replacement;
 	for (const auto& province: targets)
@@ -140,10 +150,20 @@ void LinkMapping::toggleTarget(const int targetID)
 		// We need to find the province in targetDefs and import it.
 		auto province = targetDefs->getProvinceForID(targetID);
 		if (province)
+		{
 			targets.emplace_back(province);
+			return Mapping::MAPPED;
+		}
+		else
+		{
+			return Mapping::FAIL;
+		}
 	}
 	else
+	{
 		targets = replacement;
+		return Mapping::UNMAPPED;
+	}
 }
 
 bool LinkMapping::operator==(const LinkMapping& rhs) const

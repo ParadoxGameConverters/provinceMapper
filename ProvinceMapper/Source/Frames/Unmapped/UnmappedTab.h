@@ -3,6 +3,7 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include <map>
 #include <wx/grid.h>
 #include <wx/notebook.h>
 
@@ -16,8 +17,10 @@ class UnmappedTab: public wxNotebookPage
 {
   public:
 	UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, ImageTabSelector theSelector);
-	void redrawGrid() const;
+	void redrawGrid();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& theVersion) { version = theVersion; }
+	void removeProvince(int ID);
+	void addProvince(int ID);
 
   private:
 	void onKeyDown(wxKeyEvent& event);
@@ -39,6 +42,7 @@ class UnmappedTab: public wxNotebookPage
 	ImageTabSelector selector;
 
 	std::shared_ptr<LinkMappingVersion> version;
+	std::map<int, int> provinceRows; // province/row
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

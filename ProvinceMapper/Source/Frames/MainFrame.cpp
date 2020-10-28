@@ -587,6 +587,14 @@ void MainFrame::onToggleProvince(wxCommandEvent& evt)
 		imageFrame->shadeProvinceByID(ID, sourceImage);
 		imageFrame->activateLinkByID(*newLinkID);
 	}
+
+	// it is unclear what happened to the province. It may be mapped or unmapped so we poke.
+	const auto result = linkMapper.isProvinceMapped(ID, sourceImage);
+	if (result == Mapping::MAPPED)
+		unmappedFrame->removeProvince(ID, sourceImage);
+	else if (result == Mapping::UNMAPPED)
+		unmappedFrame->addProvince(ID, sourceImage);
+	// else something went wrong and better don't touch.
 }
 
 void MainFrame::onCenterMap(wxCommandEvent& evt)

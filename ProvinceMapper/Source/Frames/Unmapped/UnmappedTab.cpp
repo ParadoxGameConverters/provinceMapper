@@ -41,17 +41,19 @@ const std::vector<std::shared_ptr<Province>>& UnmappedTab::getRelevantProvinces(
 		return *version->getUnmappedTargets();
 }
 
-void UnmappedTab::redrawGrid() const
+void UnmappedTab::redrawGrid()
 {
 	auto rowCounter = 0;
+	provinceRows.clear();
 	theGrid->BeginBatch();
 	theGrid->DeleteRows(0, theGrid->GetNumberRows());
 
 	for (const auto& province: getRelevantProvinces())
 	{
-		auto bgColor = wxColour(240, 240, 240);
-		std::string name = std::to_string(province->ID) + " - " + province->bespokeName();
+		const auto bgColor = wxColour(240, 240, 240);
+		const auto name = std::to_string(province->ID) + " - " + province->bespokeName();
 		theGrid->AppendRows(1, false);
+		provinceRows.insert(std::pair(province->ID, rowCounter));
 		theGrid->SetRowSize(rowCounter, 20);
 		theGrid->SetCellValue(rowCounter, 0, name);
 		theGrid->SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
@@ -169,4 +171,35 @@ void UnmappedTab::stageMoveVersionRight() const
 {
 	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventListener->QueueEvent(evt->Clone());
+}
+
+void UnmappedTab::removeProvince(const int ID)
+{
+	if (const auto& provinceRowItr = provinceRows.find(ID); provinceRowItr != provinceRows.end())
+	{
+		theGrid->Fit();
+		theGrid->DeleteRows(provinceRowItr->second, 1);
+		provinceRows.erase(ID);
+		Refresh();
+	}
+}
+
+void UnmappedTab::addProvince(int ID)
+{
+	for (const auto& province: getRelevantProvinces())
+	{
+		if (province->ID == ID)
+		{
+			const auto bgColor = wxColour(240, 240, 240);
+			const auto name = std::to_string(province->ID) + " - " + province->bespokeName();
+			auto currentRow = theGrid->GetNumberRows() + 1;
+			theGrid->AppendRows(1);
+			provinceRows.insert(std::pair(province->ID, currentRow));
+			theGrid->SetCellValue(currentRow, 0, name);
+			theGrid->SetCellBackgroundColour(currentRow, 0, bgColor);
+			theGrid->MakeCellVisible(currentRow, 0);
+			Refresh();
+			break;
+		}
+	}
 }

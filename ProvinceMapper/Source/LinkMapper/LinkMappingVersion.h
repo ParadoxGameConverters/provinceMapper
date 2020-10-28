@@ -27,7 +27,8 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getUnmappedSources() const { return unmappedSources; }
 	[[nodiscard]] const auto& getUnmappedTargets() const { return unmappedTargets; }
-	
+	[[nodiscard]] Mapping isProvinceMapped(int provinceID, bool isSource) const;
+
 	void deactivateLink();
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int theID);
@@ -49,7 +50,11 @@ class LinkMappingVersion: commonItems::parser
 
   private:
 	void generateUnmapped() const;
-	
+	void removeUnmappedSourceByID(int provinceID) const;
+	void removeUnmappedTargetByID(int provinceID) const;
+	void addUnmappedSourceByID(int provinceID) const;
+	void addUnmappedTargetByID(int provinceID) const;
+
 	int ID = 0;
 	std::string versionName;
 	int linkCounter = 0;

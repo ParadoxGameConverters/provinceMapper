@@ -18,6 +18,8 @@ class UnmappedFrame: public wxFrame
 		 std::shared_ptr<Configuration> theConfiguration);
 
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) const;
+	void removeProvince(int ID, bool sourceTab);
+	void addProvince(int ID, bool sourceTab);
 
   private:
 	wxNotebook* notebook = nullptr;

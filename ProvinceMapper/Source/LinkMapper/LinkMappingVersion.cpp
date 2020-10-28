@@ -95,9 +95,21 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 	if (activeLink)
 	{
 		if (isSource)
-			activeLink->toggleSource(provinceID);
+		{
+			const auto result = activeLink->toggleSource(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedSourceByID(provinceID);
+			else if (result == Mapping::UNMAPPED)
+				addUnmappedSourceByID(provinceID);
+		}
 		else
-			activeLink->toggleTarget(provinceID);
+		{
+			const auto result = activeLink->toggleTarget(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedTargetByID(provinceID);
+			else if (result == Mapping::UNMAPPED)
+				addUnmappedTargetByID(provinceID);
+		}
 		return std::nullopt;
 	}
 	else
@@ -105,9 +117,17 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 		// Create a new link and activate it.
 		const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		if (isSource)
-			link->toggleSource(provinceID);
+		{
+			const auto result = link->toggleSource(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedSourceByID(provinceID);
+		}
 		else
-			link->toggleTarget(provinceID);
+		{
+			const auto result = link->toggleTarget(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedTargetByID(provinceID);
+		}
 		++linkCounter;
 		// We're positioning the new link above the last clicked one.
 		const auto& positionItr = links->begin() + lastActiveLinkIndex;
@@ -115,6 +135,46 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 		activeLink = link;
 		return link->getID();
 	}
+}
+
+void LinkMappingVersion::removeUnmappedSourceByID(int provinceID) const
+{
+	auto counter = 0;
+	for (const auto& province: *unmappedSources)
+	{
+		if (province->ID == provinceID)
+		{
+			(*unmappedSources).erase((*unmappedSources).begin() + counter);
+			break;
+		}
+		++counter;
+	}
+}
+
+void LinkMappingVersion::removeUnmappedTargetByID(int provinceID) const
+{
+	auto counter = 0;
+	for (const auto& province: *unmappedTargets)
+	{
+		if (province->ID == provinceID)
+		{
+			(*unmappedTargets).erase((*unmappedTargets).begin() + counter);
+			break;
+		}
+		++counter;
+	}
+}
+
+void LinkMappingVersion::addUnmappedSourceByID(int provinceID) const
+{
+	const auto& province = sourceDefs->getProvinceForID(provinceID);
+	unmappedSources->emplace_back(province);
+}
+
+void LinkMappingVersion::addUnmappedTargetByID(int provinceID) const
+{
+	const auto& province = targetDefs->getProvinceForID(provinceID);
+	unmappedTargets->emplace_back(province);
 }
 
 int LinkMappingVersion::addCommentByIndex(const std::string& comment, const int index)
@@ -241,4 +301,29 @@ void LinkMappingVersion::generateUnmapped() const
 	}
 	Log(LogLevel::Info) << "Version " << versionName << " has " << unmappedSources->size() << " unmapped source, " << unmappedTargets->size()
 							  << " unmapped target provinces.";
+}
+
+Mapping LinkMappingVersion::isProvinceMapped(int provinceID, bool isSource) const
+{
+	if (isSource)
+	{
+		for (const auto& province: *unmappedSources)
+			if (province->ID == provinceID)
+				return Mapping::UNMAPPED;
+		for (const auto& link: *links)
+			for (const auto& province: link->getSources())
+				if (province->ID == provinceID)
+					return Mapping::MAPPED;
+	}
+	else
+	{
+		for (const auto& province: *unmappedTargets)
+			if (province->ID == provinceID)
+				return Mapping::UNMAPPED;
+		for (const auto& link: *links)
+			for (const auto& province: link->getTargets())
+				if (province->ID == provinceID)
+					return Mapping::MAPPED;
+	}
+	return Mapping::FAIL;
 }

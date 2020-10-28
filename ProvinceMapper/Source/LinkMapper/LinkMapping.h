@@ -2,6 +2,12 @@
 #define LINK_MAPPING_H
 #include "Parser.h"
 
+enum class Mapping
+{
+	MAPPED,
+	UNMAPPED,
+	FAIL
+};
 struct Province;
 class Definitions;
 class LinkMapping: commonItems::parser
@@ -22,8 +28,9 @@ class LinkMapping: commonItems::parser
 
 	bool operator==(const LinkMapping& rhs) const;
 
-	void toggleSource(int sourceID);
-	void toggleTarget(int targetID);
+	[[nodiscard]] Mapping toggleSource(int sourceID);
+	[[nodiscard]] Mapping toggleTarget(int targetID);
+
 	void setComment(const std::string& theComment) { comment = theComment; }
 
 	[[nodiscard]] auto getID() const { return ID; }

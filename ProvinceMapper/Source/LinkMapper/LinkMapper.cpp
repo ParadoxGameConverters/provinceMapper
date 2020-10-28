@@ -228,3 +228,11 @@ void LinkMapper::moveActiveVersionRight()
 		}
 	}
 }
+
+Mapping LinkMapper::isProvinceMapped(int provinceID, bool isSource) const
+{
+	if (activeVersion)
+		return activeVersion->isProvinceMapped(provinceID, isSource);
+	else
+		return Mapping::FAIL;
+}

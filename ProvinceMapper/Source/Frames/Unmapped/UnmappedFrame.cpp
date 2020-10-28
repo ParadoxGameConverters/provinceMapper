@@ -4,7 +4,6 @@
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
-#include "Provinces/Province.h"
 #include "UnmappedTab.h"
 
 UnmappedFrame::UnmappedFrame(wxWindow* parent,
@@ -113,4 +112,20 @@ void UnmappedFrame::onMove(wxMoveEvent& event)
 void UnmappedFrame::onChangeTab(wxBookCtrlEvent& event)
 {
 	// Capture this event so it doesn't get mistaken for change active version event from LinksFrame.
+}
+
+void UnmappedFrame::removeProvince(const int ID, const bool sourceTab)
+{
+	if (sourceTab)
+		sources->removeProvince(ID);
+	else
+		targets->removeProvince(ID);
+}
+
+void UnmappedFrame::addProvince(const int ID, const bool sourceTab)
+{
+	if (sourceTab)
+		sources->addProvince(ID);
+	else
+		targets->addProvince(ID);
 }
