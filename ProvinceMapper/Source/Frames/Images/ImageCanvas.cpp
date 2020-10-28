@@ -11,6 +11,8 @@ wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -25,6 +27,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	Bind(wxEVT_RIGHT_UP, &ImageCanvas::rightUp, this);
 	Bind(wxEVT_KEY_DOWN, &ImageCanvas::onKeyDown, this);
 	Bind(wxEVT_MOUSEWHEEL, &ImageCanvas::onMouseWheel, this);
+	Bind(wxEVT_SCROLLWIN_THUMBRELEASE, &ImageCanvas::onScrollRelease, this);
 
 	image = theImage;
 	width = image->GetSize().GetX();
@@ -645,4 +648,26 @@ std::string ImageCanvas::nameAtCoords(const wxPoint& point)
 		tooltipCache = std::pair(chroma, name);
 	}
 	return name;
+}
+
+void ImageCanvas::onScrollRelease(wxScrollWinEvent& event)
+{
+	int select;
+	if (selector == ImageTabSelector::SOURCE)
+		select = 0;
+	else
+		select = 1;
+	if (event.GetOrientation() == wxHORIZONTAL)
+	{
+		auto evt = wxCommandEvent(wxEVT_SCROLL_RELEASE_H);
+		evt.SetId(select);
+		eventHandler->AddPendingEvent(evt);
+	}
+	else
+	{
+		auto evt = wxCommandEvent(wxEVT_SCROLL_RELEASE_V);
+		evt.SetId(select);
+		eventHandler->AddPendingEvent(evt);
+	}
+	event.Skip();
 }

@@ -10,6 +10,8 @@ wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
 
 class wxTipWindow;
 struct Province;
@@ -40,6 +42,8 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] wxPoint locateProvinceCoordinates(int ID) const;
 	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
+	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
+	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
@@ -50,6 +54,8 @@ class ImageCanvas: public wxScrolledCanvas
 	void setBlack() { black = true; }
 	void clearBlack() { black = false; }
 	void clearScale() { oldScaleFactor = scaleFactor; }
+	void clearOldScrollH() { oldScrollPositionH = GetScrollPos(wxHORIZONTAL); }
+	void clearOldScrollV() { oldScrollPositionV = GetScrollPos(wxVERTICAL); }
 
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
@@ -67,6 +73,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void rightUp(wxMouseEvent& event);
 	void onKeyDown(wxKeyEvent& event);
 	void onMouseWheel(wxMouseEvent& event);
+	void onScrollRelease(wxScrollWinEvent& event);
 
 	void stageAddComment();
 	void stageDeleteLink() const;
@@ -104,6 +111,8 @@ class ImageCanvas: public wxScrolledCanvas
 	double oldScaleFactor = 1.0;
 	double scaleFactor = 1.0;
 	int rotationDelta = 0;
+	int oldScrollPositionV = 0;
+	int oldScrollPositionH = 0;
 
 	std::vector<Pixel> shadedPixels;
 	std::vector<Pixel> strafedPixels;

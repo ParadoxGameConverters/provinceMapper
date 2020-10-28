@@ -5,6 +5,7 @@
 #endif
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_LOCK, wxCommandEvent);
 
 class Configuration;
 class StatusBar: public wxFrame
@@ -21,12 +22,21 @@ class StatusBar: public wxFrame
 
   private:
 	void onMove(wxMoveEvent& event);
+	void onZoomChanged(wxCommandEvent& evt);
+	void onZoomResetButton(wxCommandEvent& evt);
+	void onTriangulate(wxCommandEvent& evt);
+	void onClose(wxCloseEvent& event);
+	void onLock(wxCommandEvent& evt);
 
 	bool triangulate = false;
+	bool lock = false;
 
 	wxTextCtrl* sourceZoomField = nullptr;
 	wxTextCtrl* targetZoomField = nullptr;
 	wxButton* triangulateButton = nullptr;
+
+	wxButton* lockButton = nullptr;
+	wxWindow* lockStatus = nullptr;
 
 	wxWindow* sTriangulate1 = nullptr;
 	wxWindow* sTriangulate2 = nullptr;
@@ -35,11 +45,6 @@ class StatusBar: public wxFrame
 	wxWindow* tTriangulate2 = nullptr;
 	wxWindow* tTriangulate3 = nullptr;
 	wxStaticText* triangulateText = nullptr;
-
-	void onZoomChanged(wxCommandEvent& evt);
-	void onZoomResetButton(wxCommandEvent& evt);
-	void onTriangulate(wxCommandEvent& evt);
-	void onClose(wxCloseEvent& event);
 
 	std::shared_ptr<Configuration> configuration;
 

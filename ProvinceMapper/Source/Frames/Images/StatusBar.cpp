@@ -4,9 +4,11 @@
 #include "Log.h"
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_LOCK, wxCommandEvent);
 
 StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Image Toolbar", position, wxSize(420, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), configuration(std::move(theConfiguration)),
+	 wxFrame(parent, wxID_ANY, "Image Toolbar", position, wxSize(500, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxSTAY_ON_TOP),
+	 configuration(std::move(theConfiguration)),
 	 eventHandler(parent)
 {
 	Bind(wxEVT_CLOSE_WINDOW, &StatusBar::onClose, this);
@@ -14,8 +16,13 @@ StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<
 
 	auto* holderPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxEXPAND);
 	holderPanel->SetBackgroundColour(wxColour(230, 230, 230));
-	auto* sizer = new wxFlexGridSizer(7, 5, 5);
+	auto* sizer = new wxFlexGridSizer(8, 5, 5);
 	holderPanel->SetSizer(sizer);
+
+	lockButton = new wxButton(holderPanel, wxID_ANY, "Lock", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Lock");
+	lockButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onLock, this);
+	lockStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(45, 15));
+	lockStatus->SetBackgroundColour("gray");
 
 	auto* sZoomText = new wxStaticText(holderPanel, wxID_ANY, "Source Zoom:", wxDefaultPosition, wxDefaultSize);
 	auto* tZoomText = new wxStaticText(holderPanel, wxID_ANY, "Target Zoom:", wxDefaultPosition, wxDefaultSize);
@@ -47,7 +54,8 @@ StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<
 	tTriangulate3 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 	tTriangulate3->SetBackgroundColour("gray");
 
-	sizer->Add(sZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(lockButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
+	sizer->Add(sZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(sourceZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(sourceResetButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(triangulateText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
@@ -55,7 +63,8 @@ StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<
 	sizer->Add(sTriangulate2, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(sTriangulate3, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 
-	sizer->Add(tZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(lockStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxBOTTOM, 5).Center());
+	sizer->Add(tZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(targetZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(targetResetButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(triangulateButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
@@ -244,4 +253,25 @@ void StatusBar::onMove(wxMoveEvent& event)
 	configuration->setStatusBarPos(position.x, position.y);
 	configuration->save();
 	event.Skip();
+}
+
+void StatusBar::onLock(wxCommandEvent& evt)
+{
+	auto event = wxCommandEvent(wxEVT_LOCK);
+	if (lock)
+	{
+		lock = false;
+		lockStatus->SetBackgroundColour("gray");
+		lockButton->SetLabel("Lock");
+		event.SetInt(0);
+	}
+	else
+	{
+		lock = true;
+		lockStatus->SetBackgroundColour("green");
+		lockButton->SetLabel("Unlock");
+		event.SetInt(1);
+	}
+	Refresh();
+	eventHandler->AddPendingEvent(event);
 }
