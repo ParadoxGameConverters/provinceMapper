@@ -35,6 +35,7 @@ class UnmappedTab: public wxNotebookPage
 	void stageAddLink() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
+	void focusOnRow(int row);
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces() const;
 

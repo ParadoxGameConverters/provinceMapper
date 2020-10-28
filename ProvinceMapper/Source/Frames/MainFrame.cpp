@@ -276,7 +276,7 @@ void MainFrame::initUnmappedFrame()
 	if (configuration->isUnmappedFrameOn())
 		unmappedFrame->Show();
 	if (maximize)
-		linksFrame->Maximize(true);
+		unmappedFrame->Maximize(true);
 }
 
 void MainFrame::initImageFrame()

@@ -21,9 +21,9 @@ UnmappedTab::UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> t
 	theGrid->HideRowLabels();
 	theGrid->HideColLabels();
 	theGrid->SetScrollRate(0, 20);
-	theGrid->SetColMinimalAcceptableWidth(200);
+	theGrid->SetColMinimalAcceptableWidth(600);
 	theGrid->GetGridWindow()->Bind(wxEVT_MOTION, &UnmappedTab::onGridMotion, this);
-	theGrid->SetColMinimalWidth(0, 200);
+	theGrid->SetColMinimalWidth(0, 600);
 	GetParent()->Layout();
 
 	auto* gridBox = new wxBoxSizer(wxVERTICAL);
@@ -177,10 +177,13 @@ void UnmappedTab::removeProvince(const int ID)
 {
 	if (const auto& provinceRowItr = provinceRows.find(ID); provinceRowItr != provinceRows.end())
 	{
-		theGrid->Fit();
+		const auto row = provinceRowItr->second;
 		theGrid->DeleteRows(provinceRowItr->second, 1);
 		provinceRows.erase(ID);
-		Refresh();
+		for (auto& provinceRow: provinceRows) // lower the row position for ones behind.
+			if (provinceRow.second > row)
+				--provinceRow.second;
+		theGrid->ForceRefresh();
 	}
 }
 
@@ -192,14 +195,26 @@ void UnmappedTab::addProvince(int ID)
 		{
 			const auto bgColor = wxColour(240, 240, 240);
 			const auto name = std::to_string(province->ID) + " - " + province->bespokeName();
-			auto currentRow = theGrid->GetNumberRows() + 1;
+			auto currentRow = theGrid->GetNumberRows();
 			theGrid->AppendRows(1);
 			provinceRows.insert(std::pair(province->ID, currentRow));
 			theGrid->SetCellValue(currentRow, 0, name);
 			theGrid->SetCellBackgroundColour(currentRow, 0, bgColor);
-			theGrid->MakeCellVisible(currentRow, 0);
-			Refresh();
+			theGrid->SetCellAlignment(currentRow, 0, wxCENTER, wxCENTER);
+			theGrid->SetColMinimalWidth(0, 600);
+			theGrid->ForceRefresh();
+			focusOnRow(currentRow);
 			break;
 		}
 	}
+}
+
+void UnmappedTab::focusOnRow(const int row)
+{
+	const auto cellCoords = theGrid->CellToRect(row, 0);
+	const auto units = cellCoords.y / 20;
+	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL);
+	const auto offset = wxPoint(0, units - scrollPageSize / 2);
+	theGrid->Scroll(offset);
+	theGrid->ForceRefresh();
 }
