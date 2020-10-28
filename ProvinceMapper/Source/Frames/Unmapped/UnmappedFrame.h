@@ -29,6 +29,7 @@ class UnmappedFrame: public wxFrame
 	void onClose(wxCloseEvent& event);
 	void onMove(wxMoveEvent& event);
 	void onChangeTab(wxBookCtrlEvent& event);
+	void onUpdateProvinceCount(wxCommandEvent& event);
 
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;

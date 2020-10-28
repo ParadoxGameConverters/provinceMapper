@@ -7,6 +7,7 @@
 #include "Provinces/Province.h"
 
 wxDEFINE_EVENT(wxEVT_PROVINCE_CENTER_MAP, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_UPDATE_PROVINCE_COUNT, wxCommandEvent);
 
 UnmappedTab::UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, ImageTabSelector theSelector):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), selector(theSelector), version(std::move(theVersion)), eventListener(parent)
@@ -64,6 +65,18 @@ void UnmappedTab::redrawGrid()
 	theGrid->EndBatch();
 	GetParent()->Layout();
 	theGrid->ForceRefresh();
+	stageUpdateProvinceCount();
+}
+
+void UnmappedTab::stageUpdateProvinceCount() const
+{
+	auto evt = wxCommandEvent(wxEVT_UPDATE_PROVINCE_COUNT);
+	evt.SetInt(theGrid->GetNumberRows());
+	if (selector == ImageTabSelector::SOURCE)
+		evt.SetId(0);
+	else
+		evt.SetId(1);
+	eventListener->AddPendingEvent(evt);
 }
 
 void UnmappedTab::leftUp(wxGridEvent& event)
@@ -184,6 +197,7 @@ void UnmappedTab::removeProvince(const int ID)
 			if (provinceRow.second > row)
 				--provinceRow.second;
 		theGrid->ForceRefresh();
+		stageUpdateProvinceCount();
 	}
 }
 
@@ -204,6 +218,7 @@ void UnmappedTab::addProvince(int ID)
 			theGrid->SetColMinimalWidth(0, 600);
 			theGrid->ForceRefresh();
 			focusOnRow(currentRow);
+			stageUpdateProvinceCount();
 			break;
 		}
 	}

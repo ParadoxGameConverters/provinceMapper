@@ -19,6 +19,7 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
 	Bind(wxEVT_MOVE, &UnmappedFrame::onMove, this);
 	Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &UnmappedFrame::onChangeTab, this);
+	Bind(wxEVT_UPDATE_PROVINCE_COUNT, &UnmappedFrame::onUpdateProvinceCount, this);
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
@@ -128,4 +129,12 @@ void UnmappedFrame::addProvince(const int ID, const bool sourceTab)
 		sources->addProvince(ID);
 	else
 		targets->addProvince(ID);
+}
+
+void UnmappedFrame::onUpdateProvinceCount(wxCommandEvent& event)
+{
+	if (event.GetId() == 0)
+		notebook->SetPageText(0, "Source Provinces (" + std::to_string(event.GetInt()) + ")");
+	else
+		notebook->SetPageText(1, "Target Provinces (" + std::to_string(event.GetInt()) + ")");
 }

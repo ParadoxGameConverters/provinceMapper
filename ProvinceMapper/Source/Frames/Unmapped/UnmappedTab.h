@@ -8,6 +8,7 @@
 #include <wx/notebook.h>
 
 wxDECLARE_EVENT(wxEVT_PROVINCE_CENTER_MAP, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_UPDATE_PROVINCE_COUNT, wxCommandEvent);
 
 enum class ImageTabSelector;
 class LinkMappingVersion;
@@ -33,6 +34,7 @@ class UnmappedTab: public wxNotebookPage
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageUpdateProvinceCount() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 	void focusOnRow(int row);

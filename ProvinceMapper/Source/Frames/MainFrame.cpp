@@ -717,6 +717,7 @@ void MainFrame::onVersionsAddVersion(wxCommandEvent& evt)
 	const auto& newVersion = linkMapper.addVersion();
 	linksFrame->addVersion(newVersion);
 	imageFrame->setVersion(newVersion);
+	unmappedFrame->setVersion(newVersion);
 }
 
 void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
@@ -728,6 +729,7 @@ void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
 	const auto& newVersion = linkMapper.copyVersion();
 	linksFrame->addVersion(newVersion);
 	imageFrame->setVersion(newVersion);
+	unmappedFrame->setVersion(newVersion);
 }
 
 void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
@@ -739,6 +741,7 @@ void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
 	const auto& activeVersion = linkMapper.deleteVersion();
 	linksFrame->deleteActiveAndSwapToVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
+	unmappedFrame->setVersion(activeVersion);
 }
 
 void MainFrame::onVersionsRenameVersion(wxCommandEvent& evt)
@@ -770,6 +773,7 @@ void MainFrame::onChangeTab(wxBookCtrlEvent& event)
 	const auto& activeVersion = linkMapper.activateVersionByIndex(event.GetSelection());
 	linksFrame->setVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
+	unmappedFrame->setVersion(activeVersion);
 }
 
 void MainFrame::onLinksMoveUp(wxCommandEvent& evt)
