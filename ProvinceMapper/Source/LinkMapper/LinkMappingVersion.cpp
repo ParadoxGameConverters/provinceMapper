@@ -1,8 +1,10 @@
 #include "LinkMappingVersion.h"
 #include "Definitions/Definitions.h"
+#include "Log.h"
 #include "ParserHelpers.h"
 #include "Provinces/Province.h"
 #include <fstream>
+#include <set>
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 std::string theVersionName,
@@ -13,11 +15,13 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 int theID):
 	 ID(theID),
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
-	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
+	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	registerKeys();
 	parseStream(theStream);
 	clearRegisteredKeywords();
+	generateUnmapped();
 }
 
 LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
@@ -30,6 +34,7 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
 	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
+	generateUnmapped();
 }
 
 void LinkMappingVersion::registerKeys()
@@ -204,4 +209,36 @@ void LinkMappingVersion::moveActiveLinkDown() const
 bool LinkMappingVersion::operator==(const LinkMappingVersion& rhs) const
 {
 	return ID == rhs.ID;
+}
+
+void LinkMappingVersion::generateUnmapped() const
+{
+	std::set<int> mappedSources;
+	std::set<int> mappedTargets;
+	for (const auto& link: *links)
+	{
+		if (link->getComment())
+			continue;
+		for (const auto& source: link->getSources())
+			mappedSources.insert(source->ID);
+		for (const auto& target: link->getTargets())
+			mappedTargets.insert(target->ID);
+	}
+	for (const auto& [id, province]: sourceDefs->getProvinces())
+	{
+		// normal provinces have a mapdata name, at least. Plenty of unnamed reserve provinces we don't need.
+		if (province->mapDataName.empty())
+			continue;
+		if (!mappedSources.count(id))
+			unmappedSources->emplace_back(province);
+	}
+	for (const auto& [id, province]: targetDefs->getProvinces())
+	{
+		if (province->mapDataName.empty())
+			continue;
+		if (!mappedTargets.count(id))
+			unmappedTargets->emplace_back(province);
+	}
+	Log(LogLevel::Info) << "Version " << versionName << " has " << unmappedSources->size() << " unmapped source, " << unmappedTargets->size()
+							  << " unmapped target provinces.";
 }
