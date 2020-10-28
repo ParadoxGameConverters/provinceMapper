@@ -81,8 +81,10 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 			output << comma;
 			if (province->locName)
 				output << *province->locName;
-			else
+			else if (!province->mapDataName.empty())
 				output << province->mapDataName;
+			else
+				output << "(Unknown)";
 			comma = ", ";
 		}
 	else
@@ -97,8 +99,10 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 			output << comma;
 			if (province->locName)
 				output << *province->locName;
-			else
+			else if (!province->mapDataName.empty())
 				output << province->mapDataName;
+			else
+				output << "(Unknown)";
 			comma = ", ";
 		}
 	else

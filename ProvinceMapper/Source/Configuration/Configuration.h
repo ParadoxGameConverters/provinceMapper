@@ -24,16 +24,20 @@ class Configuration: commonItems::parser
 	[[nodiscard]] const auto& getSourceToken() const { return sourceToken; }
 	[[nodiscard]] const auto& getTargetToken() const { return targetToken; }
 	[[nodiscard]] const auto& getLinkFile() const { return linkFile; }
-	[[nodiscard]] const auto& isSourceReversed() const { return reverseSource; }
-	[[nodiscard]] const auto& isTargetReversed() const { return reverseTarget; }
+	[[nodiscard]] auto isSourceReversed() const { return reverseSource; }
+	[[nodiscard]] auto isTargetReversed() const { return reverseTarget; }
 	[[nodiscard]] const auto& getImageFramePos() const { return imageFramePos; }
 	[[nodiscard]] const auto& getImageFrameSize() const { return imageFrameSize; }
-	[[nodiscard]] const auto& isImageFrameMaximized() const { return imageFrameMaximized; }
+	[[nodiscard]] auto isImageFrameMaximized() const { return imageFrameMaximized; }
 	[[nodiscard]] const auto& getLinksFramePos() const { return linksFramePos; }
 	[[nodiscard]] const auto& getLinksFrameSize() const { return linksFrameSize; }
-	[[nodiscard]] const auto& isLinksFrameMaximized() const { return linksFrameMaximized; }
+	[[nodiscard]] auto isLinksFrameMaximized() const { return linksFrameMaximized; }
+	[[nodiscard]] const auto& getUnmappedFramePos() const { return unmappedFramePos; }
+	[[nodiscard]] const auto& getUnmappedFrameSize() const { return unmappedFrameSize; }
+	[[nodiscard]] auto isUnmappedFrameMaximized() const { return unmappedFrameMaximized; }
+	[[nodiscard]] auto isUnmappedFrameOn() const { return unmappedFrameOn; }
 	[[nodiscard]] const auto& getStatusBarPos() const { return statusBarPos; }
-	[[nodiscard]] const auto& isStatusBarOn() const { return statusBarOn; }
+	[[nodiscard]] auto isStatusBarOn() const { return statusBarOn; }
 
 	void setSourceDir(const std::string& dir) { sourceDir = dir; }
 	void setTargetDir(const std::string& dir) { targetDir = dir; }
@@ -48,6 +52,10 @@ class Configuration: commonItems::parser
 	void setLinksFramePos(const int x, const int y) { linksFramePos = Rect(x, y); }
 	void setLinksFrameSize(const int x, const int y) { linksFrameSize = Rect(x, y); }
 	void setLinksFrameMaximized(const bool on) { linksFrameMaximized = on; }
+	void setUnmappedFramePos(const int x, const int y) { unmappedFramePos = Rect(x, y); }
+	void setUnmappedFrameSize(const int x, const int y) { unmappedFrameSize = Rect(x, y); }
+	void setUnmappedFrameMaximized(const bool on) { unmappedFrameMaximized = on; }
+	void setUnmappedFrameOn(const bool on) { unmappedFrameOn = on; }
 	void setStatusBarPos(const int x, const int y) { statusBarPos = Rect(x, y); }
 	void setStatusBarOn(const bool on) { statusBarOn = on; }
 
@@ -72,6 +80,10 @@ class Configuration: commonItems::parser
 	std::optional<Rect> linksFramePos;
 	std::optional<Rect> linksFrameSize;
 	bool linksFrameMaximized = false;
+	std::optional<Rect> unmappedFramePos;
+	std::optional<Rect> unmappedFrameSize;
+	bool unmappedFrameMaximized = false;
+	bool unmappedFrameOn = false;
 	std::optional<Rect> statusBarPos;
 	bool statusBarOn = true;
 };

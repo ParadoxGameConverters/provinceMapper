@@ -24,3 +24,19 @@ bool Province::operator<(const Province& rhs) const
 {
 	return ID < rhs.ID;
 }
+
+std::string Province::bespokeName() const
+{
+	std::string name;
+	if (locName)
+	{
+		name = *locName;
+		if (!mapDataName.empty())
+			name += " (" + mapDataName + ")";
+	}
+	else if (!mapDataName.empty())
+		name = mapDataName;
+	else
+		name = "(Unknown)";
+	return name;
+}

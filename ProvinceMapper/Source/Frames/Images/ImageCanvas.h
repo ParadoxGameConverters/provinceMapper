@@ -37,6 +37,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getOldScale() const { return oldScaleFactor; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
+	[[nodiscard]] wxPoint locateProvinceCoordinates(int ID) const;
 	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
 

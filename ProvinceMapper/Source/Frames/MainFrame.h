@@ -16,7 +16,9 @@ wxDECLARE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_SHOW_TOOLBAR, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_SHOW_UNMAPPED, wxCommandEvent);
 
+class UnmappedFrame;
 class wxBookCtrlEvent;
 class wxFilePickerCtrl;
 class wxDirPickerCtrl;
@@ -36,6 +38,7 @@ class MainFrame: public wxFrame
 	void applySanityToButton();
 	void initImageFrame();
 	void initLinksFrame();
+	void initUnmappedFrame();
 	void mergeRivers() const;
 	static void mergeRiverData(unsigned char* imgData, unsigned char* riverData, int size);
 	static bool isRiverMask(unsigned char r, unsigned char g, unsigned char b);
@@ -52,6 +55,7 @@ class MainFrame: public wxFrame
 	void onActivateLinkByID(wxCommandEvent& evt);
 	void onToggleProvince(wxCommandEvent& evt);
 	void onCenterMap(wxCommandEvent& evt);
+	void onCenterProvince(wxCommandEvent& evt);
 	void onAddComment(wxCommandEvent& evt);
 	void onDeleteActiveLink(wxCommandEvent& evt);
 	void onLinksAddLink(wxCommandEvent& evt);
@@ -67,8 +71,10 @@ class MainFrame: public wxFrame
 	void onLinksMoveVersionLeft(wxCommandEvent& evt);
 	void onLinksMoveVersionRight(wxCommandEvent& evt);
 	void onShowToolbar(wxCommandEvent& evt);
+	void onShowUnmapped(wxCommandEvent& evt);
 
 	LinksFrame* linksFrame = nullptr;
+	UnmappedFrame* unmappedFrame = nullptr;
 	wxFlexGridSizer* sizer = nullptr;
 
 	ImageFrame* imageFrame = nullptr;

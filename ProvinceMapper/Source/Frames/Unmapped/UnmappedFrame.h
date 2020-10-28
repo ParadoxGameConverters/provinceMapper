@@ -3,11 +3,11 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-#include <map>
 #include <wx/notebook.h>
 
 class Configuration;
 class LinkMappingVersion;
+class UnmappedTab;
 class UnmappedFrame: public wxFrame
 {
   public:
@@ -17,18 +17,22 @@ class UnmappedFrame: public wxFrame
 		 const std::shared_ptr<LinkMappingVersion>& activeVersion,
 		 std::shared_ptr<Configuration> theConfiguration);
 
-	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
+	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) const;
 
   private:
 	wxNotebook* notebook = nullptr;
 
+	void onKeyDown(wxKeyEvent& event);
 	void onResize(wxSizeEvent& evt);
 	void onClose(wxCloseEvent& event);
 	void onMove(wxMoveEvent& event);
+	void onChangeTab(wxBookCtrlEvent& event);
 
-	std::map<int, LinksTab*> pages; // version ID, page it's on.
-	LinksTab* activePage = nullptr;
-	std::vector<int> versionIDs; // this mirrors our pages so first page holds a version with first ID in this vector.
+	void stageMoveVersionLeft() const;
+	void stageMoveVersionRight() const;
+
+	UnmappedTab* sources;
+	UnmappedTab* targets;
 
 	std::shared_ptr<Configuration> configuration;
 

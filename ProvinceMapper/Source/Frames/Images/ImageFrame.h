@@ -31,6 +31,7 @@ class ImageFrame: public wxFrame
 	void toggleProvinceByID(int ID, bool sourceImage);
 	void shadeProvinceByID(int ID, bool sourceImage);
 	void centerMap(int ID);
+	void centerProvince(ImageTabSelector selector, int ID);
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;

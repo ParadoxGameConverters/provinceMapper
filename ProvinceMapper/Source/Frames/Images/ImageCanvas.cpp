@@ -394,9 +394,22 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 			}
 		}
 	}
-
 	return toReturn;
 }
+
+wxPoint ImageCanvas::locateProvinceCoordinates(int ID) const
+{
+	auto toReturn = wxPoint(0, 0);
+	const auto& provinces = definitions->getProvinces();
+	if (const auto& provinceItr = provinces.find(ID); provinceItr != provinces.end())
+		for (const auto& pixel: provinceItr->second->innerPixels)
+		{
+			toReturn = wxPoint(pixel.x, pixel.y);
+			break;
+		}
+	return toReturn;
+}
+
 void ImageCanvas::deleteActiveLink()
 {
 	if (activeLink)

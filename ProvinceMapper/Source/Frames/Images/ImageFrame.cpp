@@ -333,18 +333,45 @@ void ImageFrame::centerMap(int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
-	const auto scrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
-	const auto scrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
 
 	auto units = wxPoint(static_cast<int>(pt1.x * sourceCanvas->getScale()), static_cast<int>(pt1.y * sourceCanvas->getScale()));
-	auto offset = wxPoint(units.x - scrollPageSizeX / 2, units.y - scrollPageSizeY / 2);
+	auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
 	sourceCanvas->Scroll(offset);
 
 	units = wxPoint(static_cast<int>(pt2.x * targetCanvas->getScale()), static_cast<int>(pt2.y * targetCanvas->getScale()));
-	offset = wxPoint(units.x - scrollPageSizeX / 2, units.y - scrollPageSizeY / 2);
+	offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
 	targetCanvas->Scroll(offset);
 
 	render();
+	Refresh();
+}
+
+void ImageFrame::centerProvince(ImageTabSelector selector, int ID)
+{
+	if (selector == ImageTabSelector::SOURCE)
+	{
+		const auto pt = sourceCanvas->locateProvinceCoordinates(ID);
+		const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
+		const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+		const auto units = wxPoint(static_cast<int>(pt.x * sourceCanvas->getScale()), static_cast<int>(pt.y * sourceCanvas->getScale()));
+		const auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
+		sourceCanvas->Scroll(offset);
+		renderSource();
+	}
+	else
+	{
+		const auto pt = targetCanvas->locateProvinceCoordinates(ID);
+		const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
+		const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
+		const auto units = wxPoint(static_cast<int>(pt.x * targetCanvas->getScale()), static_cast<int>(pt.y * targetCanvas->getScale()));
+		const auto offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
+		targetCanvas->Scroll(offset);
+		renderTarget();
+	}
 	Refresh();
 }
 
