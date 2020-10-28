@@ -138,3 +138,9 @@ void UnmappedFrame::onUpdateProvinceCount(wxCommandEvent& event)
 	else
 		notebook->SetPageText(1, "Target Provinces (" + std::to_string(event.GetInt()) + ")");
 }
+
+void UnmappedFrame::refreshList() const
+{
+	sources->redrawGrid();
+	targets->redrawGrid();
+}

@@ -629,6 +629,7 @@ void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)
 	imageFrame->deleteActiveLink(); // images first so it knows which provinces to recolor.
 	linkMapper.deleteActiveLink();
 	linksFrame->deactivateLink();
+	unmappedFrame->refreshList();
 }
 
 void MainFrame::onLinksAddLink(wxCommandEvent& evt)

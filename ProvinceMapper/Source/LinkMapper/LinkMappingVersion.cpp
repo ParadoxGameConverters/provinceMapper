@@ -199,6 +199,11 @@ void LinkMappingVersion::deleteActiveLink()
 		{
 			if (*link == *activeLink)
 			{
+				// Move all mapped provinces to unmapped.
+				for (const auto& province: link->getSources())
+					unmappedSources->emplace_back(province);
+				for (const auto& province: link->getTargets())
+					unmappedTargets->emplace_back(province);
 				// we're deleting it.
 				links->erase((*links).begin() + counter);
 				break;
