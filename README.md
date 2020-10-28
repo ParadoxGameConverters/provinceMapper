@@ -152,3 +152,34 @@ Note: Do NOT delete obsolete versions, even if the converter does not support mu
 
 Loaded links file will be overwritten.
 If there was no loaded links file, links will be saved as "province_mappings.txt".
+
+## Extra Tools
+### Triangulation
+
+Triangulation can be useful in heavily distorted areas where maps differ to a large degree. It will attempt to show you where the mouse pointer from map A fould appear on map B, if they were similar.
+
+1.  Enable triangulation on the toolbar.
+2.  Select 3 points on each map. Try to target geographical features such as lakes, coastline, mountain ridges and similar.
+3.  For each point you select on a map, target the same geographical point on the other map.
+4.  Triangulation will go green for 6 successfully positioned points.
+5.  When you move your mouse in either map a cursor will appear on the other map at triangulated position.
+
+### Zoom/Scroll Locking
+
+This feature is useful when working in tight geographical areas, usually under sizeable zoom.
+
+1.  First zoom and center both maps so they appear to show the same area at approximately same size. You can fine-tune the zoom levels through the toolbar.
+2.  Enable Lock on the toolbar.
+3.  For every zoom change on either map (through mouse wheel or manually via toolbar) the other map will follow suit at same zoom factor increase or decrease.
+4.  For ever manual move of the scrollbars on either map, the other map will adjust scroll as well for the same amount, keeping the same features displayed.
+
+You can additionally fine-tune *the other map* than the one you intend to use for main scrolling by pressing the scrollbar arrow keys on scrollbar ends, without breaking the lock on toolbar. The source map will not respond to this adjustment; this is WAD.
+
+### Unmapped Provinces
+
+To get an overview of what provinces remain unmapped enable the Unmapped Province display on Image Window menu.
+
+1.  Clicking any unmapped province will zoom the appropriate map to its location, but will not mark it nor break the workflow.
+2.  Unmapped provinces will automatically respond to mapping efforts by clearing out (or filling), as provinces get mapped or unmapped.
+
+Keep in mind these provinces listed may be wastelands, rivers, seas, or other potentially unwanted provinces; what should be done with them and how they should (or should not) be linked depends on the converter in question.
