@@ -27,6 +27,9 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_MOUSE_AT, &ImageFrame::triangulateAtPoint, this);
 	Bind(wxEVT_SIZE, &ImageFrame::onResize, this);
 	Bind(wxEVT_MOVE, &ImageFrame::onMove, this);
+	Bind(wxEVT_SCROLL_RELEASE_H, &ImageFrame::onScrollReleaseH, this);
+	Bind(wxEVT_SCROLL_RELEASE_V, &ImageFrame::onScrollReleaseV, this);
+	Bind(wxEVT_LOCK, &ImageFrame::onLock, this);
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
 
@@ -72,6 +75,39 @@ void ImageFrame::onRefresh(wxCommandEvent& event)
 			sourceCanvas->pushZoomLevel(event.GetInt());
 		else
 			statusBar->setSourceZoom(static_cast<int>(sourceCanvas->getScale() * 100));
+	}
+	else
+	{
+		if (event.GetInt())
+			targetCanvas->pushZoomLevel(event.GetInt());
+		else
+			statusBar->setTargetZoom(static_cast<int>(targetCanvas->getScale() * 100));
+	}
+
+	if (lock)
+	{
+		if (event.GetId() == 0)
+		{
+			// source canvas is scaling target.
+			const auto scaleFactor = sourceCanvas->getScale() / sourceCanvas->getOldScale();
+			const auto newScale = static_cast<int>(std::round(targetCanvas->getScale() * scaleFactor * 100));
+			targetCanvas->pushZoomLevel(newScale);
+			statusBar->setTargetZoom(newScale);
+		}
+		else
+		{
+			// target canvas is scaling source.
+			const auto scaleFactor = targetCanvas->getScale() / targetCanvas->getOldScale();
+			const auto newScale = static_cast<int>(std::round(sourceCanvas->getScale() * scaleFactor * 100));
+			sourceCanvas->pushZoomLevel(newScale);
+			statusBar->setSourceZoom(newScale);
+		}
+	}
+
+	// with one or both scale factors set, we can start zooming.
+
+	if (event.GetId() == 0 || lock)
+	{
 		const auto sourceHalfScreenX = static_cast<int>(sourceCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
 		const auto sourceHalfScreenY = static_cast<int>(sourceCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
 		const auto sourceScrollX = static_cast<double>(sourceCanvas->GetViewStart().x);
@@ -87,12 +123,8 @@ void ImageFrame::onRefresh(wxCommandEvent& event)
 		sourceCanvas->Scroll(sourceOffset);
 		sourceCanvas->clearScale();
 	}
-	else if (event.GetId() == 1)
+	if (event.GetId() == 1 || lock)
 	{
-		if (event.GetInt())
-			targetCanvas->pushZoomLevel(event.GetInt());
-		else
-			statusBar->setTargetZoom(static_cast<int>(targetCanvas->getScale() * 100));
 		const auto targetHalfScreenX = static_cast<int>(targetCanvas->GetScrollPageSize(wxHORIZONTAL) / 2.0);
 		const auto targetHalfScreenY = static_cast<int>(targetCanvas->GetScrollPageSize(wxVERTICAL) / 2.0);
 		const auto targetScrollX = static_cast<double>(targetCanvas->GetViewStart().x);
@@ -333,18 +365,45 @@ void ImageFrame::centerMap(int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
-	const auto scrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
-	const auto scrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
 
 	auto units = wxPoint(static_cast<int>(pt1.x * sourceCanvas->getScale()), static_cast<int>(pt1.y * sourceCanvas->getScale()));
-	auto offset = wxPoint(units.x - scrollPageSizeX / 2, units.y - scrollPageSizeY / 2);
+	auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
 	sourceCanvas->Scroll(offset);
 
 	units = wxPoint(static_cast<int>(pt2.x * targetCanvas->getScale()), static_cast<int>(pt2.y * targetCanvas->getScale()));
-	offset = wxPoint(units.x - scrollPageSizeX / 2, units.y - scrollPageSizeY / 2);
+	offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
 	targetCanvas->Scroll(offset);
 
 	render();
+	Refresh();
+}
+
+void ImageFrame::centerProvince(ImageTabSelector selector, int ID)
+{
+	if (selector == ImageTabSelector::SOURCE)
+	{
+		const auto pt = sourceCanvas->locateProvinceCoordinates(ID);
+		const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
+		const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+		const auto units = wxPoint(static_cast<int>(pt.x * sourceCanvas->getScale()), static_cast<int>(pt.y * sourceCanvas->getScale()));
+		const auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
+		sourceCanvas->Scroll(offset);
+		renderSource();
+	}
+	else
+	{
+		const auto pt = targetCanvas->locateProvinceCoordinates(ID);
+		const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
+		const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
+		const auto units = wxPoint(static_cast<int>(pt.x * targetCanvas->getScale()), static_cast<int>(pt.y * targetCanvas->getScale()));
+		const auto offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
+		targetCanvas->Scroll(offset);
+		renderTarget();
+	}
 	Refresh();
 }
 
@@ -581,4 +640,64 @@ void ImageFrame::onMove(wxMoveEvent& event)
 	}
 	configuration->save();
 	event.Skip();
+}
+
+void ImageFrame::onLock(wxCommandEvent& event)
+{
+	if (event.GetInt() == 0)
+		lock = false;
+	else
+		lock = true;
+}
+
+void ImageFrame::onScrollReleaseH(wxCommandEvent& event)
+{
+	if (lock)
+	{
+		ImageCanvas* mover;
+		ImageCanvas* movee;
+		if (event.GetInt() == 0)
+		{
+			mover = sourceCanvas;
+			movee = targetCanvas;
+		}
+		else
+		{
+			mover = targetCanvas;
+			movee = sourceCanvas;
+		}
+
+		const auto delta = mover->GetScrollPos(wxHORIZONTAL) - mover->getOldScrollH();
+		movee->Scroll(movee->GetScrollPos(wxHORIZONTAL) + delta, movee->GetScrollPos(wxVERTICAL));
+		Refresh();
+	}
+
+	sourceCanvas->clearOldScrollH();
+	targetCanvas->clearOldScrollH();
+}
+
+void ImageFrame::onScrollReleaseV(wxCommandEvent& event)
+{
+	if (lock)
+	{
+		ImageCanvas* mover;
+		ImageCanvas* movee;
+		if (event.GetInt() == 0)
+		{
+			mover = sourceCanvas;
+			movee = targetCanvas;
+		}
+		else
+		{
+			mover = targetCanvas;
+			movee = sourceCanvas;
+		}
+
+		const auto delta = mover->GetScrollPos(wxVERTICAL) - mover->getOldScrollV();
+		movee->Scroll(movee->GetScrollPos(wxHORIZONTAL), movee->GetScrollPos(wxVERTICAL) + delta);
+		Refresh();
+	}
+
+	sourceCanvas->clearOldScrollV();
+	targetCanvas->clearOldScrollV();
 }

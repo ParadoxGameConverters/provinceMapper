@@ -122,20 +122,9 @@ void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned ch
 std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-	{
-		if (chromaCacheItr->second->locName)
-		{
-			auto name = *chromaCacheItr->second->locName;
-			if (!chromaCacheItr->second->mapDataName.empty())
-				name += " (" + chromaCacheItr->second->mapDataName + ")";
-			return std::move(name);
-		}
-		else
-		{
-			return chromaCacheItr->second->mapDataName;
-		}
-	}
-	return std::nullopt;
+		return chromaCacheItr->second->bespokeName();
+	else
+		return std::nullopt;
 }
 
 std::optional<int> Definitions::getIDForChroma(const int chroma)

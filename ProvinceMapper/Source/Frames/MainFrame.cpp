@@ -8,6 +8,8 @@
 #include "OSCompatibilityLayer.h"
 #include "PixelReader/PixelReader.h"
 #include "Provinces/Province.h"
+#include "Unmapped/UnmappedFrame.h"
+#include "Unmapped/UnmappedTab.h"
 #include "wx/splitter.h"
 #include <fstream>
 #include <wx/filepicker.h>
@@ -19,6 +21,7 @@ wxDEFINE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_SHOW_TOOLBAR, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_SHOW_UNMAPPED, wxCommandEvent);
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 	 wxFrame(nullptr, wxID_ANY, title, pos, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL)
@@ -39,6 +42,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionLeft, this, wxEVT_MOVE_ACTIVE_VERSION_LEFT);
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionRight, this, wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	Bind(wxEVT_MENU, &MainFrame::onShowToolbar, this, wxMENU_SHOW_TOOLBAR);
+	Bind(wxEVT_MENU, &MainFrame::onShowUnmapped, this, wxMENU_SHOW_UNMAPPED);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
@@ -55,6 +59,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_LEFT, &MainFrame::onLinksMoveVersionLeft, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, &MainFrame::onLinksMoveVersionRight, this);
+	Bind(wxEVT_PROVINCE_CENTER_MAP, &MainFrame::onCenterProvince, this);
 }
 
 void MainFrame::initFrame()
@@ -257,6 +262,23 @@ void MainFrame::initLinksFrame()
 		linksFrame->Maximize(true);
 }
 
+void MainFrame::initUnmappedFrame()
+{
+	auto position = wxDefaultPosition;
+	if (configuration->getUnmappedFramePos())
+		position = wxPoint(configuration->getUnmappedFramePos()->x, configuration->getUnmappedFramePos()->y);
+	auto size = wxSize(300, 900);
+	if (configuration->getUnmappedFrameSize())
+		size = wxSize(configuration->getUnmappedFrameSize()->x, configuration->getUnmappedFrameSize()->y);
+	const auto maximize = configuration->isUnmappedFrameMaximized();
+	unmappedFrame = new UnmappedFrame(this, position, size, linkMapper.getActiveVersion(), configuration);
+
+	if (configuration->isUnmappedFrameOn())
+		unmappedFrame->Show();
+	if (maximize)
+		unmappedFrame->Maximize(true);
+}
+
 void MainFrame::initImageFrame()
 {
 	localizationMapper.scrapeSourceDir(*configuration->getSourceDir());
@@ -331,9 +353,12 @@ void MainFrame::initImageFrame()
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
 	auto* toolbarDropDown = new wxMenu;
 	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");
+	auto* unmappedDropDown = new wxMenu;
+	unmappedDropDown->Append(wxMENU_SHOW_UNMAPPED, "Show Unmapped Provinces");
 	auto* imageMenuBar = new wxMenuBar;
 	imageMenuBar->Append(menuDropDown, "&Image");
 	imageMenuBar->Append(toolbarDropDown, "&Toolbar");
+	imageMenuBar->Append(unmappedDropDown, "&Unmapped");
 	imageFrame->SetMenuBar(imageMenuBar);
 
 	imageFrame->Show();
@@ -499,6 +524,7 @@ void MainFrame::onStartButton(wxCommandEvent& evt)
 	Refresh();
 	initImageFrame();
 	initLinksFrame();
+	initUnmappedFrame();
 	Hide();
 }
 
@@ -561,11 +587,29 @@ void MainFrame::onToggleProvince(wxCommandEvent& evt)
 		imageFrame->shadeProvinceByID(ID, sourceImage);
 		imageFrame->activateLinkByID(*newLinkID);
 	}
+
+	// it is unclear what happened to the province. It may be mapped or unmapped so we poke.
+	const auto result = linkMapper.isProvinceMapped(ID, sourceImage);
+	if (result == Mapping::MAPPED)
+		unmappedFrame->removeProvince(ID, sourceImage);
+	else if (result == Mapping::UNMAPPED)
+		unmappedFrame->addProvince(ID, sourceImage);
+	// else something went wrong and better don't touch.
 }
 
 void MainFrame::onCenterMap(wxCommandEvent& evt)
 {
 	imageFrame->centerMap(evt.GetInt());
+}
+
+void MainFrame::onCenterProvince(wxCommandEvent& evt)
+{
+	ImageTabSelector selector;
+	if (evt.GetId() == 0)
+		selector = ImageTabSelector::SOURCE;
+	else
+		selector = ImageTabSelector::TARGET;
+	imageFrame->centerProvince(selector, evt.GetInt());
 }
 
 void MainFrame::onAddComment(wxCommandEvent& evt)
@@ -585,6 +629,7 @@ void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)
 	imageFrame->deleteActiveLink(); // images first so it knows which provinces to recolor.
 	linkMapper.deleteActiveLink();
 	linksFrame->deactivateLink();
+	unmappedFrame->refreshList();
 }
 
 void MainFrame::onLinksAddLink(wxCommandEvent& evt)
@@ -673,6 +718,7 @@ void MainFrame::onVersionsAddVersion(wxCommandEvent& evt)
 	const auto& newVersion = linkMapper.addVersion();
 	linksFrame->addVersion(newVersion);
 	imageFrame->setVersion(newVersion);
+	unmappedFrame->setVersion(newVersion);
 }
 
 void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
@@ -684,6 +730,7 @@ void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
 	const auto& newVersion = linkMapper.copyVersion();
 	linksFrame->addVersion(newVersion);
 	imageFrame->setVersion(newVersion);
+	unmappedFrame->setVersion(newVersion);
 }
 
 void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
@@ -695,6 +742,7 @@ void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
 	const auto& activeVersion = linkMapper.deleteVersion();
 	linksFrame->deleteActiveAndSwapToVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
+	unmappedFrame->setVersion(activeVersion);
 }
 
 void MainFrame::onVersionsRenameVersion(wxCommandEvent& evt)
@@ -726,6 +774,7 @@ void MainFrame::onChangeTab(wxBookCtrlEvent& event)
 	const auto& activeVersion = linkMapper.activateVersionByIndex(event.GetSelection());
 	linksFrame->setVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
+	unmappedFrame->setVersion(activeVersion);
 }
 
 void MainFrame::onLinksMoveUp(wxCommandEvent& evt)
@@ -755,4 +804,11 @@ void MainFrame::onLinksMoveVersionRight(wxCommandEvent& evt)
 void MainFrame::onShowToolbar(wxCommandEvent& evt)
 {
 	imageFrame->showToolbar();
+}
+
+void MainFrame::onShowUnmapped(wxCommandEvent& evt)
+{
+	configuration->setUnmappedFrameOn(true);
+	configuration->save();
+	unmappedFrame->Show();
 }

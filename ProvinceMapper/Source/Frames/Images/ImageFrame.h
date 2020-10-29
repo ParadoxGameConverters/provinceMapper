@@ -31,6 +31,7 @@ class ImageFrame: public wxFrame
 	void toggleProvinceByID(int ID, bool sourceImage);
 	void shadeProvinceByID(int ID, bool sourceImage);
 	void centerMap(int ID);
+	void centerProvince(ImageTabSelector selector, int ID);
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
@@ -46,6 +47,9 @@ class ImageFrame: public wxFrame
 	void triangulateAtPoint(wxCommandEvent& event);
 	void onResize(wxSizeEvent& event);
 	void onMove(wxMoveEvent& event);
+	void onLock(wxCommandEvent& event);
+	void onScrollReleaseH(wxCommandEvent& event);
+	void onScrollReleaseV(wxCommandEvent& event);
 
 	void render() const;
 	void renderSource() const;
@@ -65,6 +69,7 @@ class ImageFrame: public wxFrame
 
 	bool black = false;
 	bool triangulationIsSane = false;
+	bool lock = false;
 
 	static wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint);
 

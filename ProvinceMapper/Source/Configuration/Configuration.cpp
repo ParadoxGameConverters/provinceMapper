@@ -27,35 +27,51 @@ void Configuration::registerKeys()
 		reverseTarget = commonItems::singleString(theStream).getString() == "true";
 	});
 	registerKeyword("imageFramePos", [this](const std::string& unused, std::istream& theStream) {
-		auto vect = commonItems::intList(theStream).getInts();
-		if (vect.size() == 2)
-			imageFramePos = Rect(vect[0], vect[1]);
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			imageFramePos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("imageFrameSize", [this](const std::string& unused, std::istream& theStream) {
-		auto vect = commonItems::intList(theStream).getInts();
-		if (vect.size() == 2)
-			imageFrameSize = Rect(vect[0], vect[1]);
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			imageFrameSize = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("imageFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
 		imageFrameMaximized = commonItems::singleString(theStream).getString() == "true";
 	});
 	registerKeyword("linksFramePos", [this](const std::string& unused, std::istream& theStream) {
-		auto vect = commonItems::intList(theStream).getInts();
-		if (vect.size() == 2)
-			linksFramePos = Rect(vect[0], vect[1]);
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			linksFramePos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("linksFrameSize", [this](const std::string& unused, std::istream& theStream) {
-		auto vect = commonItems::intList(theStream).getInts();
-		if (vect.size() == 2)
-			linksFrameSize = Rect(vect[0], vect[1]);
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			linksFrameSize = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("linksFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
 		linksFrameMaximized = commonItems::singleString(theStream).getString() == "true";
 	});
+	registerKeyword("unmappedFramePos", [this](const std::string& unused, std::istream& theStream) {
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			unmappedFramePos = Rect(theInts[0], theInts[1]);
+	});
+	registerKeyword("unmappedFrameSize", [this](const std::string& unused, std::istream& theStream) {
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			unmappedFrameSize = Rect(theInts[0], theInts[1]);
+	});
+	registerKeyword("unmappedFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
+		unmappedFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+	});
+	registerKeyword("unmappedFrameOn", [this](const std::string& unused, std::istream& theStream) {
+		unmappedFrameOn = commonItems::singleString(theStream).getString() == "true";
+	});
 	registerKeyword("statusBarPos", [this](const std::string& unused, std::istream& theStream) {
-		auto vect = commonItems::intList(theStream).getInts();
-		if (vect.size() == 2)
-			statusBarPos = Rect(vect[0], vect[1]);
+		const auto& theInts = commonItems::intList(theStream).getInts();
+		if (theInts.size() == 2)
+			statusBarPos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("statusBarOn", [this](const std::string& unused, std::istream& theStream) {
 		statusBarOn = commonItems::singleString(theStream).getString() == "true";
@@ -95,6 +111,18 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "linksFrameMaximized = true\n";
 	else
 		output << "linksFrameMaximized = false\n";
+	if (configuration.linksFramePos)
+		output << "unmappedFramePos = { " << configuration.unmappedFramePos->x << " " << configuration.unmappedFramePos->y << " }\n";
+	if (configuration.unmappedFrameSize)
+		output << "unmappedFrameSize = { " << configuration.unmappedFrameSize->x << " " << configuration.unmappedFrameSize->y << " }\n";
+	if (configuration.unmappedFrameMaximized)
+		output << "unmappedFrameMaximized = true\n";
+	else
+		output << "unmappedFrameMaximized = false\n";
+	if (configuration.unmappedFrameOn)
+		output << "unmappedFrameOn = true\n";
+	else
+		output << "unmappedFrameOn = false\n";
 	if (configuration.statusBarPos)
 		output << "statusBarPos = { " << configuration.statusBarPos->x << " " << configuration.statusBarPos->y << " }\n";
 	if (configuration.statusBarOn)

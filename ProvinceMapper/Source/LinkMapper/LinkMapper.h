@@ -34,6 +34,7 @@ class LinkMapper: commonItems::parser
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& copyVersion();
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& deleteVersion();
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& activateVersionByIndex(int index);
+	[[nodiscard]] Mapping isProvinceMapped(int provinceID, bool isSource) const;
 
   private:
 	void registerKeys();

@@ -8,6 +8,9 @@
 struct Province
 {
 	Province(int theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);
+
+	[[nodiscard]] std::string bespokeName() const;
+
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;
 	bool operator<(const Province& rhs) const;

@@ -1,8 +1,10 @@
 #include "LinkMappingVersion.h"
 #include "Definitions/Definitions.h"
+#include "Log.h"
 #include "ParserHelpers.h"
 #include "Provinces/Province.h"
 #include <fstream>
+#include <set>
 
 LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 std::string theVersionName,
@@ -13,11 +15,13 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 int theID):
 	 ID(theID),
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
-	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
+	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	registerKeys();
 	parseStream(theStream);
 	clearRegisteredKeywords();
+	generateUnmapped();
 }
 
 LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
@@ -30,6 +34,7 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
 	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
 {
+	generateUnmapped();
 }
 
 void LinkMappingVersion::registerKeys()
@@ -90,9 +95,21 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 	if (activeLink)
 	{
 		if (isSource)
-			activeLink->toggleSource(provinceID);
+		{
+			const auto result = activeLink->toggleSource(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedSourceByID(provinceID);
+			else if (result == Mapping::UNMAPPED)
+				addUnmappedSourceByID(provinceID);
+		}
 		else
-			activeLink->toggleTarget(provinceID);
+		{
+			const auto result = activeLink->toggleTarget(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedTargetByID(provinceID);
+			else if (result == Mapping::UNMAPPED)
+				addUnmappedTargetByID(provinceID);
+		}
 		return std::nullopt;
 	}
 	else
@@ -100,9 +117,17 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 		// Create a new link and activate it.
 		const auto link = std::make_shared<LinkMapping>(sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		if (isSource)
-			link->toggleSource(provinceID);
+		{
+			const auto result = link->toggleSource(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedSourceByID(provinceID);
+		}
 		else
-			link->toggleTarget(provinceID);
+		{
+			const auto result = link->toggleTarget(provinceID);
+			if (result == Mapping::MAPPED)
+				removeUnmappedTargetByID(provinceID);
+		}
 		++linkCounter;
 		// We're positioning the new link above the last clicked one.
 		const auto& positionItr = links->begin() + lastActiveLinkIndex;
@@ -110,6 +135,46 @@ std::optional<int> LinkMappingVersion::toggleProvinceByID(const int provinceID, 
 		activeLink = link;
 		return link->getID();
 	}
+}
+
+void LinkMappingVersion::removeUnmappedSourceByID(int provinceID) const
+{
+	auto counter = 0;
+	for (const auto& province: *unmappedSources)
+	{
+		if (province->ID == provinceID)
+		{
+			(*unmappedSources).erase((*unmappedSources).begin() + counter);
+			break;
+		}
+		++counter;
+	}
+}
+
+void LinkMappingVersion::removeUnmappedTargetByID(int provinceID) const
+{
+	auto counter = 0;
+	for (const auto& province: *unmappedTargets)
+	{
+		if (province->ID == provinceID)
+		{
+			(*unmappedTargets).erase((*unmappedTargets).begin() + counter);
+			break;
+		}
+		++counter;
+	}
+}
+
+void LinkMappingVersion::addUnmappedSourceByID(int provinceID) const
+{
+	const auto& province = sourceDefs->getProvinceForID(provinceID);
+	unmappedSources->emplace_back(province);
+}
+
+void LinkMappingVersion::addUnmappedTargetByID(int provinceID) const
+{
+	const auto& province = targetDefs->getProvinceForID(provinceID);
+	unmappedTargets->emplace_back(province);
 }
 
 int LinkMappingVersion::addCommentByIndex(const std::string& comment, const int index)
@@ -134,6 +199,11 @@ void LinkMappingVersion::deleteActiveLink()
 		{
 			if (*link == *activeLink)
 			{
+				// Move all mapped provinces to unmapped.
+				for (const auto& province: link->getSources())
+					unmappedSources->emplace_back(province);
+				for (const auto& province: link->getTargets())
+					unmappedTargets->emplace_back(province);
 				// we're deleting it.
 				links->erase((*links).begin() + counter);
 				break;
@@ -204,4 +274,61 @@ void LinkMappingVersion::moveActiveLinkDown() const
 bool LinkMappingVersion::operator==(const LinkMappingVersion& rhs) const
 {
 	return ID == rhs.ID;
+}
+
+void LinkMappingVersion::generateUnmapped() const
+{
+	std::set<int> mappedSources;
+	std::set<int> mappedTargets;
+	for (const auto& link: *links)
+	{
+		if (link->getComment())
+			continue;
+		for (const auto& source: link->getSources())
+			mappedSources.insert(source->ID);
+		for (const auto& target: link->getTargets())
+			mappedTargets.insert(target->ID);
+	}
+	for (const auto& [id, province]: sourceDefs->getProvinces())
+	{
+		// normal provinces have a mapdata name, at least. Plenty of unnamed reserve provinces we don't need.
+		if (province->mapDataName.empty())
+			continue;
+		if (!mappedSources.count(id))
+			unmappedSources->emplace_back(province);
+	}
+	for (const auto& [id, province]: targetDefs->getProvinces())
+	{
+		if (province->mapDataName.empty())
+			continue;
+		if (!mappedTargets.count(id))
+			unmappedTargets->emplace_back(province);
+	}
+	Log(LogLevel::Info) << "Version " << versionName << " has " << unmappedSources->size() << " unmapped source, " << unmappedTargets->size()
+							  << " unmapped target provinces.";
+}
+
+Mapping LinkMappingVersion::isProvinceMapped(int provinceID, bool isSource) const
+{
+	if (isSource)
+	{
+		for (const auto& province: *unmappedSources)
+			if (province->ID == provinceID)
+				return Mapping::UNMAPPED;
+		for (const auto& link: *links)
+			for (const auto& province: link->getSources())
+				if (province->ID == provinceID)
+					return Mapping::MAPPED;
+	}
+	else
+	{
+		for (const auto& province: *unmappedTargets)
+			if (province->ID == provinceID)
+				return Mapping::UNMAPPED;
+		for (const auto& link: *links)
+			for (const auto& province: link->getTargets())
+				if (province->ID == provinceID)
+					return Mapping::MAPPED;
+	}
+	return Mapping::FAIL;
 }

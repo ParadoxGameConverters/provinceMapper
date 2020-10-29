@@ -37,6 +37,9 @@
     <Filter Include="ProvinceMapper\Frames\PixelReader">
       <UniqueIdentifier>{6bad5182-503a-4169-89b8-68f13417e4fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProvinceMapper\Frames\Unmapped">
+      <UniqueIdentifier>{f35ad21b-0dd2-490a-a53a-6314c2f6a84b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commonItems\ParserHelpers.cpp">
@@ -120,6 +123,12 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\PixelReader\PixelReader.cpp">
       <Filter>ProvinceMapper\Frames\PixelReader</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedFrame.cpp">
+      <Filter>ProvinceMapper\Frames\Unmapped</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedTab.cpp">
+      <Filter>ProvinceMapper\Frames\Unmapped</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -199,6 +208,12 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Frames\PixelReader\PixelReader.h">
       <Filter>ProvinceMapper\Frames\PixelReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedFrame.h">
+      <Filter>ProvinceMapper\Frames\Unmapped</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedTab.h">
+      <Filter>ProvinceMapper\Frames\Unmapped</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

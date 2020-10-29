@@ -25,6 +25,9 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] const auto& getLinks() const { return links; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
 	[[nodiscard]] auto getID() const { return ID; }
+	[[nodiscard]] const auto& getUnmappedSources() const { return unmappedSources; }
+	[[nodiscard]] const auto& getUnmappedTargets() const { return unmappedTargets; }
+	[[nodiscard]] Mapping isProvinceMapped(int provinceID, bool isSource) const;
 
 	void deactivateLink();
 	void activateLinkByIndex(int row);
@@ -46,6 +49,12 @@ class LinkMappingVersion: commonItems::parser
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 
   private:
+	void generateUnmapped() const;
+	void removeUnmappedSourceByID(int provinceID) const;
+	void removeUnmappedTargetByID(int provinceID) const;
+	void addUnmappedSourceByID(int provinceID) const;
+	void addUnmappedTargetByID(int provinceID) const;
+
 	int ID = 0;
 	std::string versionName;
 	int linkCounter = 0;
@@ -59,6 +68,8 @@ class LinkMappingVersion: commonItems::parser
 
 	void registerKeys();
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
+	std::shared_ptr<std::vector<std::shared_ptr<Province>>> unmappedSources;
+	std::shared_ptr<std::vector<std::shared_ptr<Province>>> unmappedTargets;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 
