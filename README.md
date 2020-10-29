@@ -156,7 +156,7 @@ If there was no loaded links file, links will be saved as "province_mappings.txt
 ## Extra Tools
 ### Triangulation
 
-Triangulation can be useful in heavily distorted areas where maps differ to a large degree. It will attempt to show you where the mouse pointer from map A fould appear on map B, if they were similar.
+Triangulation can be useful in heavily distorted areas where maps differ to a large degree. It will attempt to show you where the mouse pointer from map A would appear on map B, if they were similar.
 
 1.  Enable triangulation on the toolbar.
 2.  Select 3 points on each map. Try to target geographical features such as lakes, coastline, mountain ridges and similar.
@@ -171,7 +171,7 @@ This feature is useful when working in tight geographical areas, usually under s
 1.  First zoom and center both maps so they appear to show the same area at approximately same size. You can fine-tune the zoom levels through the toolbar.
 2.  Enable Lock on the toolbar.
 3.  For every zoom change on either map (through mouse wheel or manually via toolbar) the other map will follow suit at same zoom factor increase or decrease.
-4.  For ever manual move of the scrollbars on either map, the other map will adjust scroll as well for the same amount, keeping the same features displayed.
+4.  For every manual move of the scrollbars on either map, the other map will adjust scroll as well for the same amount, keeping the same features displayed.
 
 You can additionally fine-tune *the other map* than the one you intend to use for main scrolling by pressing the scrollbar arrow keys on scrollbar ends, without breaking the lock on toolbar. The source map will not respond to this adjustment; this is WAD.
 
