@@ -32,7 +32,8 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 int theID):
 	 ID(theID),
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
-	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>())
+	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
+	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	generateUnmapped();
 }
