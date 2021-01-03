@@ -76,31 +76,39 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 
 std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> Definitions::parseLine(const std::string& line)
 {
-	auto sepLoc = line.find(';');
-	if (sepLoc == std::string::npos)
+	try
+	{
+		auto sepLoc = line.find(';');
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto sepLocSave = sepLoc;
+		auto ID = std::stoi(line.substr(0, sepLoc));
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+		sepLocSave = sepLoc;
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+		sepLocSave = sepLoc;
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+		sepLocSave = sepLoc;
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+		return std::make_tuple(ID, r, g, b, mapDataName);
+	}
+	catch (std::exception& e)
+	{
+		Log(LogLevel::Warning) << "Broken Definition Line: " << line << " - " << e.what();
 		return std::nullopt;
-	auto sepLocSave = sepLoc;
-	auto ID = std::stoi(line.substr(0, sepLoc));
-	sepLoc = line.find(';', sepLocSave + 1);
-	if (sepLoc == std::string::npos)
-		return std::nullopt;
-	auto r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-	sepLocSave = sepLoc;
-	sepLoc = line.find(';', sepLocSave + 1);
-	if (sepLoc == std::string::npos)
-		return std::nullopt;
-	auto g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-	sepLocSave = sepLoc;
-	sepLoc = line.find(';', sepLocSave + 1);
-	if (sepLoc == std::string::npos)
-		return std::nullopt;
-	auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-	sepLocSave = sepLoc;
-	sepLoc = line.find(';', sepLocSave + 1);
-	if (sepLoc == std::string::npos)
-		return std::nullopt;
-	auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
-	return std::make_tuple(ID, r, g, b, mapDataName);
+	}
 }
 
 void Definitions::registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b)
