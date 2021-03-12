@@ -1,8 +1,9 @@
 #include "LinkMapper.h"
 #include "Definitions/Definitions.h"
+#include "Provinces/Province.h"
 #include "Log.h"
 #include "ParserHelpers.h"
-#include "Provinces/Province.h"
+#include "CommonRegexes.h"
 #include <fstream>
 
 void LinkMapper::loadMappings(const std::string& linksFileString,

@@ -2,6 +2,7 @@
 #include "Definitions/Definitions.h"
 #include "Log.h"
 #include "ParserHelpers.h"
+#include "CommonRegexes.h"
 #include "Provinces/Province.h"
 #include <fstream>
 #include <set>
@@ -40,7 +41,7 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 
 void LinkMappingVersion::registerKeys()
 {
-	registerKeyword("link", [this](const std::string& unused, std::istream& theStream) {
+	registerKeyword("link", [this](std::istream& theStream) {
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
