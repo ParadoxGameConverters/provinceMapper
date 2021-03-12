@@ -4,8 +4,8 @@
 #include <wx/wx.h>
 #endif
 
-class ProvinceMapper: public wxApp
+class ProvinceMapper final : public wxApp
 {
   public:
-	virtual bool OnInit();
+	bool OnInit() override;
 };

@@ -9,7 +9,7 @@
 
 class LinkMappingVersion;
 class Configuration;
-class LinksFrame: public wxFrame
+class LinksFrame final : public wxFrame
 {
   public:
 	LinksFrame(wxWindow* parent,

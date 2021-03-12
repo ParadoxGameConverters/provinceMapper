@@ -6,7 +6,7 @@
 #include "Frames/Images/ImageCanvas.h"
 #include <wx/thread.h>
 
-class PixelReader: public wxThread
+class PixelReader final : public wxThread
 {
   public:
 	PixelReader(wxEvtHandler* parent): wxThread(wxTHREAD_DETACHED), eventHandler(parent) {}

@@ -8,7 +8,7 @@
 class Configuration;
 class LinkMappingVersion;
 class UnmappedTab;
-class UnmappedFrame: public wxFrame
+class UnmappedFrame final : public wxFrame
 {
   public:
 	UnmappedFrame(wxWindow* parent,

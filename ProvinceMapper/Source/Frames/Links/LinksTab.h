@@ -20,7 +20,7 @@ wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 
 class LinkMappingVersion;
 class LinkMapping;
-class LinksTab: public wxNotebookPage
+class LinksTab final : public wxNotebookPage
 {
   public:
 	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);

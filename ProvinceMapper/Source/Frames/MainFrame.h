@@ -26,7 +26,7 @@ class wxFileDirPickerEvent;
 enum class ImageTabSelector;
 class ImageFrame;
 class LinksFrame;
-class MainFrame: public wxFrame
+class MainFrame final : public wxFrame
 {
   public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
