@@ -44,7 +44,7 @@ void LinkMapping::registerKeys()
 			targets.emplace_back(provItr->second);
 	});
 	registerKeyword("comment", [this](std::istream& theStream) {
-		comment = commonItems::singleString(theStream).getString();
+		comment = commonItems::getString(theStream);
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }

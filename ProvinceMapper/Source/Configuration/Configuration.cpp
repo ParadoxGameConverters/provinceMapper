@@ -7,75 +7,75 @@
 void Configuration::registerKeys()
 {
 	registerKeyword("sourceDir", [this](std::istream& theStream) {
-		sourceDir = commonItems::singleString(theStream).getString();
+		sourceDir = commonItems::getString(theStream);
 	});
 	registerKeyword("targetDir", [this](std::istream& theStream) {
-		targetDir = commonItems::singleString(theStream).getString();
+		targetDir = commonItems::getString(theStream);
 	});
 	registerKeyword("sourceToken", [this](std::istream& theStream) {
-		sourceToken = commonItems::singleString(theStream).getString();
+		sourceToken = commonItems::getString(theStream);
 	});
 	registerKeyword("targetToken", [this](std::istream& theStream) {
-		targetToken = commonItems::singleString(theStream).getString();
+		targetToken = commonItems::getString(theStream);
 	});
 	registerKeyword("linkFile", [this](std::istream& theStream) {
-		linkFile = commonItems::singleString(theStream).getString();
+		linkFile = commonItems::getString(theStream);
 	});
 	registerKeyword("reverseSource", [this](std::istream& theStream) {
-		reverseSource = commonItems::singleString(theStream).getString() == "true";
+		reverseSource = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("reverseTarget", [this](std::istream& theStream) {
-		reverseTarget = commonItems::singleString(theStream).getString() == "true";
+		reverseTarget = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("imageFramePos", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			imageFramePos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("imageFrameSize", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			imageFrameSize = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("imageFrameMaximized", [this](std::istream& theStream) {
-		imageFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+		imageFrameMaximized = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("linksFramePos", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			linksFramePos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("linksFrameSize", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			linksFrameSize = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("linksFrameMaximized", [this](std::istream& theStream) {
-		linksFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+		linksFrameMaximized = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("unmappedFramePos", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			unmappedFramePos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("unmappedFrameSize", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			unmappedFrameSize = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("unmappedFrameMaximized", [this](std::istream& theStream) {
-		unmappedFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+		unmappedFrameMaximized = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("unmappedFrameOn", [this](std::istream& theStream) {
-		unmappedFrameOn = commonItems::singleString(theStream).getString() == "true";
+		unmappedFrameOn = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("statusBarPos", [this](std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			statusBarPos = Rect(theInts[0], theInts[1]);
 	});
 	registerKeyword("statusBarOn", [this](std::istream& theStream) {
-		statusBarOn = commonItems::singleString(theStream).getString() == "true";
+		statusBarOn = commonItems::getString(theStream) == "true";
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
