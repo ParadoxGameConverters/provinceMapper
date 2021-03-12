@@ -296,14 +296,14 @@ void LinkMappingVersion::generateUnmapped() const
 		// normal provinces have a mapdata name, at least. Plenty of unnamed reserve provinces we don't need.
 		if (province->mapDataName.empty())
 			continue;
-		if (!mappedSources.count(id))
+		if (!mappedSources.contains(id))
 			unmappedSources->emplace_back(province);
 	}
 	for (const auto& [id, province]: targetDefs->getProvinces())
 	{
 		if (province->mapDataName.empty())
 			continue;
-		if (!mappedTargets.count(id))
+		if (!mappedTargets.contains(id))
 			unmappedTargets->emplace_back(province);
 	}
 	Log(LogLevel::Info) << "Version " << versionName << " has " << unmappedSources->size() << " unmapped source, " << unmappedTargets->size()
