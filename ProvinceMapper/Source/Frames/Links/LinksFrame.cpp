@@ -119,7 +119,7 @@ void LinksFrame::deleteActiveAndSwapToVersion(const std::shared_ptr<LinkMappingV
 void LinksFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 {
 	// Do we have this version loaded?
-	const auto& idItr = std::find(versionIDs.begin(), versionIDs.end(), version->getID());
+	const auto& idItr = std::ranges::find(versionIDs, version->getID());
 	if (idItr == versionIDs.end())
 	{
 		// this is a new version.

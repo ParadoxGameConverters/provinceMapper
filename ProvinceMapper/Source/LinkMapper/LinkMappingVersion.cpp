@@ -2,6 +2,7 @@
 #include "Definitions/Definitions.h"
 #include "Log.h"
 #include "ParserHelpers.h"
+#include "CommonRegexes.h"
 #include "Provinces/Province.h"
 #include <fstream>
 #include <set>
@@ -40,7 +41,7 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 
 void LinkMappingVersion::registerKeys()
 {
-	registerKeyword("link", [this](const std::string& unused, std::istream& theStream) {
+	registerKeyword("link", [this](std::istream& theStream) {
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
@@ -295,14 +296,14 @@ void LinkMappingVersion::generateUnmapped() const
 		// normal provinces have a mapdata name, at least. Plenty of unnamed reserve provinces we don't need.
 		if (province->mapDataName.empty())
 			continue;
-		if (!mappedSources.count(id))
+		if (!mappedSources.contains(id))
 			unmappedSources->emplace_back(province);
 	}
 	for (const auto& [id, province]: targetDefs->getProvinces())
 	{
 		if (province->mapDataName.empty())
 			continue;
-		if (!mappedTargets.count(id))
+		if (!mappedTargets.contains(id))
 			unmappedTargets->emplace_back(province);
 	}
 	Log(LogLevel::Info) << "Version " << versionName << " has " << unmappedSources->size() << " unmapped source, " << unmappedTargets->size()

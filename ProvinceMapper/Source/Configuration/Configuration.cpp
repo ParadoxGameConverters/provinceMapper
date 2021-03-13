@@ -1,80 +1,81 @@
 #include "Configuration.h"
 #include "OSCompatibilityLayer.h"
 #include "ParserHelpers.h"
+#include "CommonRegexes.h"
 #include <fstream>
 
 void Configuration::registerKeys()
 {
-	registerKeyword("sourceDir", [this](const std::string& unused, std::istream& theStream) {
-		sourceDir = commonItems::singleString(theStream).getString();
+	registerKeyword("sourceDir", [this](std::istream& theStream) {
+		sourceDir = commonItems::getString(theStream);
 	});
-	registerKeyword("targetDir", [this](const std::string& unused, std::istream& theStream) {
-		targetDir = commonItems::singleString(theStream).getString();
+	registerKeyword("targetDir", [this](std::istream& theStream) {
+		targetDir = commonItems::getString(theStream);
 	});
-	registerKeyword("sourceToken", [this](const std::string& unused, std::istream& theStream) {
-		sourceToken = commonItems::singleString(theStream).getString();
+	registerKeyword("sourceToken", [this](std::istream& theStream) {
+		sourceToken = commonItems::getString(theStream);
 	});
-	registerKeyword("targetToken", [this](const std::string& unused, std::istream& theStream) {
-		targetToken = commonItems::singleString(theStream).getString();
+	registerKeyword("targetToken", [this](std::istream& theStream) {
+		targetToken = commonItems::getString(theStream);
 	});
-	registerKeyword("linkFile", [this](const std::string& unused, std::istream& theStream) {
-		linkFile = commonItems::singleString(theStream).getString();
+	registerKeyword("linkFile", [this](std::istream& theStream) {
+		linkFile = commonItems::getString(theStream);
 	});
-	registerKeyword("reverseSource", [this](const std::string& unused, std::istream& theStream) {
-		reverseSource = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("reverseSource", [this](std::istream& theStream) {
+		reverseSource = commonItems::getString(theStream) == "true";
 	});
-	registerKeyword("reverseTarget", [this](const std::string& unused, std::istream& theStream) {
-		reverseTarget = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("reverseTarget", [this](std::istream& theStream) {
+		reverseTarget = commonItems::getString(theStream) == "true";
 	});
-	registerKeyword("imageFramePos", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("imageFramePos", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			imageFramePos = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("imageFrameSize", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("imageFrameSize", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			imageFrameSize = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("imageFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
-		imageFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("imageFrameMaximized", [this](std::istream& theStream) {
+		imageFrameMaximized = commonItems::getString(theStream) == "true";
 	});
-	registerKeyword("linksFramePos", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("linksFramePos", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			linksFramePos = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("linksFrameSize", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("linksFrameSize", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			linksFrameSize = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("linksFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
-		linksFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("linksFrameMaximized", [this](std::istream& theStream) {
+		linksFrameMaximized = commonItems::getString(theStream) == "true";
 	});
-	registerKeyword("unmappedFramePos", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("unmappedFramePos", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			unmappedFramePos = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("unmappedFrameSize", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("unmappedFrameSize", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			unmappedFrameSize = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("unmappedFrameMaximized", [this](const std::string& unused, std::istream& theStream) {
-		unmappedFrameMaximized = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("unmappedFrameMaximized", [this](std::istream& theStream) {
+		unmappedFrameMaximized = commonItems::getString(theStream) == "true";
 	});
-	registerKeyword("unmappedFrameOn", [this](const std::string& unused, std::istream& theStream) {
-		unmappedFrameOn = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("unmappedFrameOn", [this](std::istream& theStream) {
+		unmappedFrameOn = commonItems::getString(theStream) == "true";
 	});
-	registerKeyword("statusBarPos", [this](const std::string& unused, std::istream& theStream) {
-		const auto& theInts = commonItems::intList(theStream).getInts();
+	registerKeyword("statusBarPos", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
 			statusBarPos = Rect(theInts[0], theInts[1]);
 	});
-	registerKeyword("statusBarOn", [this](const std::string& unused, std::istream& theStream) {
-		statusBarOn = commonItems::singleString(theStream).getString() == "true";
+	registerKeyword("statusBarOn", [this](std::istream& theStream) {
+		statusBarOn = commonItems::getString(theStream) == "true";
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }

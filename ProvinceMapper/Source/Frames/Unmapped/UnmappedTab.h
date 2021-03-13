@@ -14,7 +14,7 @@ enum class ImageTabSelector;
 class LinkMappingVersion;
 class Province;
 class LinkMapping;
-class UnmappedTab: public wxNotebookPage
+class UnmappedTab final : public wxNotebookPage
 {
   public:
 	UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, ImageTabSelector theSelector);

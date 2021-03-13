@@ -2,6 +2,7 @@
 #include "Definitions/Definitions.h"
 #include "Log.h"
 #include "ParserHelpers.h"
+#include "CommonRegexes.h"
 #include "Provinces/Province.h"
 
 LinkMapping::LinkMapping(std::istream& theStream,
@@ -30,20 +31,20 @@ LinkMapping::LinkMapping(std::shared_ptr<Definitions> theSourceDefs,
 
 void LinkMapping::registerKeys()
 {
-	registerKeyword(sourceToken, [this](const std::string& unused, std::istream& theStream) {
+	registerKeyword(sourceToken, [this](std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
 		const auto& provinces = sourceDefs->getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
-	registerKeyword(targetToken, [this](const std::string& unused, std::istream& theStream) {
+	registerKeyword(targetToken, [this](std::istream& theStream) {
 		const auto id = commonItems::singleInt(theStream).getInt();
 		const auto& provinces = targetDefs->getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			targets.emplace_back(provItr->second);
 	});
-	registerKeyword("comment", [this](const std::string& unused, std::istream& theStream) {
-		comment = commonItems::singleString(theStream).getString();
+	registerKeyword("comment", [this](std::istream& theStream) {
+		comment = commonItems::getString(theStream);
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }

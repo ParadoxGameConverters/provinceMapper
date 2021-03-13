@@ -44,8 +44,8 @@ class Configuration: commonItems::parser
 	void setSourceToken(const std::string& token) { sourceToken = token; }
 	void setTargetToken(const std::string& token) { targetToken = token; }
 	void setLinkFile(const std::string& file) { linkFile = file; }
-	void setSourceReversed(bool reversed) { reverseSource = reversed; }
-	void setTargetReversed(bool reversed) { reverseTarget = reversed; }
+	void setSourceReversed(const bool reversed) { reverseSource = reversed; }
+	void setTargetReversed(const bool reversed) { reverseTarget = reversed; }
 	void setImageFramePos(const int x, const int y) { imageFramePos = Rect(x, y); }
 	void setImageFrameSize(const int x, const int y) { imageFrameSize = Rect(x, y); }
 	void setImageFrameMaximized(const bool on) { imageFrameMaximized = on; }
