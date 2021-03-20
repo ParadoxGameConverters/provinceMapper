@@ -229,13 +229,13 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\vcruntime140_1.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="wxWidgets\3.1.3\lib\vc14x_x64_dll\wxbase313u_vc14x_x64.dll">
-      <Filter>Resources</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="wxWidgets\3.1.3\lib\vc14x_x64_dll\wxmsw313u_core_vc14x_x64.dll">
-      <Filter>Resources</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="README.md">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="wxWidgets\3.1.4\lib\vc14x_x64_dll\wxbase314u_vc14x_x64.dll">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="wxWidgets\3.1.4\lib\vc14x_x64_dll\wxmsw314u_core_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
   </ItemGroup>
