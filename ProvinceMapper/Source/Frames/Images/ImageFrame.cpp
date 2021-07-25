@@ -546,6 +546,8 @@ void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
 		if (targetRect.Contains(currentPosition))
 		{
 			sourcePointer = triangulate(targetCanvas->getPoints(), sourceCanvas->getPoints(), currentPosition);
+			sourcePointer->x = std::min(std::max(sourcePointer->x, 20), sourceCanvas->getWidth() - 20);
+			sourcePointer->y = std::min(std::max(sourcePointer->y, 20), sourceCanvas->getHeight() - 20);
 			renderSource();
 		}
 		else
@@ -558,6 +560,8 @@ void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
 		if (sourceRect.Contains(currentPosition))
 		{
 			targetPointer = triangulate(sourceCanvas->getPoints(), targetCanvas->getPoints(), currentPosition);
+			targetPointer->x = std::min(std::max(targetPointer->x, 20), targetCanvas->getWidth() - 20);
+			targetPointer->y = std::min(std::max(targetPointer->y, 20), targetCanvas->getHeight() - 20);
 			renderTarget();
 		}
 		else
