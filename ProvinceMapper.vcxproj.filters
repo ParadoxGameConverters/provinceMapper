@@ -232,10 +232,10 @@
     <CopyFileToFolders Include="README.md">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="wxWidgets\3.1.4\lib\vc14x_x64_dll\wxbase314u_vc14x_x64.dll">
+    <CopyFileToFolders Include="wxWidgets\3.1.5\lib\vc14x_x64_dll\wxbase315u_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="wxWidgets\3.1.4\lib\vc14x_x64_dll\wxmsw314u_core_vc14x_x64.dll">
+    <CopyFileToFolders Include="wxWidgets\3.1.5\lib\vc14x_x64_dll\wxmsw315u_core_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
   </ItemGroup>
