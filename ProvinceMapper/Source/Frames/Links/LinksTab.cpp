@@ -150,15 +150,8 @@ void LinksTab::leftUp(wxGridEvent& event)
 		}
 
 		// Case 1: Selecting a new row.
-		// Restore existing working link color
 		if (activeRow)
 			restoreRowColor(*activeRow);
-
-		// And mark the new working row.
-		activeLink = version->getLinks()->at(row);
-		activeRow = row;
-		activateRowColor(row);
-		Refresh();
 
 		auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
 		evt->SetInt(row);
@@ -241,6 +234,9 @@ void LinksTab::activateLinkByIndex(const int index)
 	// If we're already active, restore color.
 	if (activeRow)
 		restoreRowColor(*activeRow);
+
+	if (index >= static_cast<int>(version->getLinks()->size()))
+		return; // uh-huh
 
 	const auto& link = version->getLinks()->at(index);
 	activeRow = index;
