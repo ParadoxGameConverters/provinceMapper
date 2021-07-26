@@ -36,7 +36,7 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 				{
 					// can we get a locname? Probe for PROV first.
 					auto locName = localizationMapper.getLocForSourceKey("PROV" + std::to_string(ID));
-					if (locName)
+					if (locName && !locName->empty())
 					{
 						province->locName = locName;
 					}
@@ -44,7 +44,7 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 					{
 						// maybe mapdataname as key.
 						locName = localizationMapper.getLocForSourceKey(mapDataName);
-						if (locName)
+						if (locName && !locName->empty())
 							province->locName = locName;
 					}
 				}
@@ -52,14 +52,14 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 				{
 					// ditto for the other defs.
 					auto locName = localizationMapper.getLocForTargetKey("PROV" + std::to_string(ID));
-					if (locName)
+					if (locName && !locName->empty())
 					{
 						province->locName = locName;
 					}
 					else
 					{
 						locName = localizationMapper.getLocForTargetKey(mapDataName);
-						if (locName)
+						if (locName && !locName->empty())
 							province->locName = locName;
 					}
 				}
