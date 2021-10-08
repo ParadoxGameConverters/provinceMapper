@@ -302,25 +302,25 @@ void MainFrame::initImageFrame()
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
 	sourceRiversImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.bmp"))
-		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.bmp");
-	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.png"))
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.png"))
 		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.png");
-	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.bmp"))
-		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.bmp");
-	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.png"))
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.bmp"))
+		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.bmp");
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.png"))
 		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.png");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.bmp"))
+		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.bmp");
 
 	targetImg = new wxImage();
 	targetRiversImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.bmp"))
-		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.bmp");
-	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.png"))
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.png"))
 		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.png");
-	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.bmp"))
-		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.bmp");
-	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.png"))
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.bmp"))
+		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.bmp");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.png"))
 		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.png");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.bmp"))
+		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.bmp");
 
 	mergeRivers();
 
