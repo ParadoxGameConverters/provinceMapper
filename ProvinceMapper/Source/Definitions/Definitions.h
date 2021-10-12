@@ -23,7 +23,7 @@ class Definitions
 
   private:
 	void parseStream(std::istream& theStream, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType);
-	[[nodiscard]] std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> parseLine(const std::string& line);
+	[[nodiscard]] std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> parseLine(const std::string& line) const;
 
 	std::map<int, std::shared_ptr<Province>> provinces;				// ID, province
 	std::map<unsigned int, std::shared_ptr<Province>> chromaCache; // color, province

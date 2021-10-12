@@ -66,7 +66,7 @@ void ImageFrame::onScrollPaint(wxPaintEvent& event)
 	render();
 }
 
-void ImageFrame::onRefresh(wxCommandEvent& event)
+void ImageFrame::onRefresh(const wxCommandEvent& event)
 {
 	// force refresh comes from zooming. We need to store and then recalculate scroll position.
 	if (event.GetId() == 0)
@@ -289,7 +289,7 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	Refresh();
 }
 
-void ImageFrame::onClose(wxCloseEvent& event)
+void ImageFrame::onClose(const wxCloseEvent& event)
 {
 	// We need to kill the app.
 	eventHandler->QueueEvent(event.Clone());
@@ -443,7 +443,7 @@ void ImageFrame::onTriangulate(wxCommandEvent& event)
 	Refresh();
 }
 
-void ImageFrame::onPointPlaced(wxCommandEvent& event)
+void ImageFrame::onPointPlaced(const wxCommandEvent& event)
 {
 	statusBar->setPointPlaced(event.GetInt());
 	if (event.GetInt() <= 3)
@@ -529,7 +529,7 @@ void ImageFrame::buildBounds()
 	targetRect = wxRect(wxPoint(static_cast<int>(minX), static_cast<int>(minY)), wxPoint(static_cast<int>(maxX), static_cast<int>(maxY)));
 }
 
-void ImageFrame::triangulateAtPoint(wxCommandEvent& event)
+void ImageFrame::triangulateAtPoint(const wxCommandEvent& event)
 {
 	if (!triangulationIsSane)
 		return;
@@ -646,7 +646,7 @@ void ImageFrame::onMove(wxMoveEvent& event)
 	event.Skip();
 }
 
-void ImageFrame::onLock(wxCommandEvent& event)
+void ImageFrame::onLock(const wxCommandEvent& event)
 {
 	if (event.GetInt() == 0)
 		lock = false;
@@ -654,7 +654,7 @@ void ImageFrame::onLock(wxCommandEvent& event)
 		lock = true;
 }
 
-void ImageFrame::onScrollReleaseH(wxCommandEvent& event)
+void ImageFrame::onScrollReleaseH(const wxCommandEvent& event)
 {
 	if (lock)
 	{
@@ -680,7 +680,7 @@ void ImageFrame::onScrollReleaseH(wxCommandEvent& event)
 	targetCanvas->clearOldScrollH();
 }
 
-void ImageFrame::onScrollReleaseV(wxCommandEvent& event)
+void ImageFrame::onScrollReleaseV(const wxCommandEvent& event)
 {
 	if (lock)
 	{

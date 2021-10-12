@@ -205,7 +205,7 @@ void ImageCanvas::onMouseOver(wxMouseEvent& event)
 	event.Skip();
 }
 
-void ImageCanvas::leftUp(wxMouseEvent& event)
+void ImageCanvas::leftUp(const wxMouseEvent& event)
 {
 	// Left up means:
 	// 1. select a mapping, or
@@ -284,7 +284,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 	// If our active link is dry, we're not deselecting it, we're deleting it.
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
 	}
 	event.Skip();
@@ -471,12 +471,12 @@ void ImageCanvas::stageDeleteLink() const
 	// Do nothing unless working on active link. Don't want accidents here.
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
 	}
 }
 
-void ImageCanvas::onMouseWheel(wxMouseEvent& event)
+void ImageCanvas::onMouseWheel(const wxMouseEvent& event)
 {
 	if (event.GetWheelRotation() != 0)
 	{
@@ -568,7 +568,7 @@ void ImageCanvas::stageMoveUp() const
 {
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
+		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventHandler->QueueEvent(evt->Clone());
 	}
 }
@@ -577,32 +577,32 @@ void ImageCanvas::stageMoveDown() const
 {
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
+		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventHandler->QueueEvent(evt->Clone());
 	}
 }
 
 void ImageCanvas::stageSave() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
+	const auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
 	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageAddLink() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	const auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
 	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageMoveVersionLeft() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
 	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::stageMoveVersionRight() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventHandler->QueueEvent(evt->Clone());
 }
 

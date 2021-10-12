@@ -22,8 +22,8 @@ class StatusBar: public wxFrame
 
   private:
 	void onMove(wxMoveEvent& event);
-	void onZoomChanged(wxCommandEvent& evt);
-	void onZoomResetButton(wxCommandEvent& evt);
+	void onZoomChanged(const wxCommandEvent& evt);
+	void onZoomResetButton(const wxCommandEvent& evt);
 	void onTriangulate(wxCommandEvent& evt);
 	void onClose(wxCloseEvent& event);
 	void onLock(wxCommandEvent& evt);

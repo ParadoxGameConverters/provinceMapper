@@ -466,7 +466,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 	Refresh();
 }
 
-void MainFrame::onTokenChanged(wxCommandEvent& evt)
+void MainFrame::onTokenChanged(const wxCommandEvent& evt)
 {
 	const auto green = wxColour(130, 250, 130);
 	const auto red = wxColour(250, 130, 130);
@@ -544,7 +544,7 @@ void MainFrame::onDeactivateLink(wxCommandEvent& evt)
 	imageFrame->deactivateLink();
 }
 
-void MainFrame::onActivateLinkByIndex(wxCommandEvent& evt)
+void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)
 {
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
@@ -554,7 +554,7 @@ void MainFrame::onActivateLinkByIndex(wxCommandEvent& evt)
 	imageFrame->activateLinkByIndex(evt.GetInt());
 }
 
-void MainFrame::onActivateLinkByID(wxCommandEvent& evt)
+void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 {
 	// This is coming from one of the imageCanvases, so we need to update everything.
 	linkMapper.deactivateLink();
@@ -565,7 +565,7 @@ void MainFrame::onActivateLinkByID(wxCommandEvent& evt)
 	linksFrame->activateLinkByID(evt.GetInt());
 }
 
-void MainFrame::onToggleProvince(wxCommandEvent& evt)
+void MainFrame::onToggleProvince(const wxCommandEvent& evt)
 {
 	// Two things can happen. We're either:
 	// 1. toggling a province within our active link
@@ -597,12 +597,12 @@ void MainFrame::onToggleProvince(wxCommandEvent& evt)
 	// else something went wrong and better don't touch.
 }
 
-void MainFrame::onCenterMap(wxCommandEvent& evt)
+void MainFrame::onCenterMap(const wxCommandEvent& evt)
 {
 	imageFrame->centerMap(evt.GetInt());
 }
 
-void MainFrame::onCenterProvince(wxCommandEvent& evt)
+void MainFrame::onCenterProvince(const wxCommandEvent& evt)
 {
 	ImageTabSelector selector;
 	if (evt.GetId() == 0)
@@ -612,7 +612,7 @@ void MainFrame::onCenterProvince(wxCommandEvent& evt)
 	imageFrame->centerProvince(selector, evt.GetInt());
 }
 
-void MainFrame::onAddComment(wxCommandEvent& evt)
+void MainFrame::onAddComment(const wxCommandEvent& evt)
 {
 	const auto newLinkID = linkMapper.addCommentByIndex(evt.GetString().ToStdString(), evt.GetInt());
 	if (newLinkID)
@@ -680,7 +680,7 @@ void MainFrame::mergeRivers() const
 	}
 }
 
-void MainFrame::mergeRiverData(unsigned char* imgData, unsigned char* riverData, const int size)
+void MainFrame::mergeRiverData(unsigned char* imgData, const unsigned char* riverData, const int size)
 {
 	for (auto offset = 0; offset < size; offset = offset + 3)
 	{
@@ -755,7 +755,7 @@ void MainFrame::onVersionsRenameVersion(wxCommandEvent& evt)
 	}
 }
 
-void MainFrame::onRenameVersion(wxCommandEvent& evt)
+void MainFrame::onRenameVersion(const wxCommandEvent& evt)
 {
 	const auto versionName = evt.GetString().ToStdString();
 
@@ -763,7 +763,7 @@ void MainFrame::onRenameVersion(wxCommandEvent& evt)
 	linksFrame->updateActiveVersionName(versionName);
 }
 
-void MainFrame::onChangeTab(wxBookCtrlEvent& event)
+void MainFrame::onChangeTab(const wxBookCtrlEvent& event)
 {
 	// linksTab has changed tab to another set. We need to update everything.
 

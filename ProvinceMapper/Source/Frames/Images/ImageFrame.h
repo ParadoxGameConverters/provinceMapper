@@ -40,16 +40,16 @@ class ImageFrame: public wxFrame
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
-	void onClose(wxCloseEvent& event);
-	void onRefresh(wxCommandEvent& event);
+	void onClose(const wxCloseEvent& event);
+	void onRefresh(const wxCommandEvent& event);
 	void onTriangulate(wxCommandEvent& event);
-	void onPointPlaced(wxCommandEvent& event);
-	void triangulateAtPoint(wxCommandEvent& event);
+	void onPointPlaced(const wxCommandEvent& event);
+	void triangulateAtPoint(const wxCommandEvent& event);
 	void onResize(wxSizeEvent& event);
 	void onMove(wxMoveEvent& event);
-	void onLock(wxCommandEvent& event);
-	void onScrollReleaseH(wxCommandEvent& event);
-	void onScrollReleaseV(wxCommandEvent& event);
+	void onLock(const wxCommandEvent& event);
+	void onScrollReleaseH(const wxCommandEvent& event);
+	void onScrollReleaseV(const wxCommandEvent& event);
 
 	void render() const;
 	void renderSource() const;

@@ -69,10 +69,10 @@ class ImageCanvas: public wxScrolledCanvas
 
   private:
 	void onMouseOver(wxMouseEvent& event);
-	void leftUp(wxMouseEvent& event);
+	void leftUp(const wxMouseEvent& event);
 	void rightUp(wxMouseEvent& event);
 	void onKeyDown(wxKeyEvent& event);
-	void onMouseWheel(wxMouseEvent& event);
+	void onMouseWheel(const wxMouseEvent& event);
 	void onScrollRelease(wxScrollWinEvent& event);
 
 	void stageAddComment();

@@ -52,7 +52,7 @@ void LinksFrame::onResize(wxSizeEvent& event)
 	event.Skip();
 }
 
-void LinksFrame::onClose(wxCloseEvent& event)
+void LinksFrame::onClose(const wxCloseEvent& event)
 {
 	// We need to kill the app.
 	eventHandler->QueueEvent(event.Clone());
@@ -204,13 +204,13 @@ void LinksFrame::onKeyDown(wxKeyEvent& event)
 
 void LinksFrame::stageMoveVersionLeft() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
 	eventHandler->QueueEvent(evt->Clone());
 }
 
 void LinksFrame::stageMoveVersionRight() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventHandler->QueueEvent(evt->Clone());
 }
 

@@ -116,7 +116,7 @@ std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
 	return name;
 }
 
-void LinksTab::leftUp(wxGridEvent& event)
+void LinksTab::leftUp(const wxGridEvent& event)
 {
 	// Left Up means:
 	// 1. We want to mark a nonworking row as working row
@@ -272,7 +272,7 @@ void LinksTab::rightUp(wxGridEvent& event)
 {
 	// Right up means deselect active link, which is serious stuff.
 	// If our active link is dry, we're not deselecting it, we're deleting it.
-	auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+	const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 	eventListener->QueueEvent(evt->Clone());
 	event.Skip();
 }
@@ -283,7 +283,7 @@ void LinksTab::onGridMotion(wxMouseEvent& event)
 	// Thus, we're preventing mouse motion events to propagate by not processing them.
 }
 
-void LinksTab::onUpdateComment(wxCommandEvent& event)
+void LinksTab::onUpdateComment(const wxCommandEvent& event)
 {
 	const auto comment = event.GetString().ToStdString();
 	const auto index = event.GetInt();
@@ -374,7 +374,7 @@ void LinksTab::stageDeleteLink() const
 	// Do nothing unless working on active link. Don't want accidents here.
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
 	}
 }
@@ -383,7 +383,7 @@ void LinksTab::stageMoveUp() const
 {
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
+		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventListener->QueueEvent(evt->Clone());
 	}
 }
@@ -392,7 +392,7 @@ void LinksTab::stageMoveDown() const
 {
 	if (activeLink)
 	{
-		auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
+		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventListener->QueueEvent(evt->Clone());
 	}
 }
@@ -427,24 +427,24 @@ void LinksTab::moveActiveLinkDown()
 
 void LinksTab::stageSave() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
+	const auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void LinksTab::stageAddLink() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	const auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void LinksTab::stageMoveVersionLeft() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void LinksTab::stageMoveVersionRight() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventListener->QueueEvent(evt->Clone());
 }

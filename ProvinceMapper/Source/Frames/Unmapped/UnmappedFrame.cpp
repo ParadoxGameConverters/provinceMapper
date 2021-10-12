@@ -131,7 +131,7 @@ void UnmappedFrame::addProvince(const int ID, const bool sourceTab)
 		targets->addProvince(ID);
 }
 
-void UnmappedFrame::onUpdateProvinceCount(wxCommandEvent& event)
+void UnmappedFrame::onUpdateProvinceCount(const wxCommandEvent& event)
 {
 	if (event.GetId() == 0)
 		notebook->SetPageText(0, "Source Provinces (" + std::to_string(event.GetInt()) + ")");

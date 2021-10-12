@@ -36,9 +36,9 @@ class LinksTab final : public wxNotebookPage
 
   private:
 	void rightUp(wxGridEvent& event);
-	void leftUp(wxGridEvent& event);
+	void leftUp(const wxGridEvent& event);
 	void onGridMotion(wxMouseEvent& event);
-	void onUpdateComment(wxCommandEvent& event);
+	void onUpdateComment(const wxCommandEvent& event);
 	void onKeyDown(wxKeyEvent& event);
 
 	void restoreRowColor(int row) const;
