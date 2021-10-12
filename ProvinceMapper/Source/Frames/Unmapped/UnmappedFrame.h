@@ -26,7 +26,7 @@ class UnmappedFrame final : public wxFrame
 	wxNotebook* notebook = nullptr;
 
 	void onKeyDown(wxKeyEvent& event);
-	void onResize(wxSizeEvent& evt);
+	void onResize(wxSizeEvent& event);
 	void onClose(wxCloseEvent& event);
 	void onMove(wxMoveEvent& event);
 	void onChangeTab(wxBookCtrlEvent& event);

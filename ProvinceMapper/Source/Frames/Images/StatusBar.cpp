@@ -148,7 +148,7 @@ void StatusBar::setTargetZoom(const int zoomLevel) const
 
 void StatusBar::onZoomResetButton(wxCommandEvent& evt)
 {
-	const auto zoomLevel = 100;
+	constexpr auto zoomLevel = 100;
 	wxCommandEvent event(wxEVT_REFRESH);
 	if (evt.GetId() == 0)
 	{

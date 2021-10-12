@@ -74,7 +74,7 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 	}
 }
 
-std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> Definitions::parseLine(const std::string& line)
+std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> Definitions::parseLine(const std::string& line) const
 {
 	try
 	{
