@@ -663,7 +663,7 @@ void MainFrame::mergeRivers() const
 		Log(LogLevel::Info) << "Merging source rivers";
 		auto* imageData = sourceImg->GetData();
 		const auto imageDataSize = sourceImg->GetSize().x * sourceImg->GetSize().y * 3;
-		auto* riverData = sourceRiversImg->GetData();
+		const auto* riverData = sourceRiversImg->GetData();
 		const auto riverDataSize = sourceRiversImg->GetSize().x * sourceRiversImg->GetSize().y * 3;
 		if (riverDataSize == imageDataSize)
 			mergeRiverData(imageData, riverData, imageDataSize);
@@ -673,7 +673,7 @@ void MainFrame::mergeRivers() const
 		Log(LogLevel::Info) << "Merging target rivers";
 		auto* imageData = targetImg->GetData();
 		const auto imageDataSize = targetImg->GetSize().x * targetImg->GetSize().y * 3;
-		auto* riverData = targetRiversImg->GetData();
+		const auto* riverData = targetRiversImg->GetData();
 		const auto riverDataSize = targetRiversImg->GetSize().x * targetRiversImg->GetSize().y * 3;
 		if (riverDataSize == imageDataSize)
 			mergeRiverData(imageData, riverData, imageDataSize);

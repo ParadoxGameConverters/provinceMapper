@@ -45,7 +45,7 @@ class MainFrame final : public wxFrame
 
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
-	void onSupportUs(wxCommandEvent& event);
+	static void onSupportUs(wxCommandEvent& event);
 	void onPathChanged(wxFileDirPickerEvent& evt);
 	void onTokenChanged(const wxCommandEvent& evt);
 	void onStartButton(wxCommandEvent& evt);
