@@ -37,7 +37,7 @@ class LinksFrame final : public wxFrame
 	wxNotebook* notebook = nullptr;
 
 	void onResize(wxSizeEvent& event);
-	void onClose(wxCloseEvent& event);
+	void onClose(const wxCloseEvent& event);
 	void onKeyDown(wxKeyEvent& event);
 	void onMove(wxMoveEvent& event);
 

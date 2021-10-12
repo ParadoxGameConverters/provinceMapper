@@ -79,7 +79,7 @@ StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<
 	SetIcon(wxIcon(wxT("converter.ico"), wxBITMAP_TYPE_ICO, 16, 16));
 }
 
-void StatusBar::onZoomChanged(wxCommandEvent& evt)
+void StatusBar::onZoomChanged(const wxCommandEvent& evt)
 {
 	if (evt.GetId() == 0)
 	{
@@ -146,7 +146,7 @@ void StatusBar::setTargetZoom(const int zoomLevel) const
 	targetZoomField->ChangeValue(std::to_string(zoomLevel));
 }
 
-void StatusBar::onZoomResetButton(wxCommandEvent& evt)
+void StatusBar::onZoomResetButton(const wxCommandEvent& evt)
 {
 	constexpr auto zoomLevel = 100;
 	wxCommandEvent event(wxEVT_REFRESH);

@@ -79,7 +79,7 @@ void UnmappedTab::stageUpdateProvinceCount() const
 	eventListener->AddPendingEvent(evt);
 }
 
-void UnmappedTab::leftUp(wxGridEvent& event)
+void UnmappedTab::leftUp(const wxGridEvent& event)
 {
 	// Left Up means "center on this province". Not mark, not anything, just center.
 
@@ -139,50 +139,50 @@ void UnmappedTab::onKeyDown(wxKeyEvent& event)
 
 void UnmappedTab::stageAddComment() const
 {
-	auto* evt = new wxCommandEvent(wxMENU_ADD_COMMENT);
+	const auto* evt = new wxCommandEvent(wxMENU_ADD_COMMENT);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageDeleteLink() const
 {
 	// Do nothing unless working on active link. Don't want accidents here.
-	auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+	const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageMoveUp() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageMoveDown() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageSave() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
+	const auto* evt = new wxCommandEvent(wxEVT_SAVE_LINKS);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageAddLink() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	const auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageMoveVersionLeft() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_LEFT);
 	eventListener->QueueEvent(evt->Clone());
 }
 
 void UnmappedTab::stageMoveVersionRight() const
 {
-	auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
+	const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	eventListener->QueueEvent(evt->Clone());
 }
 

@@ -25,7 +25,7 @@ class UnmappedTab final : public wxNotebookPage
 
   private:
 	void onKeyDown(wxKeyEvent& event);
-	void leftUp(wxGridEvent& event);
+	void leftUp(const wxGridEvent& event);
 	void onGridMotion(wxMouseEvent& event);
 
 	void stageAddComment() const;

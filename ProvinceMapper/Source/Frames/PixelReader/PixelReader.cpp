@@ -4,7 +4,7 @@
 
 void* PixelReader::Entry()
 {
-	unsigned char* rgb = image->GetData();
+	const unsigned char* rgb = image->GetData();
 	for (auto y = 0; y < image->GetSize().GetY(); y++)
 		for (auto x = 0; x < image->GetSize().GetX(); x++)
 		{
@@ -34,7 +34,7 @@ bool PixelReader::isSameColorAtCoords(const int ax, const int ay, const int bx, 
 		return false;
 	const auto offsetA = coordsToOffset(ax, ay, width);
 	const auto offsetB = coordsToOffset(bx, by, width);
-	unsigned char* rgb = image->GetData();
+	const unsigned char* rgb = image->GetData();
 
 	// Override for river colors which are hardcoded at 200/200/200. They are always true so adjacent pixels are not border pixels.
 	if (rgb[offsetA] == 200 && rgb[offsetA + 1] == 200 && rgb[offsetA + 2] == 200)
