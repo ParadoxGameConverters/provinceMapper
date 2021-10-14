@@ -45,7 +45,7 @@ class MainFrame final : public wxFrame
 
 	void onExit(wxCommandEvent& event);
 	void onAbout(wxCommandEvent& event);
-	static void onSupportUs(wxCommandEvent& event);
+	void onSupportUs(wxCommandEvent& event);
 	void onPathChanged(wxFileDirPickerEvent& evt);
 	void onTokenChanged(const wxCommandEvent& evt);
 	void onStartButton(wxCommandEvent& evt);
@@ -53,6 +53,7 @@ class MainFrame final : public wxFrame
 	void onDeactivateLink(wxCommandEvent& evt);
 	void onActivateLinkByIndex(const wxCommandEvent& evt);
 	void onActivateLinkByID(const wxCommandEvent& evt);
+	void onHighlightLinkUnderComment(const wxCommandEvent& evt);
 	void onToggleProvince(const wxCommandEvent& evt);
 	void onCenterMap(const wxCommandEvent& evt);
 	void onCenterProvince(const wxCommandEvent& evt);

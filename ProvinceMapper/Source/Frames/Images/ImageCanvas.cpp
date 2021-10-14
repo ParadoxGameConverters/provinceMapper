@@ -109,6 +109,28 @@ void ImageCanvas::strafeProvince(const std::shared_ptr<Province>& province)
 			strafedPixels.emplace_back(pixel);
 }
 
+void ImageCanvas::highlightLinkByIndex(const int row)
+{
+	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
+	{
+		const auto& linkToHighlight = activeVersion->getLinks()->at(row);
+		// Highlight our provinces' pixels.
+		highlightProvinces(linkToHighlight);
+	}
+}
+
+void ImageCanvas::highlightProvinces(const std::shared_ptr<LinkMapping>& linkToHighlight)
+{
+	for (const auto& province: getRelevantProvinces(linkToHighlight))
+		highlightProvince(province);
+}
+
+void ImageCanvas::highlightProvince(const std::shared_ptr<Province>& province)
+{
+	for (const auto& pixel: province->innerPixels)
+		highlightedPixels.emplace_back(pixel);
+}
+
 void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) const
 {
 	// This fires when provinces within link are deselected, we're restoring their original color.
@@ -153,6 +175,17 @@ void ImageCanvas::applyStrafedPixels()
 	}
 }
 
+void ImageCanvas::applyHighlightedPixels()
+{
+	for (const auto& pixel: highlightedPixels)
+	{
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		imageData[offset] = 150;
+		imageData[offset + 1] = 150;
+		imageData[offset + 2] = 150;
+	}
+}
+
 void ImageCanvas::deactivateLink()
 {
 	activeLink.reset();
@@ -174,6 +207,21 @@ void ImageCanvas::deactivateLink()
 		}
 	}
 	strafedPixels.clear();
+}
+
+void ImageCanvas::dehighlightLink()
+{
+	for (const auto& province: highlightedProvinces)
+	{
+		for (const auto& pixel: province->innerPixels)
+		{
+			const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+			imageData[offset] = province->r;
+			imageData[offset + 1] = province->g;
+			imageData[offset + 2] = province->b;
+		}
+	}
+	highlightedPixels.clear();
 }
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)

@@ -47,6 +47,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
+	Bind(wxEVT_HIGHLIGHT_LINK_UNDER_COMMENT, &MainFrame::onHighlightLinkUnderComment, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
@@ -563,6 +564,11 @@ void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 	linkMapper.activateLinkByID(evt.GetInt());
 	imageFrame->activateLinkByID(evt.GetInt());
 	linksFrame->activateLinkByID(evt.GetInt());
+}
+
+void MainFrame::onHighlightLinkUnderComment(const wxCommandEvent& evt)
+{
+	imageFrame->highlightLinkByIndex(evt.GetInt());
 }
 
 void MainFrame::onToggleProvince(const wxCommandEvent& evt)

@@ -331,6 +331,16 @@ void ImageFrame::deleteActiveLink()
 	Refresh();
 }
 
+void ImageFrame::highlightLinkByIndex(const int row)
+{
+	sourceCanvas->highlightLinkByIndex(row);
+	targetCanvas->highlightLinkByIndex(row);
+	sourceCanvas->applyHighlightedPixels();
+	targetCanvas->applyHighlightedPixels();
+	render();
+	Refresh();
+}
+
 void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 {
 	if (sourceImage)
