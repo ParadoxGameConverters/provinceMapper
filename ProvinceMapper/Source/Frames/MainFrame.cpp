@@ -47,7 +47,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
-	Bind(wxEVT_HIGHLIGHT_LINK_UNDER_COMMENT, &MainFrame::onHighlightLinkUnderComment, this);
+	Bind(wxEVT_HIGHLIGHT_REGION, &MainFrame::onHighlightRegion, this);
 	Bind(wxEVT_DISABLE_REGION_HIGHLIGHT, &MainFrame::clearRegionHighlight, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
@@ -567,9 +567,9 @@ void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 	linksFrame->activateLinkByID(evt.GetInt());
 }
 
-void MainFrame::onHighlightLinkUnderComment(const wxCommandEvent& evt)
+void MainFrame::onHighlightRegion(const wxCommandEvent& evt)
 {
-	imageFrame->highlightLinkByIndex(evt.GetInt());
+	imageFrame->highlightRegionByCommentRow(evt.GetInt());
 }
 
 void MainFrame::clearRegionHighlight(wxCommandEvent& evt)

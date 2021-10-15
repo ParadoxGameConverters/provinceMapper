@@ -109,13 +109,27 @@ void ImageCanvas::strafeProvince(const std::shared_ptr<Province>& province)
 			strafedPixels.emplace_back(pixel);
 }
 
-void ImageCanvas::highlightLinkByIndex(const int row)
+void ImageCanvas::highlightRegionByCommentRow(const int row)
 {
-	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
+	if (!activeVersion)
 	{
-		const auto& linkToHighlight = activeVersion->getLinks()->at(row);
-		// Highlight our provinces' pixels.
-		highlightProvinces(linkToHighlight);
+		return;
+	}
+	const auto& links = activeVersion->getLinks();
+	if (row >= static_cast<int>(links->size()))
+	{
+		return;
+	}
+	if (const auto& commentLink = links->at(row); commentLink->getComment())
+	{
+		auto rowUnderComment = row + 1;
+		while (static_cast<unsigned long>(rowUnderComment) < links->size() && !links->at(rowUnderComment)->getComment())
+		{
+			const auto& link = links->at(rowUnderComment);
+			// Highlight our provinces' pixels.
+			highlightProvinces(link);
+			++rowUnderComment;
+		}
 	}
 }
 

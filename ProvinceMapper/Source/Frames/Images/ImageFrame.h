@@ -28,7 +28,7 @@ class ImageFrame: public wxFrame
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
-	void highlightLinkByIndex(int row);
+	void highlightRegionByCommentRow(int commentRow);
 	void toggleProvinceByID(int ID, bool sourceImage);
 	void shadeProvinceByID(int ID, bool sourceImage);
 	void centerMap(int ID);

@@ -335,10 +335,10 @@ void ImageFrame::deleteActiveLink()
 	Refresh();
 }
 
-void ImageFrame::highlightLinkByIndex(const int row)
+void ImageFrame::highlightRegionByCommentRow(const int commentRow)
 {
-	sourceCanvas->highlightLinkByIndex(row);
-	targetCanvas->highlightLinkByIndex(row);
+	sourceCanvas->highlightRegionByCommentRow(commentRow);
+	targetCanvas->highlightRegionByCommentRow(commentRow);
 	sourceCanvas->applyHighlightedPixels();
 	targetCanvas->applyHighlightedPixels();
 	render();

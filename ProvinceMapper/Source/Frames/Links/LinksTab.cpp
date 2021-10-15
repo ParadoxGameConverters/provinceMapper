@@ -7,7 +7,7 @@
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_HIGHLIGHT_LINK_UNDER_COMMENT, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_HIGHLIGHT_REGION, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DISABLE_REGION_HIGHLIGHT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
@@ -165,14 +165,9 @@ void LinksTab::leftUp(const wxGridEvent& event)
 		// highlight provinces from all links between the selected comment and the first comment below it
 		if (const auto& links = version->getLinks(); links->at(row)->getComment())
 		{
-			auto rowUnderComment = row + 1;
-			while (static_cast<unsigned long>(rowUnderComment) < links->size() && !links->at(rowUnderComment)->getComment())
-			{
-				auto* evt = new wxCommandEvent(wxEVT_HIGHLIGHT_LINK_UNDER_COMMENT);
-				evt->SetInt(rowUnderComment);
-				eventListener->QueueEvent(evt->Clone());
-				++rowUnderComment;
-			}
+			auto* evt = new wxCommandEvent(wxEVT_HIGHLIGHT_REGION);
+			evt->SetInt(row);
+			eventListener->QueueEvent(evt->Clone());
 		}
 	}
 }

@@ -66,7 +66,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
-	void highlightLinkByIndex(int row);
+	void highlightRegionByCommentRow(int row);
 	void dehighlightRegion();
 	void toggleProvinceByID(int ID);
 	void shadeProvinceByID(int ID);
