@@ -216,7 +216,6 @@ void ImageCanvas::dehighlightRegion()
 {
 	for (const auto& province: highlightedProvinces)
 	{
-		LOG(LogLevel::Debug) << "DEHIGHLIGHTING PROVINCE " << province->mapDataName;
 		for (const auto& pixel: province->innerPixels)
 		{
 			const auto offset = coordsToOffset(pixel.x, pixel.y, width);

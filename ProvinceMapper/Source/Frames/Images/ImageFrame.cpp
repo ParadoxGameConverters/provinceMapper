@@ -347,7 +347,6 @@ void ImageFrame::highlightLinkByIndex(const int row)
 
 void ImageFrame::clearRegionHighlight()
 {
-	Log(LogLevel::Debug) << "CLEARING REGION HIGHLIGHT";
 	sourceCanvas->dehighlightRegion();
 	targetCanvas->dehighlightRegion();
 	render();
