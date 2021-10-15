@@ -54,6 +54,7 @@ class MainFrame final : public wxFrame
 	void onActivateLinkByIndex(const wxCommandEvent& evt);
 	void onActivateLinkByID(const wxCommandEvent& evt);
 	void onHighlightLinkUnderComment(const wxCommandEvent& evt);
+	void clearRegionHighlight(wxCommandEvent& evt);
 	void onToggleProvince(const wxCommandEvent& evt);
 	void onCenterMap(const wxCommandEvent& evt);
 	void onCenterProvince(const wxCommandEvent& evt);

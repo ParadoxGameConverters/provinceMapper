@@ -36,8 +36,9 @@ class ImageFrame: public wxFrame
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
+	void clearRegionHighlight();
 
-  private:
+private:
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);

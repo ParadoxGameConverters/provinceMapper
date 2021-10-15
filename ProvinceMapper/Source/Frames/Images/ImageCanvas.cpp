@@ -128,7 +128,10 @@ void ImageCanvas::highlightProvinces(const std::shared_ptr<LinkMapping>& linkToH
 void ImageCanvas::highlightProvince(const std::shared_ptr<Province>& province)
 {
 	for (const auto& pixel: province->innerPixels)
+	{
+		highlightedProvinces.emplace_back(province);
 		highlightedPixels.emplace_back(pixel);
+	}
 }
 
 void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) const
@@ -209,10 +212,11 @@ void ImageCanvas::deactivateLink()
 	strafedPixels.clear();
 }
 
-void ImageCanvas::dehighlightLink()
+void ImageCanvas::dehighlightRegion()
 {
 	for (const auto& province: highlightedProvinces)
 	{
+		LOG(LogLevel::Debug) << "DEHIGHLIGHTING PROVINCE " << province->mapDataName;
 		for (const auto& pixel: province->innerPixels)
 		{
 			const auto offset = coordsToOffset(pixel.x, pixel.y, width);

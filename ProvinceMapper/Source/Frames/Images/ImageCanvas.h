@@ -47,7 +47,11 @@ class ImageCanvas: public wxScrolledCanvas
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
-	void clearHighlightedPixels() { highlightedPixels.clear(); }
+	void clearHighlightedPixels()
+	{
+		highlightedPixels.clear();
+		highlightedProvinces.clear();
+	}
 	void generateShadedPixels();
 	void applyShadedPixels();
 	void applyStrafedPixels();
@@ -62,8 +66,8 @@ class ImageCanvas: public wxScrolledCanvas
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
-	void dehighlightLink();
 	void highlightLinkByIndex(int row);
+	void dehighlightRegion();
 	void toggleProvinceByID(int ID);
 	void shadeProvinceByID(int ID);
 	void deleteActiveLink();

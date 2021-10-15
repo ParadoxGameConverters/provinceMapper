@@ -270,6 +270,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 		sourceCanvas->restoreImageData();
 		targetCanvas->clearShadedPixels();
 		targetCanvas->restoreImageData();
+		sourceCanvas->applyHighlightedPixels();
+		targetCanvas->applyHighlightedPixels();
 		sourceCanvas->applyStrafedPixels();
 		targetCanvas->applyStrafedPixels();
 	}
@@ -282,6 +284,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 		sourceCanvas->applyShadedPixels();
 		targetCanvas->generateShadedPixels();
 		targetCanvas->applyShadedPixels();
+		sourceCanvas->applyHighlightedPixels();
+		targetCanvas->applyHighlightedPixels();
 		sourceCanvas->applyStrafedPixels();
 		targetCanvas->applyStrafedPixels();
 	}
@@ -341,6 +345,15 @@ void ImageFrame::highlightLinkByIndex(const int row)
 	Refresh();
 }
 
+void ImageFrame::clearRegionHighlight()
+{
+	Log(LogLevel::Debug) << "CLEARING REGION HIGHLIGHT";
+	sourceCanvas->dehighlightRegion();
+	targetCanvas->dehighlightRegion();
+	render();
+	Refresh();
+}
+
 void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 {
 	if (sourceImage)
@@ -356,7 +369,7 @@ void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 	Refresh();
 }
 
-void ImageFrame::shadeProvinceByID(int ID, bool sourceImage)
+void ImageFrame::shadeProvinceByID(const int ID, const bool sourceImage)
 {
 	if (sourceImage)
 	{
@@ -371,7 +384,7 @@ void ImageFrame::shadeProvinceByID(int ID, bool sourceImage)
 	Refresh();
 }
 
-void ImageFrame::centerMap(int ID)
+void ImageFrame::centerMap(const int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
@@ -392,7 +405,7 @@ void ImageFrame::centerMap(int ID)
 	Refresh();
 }
 
-void ImageFrame::centerProvince(ImageTabSelector selector, int ID)
+void ImageFrame::centerProvince(const ImageTabSelector selector, const int ID)
 {
 	if (selector == ImageTabSelector::SOURCE)
 	{
@@ -423,6 +436,8 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	targetCanvas->setVersion(version);
 	sourceCanvas->clearStrafedPixels();
 	targetCanvas->clearStrafedPixels();
+	sourceCanvas->clearHighlightedPixels();
+	targetCanvas->clearHighlightedPixels();
 	sourceCanvas->restoreImageData();
 	targetCanvas->restoreImageData();
 

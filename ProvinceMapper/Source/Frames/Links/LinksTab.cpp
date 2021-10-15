@@ -8,6 +8,7 @@ wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_HIGHLIGHT_LINK_UNDER_COMMENT, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_DISABLE_REGION_HIGHLIGHT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
@@ -289,6 +290,11 @@ void LinksTab::rightUp(wxGridEvent& event)
 	// If our active link is dry, we're not deselecting it, we're deleting it.
 	const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 	eventListener->QueueEvent(evt->Clone());
+
+	// If the link is a comment, disable the region highlight
+	evt = new wxCommandEvent(wxEVT_DISABLE_REGION_HIGHLIGHT);
+	eventListener->QueueEvent(evt->Clone());
+
 	event.Skip();
 }
 
