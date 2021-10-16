@@ -395,15 +395,13 @@ void ImageFrame::centerMapToActiveLink()
 	const auto pt2 = targetCanvas->locateActiveLinkCoordinates();
 	centerMap(pt1, pt2);
 }
-
 void ImageFrame::centerMap(const int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
 	centerMap(pt1, pt2);
 }
-
-void ImageFrame::centerMap(wxPoint srcCanvasPoint, wxPoint targetCanvasPoint)
+void ImageFrame::centerMap(const wxPoint srcCanvasPoint, const wxPoint targetCanvasPoint)
 {
 	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
 	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);

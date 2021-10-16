@@ -103,7 +103,6 @@ void ImageCanvas::activateFirstRegionLink(const int commentRow)
 	{
 		activeLink = activeVersion->getLinks()->at(firstRegionRow);
 	}
-	Log(LogLevel::Debug) << "ACTIVE LINK " << activeLink->getID();
 }
 
 void ImageCanvas::strafeProvinces()
@@ -439,12 +438,11 @@ void ImageCanvas::shadeProvinceByID(const int ID)
 
 wxPoint ImageCanvas::locateActiveLinkCoordinates() const
 {
-	auto toReturn = wxPoint(0, 0);
 	if (activeLink)
 	{
-		toReturn = GetCoordinatesForLink(activeLink);
+		return GetCoordinatesForLink(activeLink);
 	}
-	return toReturn;
+	return wxPoint(0, 0);
 }
 
 wxPoint ImageCanvas::locateLinkCoordinates(const int ID) const
