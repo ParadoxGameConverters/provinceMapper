@@ -48,10 +48,10 @@ class ImageCanvas: public wxScrolledCanvas
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
-	void clearHighlightedProvinces()
+	void clearHighlightedLinks()
 	{
 		highlightedPixels.clear();
-		highlightedProvinces.clear();
+		highlightedLinks.clear();
 	}
 	void generateShadedPixels();
 	void applyShadedPixels();
@@ -130,7 +130,7 @@ class ImageCanvas: public wxScrolledCanvas
 	std::vector<Pixel> shadedPixels;
 	std::vector<Pixel> strafedPixels;
 	std::vector<Pixel> highlightedPixels;
-	std::vector<std::shared_ptr<Province>> highlightedProvinces;
+	std::vector<std::shared_ptr<LinkMapping>> highlightedLinks;
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	std::shared_ptr<Definitions> definitions;

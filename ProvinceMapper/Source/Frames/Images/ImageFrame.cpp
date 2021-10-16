@@ -451,8 +451,8 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	targetCanvas->setVersion(version);
 	sourceCanvas->clearStrafedPixels();
 	targetCanvas->clearStrafedPixels();
-	sourceCanvas->clearHighlightedProvinces();
-	targetCanvas->clearHighlightedProvinces();
+	sourceCanvas->clearHighlightedLinks();
+	targetCanvas->clearHighlightedLinks();
 	sourceCanvas->restoreImageData();
 	targetCanvas->restoreImageData();
 

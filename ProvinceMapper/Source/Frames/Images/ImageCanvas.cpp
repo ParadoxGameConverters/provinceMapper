@@ -144,13 +144,13 @@ void ImageCanvas::highlightRegionByCommentRow(const int row)
 
 void ImageCanvas::highlightProvinces(const std::shared_ptr<LinkMapping>& linkToHighlight)
 {
+	highlightedLinks.emplace_back(linkToHighlight);
 	for (const auto& province: getRelevantProvinces(linkToHighlight))
 		highlightProvince(province);
 }
 
 void ImageCanvas::highlightProvince(const std::shared_ptr<Province>& province)
 {
-	highlightedProvinces.emplace_back(province);
 	for (const auto& pixel: province->innerPixels)
 	{
 		highlightedPixels.emplace_back(pixel);
@@ -237,17 +237,21 @@ void ImageCanvas::deactivateLink()
 
 void ImageCanvas::clearRegionHighlight()
 {
-	for (const auto& province: highlightedProvinces)
+	for (const auto& link: highlightedLinks)
 	{
-		for (const auto& pixel: province->innerPixels)
+		const std::vector<std::shared_ptr<Province>>& provinces = selector == ImageTabSelector::SOURCE ? link->getSources() : link->getTargets();
+		for (const auto& province: provinces)
 		{
-			const auto offset = coordsToOffset(pixel.x, pixel.y, width);
-			imageData[offset] = province->r;
-			imageData[offset + 1] = province->g;
-			imageData[offset + 2] = province->b;
+			for (const auto& pixel: province->innerPixels)
+			{
+				const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+				imageData[offset] = province->r;
+				imageData[offset + 1] = province->g;
+				imageData[offset + 2] = province->b;
+			}
 		}
 	}
-	clearHighlightedProvinces();
+	clearHighlightedLinks();
 }
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)
@@ -406,6 +410,8 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 		{
 			// mark the province as black if needed.
 			markProvince(province);
+			// highlight province if it's being added to currently highlighted region
+			// highlightPro // TODO: FINISH
 			// We need to add this province to strafe.
 			strafeProvince(province);
 			applyStrafedPixels();
