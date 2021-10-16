@@ -57,6 +57,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void applyShadedPixels();
 	void applyStrafedPixels();
 	void applyHighlightedPixels();
+	void applyProvinceHighlight(const std::shared_ptr<Province>& province);
 	void restoreImageData() const;
 	void setBlack() { black = true; }
 	void clearBlack() { black = false; }
@@ -71,8 +72,9 @@ class ImageCanvas: public wxScrolledCanvas
 	void highlightRegionByCommentRow(int row);
 	void clearRegionHighlight();
 	void toggleProvinceByID(int ID);
+	void HighlightProvinceIfInHighlightedRegion(const std::shared_ptr<Province>& province);
 	void shadeProvinceByID(int ID);
-	wxPoint locateActiveLinkCoordinates() const;
+	[[nodiscard]] wxPoint locateActiveLinkCoordinates() const;
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
 	void pushZoomLevel(int zoomLevel);

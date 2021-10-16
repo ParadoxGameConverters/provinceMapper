@@ -211,6 +211,16 @@ void ImageCanvas::applyHighlightedPixels()
 		imageData[offset + 2] = 150;
 	}
 }
+void ImageCanvas::applyProvinceHighlight(const std::shared_ptr<Province>& province)
+{
+	for (const auto& pixel: province->innerPixels)
+	{
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		imageData[offset] = 150;
+		imageData[offset + 1] = 150;
+		imageData[offset + 2] = 150;
+	}
+}
 
 void ImageCanvas::deactivateLink()
 {
@@ -411,7 +421,7 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 			// mark the province as black if needed.
 			markProvince(province);
 			// highlight province if it's being added to currently highlighted region
-			// highlightPro // TODO: FINISH
+			HighlightProvinceIfInHighlightedRegion(province);
 			// We need to add this province to strafe.
 			strafeProvince(province);
 			applyStrafedPixels();
@@ -428,6 +438,22 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 	strafedPixels.clear();
 	strafeProvinces();
 	applyStrafedPixels();
+}
+
+void ImageCanvas::HighlightProvinceIfInHighlightedRegion(const std::shared_ptr<Province>& province)
+{
+	for (const auto& link: highlightedLinks)
+	{
+		for (const auto& linkProvince: getRelevantProvinces(link))
+		{
+			if (linkProvince->ID == province->ID)
+			{
+				highlightProvince(province);
+				applyProvinceHighlight(province);
+				return;
+			}
+		}
+	}
 }
 
 void ImageCanvas::shadeProvinceByID(const int ID)
