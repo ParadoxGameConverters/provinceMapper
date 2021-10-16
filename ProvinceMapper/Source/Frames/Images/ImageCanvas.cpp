@@ -141,9 +141,9 @@ void ImageCanvas::highlightProvinces(const std::shared_ptr<LinkMapping>& linkToH
 
 void ImageCanvas::highlightProvince(const std::shared_ptr<Province>& province)
 {
+	highlightedProvinces.emplace_back(province);
 	for (const auto& pixel: province->innerPixels)
 	{
-		highlightedProvinces.emplace_back(province);
 		highlightedPixels.emplace_back(pixel);
 	}
 }
@@ -238,7 +238,7 @@ void ImageCanvas::dehighlightRegion()
 			imageData[offset + 2] = province->b;
 		}
 	}
-	highlightedPixels.clear();
+	clearHighlightedProvinces();
 }
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)

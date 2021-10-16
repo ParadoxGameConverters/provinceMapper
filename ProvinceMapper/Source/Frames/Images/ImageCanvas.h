@@ -47,7 +47,7 @@ class ImageCanvas: public wxScrolledCanvas
 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
-	void clearHighlightedPixels()
+	void clearHighlightedProvinces()
 	{
 		highlightedPixels.clear();
 		highlightedProvinces.clear();
