@@ -39,6 +39,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getOldScale() const { return oldScaleFactor; }
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
+	[[nodiscard]] wxPoint GetCoordinatesForLink(const std::shared_ptr<LinkMapping>& link) const;
 	[[nodiscard]] wxPoint locateProvinceCoordinates(int ID) const;
 	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
@@ -65,11 +66,13 @@ class ImageCanvas: public wxScrolledCanvas
 
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
+	void activateFirstRegionLink(int commentRow);
 	void deactivateLink();
 	void highlightRegionByCommentRow(int row);
-	void dehighlightRegion();
+	void clearRegionHighlight();
 	void toggleProvinceByID(int ID);
 	void shadeProvinceByID(int ID);
+	wxPoint locateActiveLinkCoordinates() const;
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
 	void pushZoomLevel(int zoomLevel);

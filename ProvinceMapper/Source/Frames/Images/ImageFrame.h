@@ -31,7 +31,9 @@ class ImageFrame: public wxFrame
 	void highlightRegionByCommentRow(int commentRow);
 	void toggleProvinceByID(int ID, bool sourceImage);
 	void shadeProvinceByID(int ID, bool sourceImage);
+	void centerMapToActiveLink();
 	void centerMap(int ID);
+	void centerMap(wxPoint srcCanvasPoint, wxPoint targetCanvasPoint);
 	void centerProvince(ImageTabSelector selector, int ID);
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);

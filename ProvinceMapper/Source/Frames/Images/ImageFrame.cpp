@@ -337,18 +337,24 @@ void ImageFrame::deleteActiveLink()
 
 void ImageFrame::highlightRegionByCommentRow(const int commentRow)
 {
+	sourceCanvas->clearRegionHighlight();
+	targetCanvas->clearRegionHighlight();
+	
+	sourceCanvas->activateFirstRegionLink(commentRow);
+	targetCanvas->activateFirstRegionLink(commentRow);
 	sourceCanvas->highlightRegionByCommentRow(commentRow);
 	targetCanvas->highlightRegionByCommentRow(commentRow);
 	sourceCanvas->applyHighlightedPixels();
 	targetCanvas->applyHighlightedPixels();
+
 	render();
 	Refresh();
 }
 
 void ImageFrame::clearRegionHighlight()
 {
-	sourceCanvas->dehighlightRegion();
-	targetCanvas->dehighlightRegion();
+	sourceCanvas->clearRegionHighlight();
+	targetCanvas->clearRegionHighlight();
 	render();
 	Refresh();
 }
@@ -383,20 +389,32 @@ void ImageFrame::shadeProvinceByID(const int ID, const bool sourceImage)
 	Refresh();
 }
 
+void ImageFrame::centerMapToActiveLink()
+{
+	const auto pt1 = sourceCanvas->locateActiveLinkCoordinates();
+	const auto pt2 = targetCanvas->locateActiveLinkCoordinates();
+	centerMap(pt1, pt2);
+}
+
 void ImageFrame::centerMap(const int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
+	centerMap(pt1, pt2);
+}
+
+void ImageFrame::centerMap(wxPoint srcCanvasPoint, wxPoint targetCanvasPoint)
+{
 	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
 	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
 	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
 	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
 
-	auto units = wxPoint(static_cast<int>(pt1.x * sourceCanvas->getScale()), static_cast<int>(pt1.y * sourceCanvas->getScale()));
+	auto units = wxPoint(static_cast<int>(srcCanvasPoint.x * sourceCanvas->getScale()), static_cast<int>(srcCanvasPoint.y * sourceCanvas->getScale()));
 	auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
 	sourceCanvas->Scroll(offset);
 
-	units = wxPoint(static_cast<int>(pt2.x * targetCanvas->getScale()), static_cast<int>(pt2.y * targetCanvas->getScale()));
+	units = wxPoint(static_cast<int>(targetCanvasPoint.x * targetCanvas->getScale()), static_cast<int>(targetCanvasPoint.y * targetCanvas->getScale()));
 	offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
 	targetCanvas->Scroll(offset);
 

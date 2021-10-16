@@ -570,6 +570,7 @@ void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 void MainFrame::onHighlightRegion(const wxCommandEvent& evt)
 {
 	imageFrame->highlightRegionByCommentRow(evt.GetInt());
+	imageFrame->centerMapToActiveLink();
 }
 
 void MainFrame::clearRegionHighlight(wxCommandEvent& evt)

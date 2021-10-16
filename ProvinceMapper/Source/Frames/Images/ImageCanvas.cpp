@@ -96,6 +96,16 @@ void ImageCanvas::activateLinkByID(const int ID)
 	}
 }
 
+void ImageCanvas::activateFirstRegionLink(const int commentRow)
+{
+	const auto firstRegionRow = commentRow + 1;
+	if (activeVersion && firstRegionRow < static_cast<int>(activeVersion->getLinks()->size()))
+	{
+		activeLink = activeVersion->getLinks()->at(firstRegionRow);
+	}
+	Log(LogLevel::Debug) << "ACTIVE LINK " << activeLink->getID();
+}
+
 void ImageCanvas::strafeProvinces()
 {
 	for (const auto& province: getRelevantProvinces(activeLink))
@@ -226,7 +236,7 @@ void ImageCanvas::deactivateLink()
 	strafedPixels.clear();
 }
 
-void ImageCanvas::dehighlightRegion()
+void ImageCanvas::clearRegionHighlight()
 {
 	for (const auto& province: highlightedProvinces)
 	{
@@ -415,7 +425,7 @@ void ImageCanvas::toggleProvinceByID(const int ID)
 	applyStrafedPixels();
 }
 
-void ImageCanvas::shadeProvinceByID(int ID)
+void ImageCanvas::shadeProvinceByID(const int ID)
 {
 	// this is called when we're marking a province outside of a working link. Often a preface to a new link being initialized.
 	// Irrelevant unless we're shading.
@@ -427,7 +437,17 @@ void ImageCanvas::shadeProvinceByID(int ID)
 		markProvince(province);
 }
 
-wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
+wxPoint ImageCanvas::locateActiveLinkCoordinates() const
+{
+	auto toReturn = wxPoint(0, 0);
+	if (activeLink)
+	{
+		toReturn = GetCoordinatesForLink(activeLink);
+	}
+	return toReturn;
+}
+
+wxPoint ImageCanvas::locateLinkCoordinates(const int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
 	std::shared_ptr<LinkMapping> link = nullptr;
@@ -448,24 +468,31 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 	// find out first province's pixels.
 	if (link)
 	{
-		const auto& relevantProvinces = getRelevantProvinces(link);
-		if (!relevantProvinces.empty()) // not all links have provinces in them.
+		toReturn = GetCoordinatesForLink(link);
+	}
+	return toReturn;
+}
+
+wxPoint ImageCanvas::GetCoordinatesForLink(const std::shared_ptr<LinkMapping>& link) const
+{
+	auto toReturn = wxPoint(0, 0);
+	const auto& relevantProvinces = getRelevantProvinces(link);
+	if (!relevantProvinces.empty()) // not all links have provinces in them.
+	{
+		const auto& province = relevantProvinces.front();
+		// provinces usually have pixels.
+		if (!province->innerPixels.empty())
 		{
-			const auto& province = relevantProvinces.front();
-			// provinces usually have pixels.
-			if (!province->innerPixels.empty())
-			{
-				const auto& pixel = province->innerPixels.front();
-				// And there we have it.
-				toReturn.x = pixel.x;
-				toReturn.y = pixel.y;
-			}
+			const auto& pixel = province->innerPixels.front();
+			// And there we have it.
+			toReturn.x = pixel.x;
+			toReturn.y = pixel.y;
 		}
 	}
 	return toReturn;
 }
 
-wxPoint ImageCanvas::locateProvinceCoordinates(int ID) const
+wxPoint ImageCanvas::locateProvinceCoordinates(const int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
 	const auto& provinces = definitions->getProvinces();
