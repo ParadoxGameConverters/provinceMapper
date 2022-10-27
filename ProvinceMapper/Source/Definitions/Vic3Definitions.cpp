@@ -18,7 +18,7 @@ void Vic3Definitions::registerPixel(int x, int y, unsigned char r, unsigned char
 	else
 	{
 		std::stringstream id;
-		id << "0x" << std::hex << std::setw(2) << std::setfill('0') << r << g << b;
+		id << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(r) << static_cast<int>(g) << static_cast<int>(b);
 		auto new_province = std::make_shared<Province>(id.str(), r, g, b, "");
 		new_province->innerPixels.emplace_back(pixel);
 		chromaCache.emplace(pixelPack(r, g, b), new_province);
@@ -37,7 +37,7 @@ void Vic3Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigne
 	else
 	{
 		std::stringstream id;
-		id << "0x" << std::hex << std::setw(2) << std::setfill('0') << r << g << b;
+		id << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(r) << static_cast<int>(g) << static_cast<int>(b);
 		auto new_province = std::make_shared<Province>(id.str(), r, g, b, "");
 		new_province->borderPixels.emplace_back(pixel);
 		chromaCache.emplace(pixelPack(r, g, b), new_province);
