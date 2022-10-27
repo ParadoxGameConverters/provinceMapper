@@ -1,5 +1,4 @@
 #include "PixelReader.h"
-#include "Definitions/Definitions.h"
 #include "Log.h"
 
 void* PixelReader::Entry()

@@ -2,22 +2,22 @@
 #define LINK_MAPPING_VERSION_H
 #include "LinkMapping.h"
 #include "Parser.h"
+#include "Definitions/DefinitionsInterface.h"
 
-class Definitions;
 class LinkMappingVersion: commonItems::parser
 {
   public:
 	LinkMappingVersion(std::istream& theStream,
 		 std::string theVersionName,
-		 std::shared_ptr<Definitions> theSourceToken,
-		 std::shared_ptr<Definitions> theTargetToken,
+		 std::shared_ptr<DefinitionsInterface> theSourceToken,
+		 std::shared_ptr<DefinitionsInterface> theTargetToken,
 		 std::string sourceToken,
 		 std::string targetToken,
 		 int theID);
 
 	LinkMappingVersion(std::string theVersionName,
-		 std::shared_ptr<Definitions> sourceDefs,
-		 std::shared_ptr<Definitions> targetDefs,
+		 std::shared_ptr<DefinitionsInterface> sourceDefs,
+		 std::shared_ptr<DefinitionsInterface> targetDefs,
 		 std::string theSourceToken,
 		 std::string theTargetToken,
 		 int theID);
@@ -27,7 +27,7 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getUnmappedSources() const { return unmappedSources; }
 	[[nodiscard]] const auto& getUnmappedTargets() const { return unmappedTargets; }
-	[[nodiscard]] Mapping isProvinceMapped(int provinceID, bool isSource) const;
+	[[nodiscard]] Mapping isProvinceMapped(const std::string& provinceID, bool isSource) const;
 
 	void deactivateLink();
 	void activateLinkByIndex(int row);
@@ -39,7 +39,7 @@ class LinkMappingVersion: commonItems::parser
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;
 
-	[[nodiscard]] std::optional<int> toggleProvinceByID(int provinceID, bool isSource);
+	[[nodiscard]] std::optional<int> toggleProvinceByID(const std::string& provinceID, bool isSource);
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
@@ -50,17 +50,17 @@ class LinkMappingVersion: commonItems::parser
 
   private:
 	void generateUnmapped() const;
-	void removeUnmappedSourceByID(int provinceID) const;
-	void removeUnmappedTargetByID(int provinceID) const;
-	void addUnmappedSourceByID(int provinceID) const;
-	void addUnmappedTargetByID(int provinceID) const;
+	void removeUnmappedSourceByID(const std::string& provinceID) const;
+	void removeUnmappedTargetByID(const std::string& provinceID) const;
+	void addUnmappedSourceByID(const std::string& provinceID) const;
+	void addUnmappedTargetByID(const std::string& provinceID) const;
 
 	int ID = 0;
 	std::string versionName;
 	int linkCounter = 0;
 	int lastActiveLinkIndex = 0;
-	std::shared_ptr<Definitions> sourceDefs;
-	std::shared_ptr<Definitions> targetDefs;
+	std::shared_ptr<DefinitionsInterface> sourceDefs;
+	std::shared_ptr<DefinitionsInterface> targetDefs;
 	std::string sourceToken;
 	std::string targetToken;
 

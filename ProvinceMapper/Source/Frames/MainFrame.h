@@ -4,7 +4,7 @@
 #include <wx/wx.h>
 #endif
 #include "Configuration/Configuration.h"
-#include "Definitions/Definitions.h"
+#include "Definitions/DefinitionsInterface.h"
 #include "LinkMapper/LinkMapper.h"
 #include "Localization/LocalizationMapper.h"
 #include <array>
@@ -99,8 +99,8 @@ class MainFrame final : public wxFrame
 
 	wxButton* startButton = nullptr;
 
-	std::shared_ptr<Definitions> sourceDefs;
-	std::shared_ptr<Definitions> targetDefs;
+	std::shared_ptr<DefinitionsInterface> sourceDefs;
+	std::shared_ptr<DefinitionsInterface> targetDefs;
 	LinkMapper linkMapper;
 	std::shared_ptr<Configuration> configuration;
 	LocalizationMapper localizationMapper;

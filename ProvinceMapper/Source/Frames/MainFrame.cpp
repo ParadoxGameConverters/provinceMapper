@@ -1,5 +1,7 @@
 #include "MainFrame.h"
 #include "CommonFunctions.h"
+#include "Definitions/Definitions.h"
+#include "Definitions/Vic3Definitions.h"
 #include "Images/ImageCanvas.h"
 #include "Images/ImageFrame.h"
 #include "Links/DialogComment.h"
@@ -286,13 +288,31 @@ void MainFrame::initImageFrame()
 	localizationMapper.scrapeTargetDir(*configuration->getTargetDir());
 	Log(LogLevel::Info) << "Target Localizations Loaded.";
 
-	sourceDefs = std::make_shared<Definitions>();
-	targetDefs = std::make_shared<Definitions>();
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/definition.csv"))
+	{
+		auto definitions = std::make_shared<Definitions>();
+		definitions->loadDefinitions(*configuration->getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
+		sourceDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
+	}
+	else
+	{
+		sourceDefs = std::make_shared<Vic3Definitions>();
+		Log(LogLevel::Info) << "Loaded Vic3 source provinces.";
+	}
 
-	sourceDefs->loadDefinitions(*configuration->getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
-	Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
-	targetDefs->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
-	Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/definition.csv"))
+	{
+		auto definitions = std::make_shared<Definitions>();
+		definitions->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
+		targetDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
+	}
+	else
+	{
+		targetDefs = std::make_shared<Vic3Definitions>();
+		Log(LogLevel::Info) << "Loaded Vic3 target provinces.";
+	}
 
 	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
@@ -572,8 +592,13 @@ void MainFrame::onToggleProvince(const wxCommandEvent& evt)
 	// 2. toggling a province without active link, thus creating one.
 	// In the second case we need to update quite a lot of things.
 
-	const auto ID = std::abs(evt.GetInt());
-	const auto sourceImage = evt.GetInt() > 0;
+	bool sourceImage = false;
+	auto ID = evt.GetString().ToStdString();
+	if (ID.starts_with('-'))
+	{
+		ID = ID.substr(1, ID.length());
+		sourceImage = true;
+	}
 
 	const auto newLinkID = linkMapper.toggleProvinceByID(ID, sourceImage);
 	if (!newLinkID)
@@ -609,7 +634,7 @@ void MainFrame::onCenterProvince(const wxCommandEvent& evt)
 		selector = ImageTabSelector::SOURCE;
 	else
 		selector = ImageTabSelector::TARGET;
-	imageFrame->centerProvince(selector, evt.GetInt());
+	imageFrame->centerProvince(selector, evt.GetString().ToStdString());
 }
 
 void MainFrame::onAddComment(const wxCommandEvent& evt)

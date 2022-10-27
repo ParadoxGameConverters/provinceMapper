@@ -1,5 +1,6 @@
 #ifndef LINK_MAPPING_H
 #define LINK_MAPPING_H
+#include "Definitions/DefinitionsInterface.h"
 #include "Parser.h"
 
 enum class Mapping
@@ -9,27 +10,26 @@ enum class Mapping
 	FAIL
 };
 struct Province;
-class Definitions;
 class LinkMapping: commonItems::parser
 {
   public:
 	LinkMapping() = default;
 	explicit LinkMapping(std::istream& theStream,
-		 std::shared_ptr<Definitions> theSourceDefs,
-		 std::shared_ptr<Definitions> theTargetDefs,
+		 std::shared_ptr<DefinitionsInterface> theSourceDefs,
+		 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 		 std::string theSourceToken,
 		 std::string theTargetToken,
 		 int theID);
-	explicit LinkMapping(std::shared_ptr<Definitions> theSourceDefs,
-		 std::shared_ptr<Definitions> theTargetDefs,
+	explicit LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
+		 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 		 std::string theSourceToken,
 		 std::string theTargetToken,
 		 int theID);
 
 	bool operator==(const LinkMapping& rhs) const;
 
-	[[nodiscard]] Mapping toggleSource(int sourceID);
-	[[nodiscard]] Mapping toggleTarget(int targetID);
+	[[nodiscard]] Mapping toggleSource(const std::string& sourceID);
+	[[nodiscard]] Mapping toggleTarget(const std::string& targetID);
 
 	void setComment(const std::string& theComment) { comment = theComment; }
 
@@ -47,8 +47,8 @@ class LinkMapping: commonItems::parser
 	std::vector<std::shared_ptr<Province>> sources;
 	std::vector<std::shared_ptr<Province>> targets;
 	std::optional<std::string> comment;
-	std::shared_ptr<Definitions> sourceDefs;
-	std::shared_ptr<Definitions> targetDefs;
+	std::shared_ptr<DefinitionsInterface> sourceDefs;
+	std::shared_ptr<DefinitionsInterface> targetDefs;
 	std::string sourceToken;
 	std::string targetToken;
 };
