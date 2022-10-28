@@ -1,5 +1,4 @@
 #include "ImageCanvas.h"
-//#include "Definitions/Definitions.h"
 #include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
