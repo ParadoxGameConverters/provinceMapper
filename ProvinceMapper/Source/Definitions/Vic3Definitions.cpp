@@ -22,6 +22,7 @@ void Vic3Definitions::registerPixel(int x, int y, unsigned char r, unsigned char
 		auto new_province = std::make_shared<Province>(id.str(), r, g, b, "");
 		new_province->innerPixels.emplace_back(pixel);
 		chromaCache.emplace(pixelPack(r, g, b), new_province);
+		provinces.emplace(id.str(), new_province);
 	}
 }
 
@@ -41,6 +42,7 @@ void Vic3Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigne
 		auto new_province = std::make_shared<Province>(id.str(), r, g, b, "");
 		new_province->borderPixels.emplace_back(pixel);
 		chromaCache.emplace(pixelPack(r, g, b), new_province);
+		provinces.emplace(id.str(), new_province);
 	}
 }
 

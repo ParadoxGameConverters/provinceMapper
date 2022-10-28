@@ -592,12 +592,12 @@ void MainFrame::onToggleProvince(const wxCommandEvent& evt)
 	// 2. toggling a province without active link, thus creating one.
 	// In the second case we need to update quite a lot of things.
 
-	bool sourceImage = false;
+	bool sourceImage = true;
 	auto ID = evt.GetString().ToStdString();
 	if (ID.starts_with('-'))
 	{
 		ID = ID.substr(1, ID.length());
-		sourceImage = true;
+		sourceImage = false;
 	}
 
 	const auto newLinkID = linkMapper.toggleProvinceByID(ID, sourceImage);
