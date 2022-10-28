@@ -10,7 +10,7 @@
 class PixelReader final: public wxThread
 {
   public:
-	PixelReader(wxEvtHandler* parent): wxThread(wxTHREAD_DETACHED), eventHandler(parent) {}
+	PixelReader(wxEvtHandler* parent): wxThread(wxTHREAD_JOINABLE), eventHandler(parent) {}
 	void prepare(wxImage* theImage, const std::shared_ptr<DefinitionsInterface>& theDefinitions)
 	{
 		image = theImage;

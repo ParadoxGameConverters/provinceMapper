@@ -314,10 +314,6 @@ void MainFrame::initImageFrame()
 		Log(LogLevel::Info) << "Loaded Vic3 target provinces.";
 	}
 
-	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
-	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
-	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
-
 	// Import pixels.
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
@@ -358,6 +354,13 @@ void MainFrame::initImageFrame()
 	pixelReader2->prepare(targetImg, targetDefs);
 	pixelReader2->Create();
 	pixelReader2->Run();
+
+	pixelReader->Wait();
+	pixelReader2->Wait();
+
+	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
+	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
+	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
 	auto position = wxDefaultPosition;
 	if (configuration->getImageFramePos())
