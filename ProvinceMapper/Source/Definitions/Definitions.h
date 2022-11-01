@@ -12,6 +12,7 @@ class Definitions: public DefinitionsInterface
 {
   public:
 	void loadDefinitions(const std::string& fileName, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType);
+	void loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType) override;
 
 	void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) override;
 	void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) override;

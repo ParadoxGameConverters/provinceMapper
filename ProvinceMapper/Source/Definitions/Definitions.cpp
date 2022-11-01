@@ -166,3 +166,14 @@ std::shared_ptr<Province> Definitions::getProvinceForID(const std::string& ID)
 	else
 		return nullptr;
 }
+
+void Definitions::loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
+{
+	for (const auto& [id, province]: provinces)
+	{
+		if (locType == LocalizationMapper::LocType::SOURCE && localizationMapper.getLocForSourceKey(id))
+			province->locName = *localizationMapper.getLocForSourceKey(id);
+		if (locType == LocalizationMapper::LocType::TARGET && localizationMapper.getLocForTargetKey(id))
+			province->locName = *localizationMapper.getLocForTargetKey(id);
+	}
+}

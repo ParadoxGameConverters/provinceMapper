@@ -13,6 +13,7 @@ class Vic3Definitions: public DefinitionsInterface
 
 	void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) override;
 	void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) override;
+	void loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType) override;
 
 	[[nodiscard]] std::optional<std::string> getNameForChroma(int chroma) override;
 	[[nodiscard]] std::optional<std::string> getIDForChroma(int chroma) override;

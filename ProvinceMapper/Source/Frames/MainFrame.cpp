@@ -288,6 +288,8 @@ void MainFrame::initImageFrame()
 	localizationMapper.scrapeTargetDir(*configuration->getTargetDir());
 	Log(LogLevel::Info) << "Target Localizations Loaded.";
 
+	std::optional<LocalizationMapper::LocType> vic3SideloadStates;
+
 	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/definition.csv"))
 	{
 		auto definitions = std::make_shared<Definitions>();
@@ -298,6 +300,7 @@ void MainFrame::initImageFrame()
 	else
 	{
 		sourceDefs = std::make_shared<Vic3Definitions>();
+		vic3SideloadStates = LocalizationMapper::LocType::SOURCE;
 		Log(LogLevel::Info) << "Loaded Vic3 source provinces.";
 	}
 
@@ -311,6 +314,7 @@ void MainFrame::initImageFrame()
 	else
 	{
 		targetDefs = std::make_shared<Vic3Definitions>();
+		vic3SideloadStates = LocalizationMapper::LocType::TARGET;
 		Log(LogLevel::Info) << "Loaded Vic3 target provinces.";
 	}
 
@@ -357,6 +361,11 @@ void MainFrame::initImageFrame()
 
 	pixelReader->Wait();
 	pixelReader2->Wait();
+
+	if (vic3SideloadStates == LocalizationMapper::LocType::SOURCE)
+		sourceDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::SOURCE);
+	else if (vic3SideloadStates == LocalizationMapper::LocType::TARGET)
+		targetDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::TARGET);
 
 	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();

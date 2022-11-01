@@ -37,6 +37,8 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\CsvScraper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\LocalizationMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraping.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\YmlScraper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
@@ -69,6 +71,8 @@
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\CsvScraper.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\LocalizationMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraping.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\YmlScraper.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />
