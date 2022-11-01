@@ -79,7 +79,7 @@ void MainFrame::initFrame()
 		 new wxDirPickerCtrl(holderPanel, 0, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	sourceDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	sourceDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	reverseSourceCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	reverseSourceCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE, wxDefaultValidator);
 	if (configuration->isSourceReversed())
 		reverseSourceCheck->SetValue(true);
 	reverseSourceCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
@@ -101,7 +101,7 @@ void MainFrame::initFrame()
 		 new wxDirPickerCtrl(holderPanel, 1, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	targetDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	targetDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	reverseTargetCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	reverseTargetCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE, wxDefaultValidator);
 	if (configuration->isTargetReversed())
 		reverseTargetCheck->SetValue(true);
 	reverseTargetCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
