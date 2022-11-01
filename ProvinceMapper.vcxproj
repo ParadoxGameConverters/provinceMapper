@@ -21,6 +21,7 @@
     <ClCompile Include="commonItems\WinUtils.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\StatusBar.cpp" />
@@ -51,6 +52,8 @@
     <ClInclude Include="commonItems\StringUtils.h" />
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\StatusBar.h" />

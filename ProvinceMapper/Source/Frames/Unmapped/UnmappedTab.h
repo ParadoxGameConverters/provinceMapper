@@ -14,14 +14,14 @@ enum class ImageTabSelector;
 class LinkMappingVersion;
 class Province;
 class LinkMapping;
-class UnmappedTab final : public wxNotebookPage
+class UnmappedTab final: public wxNotebookPage
 {
   public:
 	UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion, ImageTabSelector theSelector);
 	void redrawGrid();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& theVersion) { version = theVersion; }
-	void removeProvince(int ID);
-	void addProvince(int ID);
+	void removeProvince(const std::string& ID);
+	void addProvince(const std::string& ID);
 
   private:
 	void onKeyDown(wxKeyEvent& event);
@@ -45,7 +45,7 @@ class UnmappedTab final : public wxNotebookPage
 	ImageTabSelector selector;
 
 	std::shared_ptr<LinkMappingVersion> version;
-	std::map<int, int> provinceRows; // province/row
+	std::map<std::string, int> provinceRows; // province/row
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

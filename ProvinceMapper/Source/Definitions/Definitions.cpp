@@ -4,6 +4,51 @@
 #include "Provinces/Province.h"
 #include <fstream>
 
+
+
+namespace
+{
+
+std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned char, std::string>> parseLine(const std::string& line)
+{
+	try
+	{
+		auto sepLoc = line.find(';');
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto sepLocSave = sepLoc;
+		auto ID = line.substr(0, sepLoc);
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+		sepLocSave = sepLoc;
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+		sepLocSave = sepLoc;
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
+		sepLocSave = sepLoc;
+		sepLoc = line.find(';', sepLocSave + 1);
+		if (sepLoc == std::string::npos)
+			return std::nullopt;
+		auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+		return std::make_tuple(ID, r, g, b, mapDataName);
+	}
+	catch (std::exception& e)
+	{
+		Log(LogLevel::Warning) << "Broken Definition Line: " << line << " - " << e.what();
+		return std::nullopt;
+	}
+}
+
+} // namespace
+
+
 void Definitions::loadDefinitions(const std::string& fileName, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
 	if (!commonItems::DoesFileExist(fileName))
@@ -35,7 +80,7 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 				if (locType == LocalizationMapper::LocType::SOURCE)
 				{
 					// can we get a locname? Probe for PROV first.
-					auto locName = localizationMapper.getLocForSourceKey("PROV" + std::to_string(ID));
+					auto locName = localizationMapper.getLocForSourceKey("PROV" + ID);
 					if (locName && !locName->empty())
 					{
 						province->locName = locName;
@@ -51,7 +96,7 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 				else
 				{
 					// ditto for the other defs.
-					auto locName = localizationMapper.getLocForTargetKey("PROV" + std::to_string(ID));
+					auto locName = localizationMapper.getLocForTargetKey("PROV" + ID);
 					if (locName && !locName->empty())
 					{
 						province->locName = locName;
@@ -71,43 +116,6 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 		{
 			throw std::runtime_error("Line: |" + line + "| is unparseable! Breaking. (" + e.what() + ")");
 		}
-	}
-}
-
-std::optional<std::tuple<int, unsigned char, unsigned char, unsigned char, std::string>> Definitions::parseLine(const std::string& line) const
-{
-	try
-	{
-		auto sepLoc = line.find(';');
-		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto sepLocSave = sepLoc;
-		auto ID = std::stoi(line.substr(0, sepLoc));
-		sepLoc = line.find(';', sepLocSave + 1);
-		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto r = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-		sepLocSave = sepLoc;
-		sepLoc = line.find(';', sepLocSave + 1);
-		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto g = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-		sepLocSave = sepLoc;
-		sepLoc = line.find(';', sepLocSave + 1);
-		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
-		sepLocSave = sepLoc;
-		sepLoc = line.find(';', sepLocSave + 1);
-		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
-		return std::make_tuple(ID, r, g, b, mapDataName);
-	}
-	catch (std::exception& e)
-	{
-		Log(LogLevel::Warning) << "Broken Definition Line: " << line << " - " << e.what();
-		return std::nullopt;
 	}
 }
 
@@ -135,7 +143,7 @@ std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 		return std::nullopt;
 }
 
-std::optional<int> Definitions::getIDForChroma(const int chroma)
+std::optional<std::string> Definitions::getIDForChroma(const int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
 		return chromaCacheItr->second->ID;
@@ -151,7 +159,7 @@ std::shared_ptr<Province> Definitions::getProvinceForChroma(const int chroma)
 		return nullptr;
 }
 
-std::shared_ptr<Province> Definitions::getProvinceForID(const int ID)
+std::shared_ptr<Province> Definitions::getProvinceForID(const std::string& ID)
 {
 	if (const auto& provinceItr = provinces.find(ID); provinceItr != provinces.end())
 		return provinceItr->second;

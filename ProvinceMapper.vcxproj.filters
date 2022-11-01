@@ -129,6 +129,9 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedTab.cpp">
       <Filter>ProvinceMapper\Frames\Unmapped</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Definitions.cpp">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -214,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedTab.h">
       <Filter>ProvinceMapper\Frames\Unmapped</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Definitions.h">
+      <Filter>ProvinceMapper\Definitions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

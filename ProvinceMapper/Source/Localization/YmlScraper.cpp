@@ -20,7 +20,7 @@ void YmlScraper::scrapeStream(std::istream& theStream)
 	while (!theStream.eof())
 	{
 		getline(theStream, line);
-		if (line[0] == '#' || line[1] == '#' || line.length() < 4)
+		if (line.length() < 4 || line[0] == '#' || line[1] == '#')
 			continue;
 
 		const auto sepLoc = line.find(':');

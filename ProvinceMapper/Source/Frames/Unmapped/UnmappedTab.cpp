@@ -52,7 +52,7 @@ void UnmappedTab::redrawGrid()
 	for (const auto& province: getRelevantProvinces())
 	{
 		const auto bgColor = wxColour(240, 240, 240);
-		const auto name = std::to_string(province->ID) + " - " + province->bespokeName();
+		const auto name = province->ID + " - " + province->bespokeName();
 		theGrid->AppendRows(1, false);
 		provinceRows.insert(std::pair(province->ID, rowCounter));
 		theGrid->SetRowSize(rowCounter, 20);
@@ -88,7 +88,7 @@ void UnmappedTab::leftUp(const wxGridEvent& event)
 	if (row < static_cast<int>(getRelevantProvinces().size()))
 	{
 		auto centerEvt = wxCommandEvent(wxEVT_PROVINCE_CENTER_MAP);
-		centerEvt.SetInt(getRelevantProvinces().at(row)->ID);
+		centerEvt.SetString(getRelevantProvinces().at(row)->ID);
 		if (selector == ImageTabSelector::SOURCE)
 			centerEvt.SetId(0);
 		else
@@ -186,7 +186,7 @@ void UnmappedTab::stageMoveVersionRight() const
 	eventListener->QueueEvent(evt->Clone());
 }
 
-void UnmappedTab::removeProvince(const int ID)
+void UnmappedTab::removeProvince(const std::string& ID)
 {
 	if (const auto& provinceRowItr = provinceRows.find(ID); provinceRowItr != provinceRows.end())
 	{
@@ -201,14 +201,14 @@ void UnmappedTab::removeProvince(const int ID)
 	}
 }
 
-void UnmappedTab::addProvince(int ID)
+void UnmappedTab::addProvince(const std::string& ID)
 {
 	for (const auto& province: getRelevantProvinces())
 	{
 		if (province->ID == ID)
 		{
 			const auto bgColor = wxColour(240, 240, 240);
-			const auto name = std::to_string(province->ID) + " - " + province->bespokeName();
+			const auto name = province->ID + " - " + province->bespokeName();
 			auto currentRow = theGrid->GetNumberRows();
 			theGrid->AppendRows(1);
 			provinceRows.insert(std::pair(province->ID, currentRow));

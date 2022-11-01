@@ -8,7 +8,7 @@
 class Configuration;
 class LinkMappingVersion;
 class UnmappedTab;
-class UnmappedFrame final : public wxFrame
+class UnmappedFrame final: public wxFrame
 {
   public:
 	UnmappedFrame(wxWindow* parent,
@@ -18,8 +18,8 @@ class UnmappedFrame final : public wxFrame
 		 std::shared_ptr<Configuration> theConfiguration);
 
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) const;
-	void removeProvince(int ID, bool sourceTab);
-	void addProvince(int ID, bool sourceTab);
+	void removeProvince(const std::string& ID, bool sourceTab);
+	void addProvince(const std::string& ID, bool sourceTab);
 	void refreshList() const;
 
   private:
