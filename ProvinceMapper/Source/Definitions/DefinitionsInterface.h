@@ -18,6 +18,7 @@ class DefinitionsInterface
   public:
 	virtual void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) = 0;
 	virtual void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) = 0;
+	virtual void loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType) = 0;
 
 	[[nodiscard]] const auto& getProvinces() const { return provinces; }
 	[[nodiscard]] virtual std::optional<std::string> getNameForChroma(int chroma) = 0;

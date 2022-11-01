@@ -1,18 +1,20 @@
 #include "LocalizationMapper.h"
 #include "CsvScraper.h"
 #include "OSCompatibilityLayer.h"
+#include "Vic3StateRegionScraper.h"
 #include "YmlScraper.h"
-#include <fstream>
 
 void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 {
 	std::string actualPath;
 	// our dirpath is a path to the map folder. locs are elsewhere.
-	if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
+	if (commonItems::DoesFolderExist(dirPath + "/state_regions")) // vic3
+		actualPath = dirPath + "/state_regions";
+	else if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
 		actualPath = dirPath + "/../localisation";
-	if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
+	else if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
 		actualPath = dirPath + "/../localization/english";
-	if (actualPath.empty())
+	else if (actualPath.empty())
 		return;
 
 	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
@@ -22,11 +24,13 @@ void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 void LocalizationMapper::scrapeTargetDir(const std::string& dirPath)
 {
 	std::string actualPath;
-	if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
+	if (commonItems::DoesFolderExist(dirPath + "/state_regions")) // vic3
+		actualPath = dirPath + "/state_regions";
+	else if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
 		actualPath = dirPath + "/../localisation";
-	if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
+	else if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
 		actualPath = dirPath + "/../localization/english";
-	if (actualPath.empty())
+	else if (actualPath.empty())
 		return;
 
 	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
@@ -46,6 +50,14 @@ void LocalizationMapper::scrapeFile(const std::string& filePath, LocType locType
 	else if (filePath.find(".yml") != std::string::npos)
 	{
 		const auto locs = YmlScraper(filePath).getLocalizations();
+		if (locType == LocType::SOURCE)
+			sourceLocalizations.insert(locs.begin(), locs.end());
+		else
+			targetLocalizations.insert(locs.begin(), locs.end());
+	}
+	else if (filePath.find(".txt") != std::string::npos)
+	{
+		const auto locs = Vic3StateRegionScraper(filePath).getLocalizations();
 		if (locType == LocType::SOURCE)
 			sourceLocalizations.insert(locs.begin(), locs.end());
 		else

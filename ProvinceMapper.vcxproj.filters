@@ -132,6 +132,12 @@
     <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Definitions.cpp">
       <Filter>ProvinceMapper\Definitions</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.cpp">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraping.cpp">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -223,6 +229,12 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Definitions.h">
       <Filter>ProvinceMapper\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.h">
+      <Filter>ProvinceMapper\Localization</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraping.h">
+      <Filter>ProvinceMapper\Localization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
