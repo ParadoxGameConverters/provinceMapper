@@ -31,13 +31,21 @@ LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
 void LinkMapping::registerKeys()
 {
 	registerKeyword(sourceToken, [this](std::istream& theStream) {
-		const auto id = commonItems::getString(theStream);
+		auto id = commonItems::getString(theStream);
+		if (id.substr(0, 2) == "0x")
+		{
+			id = id.substr(1, id.length());
+		}
 		const auto& provinces = sourceDefs->getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
 	registerKeyword(targetToken, [this](std::istream& theStream) {
-		const auto id = commonItems::getString(theStream);
+		auto id = commonItems::getString(theStream);
+		if (id.substr(0, 2) == "0x")
+		{
+			id = id.substr(1, id.length());
+		}
 		const auto& provinces = targetDefs->getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			targets.emplace_back(provItr->second);
