@@ -18,7 +18,7 @@ void Vic3Definitions::registerPixel(int x, int y, unsigned char r, unsigned char
 	else
 	{
 		std::stringstream id;
-		id << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(r) << std::setw(2) << std::setfill('0')
+		id << "x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(r) << std::setw(2) << std::setfill('0')
 			<< static_cast<int>(g) << std::setw(2) << std::setfill('0') << static_cast<int>(b);
 		auto new_province = std::make_shared<Province>(id.str(), r, g, b, id.str());
 		new_province->innerPixels.emplace_back(pixel);
@@ -39,7 +39,7 @@ void Vic3Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigne
 	else
 	{
 		std::stringstream id;
-		id << "0x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(r) << std::setw(2) << std::setfill('0')
+		id << "x" << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(r) << std::setw(2) << std::setfill('0')
 			<< static_cast<int>(g) << std::setw(2) << std::setfill('0') << static_cast<int>(b);
 		auto new_province = std::make_shared<Province>(id.str(), r, g, b, id.str());
 		new_province->borderPixels.emplace_back(pixel);
@@ -94,11 +94,17 @@ std::shared_ptr<Province> Vic3Definitions::getProvinceForID(const std::string& I
 	{
 		return province_itr->second;
 	}
-	else
+	else if (ID.starts_with('0'))
 	{
-		return nullptr;
+		if (const auto& province_itr = provinces.find(ID.substr(1, ID.length())); province_itr != provinces.end())
+		{
+			return province_itr->second;
+		}
 	}
+
+	return nullptr;
 }
+
 
 void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
