@@ -21,7 +21,7 @@ void Vic3StateRegionScraping::registerKeys()
 			if (theProvince.starts_with("X"))
 				theProvince = "x" + theProvince.substr(1, theProvince.length() - 1);
 			if (theProvince.starts_with("0X"))
-				theProvince = "x" + theProvince.substr(1, theProvince.length() - 1);
+				theProvince = "x" + theProvince.substr(2, theProvince.length() - 2);
 			provinces.insert(theProvince); // from "0x12345a" to x12345A
 		}
 	});
