@@ -20,9 +20,9 @@ void Vic3StateRegionScraping::registerKeys()
 			std::transform(theProvince.begin(), theProvince.end(), theProvince.begin(), ::toupper);
 			if (theProvince.starts_with("X"))
 				theProvince = "x" + theProvince.substr(1, theProvince.length() - 1);
-			if (theProvince.starts_with("x"))
-				theProvince = "0" + theProvince;
-			provinces.insert(theProvince); // from "x12345a" to 0x12345A
+			if (theProvince.starts_with("0X"))
+				theProvince = "x" + theProvince.substr(2, theProvince.length() - 2);
+			provinces.insert(theProvince); // from "0x12345a" to x12345A
 		}
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
