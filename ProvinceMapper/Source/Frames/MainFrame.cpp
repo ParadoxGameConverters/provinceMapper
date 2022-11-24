@@ -307,7 +307,7 @@ void MainFrame::initImageFrame()
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/definition.csv"))
 	{
 		auto definitions = std::make_shared<Definitions>();
-		definitions->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
+		definitions->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
 		targetDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 	}
