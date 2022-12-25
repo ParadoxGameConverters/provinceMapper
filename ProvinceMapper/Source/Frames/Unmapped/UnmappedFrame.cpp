@@ -115,7 +115,7 @@ void UnmappedFrame::onChangeTab(wxBookCtrlEvent& event)
 	// Capture this event so it doesn't get mistaken for change active version event from LinksFrame.
 }
 
-void UnmappedFrame::removeProvince(const int ID, const bool sourceTab)
+void UnmappedFrame::removeProvince(const std::string& ID, const bool sourceTab)
 {
 	if (sourceTab)
 		sources->removeProvince(ID);
@@ -123,7 +123,7 @@ void UnmappedFrame::removeProvince(const int ID, const bool sourceTab)
 		targets->removeProvince(ID);
 }
 
-void UnmappedFrame::addProvince(const int ID, const bool sourceTab)
+void UnmappedFrame::addProvince(const std::string& ID, const bool sourceTab)
 {
 	if (sourceTab)
 		sources->addProvince(ID);
@@ -134,9 +134,9 @@ void UnmappedFrame::addProvince(const int ID, const bool sourceTab)
 void UnmappedFrame::onUpdateProvinceCount(const wxCommandEvent& event)
 {
 	if (event.GetId() == 0)
-		notebook->SetPageText(0, "Source Provinces (" + std::to_string(event.GetInt()) + ")");
+		notebook->SetPageText(0, "Source Provinces (" + event.GetString() + ")");
 	else
-		notebook->SetPageText(1, "Target Provinces (" + std::to_string(event.GetInt()) + ")");
+		notebook->SetPageText(1, "Target Provinces (" + event.GetString() + ")");
 }
 
 void UnmappedFrame::refreshList() const

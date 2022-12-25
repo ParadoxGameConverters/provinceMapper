@@ -7,7 +7,7 @@
 
 struct Province
 {
-	Province(int theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);
+	Province(std::string theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);
 
 	[[nodiscard]] std::string bespokeName() const;
 
@@ -16,7 +16,7 @@ struct Province
 	bool operator<(const Province& rhs) const;
 	bool operator!=(const Province& rhs) const;
 
-	int ID = 0;
+	std::string ID;
 	mutable unsigned char r = 0; // canonical values for color, they may differ from actual pixel colors.
 	mutable unsigned char g = 0;
 	mutable unsigned char b = 0;

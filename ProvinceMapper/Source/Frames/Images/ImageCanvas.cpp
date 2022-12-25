@@ -1,5 +1,4 @@
 #include "ImageCanvas.h"
-#include "Definitions/Definitions.h"
 #include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
@@ -18,7 +17,7 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 	 wxImage* theImage,
-	 std::shared_ptr<Definitions> theDefinitions):
+	 std::shared_ptr<DefinitionsInterface> theDefinitions):
 	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL),
 	 definitions(std::move(theDefinitions)), eventHandler(parent)
 {
@@ -393,22 +392,21 @@ void ImageCanvas::selectLink(const int linkID) const
 	eventHandler->QueueEvent(evt->Clone());
 }
 
-void ImageCanvas::stageToggleProvinceByID(const int provinceID) const
+void ImageCanvas::stageToggleProvinceByID(const std::string& provinceID) const
 {
 	wxCommandEvent evt(wxEVT_TOGGLE_PROVINCE);
 
 	// We have a single Int as a common data field, so, be creative with least fuss.
-	// Fortunately there are no provinces with ID 0 in any of PDX games.
 	if (selector == ImageTabSelector::SOURCE)
-		evt.SetInt(provinceID);
+		evt.SetString(provinceID);
 	else if (selector == ImageTabSelector::TARGET)
-		evt.SetInt(-provinceID);
+		evt.SetString('-' + provinceID);
 
 	// Notify authorities.
 	eventHandler->QueueEvent(evt.Clone());
 }
 
-void ImageCanvas::toggleProvinceByID(const int ID)
+void ImageCanvas::toggleProvinceByID(const std::string& ID)
 {
 	if (!activeLink)
 		return;
@@ -456,7 +454,7 @@ void ImageCanvas::HighlightProvinceIfInHighlightedRegion(const std::shared_ptr<P
 	}
 }
 
-void ImageCanvas::shadeProvinceByID(const int ID)
+void ImageCanvas::shadeProvinceByID(const std::string& ID)
 {
 	// this is called when we're marking a province outside of a working link. Often a preface to a new link being initialized.
 	// Irrelevant unless we're shading.
@@ -522,7 +520,7 @@ wxPoint ImageCanvas::GetCoordinatesForLink(const std::shared_ptr<LinkMapping>& l
 	return toReturn;
 }
 
-wxPoint ImageCanvas::locateProvinceCoordinates(const int ID) const
+wxPoint ImageCanvas::locateProvinceCoordinates(const std::string& ID) const
 {
 	auto toReturn = wxPoint(0, 0);
 	const auto& provinces = definitions->getProvinces();
@@ -761,7 +759,7 @@ std::string ImageCanvas::nameAtCoords(const wxPoint& point)
 		// poke the definitions for a chroma name.
 		const auto provID = definitions->getIDForChroma(chroma);
 		if (provID)
-			name = std::to_string(*provID) + " - ";
+			name = *provID + " - ";
 		const auto& provinceName = definitions->getNameForChroma(chroma);
 		if (provinceName)
 			name += *provinceName;

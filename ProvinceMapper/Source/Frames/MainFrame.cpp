@@ -1,5 +1,7 @@
 #include "MainFrame.h"
 #include "CommonFunctions.h"
+#include "Definitions/Definitions.h"
+#include "Definitions/Vic3Definitions.h"
 #include "Images/ImageCanvas.h"
 #include "Images/ImageFrame.h"
 #include "Links/DialogComment.h"
@@ -79,7 +81,7 @@ void MainFrame::initFrame()
 		 new wxDirPickerCtrl(holderPanel, 0, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	sourceDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	sourceDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	reverseSourceCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	reverseSourceCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE, wxDefaultValidator);
 	if (configuration->isSourceReversed())
 		reverseSourceCheck->SetValue(true);
 	reverseSourceCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
@@ -101,7 +103,7 @@ void MainFrame::initFrame()
 		 new wxDirPickerCtrl(holderPanel, 1, wxEmptyString, "BROWSE", wxDefaultPosition, wxSize(350, wxDefaultCoord), wxFLP_USE_TEXTCTRL | wxFLP_SMALL);
 	targetDirPicker->Bind(wxEVT_DIRPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	targetDirStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	reverseTargetCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxEXPAND, wxDefaultValidator);
+	reverseTargetCheck = new wxCheckBox(holderPanel, 0, "Reverse?", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE, wxDefaultValidator);
 	if (configuration->isTargetReversed())
 		reverseTargetCheck->SetValue(true);
 	reverseTargetCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
@@ -288,17 +290,35 @@ void MainFrame::initImageFrame()
 	localizationMapper.scrapeTargetDir(*configuration->getTargetDir());
 	Log(LogLevel::Info) << "Target Localizations Loaded.";
 
-	sourceDefs = std::make_shared<Definitions>();
-	targetDefs = std::make_shared<Definitions>();
+	std::optional<LocalizationMapper::LocType> vic3SideloadStates;
 
-	sourceDefs->loadDefinitions(*configuration->getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
-	Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
-	targetDefs->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
-	Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/definition.csv"))
+	{
+		auto definitions = std::make_shared<Definitions>();
+		definitions->loadDefinitions(*configuration->getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
+		sourceDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
+	}
+	else
+	{
+		sourceDefs = std::make_shared<Vic3Definitions>();
+		vic3SideloadStates = LocalizationMapper::LocType::SOURCE;
+		Log(LogLevel::Info) << "Loaded Vic3 source provinces.";
+	}
 
-	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
-	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
-	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/definition.csv"))
+	{
+		auto definitions = std::make_shared<Definitions>();
+		definitions->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
+		targetDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
+	}
+	else
+	{
+		targetDefs = std::make_shared<Vic3Definitions>();
+		vic3SideloadStates = LocalizationMapper::LocType::TARGET;
+		Log(LogLevel::Info) << "Loaded Vic3 target provinces.";
+	}
 
 	// Import pixels.
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
@@ -340,6 +360,18 @@ void MainFrame::initImageFrame()
 	pixelReader2->prepare(targetImg, targetDefs);
 	pixelReader2->Create();
 	pixelReader2->Run();
+
+	pixelReader->Wait();
+	pixelReader2->Wait();
+
+	if (vic3SideloadStates == LocalizationMapper::LocType::SOURCE)
+		sourceDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::SOURCE);
+	else if (vic3SideloadStates == LocalizationMapper::LocType::TARGET)
+		targetDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::TARGET);
+
+	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
+	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
+	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
 	auto position = wxDefaultPosition;
 	if (configuration->getImageFramePos())
@@ -585,8 +617,13 @@ void MainFrame::onToggleProvince(const wxCommandEvent& evt)
 	// 2. toggling a province without active link, thus creating one.
 	// In the second case we need to update quite a lot of things.
 
-	const auto ID = std::abs(evt.GetInt());
-	const auto sourceImage = evt.GetInt() > 0;
+	bool sourceImage = true;
+	auto ID = evt.GetString().ToStdString();
+	if (ID.starts_with('-'))
+	{
+		ID = ID.substr(1, ID.length());
+		sourceImage = false;
+	}
 
 	const auto newLinkID = linkMapper.toggleProvinceByID(ID, sourceImage);
 	if (!newLinkID)
@@ -622,7 +659,7 @@ void MainFrame::onCenterProvince(const wxCommandEvent& evt)
 		selector = ImageTabSelector::SOURCE;
 	else
 		selector = ImageTabSelector::TARGET;
-	imageFrame->centerProvince(selector, evt.GetInt());
+	imageFrame->centerProvince(selector, evt.GetString().ToStdString());
 }
 
 void MainFrame::onAddComment(const wxCommandEvent& evt)

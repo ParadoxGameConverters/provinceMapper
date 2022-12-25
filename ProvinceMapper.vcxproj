@@ -21,6 +21,7 @@
     <ClCompile Include="commonItems\WinUtils.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\StatusBar.cpp" />
@@ -36,6 +37,8 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\CsvScraper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\LocalizationMapper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraping.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\YmlScraper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
@@ -51,6 +54,8 @@
     <ClInclude Include="commonItems\StringUtils.h" />
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\StatusBar.h" />
@@ -66,6 +71,8 @@
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\CsvScraper.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\LocalizationMapper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.h" />
+    <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraping.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\YmlScraper.h" />
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />

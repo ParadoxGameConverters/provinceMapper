@@ -3,6 +3,7 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "Definitions/DefinitionsInterface.h"
 #include "Provinces/Pixel.h"
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
@@ -31,7 +32,7 @@ class ImageCanvas: public wxScrolledCanvas
 		 ImageTabSelector theSelector,
 		 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 		 wxImage* theImage,
-		 std::shared_ptr<Definitions> theDefinitions);
+		 std::shared_ptr<DefinitionsInterface> theDefinitions);
 
 	[[nodiscard]] auto getHeight() const { return height; }
 	[[nodiscard]] auto getWidth() const { return width; }
@@ -40,7 +41,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
 	[[nodiscard]] wxPoint GetCoordinatesForLink(const std::shared_ptr<LinkMapping>& link) const;
-	[[nodiscard]] wxPoint locateProvinceCoordinates(int ID) const;
+	[[nodiscard]] wxPoint locateProvinceCoordinates(const std::string& ID) const;
 	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
 	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
@@ -71,9 +72,9 @@ class ImageCanvas: public wxScrolledCanvas
 	void deactivateLink();
 	void highlightRegionByCommentRow(int row);
 	void clearRegionHighlight();
-	void toggleProvinceByID(int ID);
+	void toggleProvinceByID(const std::string& ID);
 	void HighlightProvinceIfInHighlightedRegion(const std::shared_ptr<Province>& province);
-	void shadeProvinceByID(int ID);
+	void shadeProvinceByID(const std::string& ID);
 	[[nodiscard]] wxPoint locateActiveLinkCoordinates() const;
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
@@ -90,7 +91,7 @@ class ImageCanvas: public wxScrolledCanvas
 
 	void stageAddComment();
 	void stageDeleteLink() const;
-	void stageToggleProvinceByID(int provinceID) const;
+	void stageToggleProvinceByID(const std::string& provinceID) const;
 	void strafeProvinces();
 	void strafeProvince(const std::shared_ptr<Province>& province);
 	void highlightProvinces(const std::shared_ptr<LinkMapping>& linkToHighlight);
@@ -135,7 +136,7 @@ class ImageCanvas: public wxScrolledCanvas
 	std::vector<std::shared_ptr<LinkMapping>> highlightedLinks;
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
-	std::shared_ptr<Definitions> definitions;
+	std::shared_ptr<DefinitionsInterface> definitions;
 	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;

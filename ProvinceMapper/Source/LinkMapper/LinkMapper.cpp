@@ -1,14 +1,13 @@
 #include "LinkMapper.h"
-#include "Definitions/Definitions.h"
-#include "Provinces/Province.h"
+#include "CommonRegexes.h"
 #include "Log.h"
 #include "ParserHelpers.h"
-#include "CommonRegexes.h"
+#include "Provinces/Province.h"
 #include <fstream>
 
 void LinkMapper::loadMappings(const std::string& linksFileString,
-	 std::shared_ptr<Definitions> theSourceDefs,
-	 std::shared_ptr<Definitions> theTargetDefs,
+	 std::shared_ptr<DefinitionsInterface> theSourceDefs,
+	 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 	 std::string theSourceToken,
 	 std::string theTargetToken)
 {
@@ -70,7 +69,7 @@ void LinkMapper::activateLinkByID(const int ID) const
 		activeVersion->activateLinkByID(ID);
 }
 
-std::optional<int> LinkMapper::toggleProvinceByID(const int provinceID, const bool isSource) const
+std::optional<int> LinkMapper::toggleProvinceByID(const std::string& provinceID, const bool isSource) const
 {
 	if (activeVersion)
 		return activeVersion->toggleProvinceByID(provinceID, isSource);
@@ -230,7 +229,7 @@ void LinkMapper::moveActiveVersionRight()
 	}
 }
 
-Mapping LinkMapper::isProvinceMapped(int provinceID, bool isSource) const
+Mapping LinkMapper::isProvinceMapped(const std::string& provinceID, bool isSource) const
 {
 	if (activeVersion)
 		return activeVersion->isProvinceMapped(provinceID, isSource);

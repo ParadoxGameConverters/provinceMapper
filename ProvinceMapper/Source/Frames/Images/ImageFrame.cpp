@@ -12,8 +12,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 	 wxImage* sourceImg,
 	 wxImage* targetImg,
-	 const std::shared_ptr<Definitions>& sourceDefs,
-	 const std::shared_ptr<Definitions>& targetDefs,
+	 const std::shared_ptr<DefinitionsInterface>& sourceDefs,
+	 const std::shared_ptr<DefinitionsInterface>& targetDefs,
 	 std::shared_ptr<Configuration> theConfiguration):
 	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
 	 configuration(std::move(theConfiguration)), eventHandler(parent)
@@ -359,7 +359,7 @@ void ImageFrame::clearRegionHighlight()
 	Refresh();
 }
 
-void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
+void ImageFrame::toggleProvinceByID(const std::string& ID, const bool sourceImage)
 {
 	if (sourceImage)
 	{
@@ -374,7 +374,7 @@ void ImageFrame::toggleProvinceByID(const int ID, const bool sourceImage)
 	Refresh();
 }
 
-void ImageFrame::shadeProvinceByID(const int ID, const bool sourceImage)
+void ImageFrame::shadeProvinceByID(const std::string& ID, bool sourceImage)
 {
 	if (sourceImage)
 	{
@@ -420,7 +420,7 @@ void ImageFrame::centerMap(const wxPoint srcCanvasPoint, const wxPoint targetCan
 	Refresh();
 }
 
-void ImageFrame::centerProvince(const ImageTabSelector selector, const int ID)
+void ImageFrame::centerProvince(ImageTabSelector selector, const std::string& ID)
 {
 	if (selector == ImageTabSelector::SOURCE)
 	{

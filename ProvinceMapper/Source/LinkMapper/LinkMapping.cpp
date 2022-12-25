@@ -1,13 +1,12 @@
 #include "LinkMapping.h"
-#include "Definitions/Definitions.h"
+#include "CommonRegexes.h"
 #include "Log.h"
 #include "ParserHelpers.h"
-#include "CommonRegexes.h"
 #include "Provinces/Province.h"
 
 LinkMapping::LinkMapping(std::istream& theStream,
-	 std::shared_ptr<Definitions> theSourceDefs,
-	 std::shared_ptr<Definitions> theTargetDefs,
+	 std::shared_ptr<DefinitionsInterface> theSourceDefs,
+	 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 	 std::string theSourceToken,
 	 std::string theTargetToken,
 	 const int theID):
@@ -19,8 +18,8 @@ LinkMapping::LinkMapping(std::istream& theStream,
 	clearRegisteredKeywords();
 }
 
-LinkMapping::LinkMapping(std::shared_ptr<Definitions> theSourceDefs,
-	 std::shared_ptr<Definitions> theTargetDefs,
+LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
+	 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 	 std::string theSourceToken,
 	 std::string theTargetToken,
 	 int theID):
@@ -32,13 +31,21 @@ LinkMapping::LinkMapping(std::shared_ptr<Definitions> theSourceDefs,
 void LinkMapping::registerKeys()
 {
 	registerKeyword(sourceToken, [this](std::istream& theStream) {
-		const auto id = commonItems::singleInt(theStream).getInt();
+		auto id = commonItems::getString(theStream);
+		if (id.substr(0, 2) == "0x")
+		{
+			id = id.substr(1, id.length());
+		}
 		const auto& provinces = sourceDefs->getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
 	registerKeyword(targetToken, [this](std::istream& theStream) {
-		const auto id = commonItems::singleInt(theStream).getInt();
+		auto id = commonItems::getString(theStream);
+		if (id.substr(0, 2) == "0x")
+		{
+			id = id.substr(1, id.length());
+		}
 		const auto& provinces = targetDefs->getProvinces();
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			targets.emplace_back(provItr->second);
@@ -113,7 +120,7 @@ std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
 	return output;
 }
 
-Mapping LinkMapping::toggleSource(const int sourceID)
+Mapping LinkMapping::toggleSource(const std::string& sourceID)
 {
 	std::vector<std::shared_ptr<Province>> replacement;
 	for (const auto& province: sources)
@@ -140,7 +147,7 @@ Mapping LinkMapping::toggleSource(const int sourceID)
 	}
 }
 
-Mapping LinkMapping::toggleTarget(const int targetID)
+Mapping LinkMapping::toggleTarget(const std::string& targetID)
 {
 	std::vector<std::shared_ptr<Province>> replacement;
 	for (const auto& province: targets)
