@@ -293,13 +293,14 @@ void MainFrame::initImageFrame()
 	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/definition.csv"))
 	{
 		auto definitions = std::make_shared<Definitions>();
-		definitions->loadDefinitions(*configuration->getSourceDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::SOURCE);
+		definitions->loadDefinitions(*configuration->getSourceDir(), localizationMapper, LocalizationMapper::LocType::SOURCE);
 		sourceDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
 	}
 	else
 	{
 		sourceDefs = std::make_shared<Vic3Definitions>();
+		sourceDefs->loadVic3Regions(*configuration->getSourceDir());
 		vic3SideloadStates = LocalizationMapper::LocType::SOURCE;
 		Log(LogLevel::Info) << "Loaded Vic3 source provinces.";
 	}
@@ -307,13 +308,14 @@ void MainFrame::initImageFrame()
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/definition.csv"))
 	{
 		auto definitions = std::make_shared<Definitions>();
-		definitions->loadDefinitions(*configuration->getTargetDir() + "/definition.csv", localizationMapper, LocalizationMapper::LocType::TARGET);
+		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
 		targetDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 	}
 	else
 	{
 		targetDefs = std::make_shared<Vic3Definitions>();
+		targetDefs->loadVic3Regions(*configuration->getTargetDir());
 		vic3SideloadStates = LocalizationMapper::LocType::TARGET;
 		Log(LogLevel::Info) << "Loaded Vic3 target provinces.";
 	}

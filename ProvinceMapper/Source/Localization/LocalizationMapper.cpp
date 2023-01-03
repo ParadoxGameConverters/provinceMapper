@@ -8,11 +8,17 @@ void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 {
 	std::string actualPath;
 	// our dirpath is a path to the map folder. locs are elsewhere.
-	if (commonItems::DoesFolderExist(dirPath + "/state_regions")) // vic3
+	if (commonItems::DoesFolderExist(dirPath + "/state_regions")) // vic3 scraping override
+	{
 		actualPath = dirPath + "/state_regions";
-	else if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
+		for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
+			scrapeFile(actualPath + "/" + fileName, LocType::SOURCE);
+		actualPath.clear();
+	}
+
+	if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
 		actualPath = dirPath + "/../localisation";
-	else if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
+	else if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp, vic3
 		actualPath = dirPath + "/../localization/english";
 	else if (actualPath.empty())
 		return;
@@ -24,11 +30,17 @@ void LocalizationMapper::scrapeSourceDir(const std::string& dirPath)
 void LocalizationMapper::scrapeTargetDir(const std::string& dirPath)
 {
 	std::string actualPath;
-	if (commonItems::DoesFolderExist(dirPath + "/state_regions")) // vic3
+	if (commonItems::DoesFolderExist(dirPath + "/state_regions")) // vic3 scraping override
+	{
 		actualPath = dirPath + "/state_regions";
-	else if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
+		for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
+			scrapeFile(actualPath + "/" + fileName, LocType::TARGET);
+		actualPath.clear();
+	}
+
+	if (commonItems::DoesFolderExist(dirPath + "/../localisation")) // ck2, eu4, vic2
 		actualPath = dirPath + "/../localisation";
-	else if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp
+	else if (commonItems::DoesFolderExist(dirPath + "/../localization/english")) // ck3, imp, vic3
 		actualPath = dirPath + "/../localization/english";
 	else if (actualPath.empty())
 		return;

@@ -643,6 +643,9 @@ std::string ImageCanvas::nameAtCoords(const wxPoint& point)
 			name += *provinceName;
 		else
 			name += "UNDEFINED";
+		const auto& miscInfo = definitions->getMiscForChroma(chroma);
+		if (miscInfo)
+			name += *miscInfo;
 		tooltipCache = std::pair(chroma, name);
 	}
 	return name;

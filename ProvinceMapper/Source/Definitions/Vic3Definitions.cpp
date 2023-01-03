@@ -61,6 +61,17 @@ std::optional<std::string> Vic3Definitions::getNameForChroma(const int chroma)
 	}
 }
 
+std::optional<std::string> Vic3Definitions::getMiscForChroma(const int chroma)
+{
+	if (const auto& chroma_cache_itr = chromaCache.find(chroma); chroma_cache_itr != chromaCache.end())
+	{
+		return chroma_cache_itr->second->miscName();
+	}
+	else
+	{
+		return std::nullopt;
+	}
+}
 
 std::optional<std::string> Vic3Definitions::getIDForChroma(const int chroma)
 {
@@ -105,19 +116,57 @@ std::shared_ptr<Province> Vic3Definitions::getProvinceForID(const std::string& I
 	return nullptr;
 }
 
-
 void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
 	for (const auto& [id, province]: provinces)
 	{
 		if (locType == LocalizationMapper::LocType::SOURCE && localizationMapper.getLocForSourceKey(id))
 		{
-			province->locName = *localizationMapper.getLocForSourceKey(id);
+			auto stateName = *localizationMapper.getLocForSourceKey(id);
+			province->locName = stateName;
+			if (const auto& match = localizationMapper.getLocForSourceKey(stateName); match)
+				province->areaName = *match;
+			if (const auto& regionName = vic3regions.getParentRegionName(stateName); regionName)
+			{
+				if (const auto& match = localizationMapper.getLocForSourceKey(*regionName); match)
+					province->regionName = *match;
+				else
+					province->regionName = *regionName;
+			}
+			if (const auto& regionName = vic3regions.getParentSuperRegionName(stateName); regionName)
+			{
+				if (const auto& match = localizationMapper.getLocForSourceKey(*regionName); match)
+					province->superRegionName = *match;
+				else
+					province->superRegionName = *regionName;
+			}
 		}
 
 		if (locType == LocalizationMapper::LocType::TARGET && localizationMapper.getLocForTargetKey(id))
 		{
-			province->locName = *localizationMapper.getLocForTargetKey(id);
+			auto stateName = *localizationMapper.getLocForTargetKey(id);
+			province->locName = stateName;
+			if (const auto& match = localizationMapper.getLocForTargetKey(stateName); match)
+				province->areaName = *match;
+			if (const auto& regionName = vic3regions.getParentRegionName(stateName); regionName)
+			{
+				if (const auto& match = localizationMapper.getLocForTargetKey(*regionName); match)
+					province->regionName = *match;
+				else
+					province->regionName = *regionName;
+			}
+			if (const auto& regionName = vic3regions.getParentSuperRegionName(stateName); regionName)
+			{
+				if (const auto& match = localizationMapper.getLocForTargetKey(*regionName); match)
+					province->superRegionName = *match;
+				else
+					province->superRegionName = *regionName;
+			}
 		}
 	}
+}
+
+void Vic3Definitions::loadVic3Regions(const std::string& folderPath)
+{
+	vic3regions.loadSuperRegions(folderPath);
 }
