@@ -10,6 +10,7 @@ struct Province
 	Province(std::string theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);
 
 	[[nodiscard]] std::string bespokeName() const;
+	[[nodiscard]] std::string miscName() const;
 
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;
@@ -24,6 +25,9 @@ struct Province
 	mutable std::string mapDataName;
 	std::vector<Pixel> innerPixels; // Not border pixels, just the inner stuff!
 	std::vector<Pixel> borderPixels;
+	std::optional<std::string> areaName;
+	std::optional<std::string> regionName;
+	std::optional<std::string> superRegionName;
 };
 
 #endif // PROVINCE_H

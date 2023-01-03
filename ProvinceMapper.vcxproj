@@ -11,9 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="commonItems\Color.cpp" />
     <ClCompile Include="commonItems\CommonFunctions.cpp" />
+    <ClCompile Include="commonItems\ConvenientParser.cpp" />
+    <ClCompile Include="commonItems\ConverterVersion.cpp" />
+    <ClCompile Include="commonItems\Date.cpp" />
+    <ClCompile Include="commonItems\external\zip\src\zip.c" />
+    <ClCompile Include="commonItems\GameVersion.cpp" />
     <ClCompile Include="commonItems\iconvlite.cpp" />
+    <ClCompile Include="commonItems\LinuxUtils.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="commonItems\Log.cpp" />
+    <ClCompile Include="commonItems\ModLoader\ModFilesystem.cpp" />
+    <ClCompile Include="commonItems\ModLoader\ModLoader.cpp" />
+    <ClCompile Include="commonItems\ModLoader\ModParser.cpp" />
     <ClCompile Include="commonItems\OSCommonLayer.cpp" />
     <ClCompile Include="commonItems\Parser.cpp" />
     <ClCompile Include="commonItems\ParserHelpers.cpp" />
@@ -21,7 +33,14 @@
     <ClCompile Include="commonItems\WinUtils.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\Area.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\Region.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\RegionManager.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\SuperRegion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Definitions.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Regions\SuperRegionLoader.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Regions\V3Region.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Regions\V3SuperRegion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\ImageFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Images\StatusBar.cpp" />
@@ -45,9 +64,21 @@
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commonItems\Color.h" />
     <ClInclude Include="commonItems\CommonFunctions.h" />
+    <ClInclude Include="commonItems\CommonRegexes.h" />
+    <ClInclude Include="commonItems\ConvenientParser.h" />
+    <ClInclude Include="commonItems\ConverterVersion.h" />
+    <ClInclude Include="commonItems\Date.h" />
+    <ClInclude Include="commonItems\external\zip\src\miniz.h" />
+    <ClInclude Include="commonItems\external\zip\src\zip.h" />
+    <ClInclude Include="commonItems\GameVersion.h" />
     <ClInclude Include="commonItems\iconvlite.h" />
     <ClInclude Include="commonItems\Log.h" />
+    <ClInclude Include="commonItems\ModLoader\Mod.h" />
+    <ClInclude Include="commonItems\ModLoader\ModFilesystem.h" />
+    <ClInclude Include="commonItems\ModLoader\ModLoader.h" />
+    <ClInclude Include="commonItems\ModLoader\ModParser.h" />
     <ClInclude Include="commonItems\OSCompatibilityLayer.h" />
     <ClInclude Include="commonItems\Parser.h" />
     <ClInclude Include="commonItems\ParserHelpers.h" />
@@ -55,7 +86,14 @@
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU4Regions\Area.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU4Regions\Region.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU4Regions\RegionManager.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU4Regions\SuperRegion.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Definitions.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Regions\SuperRegionLoader.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Regions\V3Region.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Regions\V3SuperRegion.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageCanvas.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\ImageFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Images\StatusBar.h" />
