@@ -4,8 +4,6 @@
 #include "Provinces/Province.h"
 #include <fstream>
 
-
-
 namespace
 {
 
@@ -49,12 +47,15 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 } // namespace
 
 
-void Definitions::loadDefinitions(const std::string& fileName, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
+void Definitions::loadDefinitions(const std::string& filePath, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
-	if (!commonItems::DoesFileExist(fileName))
+	if (!commonItems::DoesFileExist(filePath + "/definition.csv"))
 		throw std::runtime_error("Definitions file cannot be found!");
 
-	std::ifstream definitionsFile(fileName);
+	if (commonItems::DoesFileExist(filePath + "/area.txt"))
+		eu4RegionManager.loadRegions(filePath);
+
+	std::ifstream definitionsFile(filePath + "/definition.csv");
 	parseStream(definitionsFile, localizationMapper, locType);
 	definitionsFile.close();
 }
@@ -108,6 +109,32 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 							province->locName = locName;
 					}
 				}
+				if (const auto& regName = eu4RegionManager.getParentAreaName(province->ID); regName)
+				{
+					const auto& locName = localizationMapper.getLocForSourceKey(*regName);
+					if (locName && !locName->empty())
+					{
+						province->areaName = *locName;
+					}
+					else
+						province->areaName = *regName;
+				}
+				if (const auto& regName = eu4RegionManager.getParentRegionName(province->ID); regName)
+				{
+					const auto& locName = localizationMapper.getLocForSourceKey(*regName);
+					if (locName && !locName->empty())
+						province->regionName = *locName;
+					else
+						province->regionName = *regName;
+				}
+				if (const auto& regName = eu4RegionManager.getParentSuperRegionName(province->ID); regName)
+				{
+					const auto& locName = localizationMapper.getLocForSourceKey(*regName);
+					if (locName && !locName->empty())
+						province->superRegionName = *locName;
+					else
+						province->superRegionName = *regName;
+				}
 				provinces.insert(std::pair(province->ID, province));
 				chromaCache.insert(std::pair(pixelPack(province->r, province->g, province->b), province));
 			}
@@ -139,6 +166,14 @@ std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
 		return chromaCacheItr->second->bespokeName();
+	else
+		return std::nullopt;
+}
+
+std::optional<std::string> Definitions::getMiscForChroma(const int chroma)
+{
+	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
+		return chromaCacheItr->second->miscName();
 	else
 		return std::nullopt;
 }
