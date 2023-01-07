@@ -123,7 +123,38 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 		if (locType == LocalizationMapper::LocType::SOURCE && localizationMapper.getLocForSourceKey(id))
 		{
 			auto stateName = *localizationMapper.getLocForSourceKey(id);
-			province->locName = stateName;
+			province->areaName = stateName;
+
+			if (const auto& cmatch = localizationMapper.getLocForSourceKey(id + "_city"); cmatch)
+			{
+				if (const auto& cmatch2 = localizationMapper.getLocForSourceKey(*cmatch))
+					province->locName = *cmatch2;
+			}
+			else if (const auto& pmatch = localizationMapper.getLocForSourceKey(id + "_port"); pmatch)
+			{
+				if (const auto& pmatch2 = localizationMapper.getLocForSourceKey(*pmatch))
+					province->locName = *pmatch2;
+			}
+			else if (const auto& wmatch = localizationMapper.getLocForSourceKey(id + "_wood"); wmatch)
+			{
+				if (const auto& wmatch2 = localizationMapper.getLocForSourceKey(*wmatch))
+					province->locName = *wmatch2;
+			}
+			else if (const auto& fmatch = localizationMapper.getLocForSourceKey(id + "_farm"); fmatch)
+			{
+				if (const auto& fmatch2 = localizationMapper.getLocForSourceKey(*fmatch))
+					province->locName = *fmatch2;
+			}
+			else if (const auto& mmatch = localizationMapper.getLocForSourceKey(id + "_mine"); mmatch)
+			{
+				if (const auto& mmatch2 = localizationMapper.getLocForSourceKey(*mmatch))
+					province->locName = *mmatch2;
+			}
+			if (!province->locName)
+			{
+				province->locName = province->areaName;
+			}
+
 			if (const auto& match = localizationMapper.getLocForSourceKey(stateName); match)
 				province->areaName = *match;
 			if (const auto& regionName = vic3regions.getParentRegionName(stateName); regionName)
@@ -145,7 +176,38 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 		if (locType == LocalizationMapper::LocType::TARGET && localizationMapper.getLocForTargetKey(id))
 		{
 			auto stateName = *localizationMapper.getLocForTargetKey(id);
-			province->locName = stateName;
+			province->areaName = stateName;
+
+			if (const auto& cmatch = localizationMapper.getLocForTargetKey(id + "_city"); cmatch)
+			{
+				if (const auto& cmatch2 = localizationMapper.getLocForTargetKey(*cmatch))
+					province->locName = *cmatch2;
+			}
+			else if (const auto& pmatch = localizationMapper.getLocForTargetKey(id + "_port"); pmatch)
+			{
+				if (const auto& pmatch2 = localizationMapper.getLocForTargetKey(*pmatch))
+					province->locName = *pmatch2;
+			}
+			else if (const auto& wmatch = localizationMapper.getLocForTargetKey(id + "_wood"); wmatch)
+			{
+				if (const auto& wmatch2 = localizationMapper.getLocForTargetKey(*wmatch))
+					province->locName = *wmatch2;
+			}
+			else if (const auto& fmatch = localizationMapper.getLocForTargetKey(id + "_farm"); fmatch)
+			{
+				if (const auto& fmatch2 = localizationMapper.getLocForTargetKey(*fmatch))
+					province->locName = *fmatch2;
+			}
+			else if (const auto& mmatch = localizationMapper.getLocForTargetKey(id + "_mine"); mmatch)
+			{
+				if (const auto& mmatch2 = localizationMapper.getLocForTargetKey(*mmatch))
+					province->locName = *mmatch2;
+			}
+			if (!province->locName)
+			{
+				province->locName = province->areaName;
+			}
+
 			if (const auto& match = localizationMapper.getLocForTargetKey(stateName); match)
 				province->areaName = *match;
 			if (const auto& regionName = vic3regions.getParentRegionName(stateName); regionName)
