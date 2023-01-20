@@ -212,3 +212,43 @@ void Definitions::loadLocalizations(const LocalizationMapper& localizationMapper
 			province->locName = *localizationMapper.getLocForTargetKey(id);
 	}
 }
+
+void Definitions::registerNeighbor(int provinceChroma, int neighborChroma)
+{
+	if (!neighborChromas.contains(provinceChroma))
+		neighborChromas.emplace(provinceChroma, std::set<int>{});
+	neighborChromas.at(provinceChroma).emplace(neighborChroma);
+}
+
+std::map<int, std::set<int>> Definitions::getNeighborChromas() const
+{
+	return neighborChromas;
+}
+
+void Definitions::ditchAdjacencies(const std::string& fileName)
+{
+	std::map<std::string, std::set<std::string>> adjacencies;
+	for (const auto& [sourceChroma, targetChromas]: neighborChromas)
+	{
+		if (const auto& sourceProvince = getIDForChroma(sourceChroma); sourceChroma)
+		{
+			adjacencies.emplace(*sourceProvince, std::set<std::string>{});
+			for (const auto& targetChroma: targetChromas)
+			{
+				if (const auto& targetProvince = getIDForChroma(targetChroma); targetProvince)
+					adjacencies.at(*sourceProvince).emplace(*targetProvince);
+			}
+		}
+	}
+	std::ofstream adjacenciesFile(fileName);
+	for (const auto& [sourceProvince, targetProvinces]: adjacencies)
+	{
+		if (targetProvinces.empty())
+			continue;
+		adjacenciesFile << sourceProvince << " = { ";
+		for (const auto& targetProvince: targetProvinces)
+			adjacenciesFile << targetProvince << " ";
+		adjacenciesFile << "}\n";
+	}
+	adjacenciesFile.close();
+}
