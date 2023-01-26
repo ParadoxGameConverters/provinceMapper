@@ -49,7 +49,7 @@ void Vic3Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigne
 }
 
 
-std::optional<std::string> Vic3Definitions::getNameForChroma(const int chroma)
+std::optional<std::string> Vic3Definitions::getNameForChroma(const unsigned int chroma)
 {
 	if (const auto& chroma_cache_itr = chromaCache.find(chroma); chroma_cache_itr != chromaCache.end())
 	{
@@ -61,7 +61,7 @@ std::optional<std::string> Vic3Definitions::getNameForChroma(const int chroma)
 	}
 }
 
-std::optional<std::string> Vic3Definitions::getMiscForChroma(const int chroma)
+std::optional<std::string> Vic3Definitions::getMiscForChroma(const unsigned int chroma)
 {
 	if (const auto& chroma_cache_itr = chromaCache.find(chroma); chroma_cache_itr != chromaCache.end())
 	{
@@ -73,7 +73,7 @@ std::optional<std::string> Vic3Definitions::getMiscForChroma(const int chroma)
 	}
 }
 
-std::optional<std::string> Vic3Definitions::getIDForChroma(const int chroma)
+std::optional<std::string> Vic3Definitions::getIDForChroma(const unsigned int chroma)
 {
 	if (const auto& chroma_cache_itr = chromaCache.find(chroma); chroma_cache_itr != chromaCache.end())
 	{
@@ -86,7 +86,7 @@ std::optional<std::string> Vic3Definitions::getIDForChroma(const int chroma)
 }
 
 
-std::shared_ptr<Province> Vic3Definitions::getProvinceForChroma(const int chroma)
+std::shared_ptr<Province> Vic3Definitions::getProvinceForChroma(const unsigned int chroma)
 {
 	if (const auto& chroma_cache_itr = chromaCache.find(chroma); chroma_cache_itr != chromaCache.end())
 	{
@@ -107,9 +107,9 @@ std::shared_ptr<Province> Vic3Definitions::getProvinceForID(const std::string& I
 	}
 	else if (ID.starts_with('0'))
 	{
-		if (const auto& province_itr = provinces.find(ID.substr(1, ID.length())); province_itr != provinces.end())
+		if (const auto& province_itr2 = provinces.find(ID.substr(1, ID.length())); province_itr != provinces.end())
 		{
-			return province_itr->second;
+			return province_itr2->second;
 		}
 	}
 
@@ -233,14 +233,14 @@ void Vic3Definitions::loadVic3Regions(const std::string& folderPath)
 	vic3regions.loadSuperRegions(folderPath);
 }
 
-void Vic3Definitions::registerNeighbor(int provinceChroma, int neighborChroma)
+void Vic3Definitions::registerNeighbor(unsigned int provinceChroma, unsigned int neighborChroma)
 {
 	if (!neighborChromas.contains(provinceChroma))
-		neighborChromas.emplace(provinceChroma, std::set<int>{});
+		neighborChromas.emplace(provinceChroma, std::set<unsigned int>{});
 	neighborChromas.at(provinceChroma).emplace(neighborChroma);
 }
 
-std::map<int, std::set<int>> Vic3Definitions::getNeighborChromas() const
+std::map<unsigned int, std::set<unsigned int>> Vic3Definitions::getNeighborChromas() const
 {
 	return neighborChromas;
 }
