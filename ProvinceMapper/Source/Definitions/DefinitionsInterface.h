@@ -18,20 +18,20 @@ class DefinitionsInterface
 	virtual void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) = 0;
 	virtual void loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType) = 0;
 	virtual void loadVic3Regions(const std::string& folderPath) = 0;
-	virtual void registerNeighbor(int provinceChroma, int neighborChroma) = 0;
+	virtual void registerNeighbor(unsigned int provinceChroma, unsigned int neighborChroma) = 0;
 	virtual void ditchAdjacencies(const std::string& fileName) = 0;
 
 	[[nodiscard]] const auto& getProvinces() const { return provinces; }
-	[[nodiscard]] virtual std::map<int, std::set<int>> getNeighborChromas() const = 0;
-	[[nodiscard]] virtual std::optional<std::string> getNameForChroma(int chroma) = 0;
-	[[nodiscard]] virtual std::optional<std::string> getMiscForChroma(int chroma) = 0;
-	[[nodiscard]] virtual std::optional<std::string> getIDForChroma(int chroma) = 0;
-	[[nodiscard]] virtual std::shared_ptr<Province> getProvinceForChroma(int chroma) = 0;
+	[[nodiscard]] virtual std::map<unsigned int, std::set<unsigned int>> getNeighborChromas() const = 0;
+	[[nodiscard]] virtual std::optional<std::string> getNameForChroma(unsigned int chroma) = 0;
+	[[nodiscard]] virtual std::optional<std::string> getMiscForChroma(unsigned int chroma) = 0;
+	[[nodiscard]] virtual std::optional<std::string> getIDForChroma(unsigned int chroma) = 0;
+	[[nodiscard]] virtual std::shared_ptr<Province> getProvinceForChroma(unsigned int chroma) = 0;
 	[[nodiscard]] virtual std::shared_ptr<Province> getProvinceForID(const std::string& ID) = 0;
 
   protected:
-	std::map<std::string, std::shared_ptr<Province>> provinces; // ID, province
-	std::map<int, std::shared_ptr<Province>> chromaCache;			// color, province
+	std::map<std::string, std::shared_ptr<Province>> provinces;		// ID, province
+	std::map<unsigned int, std::shared_ptr<Province>> chromaCache; // color, province
 };
 
 

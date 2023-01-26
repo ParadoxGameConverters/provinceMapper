@@ -162,7 +162,7 @@ void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned ch
 		chromaItr->second->borderPixels.emplace_back(pixel);
 }
 
-std::optional<std::string> Definitions::getNameForChroma(const int chroma)
+std::optional<std::string> Definitions::getNameForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
 		return chromaCacheItr->second->bespokeName();
@@ -170,7 +170,7 @@ std::optional<std::string> Definitions::getNameForChroma(const int chroma)
 		return std::nullopt;
 }
 
-std::optional<std::string> Definitions::getMiscForChroma(const int chroma)
+std::optional<std::string> Definitions::getMiscForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
 		return chromaCacheItr->second->miscName();
@@ -178,7 +178,7 @@ std::optional<std::string> Definitions::getMiscForChroma(const int chroma)
 		return std::nullopt;
 }
 
-std::optional<std::string> Definitions::getIDForChroma(const int chroma)
+std::optional<std::string> Definitions::getIDForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
 		return chromaCacheItr->second->ID;
@@ -186,7 +186,7 @@ std::optional<std::string> Definitions::getIDForChroma(const int chroma)
 		return std::nullopt;
 }
 
-std::shared_ptr<Province> Definitions::getProvinceForChroma(const int chroma)
+std::shared_ptr<Province> Definitions::getProvinceForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
 		return chromaCacheItr->second;
@@ -213,14 +213,14 @@ void Definitions::loadLocalizations(const LocalizationMapper& localizationMapper
 	}
 }
 
-void Definitions::registerNeighbor(int provinceChroma, int neighborChroma)
+void Definitions::registerNeighbor(unsigned int provinceChroma, unsigned int neighborChroma)
 {
 	if (!neighborChromas.contains(provinceChroma))
-		neighborChromas.emplace(provinceChroma, std::set<int>{});
+		neighborChromas.emplace(provinceChroma, std::set<unsigned int>{});
 	neighborChromas.at(provinceChroma).emplace(neighborChroma);
 }
 
-std::map<int, std::set<int>> Definitions::getNeighborChromas() const
+std::map<unsigned int, std::set<unsigned int>> Definitions::getNeighborChromas() const
 {
 	return neighborChromas;
 }
