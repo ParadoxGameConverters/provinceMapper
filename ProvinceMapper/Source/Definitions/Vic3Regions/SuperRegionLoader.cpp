@@ -1,6 +1,7 @@
 #include "SuperRegionLoader.h"
 #include "CommonFunctions.h"
 #include "Log.h"
+#include "OSCompatibilityLayer.h"
 #include "V3Region.h"
 #include "V3SuperRegion.h"
 #include <filesystem>
@@ -11,13 +12,11 @@ namespace fs = std::filesystem;
 void V3::SuperRegionLoader::loadSuperRegions(const std::string& folderPath)
 {
 	Log(LogLevel::Info) << "Vic3 Regions online.";
-
-	auto modFS = commonItems::ModFilesystem(folderPath + "/../", {}); // go back to root.
-	for (const auto& fileName: modFS.GetAllFilesInFolder("/common/strategic_regions/"))
+	for (const auto& fileName: commonItems::GetAllFilesInFolder(folderPath + "/../common/strategic_regions/"))
 	{
 		if (getExtension(fileName) != "txt")
 			continue;
-		std::ifstream superRegionStream(fs::u8path(fileName));
+		std::ifstream superRegionStream(fs::u8path(folderPath + "/../common/strategic_regions/" + fileName));
 		if (!superRegionStream.is_open())
 			throw std::runtime_error("Could not open " + fileName + " !");
 
