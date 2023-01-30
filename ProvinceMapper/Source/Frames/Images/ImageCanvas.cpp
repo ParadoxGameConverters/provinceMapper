@@ -200,6 +200,7 @@ void ImageCanvas::onMouseOver(wxMouseEvent& event)
 	{
 		const auto name = nameAtCoords(wxPoint(x, y));
 		this->SetToolTip(name);
+		this->GetToolTip()->SetAutoPop(20000);
 	}
 	event.Skip();
 }

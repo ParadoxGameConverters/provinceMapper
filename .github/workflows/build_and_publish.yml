@@ -10,8 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
-        submodules: recursive
+        submodules: true
 
     - name: "Get previous tag"
       if: ${{ github.event_name == 'push' }}
@@ -53,8 +52,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0
-        submodules: recursive
+        submodules: true
 
     - name: "Build solution"
       run: |
