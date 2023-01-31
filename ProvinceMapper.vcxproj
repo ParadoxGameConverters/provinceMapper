@@ -11,15 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="commonItems\Color.cpp" />
-    <ClCompile Include="commonItems\CommonFunctions.cpp" />
-    <ClCompile Include="commonItems\iconvlite.cpp" />
-    <ClCompile Include="commonItems\Log.cpp" />
-    <ClCompile Include="commonItems\OSCommonLayer.cpp" />
-    <ClCompile Include="commonItems\Parser.cpp" />
-    <ClCompile Include="commonItems\ParserHelpers.cpp" />
-    <ClCompile Include="commonItems\StringUtils.cpp" />
-    <ClCompile Include="commonItems\WinUtils.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\Area.cpp" />
@@ -53,15 +44,6 @@
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="commonItems\Color.h" />
-    <ClInclude Include="commonItems\CommonFunctions.h" />
-    <ClInclude Include="commonItems\CommonRegexes.h" />
-    <ClInclude Include="commonItems\iconvlite.h" />
-    <ClInclude Include="commonItems\Log.h" />
-    <ClInclude Include="commonItems\OSCompatibilityLayer.h" />
-    <ClInclude Include="commonItems\Parser.h" />
-    <ClInclude Include="commonItems\ParserHelpers.h" />
-    <ClInclude Include="commonItems\StringUtils.h" />
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h" />
@@ -179,8 +161,9 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)\wxWidgets\3.2.1\lib\vc14x_x64_dll;$(ProjectDir)imageMagick\lib-windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\wxWidgets\3.2.1\lib\vc14x_x64_dll;$(ProjectDir)imageMagick\lib-windows;$(ProjectDir)commonItems\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>CommonItems.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
