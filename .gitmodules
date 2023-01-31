@@ -1,3 +1,6 @@
 [submodule "wxWidgets"]
 	path = wxWidgets
 	url = https://github.com/ParadoxGameConverters/wxWidgets
+[submodule "commonItems"]
+	path = commonItems
+	url = https://github.com/Zemurin/commonItems
