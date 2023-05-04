@@ -21,13 +21,13 @@ void Vic3StateRegionScraper::registerKeys()
 		{
 			if (scraping.isProvinceCity(province))
 				localizations.emplace(province + "_city", "HUB_NAME_" + stateName + "_city");
-			else if (scraping.isProvincePort(province))
+			if (scraping.isProvincePort(province))
 				localizations.emplace(province + "_port", "HUB_NAME_" + stateName + "_port");
-			else if (scraping.isProvinceFarm(province))
+			if (scraping.isProvinceFarm(province))
 				localizations.emplace(province + "_farm", "HUB_NAME_" + stateName + "_farm");
-			else if (scraping.isProvinceMine(province))
+			if (scraping.isProvinceMine(province))
 				localizations.emplace(province + "_mine", "HUB_NAME_" + stateName + "_mine");
-			else if (scraping.isProvinceWood(province))
+			if (scraping.isProvinceWood(province))
 				localizations.emplace(province + "_wood", "HUB_NAME_" + stateName + "_wood");
 
 			localizations.emplace(province, stateName);

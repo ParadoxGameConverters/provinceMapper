@@ -128,27 +128,52 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 			if (const auto& cmatch = localizationMapper.getLocForSourceKey(id + "_city"); cmatch)
 			{
 				if (const auto& cmatch2 = localizationMapper.getLocForSourceKey(*cmatch))
-					province->locName = *cmatch2;
+				{
+					if (!province->locName)
+						province->locName = *cmatch2 + " [city]";
+					else
+						*province->locName += "[city]";
+				}
 			}
-			else if (const auto& pmatch = localizationMapper.getLocForSourceKey(id + "_port"); pmatch)
+			if (const auto& pmatch = localizationMapper.getLocForSourceKey(id + "_port"); pmatch)
 			{
 				if (const auto& pmatch2 = localizationMapper.getLocForSourceKey(*pmatch))
-					province->locName = *pmatch2;
+				{
+					if (!province->locName)
+						province->locName = *pmatch2 + " [port]";
+					else
+						*province->locName += "[port]";
+				}
 			}
-			else if (const auto& wmatch = localizationMapper.getLocForSourceKey(id + "_wood"); wmatch)
+			if (const auto& wmatch = localizationMapper.getLocForSourceKey(id + "_wood"); wmatch)
 			{
 				if (const auto& wmatch2 = localizationMapper.getLocForSourceKey(*wmatch))
-					province->locName = *wmatch2;
+				{
+					if (!province->locName)
+						province->locName = *wmatch2 + " [wood]";
+					else
+						*province->locName += "[wood]";
+				}
 			}
-			else if (const auto& fmatch = localizationMapper.getLocForSourceKey(id + "_farm"); fmatch)
+			if (const auto& fmatch = localizationMapper.getLocForSourceKey(id + "_farm"); fmatch)
 			{
 				if (const auto& fmatch2 = localizationMapper.getLocForSourceKey(*fmatch))
-					province->locName = *fmatch2;
+				{
+					if (!province->locName)
+						province->locName = *fmatch2 + " [farm]";
+					else
+						*province->locName += "[farm]";
+				}
 			}
-			else if (const auto& mmatch = localizationMapper.getLocForSourceKey(id + "_mine"); mmatch)
+			if (const auto& mmatch = localizationMapper.getLocForSourceKey(id + "_mine"); mmatch)
 			{
 				if (const auto& mmatch2 = localizationMapper.getLocForSourceKey(*mmatch))
-					province->locName = *mmatch2;
+				{
+					if (!province->locName)
+						province->locName = *mmatch2 + " [mine]";
+					else
+						*province->locName += "[mine]";
+				}
 			}
 			if (!province->locName)
 			{
@@ -181,27 +206,57 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 			if (const auto& cmatch = localizationMapper.getLocForTargetKey(id + "_city"); cmatch)
 			{
 				if (const auto& cmatch2 = localizationMapper.getLocForTargetKey(*cmatch))
-					province->locName = *cmatch2;
+				{
+					Log(LogLevel::Debug) << "cmatch on port " << id << " got " << *cmatch << " -> " << *cmatch2;
+					if (!province->locName)
+						province->locName = *cmatch2 + " [city]";
+					else
+						*province->locName += "[city]";
+					Log(LogLevel::Debug) << " jave :: " << *province->locName;
+				}
 			}
-			else if (const auto& pmatch = localizationMapper.getLocForTargetKey(id + "_port"); pmatch)
+			if (const auto& pmatch = localizationMapper.getLocForTargetKey(id + "_port"); pmatch)
 			{
 				if (const auto& pmatch2 = localizationMapper.getLocForTargetKey(*pmatch))
-					province->locName = *pmatch2;
+				{
+					Log(LogLevel::Debug) << "pmatch on port " << id << " got " << *pmatch << " -> "
+												<< *pmatch2;
+					if (!province->locName)
+						province->locName = *pmatch2 + " [port]";
+					else
+						*province->locName += "[port]";
+					Log(LogLevel::Debug) << " jave :: " << *province->locName;
+				}
 			}
-			else if (const auto& wmatch = localizationMapper.getLocForTargetKey(id + "_wood"); wmatch)
+			if (const auto& wmatch = localizationMapper.getLocForTargetKey(id + "_wood"); wmatch)
 			{
 				if (const auto& wmatch2 = localizationMapper.getLocForTargetKey(*wmatch))
-					province->locName = *wmatch2;
+				{
+					if (!province->locName)
+						province->locName = *wmatch2 + " [wood]";
+					else
+						*province->locName += "[wood]";
+				}
 			}
-			else if (const auto& fmatch = localizationMapper.getLocForTargetKey(id + "_farm"); fmatch)
+			if (const auto& fmatch = localizationMapper.getLocForTargetKey(id + "_farm"); fmatch)
 			{
 				if (const auto& fmatch2 = localizationMapper.getLocForTargetKey(*fmatch))
-					province->locName = *fmatch2;
+				{
+					if (!province->locName)
+						province->locName = *fmatch2 + " [farm]";
+					else
+						*province->locName += "[farm]";
+				}
 			}
-			else if (const auto& mmatch = localizationMapper.getLocForTargetKey(id + "_mine"); mmatch)
+			if (const auto& mmatch = localizationMapper.getLocForTargetKey(id + "_mine"); mmatch)
 			{
 				if (const auto& mmatch2 = localizationMapper.getLocForTargetKey(*mmatch))
-					province->locName = *mmatch2;
+				{
+					if (!province->locName)
+						province->locName = *mmatch2 + " [mine]";
+					else
+						*province->locName += "[mine]";
+				}
 			}
 			if (!province->locName)
 			{
