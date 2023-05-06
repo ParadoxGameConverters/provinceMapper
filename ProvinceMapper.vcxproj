@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
@@ -13,19 +9,8 @@
   <ItemGroup>
     <ClCompile Include="commonItems\Color.cpp" />
     <ClCompile Include="commonItems\CommonFunctions.cpp" />
-    <ClCompile Include="commonItems\ConvenientParser.cpp" />
-    <ClCompile Include="commonItems\ConverterVersion.cpp" />
-    <ClCompile Include="commonItems\Date.cpp" />
-    <ClCompile Include="commonItems\external\zip\src\zip.c" />
-    <ClCompile Include="commonItems\GameVersion.cpp" />
     <ClCompile Include="commonItems\iconvlite.cpp" />
-    <ClCompile Include="commonItems\LinuxUtils.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="commonItems\Log.cpp" />
-    <ClCompile Include="commonItems\ModLoader\ModFilesystem.cpp" />
-    <ClCompile Include="commonItems\ModLoader\ModLoader.cpp" />
-    <ClCompile Include="commonItems\ModLoader\ModParser.cpp" />
     <ClCompile Include="commonItems\OSCommonLayer.cpp" />
     <ClCompile Include="commonItems\Parser.cpp" />
     <ClCompile Include="commonItems\ParserHelpers.cpp" />
@@ -67,18 +52,8 @@
     <ClInclude Include="commonItems\Color.h" />
     <ClInclude Include="commonItems\CommonFunctions.h" />
     <ClInclude Include="commonItems\CommonRegexes.h" />
-    <ClInclude Include="commonItems\ConvenientParser.h" />
-    <ClInclude Include="commonItems\ConverterVersion.h" />
-    <ClInclude Include="commonItems\Date.h" />
-    <ClInclude Include="commonItems\external\zip\src\miniz.h" />
-    <ClInclude Include="commonItems\external\zip\src\zip.h" />
-    <ClInclude Include="commonItems\GameVersion.h" />
     <ClInclude Include="commonItems\iconvlite.h" />
     <ClInclude Include="commonItems\Log.h" />
-    <ClInclude Include="commonItems\ModLoader\Mod.h" />
-    <ClInclude Include="commonItems\ModLoader\ModFilesystem.h" />
-    <ClInclude Include="commonItems\ModLoader\ModLoader.h" />
-    <ClInclude Include="commonItems\ModLoader\ModParser.h" />
     <ClInclude Include="commonItems\OSCompatibilityLayer.h" />
     <ClInclude Include="commonItems\Parser.h" />
     <ClInclude Include="commonItems\ParserHelpers.h" />
@@ -120,28 +95,15 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\msvcp140_codecvt_ids.dll">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\vcruntime140_1.dll">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\VC_redist.x64.exe">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
     <CopyFileToFolders Include="README.md">
       <FileType>Document</FileType>
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="wxWidgets\3.1.5\lib\vc14x_x64_dll\wxbase315u_vc14x_x64.dll">
+    <CopyFileToFolders Include="wxWidgets\3.2.1\lib\vc14x_x64_dll\wxbase32u_vc14x_x64.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="wxWidgets\3.1.5\lib\vc14x_x64_dll\wxmsw315u_core_vc14x_x64.dll">
+    <CopyFileToFolders Include="wxWidgets\3.2.1\lib\vc14x_x64_dll\wxmsw32u_core_vc14x_x64.dll">
       <FileType>Document</FileType>
     </CopyFileToFolders>
   </ItemGroup>
@@ -153,12 +115,6 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
@@ -169,56 +125,27 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="wxWidgets\3.1.5\wxwidgets.props" />
-  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="wxWidgets\3.1.5\wxwidgets.props" />
+    <Import Project="wxWidgets\3.2.1\wxwidgets.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <PreprocessorDefinitions>WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)ProvinceMapper\Source;$(ProjectDir)wxWidgets\3.1.5\include\msvc;$(ProjectDir)commonItems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)\wxWidgets\3.1.5\lib\vc14x_x64_dll;$(ProjectDir)imageMagick\lib-windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <PreprocessorDefinitions>WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)ProvinceMapper\Source;$(ProjectDir)wxWidgets\3.1.5\include\msvc;$(ProjectDir)commonItems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)ProvinceMapper\Source;$(ProjectDir)wxWidgets\3.2.1\include\msvc;$(ProjectDir)commonItems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(ProjectDir)\wxWidgets\3.1.5\lib\vc14x_x64_dll;$(ProjectDir)imageMagick\lib-windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(ProjectDir)\wxWidgets\3.2.1\lib\vc14x_x64_dll;$(ProjectDir)imageMagick\lib-windows;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
       <Command>

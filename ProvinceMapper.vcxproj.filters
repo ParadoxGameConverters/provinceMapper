@@ -162,35 +162,8 @@
     <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\SuperRegion.cpp">
       <Filter>ProvinceMapper\Definitions\EU4Regions</Filter>
     </ClCompile>
-    <ClCompile Include="commonItems\ModLoader\ModFilesystem.cpp">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\ModLoader\ModLoader.cpp">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\ModLoader\ModParser.cpp">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClCompile>
     <ClCompile Include="commonItems\Color.cpp">
       <Filter>commonItems</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\ConvenientParser.cpp">
-      <Filter>commonItems</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\ConverterVersion.cpp">
-      <Filter>commonItems</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\Date.cpp">
-      <Filter>commonItems</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\GameVersion.cpp">
-      <Filter>commonItems</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\LinuxUtils.cpp">
-      <Filter>commonItems</Filter>
-    </ClCompile>
-    <ClCompile Include="commonItems\external\zip\src\zip.c">
-      <Filter>commonItems\zip</Filter>
     </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Regions\SuperRegionLoader.cpp">
       <Filter>ProvinceMapper\Definitions\Vic3Regions</Filter>
@@ -311,41 +284,11 @@
     <ClInclude Include="ProvinceMapper\Source\Definitions\EU4Regions\SuperRegion.h">
       <Filter>ProvinceMapper\Definitions\EU4Regions</Filter>
     </ClInclude>
-    <ClInclude Include="commonItems\ModLoader\Mod.h">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\ModLoader\ModFilesystem.h">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\ModLoader\ModLoader.h">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\ModLoader\ModParser.h">
-      <Filter>commonItems\ModLoader</Filter>
-    </ClInclude>
     <ClInclude Include="commonItems\Color.h">
       <Filter>commonItems</Filter>
     </ClInclude>
     <ClInclude Include="commonItems\CommonRegexes.h">
       <Filter>commonItems</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\ConvenientParser.h">
-      <Filter>commonItems</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\ConverterVersion.h">
-      <Filter>commonItems</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\Date.h">
-      <Filter>commonItems</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\GameVersion.h">
-      <Filter>commonItems</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\external\zip\src\miniz.h">
-      <Filter>commonItems\zip</Filter>
-    </ClInclude>
-    <ClInclude Include="commonItems\external\zip\src\zip.h">
-      <Filter>commonItems\zip</Filter>
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Regions\SuperRegionLoader.h">
       <Filter>ProvinceMapper\Definitions\Vic3Regions</Filter>
@@ -361,22 +304,13 @@
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\msvcp140_codecvt_ids.dll">
-      <Filter>Resources</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\VC_redist.x64.exe">
-      <Filter>Resources</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="ProvinceMapper\Resources\vcruntime140_1.dll">
-      <Filter>Resources</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="README.md">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="wxWidgets\3.1.5\lib\vc14x_x64_dll\wxbase315u_vc14x_x64.dll">
+    <CopyFileToFolders Include="wxWidgets\3.2.1\lib\vc14x_x64_dll\wxbase32u_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="wxWidgets\3.1.5\lib\vc14x_x64_dll\wxmsw315u_core_vc14x_x64.dll">
+    <CopyFileToFolders Include="wxWidgets\3.2.1\lib\vc14x_x64_dll\wxmsw32u_core_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
   </ItemGroup>

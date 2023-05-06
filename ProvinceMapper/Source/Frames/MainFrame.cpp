@@ -371,6 +371,9 @@ void MainFrame::initImageFrame()
 	else if (vic3SideloadStates == LocalizationMapper::LocType::TARGET)
 		targetDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::TARGET);
 
+	sourceDefs->ditchAdjacencies("source_adjacencies.txt");
+	targetDefs->ditchAdjacencies("target_adjacencies.txt");
+
 	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
 	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";

@@ -5,21 +5,61 @@ void* PixelReader::Entry()
 {
 	const unsigned char* rgb = image->GetData();
 	for (auto y = 0; y < image->GetSize().GetY(); y++)
+	{
 		for (auto x = 0; x < image->GetSize().GetX(); x++)
 		{
-			auto border = true;
-			// border or regular pixel?
-			if (isSameColorAtCoords(x, y, x - 1, y) && isSameColorAtCoords(x, y, x + 1, y) && isSameColorAtCoords(x, y, x, y - 1) &&
-				 isSameColorAtCoords(x, y, x, y + 1))
-				border = false;
+			auto border = false;
 			const auto offs = coordsToOffset(x, y, image->GetSize().GetX());
+			// border or regular pixel?
+			if (!isSameColorAtCoords(x, y, x - 1, y))
+			{
+				if (x > 0)
+				{
+					const auto borderOffs = coordsToOffset(x - 1, y, image->GetSize().GetX());
+					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
+						 pixelPack(rgb[borderOffs], rgb[borderOffs + 1], rgb[borderOffs + 2]));
+				}
+				border = true;
+			}
+			if (!isSameColorAtCoords(x, y, x + 1, y))
+			{
+				if (x < image->GetSize().GetX() - 1)
+				{
+					const auto borderOffs = coordsToOffset(x + 1, y, image->GetSize().GetX());
+					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
+						 pixelPack(rgb[borderOffs], rgb[borderOffs + 1], rgb[borderOffs + 2]));
+				}
+				border = true;
+			}
+			if (!isSameColorAtCoords(x, y, x, y - 1))
+			{
+				if (y > 0)
+				{
+					const auto borderOffs = coordsToOffset(x, y - 1, image->GetSize().GetX());
+					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
+						 pixelPack(rgb[borderOffs], rgb[borderOffs + 1], rgb[borderOffs + 2]));
+				}
+				border = true;
+			}
+			if (!isSameColorAtCoords(x, y, x, y + 1))
+			{
+				if (y < image->GetSize().GetY() - 1)
+				{
+					const auto borderOffs = coordsToOffset(x, y + 1, image->GetSize().GetX());
+					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
+						 pixelPack(rgb[borderOffs], rgb[borderOffs + 1], rgb[borderOffs + 2]));
+				}
+				border = true;
+			}
 
 			if (border == true)
 				definitions->registerBorderPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 			else
 				definitions->registerPixel(x, y, rgb[offs], rgb[offs + 1], rgb[offs + 2]);
 		}
+	}
 	Log(LogLevel::Info) << "Parsed " << image->GetSize().GetX() << "x" << image->GetSize().GetY() << " source pixels.";
+	Log(LogLevel::Info) << "Neighbor chroma cache has " << definitions->getNeighborChromas().size() << " entries.";
 	return nullptr;
 }
 
