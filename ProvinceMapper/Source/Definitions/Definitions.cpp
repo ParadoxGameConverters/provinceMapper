@@ -275,7 +275,6 @@ void Definitions::tryToLoadProvinceTypes(const string& mapDataPath)
 	auto filePathStr = filePath.string();
 	if (!commonItems::DoesFileExist(filePathStr))
 	{
-		throw new runtime_error("DEFAULT.MAP NOT LOADED");
 		return;
 	}
 
