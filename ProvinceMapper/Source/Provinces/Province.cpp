@@ -1,5 +1,5 @@
 #include "Province.h"
-#include <locale>
+#include <algorithm>
 
 Province::Province(std::string theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
 	 ID(std::move(theID)), r(tr), g(tg), b(tb), mapDataName(std::move(theName))
@@ -57,6 +57,7 @@ std::string Province::miscName() const
 
 bool Province::isWater() const
 {	
-	std::string provinceTypeLowerCase = std::tolower(provinceType, std::locale());
+	std::string provinceTypeLowerCase = provinceType;
+	std::transform(provinceTypeLowerCase.begin(), provinceTypeLowerCase.end(), provinceTypeLowerCase.begin(), ::tolower);
 	return provinceTypeLowerCase == "sea_zones" || provinceTypeLowerCase == "river_provinces" || provinceTypeLowerCase == "lakes";
 }

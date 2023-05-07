@@ -279,7 +279,7 @@ void Definitions::tryToLoadProvinceTypes(const string& mapDataPath)
 	}
 
 	auto parser = commonItems::parser();
-	const string provinceTypesRegex = "sea_zones|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
+	const string provinceTypesRegex = "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
 	parser.registerRegex(provinceTypesRegex, [&](const std::string& provinceType, std::istream& stream) {
 		parser.getNextTokenWithoutMatching(stream); // equals sign
 		auto typeOfGroup = parser.getNextTokenWithoutMatching(stream).value();
