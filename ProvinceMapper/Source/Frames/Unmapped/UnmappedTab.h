@@ -23,6 +23,7 @@ class UnmappedTab final: public wxNotebookPage
 	void removeProvince(const std::string& ID);
 	void addProvince(const std::string& ID);
 	void setExcludeWaterProvinces(bool excludeWaterProvinces);
+	void setExcludeImpassables(bool excludeImpassables);
 
   private:
 	void onKeyDown(wxKeyEvent& event);
@@ -48,6 +49,7 @@ class UnmappedTab final: public wxNotebookPage
 	std::shared_ptr<LinkMappingVersion> version;
 	std::map<std::string, int> provinceRows; // province/row
 	bool excludeWaterProvinces = false;
+	bool excludeImpassables = false;
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

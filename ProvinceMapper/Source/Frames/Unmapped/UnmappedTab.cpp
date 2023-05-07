@@ -49,8 +49,17 @@ const std::vector<std::shared_ptr<Province>> UnmappedTab::getRelevantProvinces()
 		for (auto &p : relevantProvinces | std::views::filter([](std::shared_ptr<Province> p){ return !p->isWater(); })) {
 			filteredProvinces.push_back(p);
 		}
-		return filteredProvinces;
+		relevantProvinces = filteredProvinces;
 	}
+	if (excludeImpassables)
+	{
+		std::vector<std::shared_ptr<Province>> filteredProvinces;
+		for (auto &p : relevantProvinces | std::views::filter([](std::shared_ptr<Province> p){ return !p->isImpassable(); })) {
+			filteredProvinces.push_back(p);
+		}
+		relevantProvinces = filteredProvinces;
+	}
+
 	return relevantProvinces;
 
 	
@@ -243,6 +252,13 @@ void UnmappedTab::setExcludeWaterProvinces(bool excludeWaterProvinces)
 	this->excludeWaterProvinces = excludeWaterProvinces;
 	redrawGrid();
 }
+
+void UnmappedTab::setExcludeImpassables(bool excludeImpassables)
+{
+	this->excludeImpassables = excludeImpassables;
+	redrawGrid();
+}
+
 
 void UnmappedTab::focusOnRow(const int row)
 {

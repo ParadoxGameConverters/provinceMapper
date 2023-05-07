@@ -23,7 +23,6 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
 
-	excludeWaterProvincesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude water provinces");
 
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	notebook->Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
@@ -35,6 +34,7 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	notebook->AddPage(targets, "Target Provinces", false);
 	targets->redrawGrid();
 
+	excludeWaterProvincesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude water provinces");
 	excludeWaterProvincesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
 		if (excludeWaterProvincesCheckbox->GetValue())
 		{
@@ -48,6 +48,21 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 		}
 	});
 	sizer->Add(excludeWaterProvincesCheckbox);
+
+	excludeImpassablesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude impassables");
+	excludeImpassablesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (excludeImpassablesCheckbox->GetValue())
+		{
+			sources->setExcludeImpassables(true);
+			targets->setExcludeImpassables(true);
+		}
+		else
+		{
+			sources->setExcludeImpassables(false);
+			targets->setExcludeImpassables(false);
+		}
+	});
+	sizer->Add(excludeImpassablesCheckbox);
 
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
 	this->SetSizer(sizer);
