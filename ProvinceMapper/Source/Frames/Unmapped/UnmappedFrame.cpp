@@ -23,7 +23,6 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
 
-
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	notebook->Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
 
