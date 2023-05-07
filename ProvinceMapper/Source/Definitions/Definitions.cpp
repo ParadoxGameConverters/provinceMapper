@@ -2,6 +2,7 @@
 #include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
 #include "Provinces/Province.h"
+#include <algorithm>
 #include <fstream>
 #include <filesystem>
 #include <ParserHelpers.h>
@@ -258,6 +259,18 @@ void Definitions::ditchAdjacencies(const std::string& fileName)
 	adjacenciesFile.close();
 }
 
+std::string tolower(std::string str)
+{
+	std::transform(str.begin(),
+		 str.end(),
+		 str.begin(),
+		 [](unsigned char c) {
+			 return std::tolower(c);
+		 }
+	);
+	return str;
+}
+
 void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 {
 	fs::path filePath = fs::path(mapDataPath) / fs::path("default.map");
@@ -270,12 +283,22 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 	auto parser = commonItems::parser();
 	const std::string provinceTypesRegex = "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
 	parser.registerRegex(provinceTypesRegex, [&](const std::string& provinceType, std::istream& stream) {
+		std::string lowerCaseProvinceType = tolower(provinceType);
+		
 		parser.getNextTokenWithoutMatching(stream); // equals sign
-		auto typeOfGroup = parser.getNextTokenWithoutMatching(stream).value();
-		auto provIds = commonItems::getULlongs(stream);
 
-		if (typeOfGroup == "RANGE")
-		{	
+		auto strOfItemStr = commonItems::stringOfItem(stream).getString();
+		if (strOfItemStr == "LIST") // format found in Imperator and CK3
+		{
+			auto provIds = commonItems::getStrings(stream);
+			for (auto& id: provIds)
+			{
+				provinces[id]->provinceType = lowerCaseProvinceType;
+			}
+		}
+		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
+		{
+			auto provIds = commonItems::getULlongs(stream);
 			auto groupSize = provIds.size();
 			if (provIds.size() < 1 || groupSize > 2)
 			{
@@ -287,20 +310,23 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			for (auto id = beginning; id <= end; ++id)
 			{
 				std::string idStr = std::to_string(id);
-				provinces[idStr]->provinceType = provinceType;
+				provinces[idStr]->provinceType = lowerCaseProvinceType;
 			}
 		}
-		else if (typeOfGroup == "LIST")
+		else if (strOfItemStr.find("{") == 0) // simple list
 		{
-			for (auto id : provIds)
+			std::stringstream ss;
+			ss << strOfItemStr;
+			auto provIds = commonItems::getStrings(ss);
+
+			for (auto& id: provIds)
 			{
-				std::string idStr = std::to_string(id);
-				provinces[idStr]->provinceType = provinceType;
+				provinces[id]->provinceType = lowerCaseProvinceType;
 			}
 		}
 		else
 		{
-			throw std::runtime_error("Unknown province group type: " + typeOfGroup);
+			throw std::runtime_error("Unknown province group type: " + strOfItemStr);
 		}
 	});
 	parser.IgnoreAndLogUnregisteredItems();

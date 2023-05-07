@@ -55,21 +55,12 @@ std::string Province::miscName() const
 	return name;
 }
 
-std::string Province::getLowerCaseProvinceType() const
-{
-	std::string provinceTypeLowerCase = provinceType;
-	std::transform(provinceTypeLowerCase.begin(), provinceTypeLowerCase.end(), provinceTypeLowerCase.begin(), ::tolower);
-	return provinceTypeLowerCase;
-}
-
 bool Province::isWater() const
 {	
-	auto provinceTypeLowerCase = getLowerCaseProvinceType();
-	return provinceTypeLowerCase == "sea_zones" || provinceTypeLowerCase == "river_provinces" || provinceTypeLowerCase == "lakes" || provinceTypeLowerCase == "impassable_seas";
+	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
 }
 
 bool Province::isImpassable() const
 {
-	auto provinceTypeLowerCase = getLowerCaseProvinceType();
-	return provinceTypeLowerCase == "wasteland" || provinceTypeLowerCase == "impassable_terrain" || provinceTypeLowerCase == "impassable_mountains";
+	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
 }

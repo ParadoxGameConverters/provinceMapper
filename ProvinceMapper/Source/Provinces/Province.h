@@ -31,9 +31,6 @@ struct Province
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
 	std::string provinceType = "normal";
-
-	private:
-	std::string getLowerCaseProvinceType() const;
 };
 
 #endif // PROVINCE_H
