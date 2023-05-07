@@ -44,8 +44,9 @@ std::string Province::bespokeName() const
 std::string Province::miscName() const
 {
 	std::string name;
+	name = "\nType: " + provinceType;
 	if (areaName)
-		name = "\nArea: " + *areaName;
+		name += "\nArea: " + *areaName;
 	if (regionName)
 		name += "\nRegion: " + *regionName;
 	if (superRegionName)
