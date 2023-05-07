@@ -11,7 +11,7 @@ struct Province
 
 	[[nodiscard]] std::string bespokeName() const;
 	[[nodiscard]] std::string miscName() const;
-	[[nodiscard]] bool isWater() const { return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes"; }
+	[[nodiscard]] bool isWater() const;
 
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;

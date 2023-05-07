@@ -23,8 +23,19 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
 
-	auto listWaterProvincesCheckbox = new wxCheckBox(this, wxID_ANY, "Show water provinces");
-	listWaterProvincesCheckbox->Bind(wxEVT_CHECKBOX, [&](wxCommandEvent& event) {
+	listWaterProvincesCheckbox = new wxCheckBox(this, wxID_ANY, "Show water provinces");
+
+	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+	notebook->Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
+
+	sources = new UnmappedTab(notebook, activeVersion, ImageTabSelector::SOURCE);
+	notebook->AddPage(sources, "Source Provinces", false);
+	sources->redrawGrid();
+	targets = new UnmappedTab(notebook, activeVersion, ImageTabSelector::TARGET);
+	notebook->AddPage(targets, "Target Provinces", false);
+	targets->redrawGrid();
+
+	listWaterProvincesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
 		if (listWaterProvincesCheckbox->GetValue())
 		{
 			sources->setExcludeWaterProvinces(true);
@@ -37,16 +48,6 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 		}
 	});
 	sizer->Add(listWaterProvincesCheckbox);
-
-	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-	notebook->Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
-
-	sources = new UnmappedTab(notebook, activeVersion, ImageTabSelector::SOURCE);
-	notebook->AddPage(sources, "Source Provinces", false);
-	sources->redrawGrid();
-	targets = new UnmappedTab(notebook, activeVersion, ImageTabSelector::TARGET);
-	notebook->AddPage(targets, "Target Provinces", false);
-	targets->redrawGrid();
 
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
 	this->SetSizer(sizer);

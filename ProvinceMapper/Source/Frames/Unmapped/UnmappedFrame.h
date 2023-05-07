@@ -37,6 +37,7 @@ class UnmappedFrame final: public wxFrame
 
 	UnmappedTab* sources;
 	UnmappedTab* targets;
+	wxCheckBox* listWaterProvincesCheckbox;
 
 	std::shared_ptr<Configuration> configuration;
 
