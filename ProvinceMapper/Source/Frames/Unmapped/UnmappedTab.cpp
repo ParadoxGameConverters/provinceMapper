@@ -5,6 +5,7 @@
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
+#include <ranges>
 
 wxDEFINE_EVENT(wxEVT_PROVINCE_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_UPDATE_PROVINCE_COUNT, wxCommandEvent);
@@ -34,12 +35,25 @@ UnmappedTab::UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> t
 	theGrid->ForceRefresh();
 }
 
-const std::vector<std::shared_ptr<Province>>& UnmappedTab::getRelevantProvinces() const
+const std::vector<std::shared_ptr<Province>> UnmappedTab::getRelevantProvinces() const
 {
+	std::vector<std::shared_ptr<Province>> relevantProvinces;
 	if (selector == ImageTabSelector::SOURCE)
-		return *version->getUnmappedSources();
+		relevantProvinces = *version->getUnmappedSources();
 	else
-		return *version->getUnmappedTargets();
+		relevantProvinces = *version->getUnmappedTargets();
+
+	if (excludeWaterProvinces)
+	{
+		std::vector<std::shared_ptr<Province>> filteredProvinces;
+		for (auto &p : relevantProvinces | std::views::filter([](std::shared_ptr<Province> p){ return !p->isWater(); })) {
+			filteredProvinces.push_back(p);
+		}
+		return filteredProvinces;
+	}
+	return relevantProvinces;
+
+	
 }
 
 void UnmappedTab::redrawGrid()
@@ -222,6 +236,12 @@ void UnmappedTab::addProvince(const std::string& ID)
 			break;
 		}
 	}
+}
+
+void UnmappedTab::setExcludeWaterProvinces(bool excludeWaterProvinces)
+{
+	this->excludeWaterProvinces = excludeWaterProvinces;
+	redrawGrid();
 }
 
 void UnmappedTab::focusOnRow(const int row)

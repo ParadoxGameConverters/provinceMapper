@@ -22,6 +22,22 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	Bind(wxEVT_UPDATE_PROVINCE_COUNT, &UnmappedFrame::onUpdateProvinceCount, this);
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
+
+	auto listWaterProvincesCheckbox = new wxCheckBox(this, wxID_ANY, "Show water provinces");
+	listWaterProvincesCheckbox->Bind(wxEVT_CHECKBOX, [&](wxCommandEvent& event) {
+		if (listWaterProvincesCheckbox->GetValue())
+		{
+			sources->setExcludeWaterProvinces(true);
+			targets->setExcludeWaterProvinces(true);
+		}
+		else
+		{
+			sources->setExcludeWaterProvinces(false);
+			targets->setExcludeWaterProvinces(false);
+		}
+	});
+	sizer->Add(listWaterProvincesCheckbox);
+
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	notebook->Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
 
