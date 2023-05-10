@@ -207,25 +207,20 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 			{
 				if (const auto& cmatch2 = localizationMapper.getLocForTargetKey(*cmatch))
 				{
-					Log(LogLevel::Debug) << "cmatch on port " << id << " got " << *cmatch << " -> " << *cmatch2;
 					if (!province->locName)
 						province->locName = *cmatch2 + " [city]";
 					else
 						*province->locName += "[city]";
-					Log(LogLevel::Debug) << " jave :: " << *province->locName;
 				}
 			}
 			if (const auto& pmatch = localizationMapper.getLocForTargetKey(id + "_port"); pmatch)
 			{
 				if (const auto& pmatch2 = localizationMapper.getLocForTargetKey(*pmatch))
 				{
-					Log(LogLevel::Debug) << "pmatch on port " << id << " got " << *pmatch << " -> "
-												<< *pmatch2;
 					if (!province->locName)
 						province->locName = *pmatch2 + " [port]";
 					else
 						*province->locName += "[port]";
-					Log(LogLevel::Debug) << " jave :: " << *province->locName;
 				}
 			}
 			if (const auto& wmatch = localizationMapper.getLocForTargetKey(id + "_wood"); wmatch)
