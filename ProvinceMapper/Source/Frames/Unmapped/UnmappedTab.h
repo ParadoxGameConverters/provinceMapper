@@ -22,6 +22,8 @@ class UnmappedTab final: public wxNotebookPage
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& theVersion) { version = theVersion; }
 	void removeProvince(const std::string& ID);
 	void addProvince(const std::string& ID);
+	void setExcludeWaterProvinces(bool excludeWaterProvinces);
+	void setExcludeImpassables(bool excludeImpassables);
 
   private:
 	void onKeyDown(wxKeyEvent& event);
@@ -39,13 +41,15 @@ class UnmappedTab final: public wxNotebookPage
 	void stageMoveVersionRight() const;
 	void focusOnRow(int row);
 
-	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces() const;
+	[[nodiscard]] const std::vector<std::shared_ptr<Province>> getRelevantProvinces() const;
 
 	wxGrid* theGrid = nullptr;
 	ImageTabSelector selector;
 
 	std::shared_ptr<LinkMappingVersion> version;
 	std::map<std::string, int> provinceRows; // province/row
+	bool excludeWaterProvinces = false;
+	bool excludeImpassables = false;
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

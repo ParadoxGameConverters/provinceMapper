@@ -6,3 +6,5 @@ build/
 ProvinceMapper/log.txt
 log.txt
 configuration.txt
+target_adjacencies.txt
+source_adjacencies.txt

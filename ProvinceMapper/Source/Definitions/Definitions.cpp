@@ -2,7 +2,11 @@
 #include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
 #include "Provinces/Province.h"
+#include <algorithm>
 #include <fstream>
+#include <filesystem>
+#include <ParserHelpers.h>
+namespace fs = std::filesystem;
 
 namespace
 {
@@ -47,17 +51,19 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 } // namespace
 
 
-void Definitions::loadDefinitions(const std::string& filePath, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
+void Definitions::loadDefinitions(const std::string& mapDataPath, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
-	if (!commonItems::DoesFileExist(filePath + "/definition.csv"))
+	if (!commonItems::DoesFileExist(mapDataPath + "/definition.csv"))
 		throw std::runtime_error("Definitions file cannot be found!");
 
-	if (commonItems::DoesFileExist(filePath + "/area.txt"))
-		eu4RegionManager.loadRegions(filePath);
+	if (commonItems::DoesFileExist(mapDataPath + "/area.txt"))
+		eu4RegionManager.loadRegions(mapDataPath);
 
-	std::ifstream definitionsFile(filePath + "/definition.csv");
+	std::ifstream definitionsFile(mapDataPath + "/definition.csv");
 	parseStream(definitionsFile, localizationMapper, locType);
 	definitionsFile.close();
+
+	tryToLoadProvinceTypes(mapDataPath);
 }
 
 void Definitions::parseStream(std::istream& theStream, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
@@ -251,4 +257,78 @@ void Definitions::ditchAdjacencies(const std::string& fileName)
 		adjacenciesFile << "}\n";
 	}
 	adjacenciesFile.close();
+}
+
+std::string tolower(std::string str)
+{
+	std::transform(str.begin(),
+		 str.end(),
+		 str.begin(),
+		 [](unsigned char c) {
+			 return std::tolower(c);
+		 }
+	);
+	return str;
+}
+
+void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
+{
+	fs::path filePath = fs::path(mapDataPath) / fs::path("default.map");
+	auto filePathStr = filePath.string();
+	if (!commonItems::DoesFileExist(filePathStr))
+	{
+		return;
+	}
+
+	auto parser = commonItems::parser();
+	const std::string provinceTypesRegex = "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
+	parser.registerRegex(provinceTypesRegex, [&](const std::string& provinceType, std::istream& stream) {
+		std::string lowerCaseProvinceType = tolower(provinceType);
+		
+		parser.getNextTokenWithoutMatching(stream); // equals sign
+
+		auto strOfItemStr = commonItems::stringOfItem(stream).getString();
+		if (strOfItemStr == "LIST") // format found in Imperator and CK3
+		{
+			auto provIds = commonItems::getStrings(stream);
+			for (auto& id: provIds)
+			{
+				provinces[id]->provinceType = lowerCaseProvinceType;
+			}
+		}
+		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
+		{
+			auto provIds = commonItems::getULlongs(stream);
+			auto groupSize = provIds.size();
+			if (provIds.size() < 1 || groupSize > 2)
+			{
+				throw new std::runtime_error("A range of provinces should have 1 or 2 elements!");
+			}
+
+			auto beginning = provIds[0];
+			auto end = provIds[1];
+			for (auto id = beginning; id <= end; ++id)
+			{
+				std::string idStr = std::to_string(id);
+				provinces[idStr]->provinceType = lowerCaseProvinceType;
+			}
+		}
+		else if (strOfItemStr.find("{") == 0) // simple list
+		{
+			std::stringstream ss;
+			ss << strOfItemStr;
+			auto provIds = commonItems::getStrings(ss);
+
+			for (auto& id: provIds)
+			{
+				provinces[id]->provinceType = lowerCaseProvinceType;
+			}
+		}
+		else
+		{
+			throw std::runtime_error("Unknown province group type: " + strOfItemStr);
+		}
+	});
+	parser.IgnoreAndLogUnregisteredItems();
+	parser.parseFile(filePathStr);
 }
