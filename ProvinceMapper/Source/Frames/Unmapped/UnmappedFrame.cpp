@@ -62,7 +62,7 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 		}
 	});
 	sizer->Add(excludeImpassablesCheckbox);
-	if (theConfiguration->getSourceToken() != "eu4" && theConfiguration->getTargetToken() != "eu4")
+	if (configuration->getSourceToken() == "eu4" || configuration->getTargetToken() == "eu4")
 	{
 		// Adding EU4 would require serious changes.
 		excludeImpassablesCheckbox->Hide();
