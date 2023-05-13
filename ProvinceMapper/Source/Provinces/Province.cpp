@@ -87,7 +87,7 @@ bool Province::isWater() const
 
 bool Province::isImpassable() const
 {
-	// Use province type 
+	// Use province type for games like I:R and CK3.
 	if (provinceType)
 	{
 		return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
