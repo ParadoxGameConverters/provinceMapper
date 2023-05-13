@@ -45,7 +45,17 @@ std::string Province::bespokeName() const
 std::string Province::miscName() const
 {
 	std::string name;
-	name = "\nType: " + provinceType;
+
+	name = "\nType: ";
+	if (provinceType)
+	{
+		name += *provinceType;
+	}
+	else
+	{
+		name += "normal";
+	}
+
 	if (areaName)
 		name += "\nArea: " + *areaName;
 	if (regionName)
@@ -58,19 +68,31 @@ std::string Province::miscName() const
 bool Province::isWater() const
 {	
 	// For EU4, use region and area names to determine what is water.
-	if (superRegionName && superRegionName.value().ends_with("sea_superregion"))
+	if (superRegionName && superRegionName.value().ends_with("_sea_superregion"))
 	{
 		return true;
 	}
-	if (areaName && areaName.value().ends_with("sea_area"))
+	if (regionName && regionName.value().ends_with("_sea_region"))
 	{
 		return true;
 	}
+	if (areaName && areaName.value().ends_with("_sea_area"))
+	{
+		return true;
+	}
+
 	// For games like I:R and CK3, province type is defined and can be used.
 	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
 }
 
 bool Province::isImpassable() const
 {
-	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
+	// Use province type 
+	if (provinceType)
+	{
+		return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
+	}
+
+	// In EU4, a wasteland is a land province that is not a part of any area as defined in areas.txt.
+	return !areaName;
 }

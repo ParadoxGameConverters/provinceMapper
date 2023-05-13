@@ -30,7 +30,7 @@ struct Province
 	std::optional<std::string> areaName;
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
-	std::string provinceType = "normal";
+	std::optional<std::string> provinceType;
 };
 
 #endif // PROVINCE_H
