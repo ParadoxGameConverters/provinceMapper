@@ -48,20 +48,23 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	});
 	sizer->Add(excludeWaterProvincesCheckbox);
 
-	excludeImpassablesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude impassables");
-	excludeImpassablesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
-		if (excludeImpassablesCheckbox->GetValue())
-		{
-			sources->setExcludeImpassables(true);
-			targets->setExcludeImpassables(true);
-		}
-		else
-		{
-			sources->setExcludeImpassables(false);
-			targets->setExcludeImpassables(false);
-		}
-	});
-	sizer->Add(excludeImpassablesCheckbox);
+	if (theConfiguration->getSourceToken() != "eu4" && theConfiguration->getTargetToken() != "eu4")
+	{
+		excludeImpassablesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude impassables");
+		excludeImpassablesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+			if (excludeImpassablesCheckbox->GetValue())
+			{
+				sources->setExcludeImpassables(true);
+				targets->setExcludeImpassables(true);
+			}
+			else
+			{
+				sources->setExcludeImpassables(false);
+				targets->setExcludeImpassables(false);
+			}
+		});
+		sizer->Add(excludeImpassablesCheckbox);
+	}
 
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
 	this->SetSizer(sizer);

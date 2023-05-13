@@ -1,5 +1,6 @@
 #include "Province.h"
 #include <algorithm>
+#include <Configuration/Configuration.h>
 
 Province::Province(std::string theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
 	 ID(std::move(theID)), r(tr), g(tg), b(tb), mapDataName(std::move(theName))
@@ -85,14 +86,7 @@ bool Province::isWater() const
 	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
 }
 
-bool Province::isImpassable() const
+bool Province::isImpassable(Configuration config) const
 {
-	// Use province type for games like I:R and CK3.
-	if (provinceType)
-	{
-		return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
-	}
-
-	// In EU4, a wasteland is a land province that is not a part of any area as defined in areas.txt.
-	return !areaName;
+	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
 }
