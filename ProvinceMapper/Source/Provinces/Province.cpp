@@ -57,6 +57,16 @@ std::string Province::miscName() const
 
 bool Province::isWater() const
 {	
+	// For EU4, use region and area names to determine what is water.
+	if (superRegionName && superRegionName.value().ends_with("sea_superregion"))
+	{
+		return true;
+	}
+	if (areaName && areaName.value().ends_with("sea_area"))
+	{
+		return true;
+	}
+	// For games like I:R and CK3, province type is defined and can be used.
 	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
 }
 
