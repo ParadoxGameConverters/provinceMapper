@@ -86,7 +86,7 @@ bool Province::isWater() const
 	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
 }
 
-bool Province::isImpassable(Configuration config) const
+bool Province::isImpassable() const
 {
 	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
 }
