@@ -44,6 +44,20 @@ void LinkMappingVersion::registerKeys()
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
+		for (const auto& source: link->getSources())
+		{
+			if (seenSources.contains(source->ID))
+				Log(LogLevel::Error) << "Source province " << source->ID << " is double-mapped!";
+			else
+				seenSources.emplace(source->ID);
+		}
+		for (const auto& target: link->getTargets())
+		{
+			if (seenTargets.contains(target->ID))
+				Log(LogLevel::Error) << "Target province " << target->ID << " is double-mapped!";
+			else
+				seenTargets.emplace(target->ID);
+		}
 	});
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
