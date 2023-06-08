@@ -1,8 +1,8 @@
 #ifndef LINK_MAPPING_VERSION_H
 #define LINK_MAPPING_VERSION_H
+#include "Definitions/DefinitionsInterface.h"
 #include "LinkMapping.h"
 #include "Parser.h"
-#include "Definitions/DefinitionsInterface.h"
 
 class LinkMappingVersion: commonItems::parser
 {
@@ -70,6 +70,8 @@ class LinkMappingVersion: commonItems::parser
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
 	std::shared_ptr<std::vector<std::shared_ptr<Province>>> unmappedSources;
 	std::shared_ptr<std::vector<std::shared_ptr<Province>>> unmappedTargets;
+	std::set<std::string> seenSources;
+	std::set<std::string> seenTargets;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 
