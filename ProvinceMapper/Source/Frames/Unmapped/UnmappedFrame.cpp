@@ -22,6 +22,7 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	Bind(wxEVT_UPDATE_PROVINCE_COUNT, &UnmappedFrame::onUpdateProvinceCount, this);
 
 	auto* sizer = new wxBoxSizer(wxVERTICAL);
+
 	notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 	notebook->Bind(wxEVT_KEY_DOWN, &UnmappedFrame::onKeyDown, this);
 
@@ -31,6 +32,41 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	targets = new UnmappedTab(notebook, activeVersion, ImageTabSelector::TARGET);
 	notebook->AddPage(targets, "Target Provinces", false);
 	targets->redrawGrid();
+
+	excludeWaterProvincesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude water provinces");
+	excludeWaterProvincesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (excludeWaterProvincesCheckbox->GetValue())
+		{
+			sources->setExcludeWaterProvinces(true);
+			targets->setExcludeWaterProvinces(true);
+		}
+		else
+		{
+			sources->setExcludeWaterProvinces(false);
+			targets->setExcludeWaterProvinces(false);
+		}
+	});
+	sizer->Add(excludeWaterProvincesCheckbox);
+
+	excludeImpassablesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude impassables");
+	excludeImpassablesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (excludeImpassablesCheckbox->GetValue())
+		{
+			sources->setExcludeImpassables(true);
+			targets->setExcludeImpassables(true);
+		}
+		else
+		{
+			sources->setExcludeImpassables(false);
+			targets->setExcludeImpassables(false);
+		}
+	});
+	sizer->Add(excludeImpassablesCheckbox);
+	if (configuration->getSourceToken() == "eu4" || configuration->getTargetToken() == "eu4")
+	{
+		// Adding EU4 would require serious changes.
+		excludeImpassablesCheckbox->Hide();
+	}
 
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
 	this->SetSizer(sizer);

@@ -26,6 +26,8 @@ class Definitions: public DefinitionsInterface
   private:
 	void parseStream(std::istream& theStream, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType);
 
+	void tryToLoadProvinceTypes(const std::string& mapDataPath);
+
 	EU4::RegionManager eu4RegionManager;
 	std::map<unsigned int, std::set<unsigned int>> neighborChromas; // chroma-> neighbor chromas
 };

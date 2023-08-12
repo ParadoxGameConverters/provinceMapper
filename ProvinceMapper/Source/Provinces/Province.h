@@ -11,6 +11,8 @@ struct Province
 
 	[[nodiscard]] std::string bespokeName() const;
 	[[nodiscard]] std::string miscName() const;
+	[[nodiscard]] bool isWater() const;
+	[[nodiscard]] bool isImpassable() const;
 
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;
@@ -28,6 +30,7 @@ struct Province
 	std::optional<std::string> areaName;
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
+	std::optional<std::string> provinceType;
 };
 
 #endif // PROVINCE_H

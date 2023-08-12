@@ -1,4 +1,6 @@
 #include "Province.h"
+#include <algorithm>
+#include <Configuration/Configuration.h>
 
 Province::Province(std::string theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
 	 ID(std::move(theID)), r(tr), g(tg), b(tb), mapDataName(std::move(theName))
@@ -44,11 +46,47 @@ std::string Province::bespokeName() const
 std::string Province::miscName() const
 {
 	std::string name;
+
+	name = "\nType: ";
+	if (provinceType)
+	{
+		name += *provinceType;
+	}
+	else
+	{
+		name += "normal";
+	}
+
 	if (areaName)
-		name = "\nArea: " + *areaName;
+		name += "\nArea: " + *areaName;
 	if (regionName)
 		name += "\nRegion: " + *regionName;
 	if (superRegionName)
 		name += "\nSuperRegion: " + *superRegionName;
 	return name;
+}
+
+bool Province::isWater() const
+{	
+	// For EU4, use region and area names to determine what is water.
+	if (superRegionName && superRegionName.value().ends_with("_sea_superregion"))
+	{
+		return true;
+	}
+	if (regionName && regionName.value().ends_with("_sea_region"))
+	{
+		return true;
+	}
+	if (areaName && areaName.value().ends_with("_sea_area"))
+	{
+		return true;
+	}
+
+	// For games like I:R and CK3, province type is defined and can be used.
+	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
+}
+
+bool Province::isImpassable() const
+{
+	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
 }
