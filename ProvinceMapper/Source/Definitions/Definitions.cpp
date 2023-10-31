@@ -2,10 +2,10 @@
 #include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
 #include "Provinces/Province.h"
-#include <algorithm>
-#include <fstream>
-#include <filesystem>
 #include <ParserHelpers.h>
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
 namespace fs = std::filesystem;
 
 namespace
@@ -35,10 +35,23 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 			return std::nullopt;
 		auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
 		sepLocSave = sepLoc;
+		std::string mapDataName;
 		sepLoc = line.find(';', sepLocSave + 1);
 		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+		{
+			// There is no closing ;
+			// This may be an actual name ot just "x" indicating name isn't defined.
+			const auto potentialMapDataName = line.substr(sepLocSave + 1, line.length());
+			if (potentialMapDataName != "x")
+				mapDataName = potentialMapDataName;
+		}
+		else
+		{
+			// We have a closing ; but name may still be just "x".
+			mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+			if (mapDataName == "x")
+				mapDataName.clear();
+		}
 		return std::make_tuple(ID, r, g, b, mapDataName);
 	}
 	catch (std::exception& e)
@@ -261,13 +274,9 @@ void Definitions::ditchAdjacencies(const std::string& fileName)
 
 std::string tolower(std::string str)
 {
-	std::transform(str.begin(),
-		 str.end(),
-		 str.begin(),
-		 [](unsigned char c) {
-			 return std::tolower(c);
-		 }
-	);
+	std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+		return std::tolower(c);
+	});
 	return str;
 }
 
@@ -281,10 +290,11 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 	}
 
 	auto parser = commonItems::parser();
-	const std::string provinceTypesRegex = "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
+	const std::string provinceTypesRegex =
+		 "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
 	parser.registerRegex(provinceTypesRegex, [&](const std::string& provinceType, std::istream& stream) {
 		std::string lowerCaseProvinceType = tolower(provinceType);
-		
+
 		parser.getNextTokenWithoutMatching(stream); // equals sign
 
 		auto strOfItemStr = commonItems::stringOfItem(stream).getString();
