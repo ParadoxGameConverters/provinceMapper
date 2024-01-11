@@ -303,7 +303,8 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			auto provIds = commonItems::getStrings(stream);
 			for (auto& id: provIds)
 			{
-				provinces[id]->provinceType = lowerCaseProvinceType;
+				if (provinces.contains(id) && provinces.at(id))
+					provinces[id]->provinceType = lowerCaseProvinceType;
 			}
 		}
 		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
@@ -320,7 +321,8 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			for (auto id = beginning; id <= end; ++id)
 			{
 				std::string idStr = std::to_string(id);
-				provinces[idStr]->provinceType = lowerCaseProvinceType;
+				if (provinces.contains(idStr) && provinces.at(idStr))
+					provinces[idStr]->provinceType = lowerCaseProvinceType;
 			}
 		}
 		else if (strOfItemStr.find("{") == 0) // simple list
