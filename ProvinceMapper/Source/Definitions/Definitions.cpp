@@ -184,41 +184,41 @@ void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned ch
 std::optional<std::string> Definitions::getNameForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second->bespokeName();
-	else
-		return std::nullopt;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second->bespokeName();
+	return std::nullopt;
 }
 
 std::optional<std::string> Definitions::getMiscForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second->miscName();
-	else
-		return std::nullopt;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second->miscName();
+	return std::nullopt;
 }
 
 std::optional<std::string> Definitions::getIDForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second->ID;
-	else
-		return std::nullopt;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second->ID;
+	return std::nullopt;
 }
 
 std::shared_ptr<Province> Definitions::getProvinceForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second;
-	else
-		return nullptr;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second;
+	return nullptr;
 }
 
 std::shared_ptr<Province> Definitions::getProvinceForID(const std::string& ID)
 {
 	if (const auto& provinceItr = provinces.find(ID); provinceItr != provinces.end())
-		return provinceItr->second;
-	else
-		return nullptr;
+		if (provinceItr->second)
+			return provinceItr->second;
+	return nullptr;
 }
 
 void Definitions::loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
@@ -249,7 +249,7 @@ void Definitions::ditchAdjacencies(const std::string& fileName)
 	std::map<std::string, std::set<std::string>> adjacencies;
 	for (const auto& [sourceChroma, targetChromas]: neighborChromas)
 	{
-		if (const auto& sourceProvince = getIDForChroma(sourceChroma); sourceChroma)
+		if (const auto& sourceProvince = getIDForChroma(sourceChroma); sourceProvince)
 		{
 			adjacencies.emplace(*sourceProvince, std::set<std::string>{});
 			for (const auto& targetChroma: targetChromas)
