@@ -2,10 +2,10 @@
 #include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
 #include "Provinces/Province.h"
-#include <algorithm>
-#include <fstream>
-#include <filesystem>
 #include <ParserHelpers.h>
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
 namespace fs = std::filesystem;
 
 namespace
@@ -35,10 +35,23 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 			return std::nullopt;
 		auto b = static_cast<unsigned char>(std::stoi(line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1)));
 		sepLocSave = sepLoc;
+		std::string mapDataName;
 		sepLoc = line.find(';', sepLocSave + 1);
 		if (sepLoc == std::string::npos)
-			return std::nullopt;
-		auto mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+		{
+			// There is no closing ;
+			// This may be an actual name ot just "x" indicating name isn't defined.
+			const auto potentialMapDataName = line.substr(sepLocSave + 1, line.length());
+			if (potentialMapDataName != "x")
+				mapDataName = potentialMapDataName;
+		}
+		else
+		{
+			// We have a closing ; but name may still be just "x".
+			mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
+			if (mapDataName == "x")
+				mapDataName.clear();
+		}
 		return std::make_tuple(ID, r, g, b, mapDataName);
 	}
 	catch (std::exception& e)
@@ -171,41 +184,41 @@ void Definitions::registerBorderPixel(int x, int y, unsigned char r, unsigned ch
 std::optional<std::string> Definitions::getNameForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second->bespokeName();
-	else
-		return std::nullopt;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second->bespokeName();
+	return std::nullopt;
 }
 
 std::optional<std::string> Definitions::getMiscForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second->miscName();
-	else
-		return std::nullopt;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second->miscName();
+	return std::nullopt;
 }
 
 std::optional<std::string> Definitions::getIDForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second->ID;
-	else
-		return std::nullopt;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second->ID;
+	return std::nullopt;
 }
 
 std::shared_ptr<Province> Definitions::getProvinceForChroma(const unsigned int chroma)
 {
 	if (const auto& chromaCacheItr = chromaCache.find(chroma); chromaCacheItr != chromaCache.end())
-		return chromaCacheItr->second;
-	else
-		return nullptr;
+		if (chromaCacheItr->second)
+			return chromaCacheItr->second;
+	return nullptr;
 }
 
 std::shared_ptr<Province> Definitions::getProvinceForID(const std::string& ID)
 {
 	if (const auto& provinceItr = provinces.find(ID); provinceItr != provinces.end())
-		return provinceItr->second;
-	else
-		return nullptr;
+		if (provinceItr->second)
+			return provinceItr->second;
+	return nullptr;
 }
 
 void Definitions::loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
@@ -236,7 +249,7 @@ void Definitions::ditchAdjacencies(const std::string& fileName)
 	std::map<std::string, std::set<std::string>> adjacencies;
 	for (const auto& [sourceChroma, targetChromas]: neighborChromas)
 	{
-		if (const auto& sourceProvince = getIDForChroma(sourceChroma); sourceChroma)
+		if (const auto& sourceProvince = getIDForChroma(sourceChroma); sourceProvince)
 		{
 			adjacencies.emplace(*sourceProvince, std::set<std::string>{});
 			for (const auto& targetChroma: targetChromas)
@@ -261,13 +274,9 @@ void Definitions::ditchAdjacencies(const std::string& fileName)
 
 std::string tolower(std::string str)
 {
-	std::transform(str.begin(),
-		 str.end(),
-		 str.begin(),
-		 [](unsigned char c) {
-			 return std::tolower(c);
-		 }
-	);
+	std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+		return std::tolower(c);
+	});
 	return str;
 }
 
@@ -281,10 +290,11 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 	}
 
 	auto parser = commonItems::parser();
-	const std::string provinceTypesRegex = "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
+	const std::string provinceTypesRegex =
+		 "sea_zones|wasteland|impassable_terrain|uninhabitable|river_provinces|lakes|LAKES|impassable_mountains|impassable_seas";
 	parser.registerRegex(provinceTypesRegex, [&](const std::string& provinceType, std::istream& stream) {
 		std::string lowerCaseProvinceType = tolower(provinceType);
-		
+
 		parser.getNextTokenWithoutMatching(stream); // equals sign
 
 		auto strOfItemStr = commonItems::stringOfItem(stream).getString();
@@ -293,7 +303,8 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			auto provIds = commonItems::getStrings(stream);
 			for (auto& id: provIds)
 			{
-				provinces[id]->provinceType = lowerCaseProvinceType;
+				if (provinces.contains(id) && provinces.at(id))
+					provinces[id]->provinceType = lowerCaseProvinceType;
 			}
 		}
 		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
@@ -310,7 +321,8 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			for (auto id = beginning; id <= end; ++id)
 			{
 				std::string idStr = std::to_string(id);
-				provinces[idStr]->provinceType = lowerCaseProvinceType;
+				if (provinces.contains(idStr) && provinces.at(idStr))
+					provinces[idStr]->provinceType = lowerCaseProvinceType;
 			}
 		}
 		else if (strOfItemStr.find("{") == 0) // simple list
