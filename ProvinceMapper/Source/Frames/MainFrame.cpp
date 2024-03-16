@@ -49,6 +49,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
+	Bind(wxEVT_HIGHLIGHT_REGION, &MainFrame::onHighlightRegion, this);
+	Bind(wxEVT_DISABLE_REGION_HIGHLIGHT, &MainFrame::clearRegionHighlight, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
@@ -602,6 +604,17 @@ void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 	linksFrame->activateLinkByID(evt.GetInt());
 }
 
+void MainFrame::onHighlightRegion(const wxCommandEvent& evt)
+{
+	imageFrame->highlightRegionByCommentRow(evt.GetInt());
+	imageFrame->centerMapToActiveLink();
+}
+
+void MainFrame::clearRegionHighlight(wxCommandEvent& evt)
+{
+	imageFrame->clearRegionHighlight();
+}
+
 void MainFrame::onToggleProvince(const wxCommandEvent& evt)
 {
 	// Two things can happen. We're either:
@@ -705,7 +718,7 @@ void MainFrame::mergeRivers() const
 		Log(LogLevel::Info) << "Merging source rivers";
 		auto* imageData = sourceImg->GetData();
 		const auto imageDataSize = sourceImg->GetSize().x * sourceImg->GetSize().y * 3;
-		auto* riverData = sourceRiversImg->GetData();
+		const auto* riverData = sourceRiversImg->GetData();
 		const auto riverDataSize = sourceRiversImg->GetSize().x * sourceRiversImg->GetSize().y * 3;
 		if (riverDataSize == imageDataSize)
 			mergeRiverData(imageData, riverData, imageDataSize);
@@ -715,7 +728,7 @@ void MainFrame::mergeRivers() const
 		Log(LogLevel::Info) << "Merging target rivers";
 		auto* imageData = targetImg->GetData();
 		const auto imageDataSize = targetImg->GetSize().x * targetImg->GetSize().y * 3;
-		auto* riverData = targetRiversImg->GetData();
+		const auto* riverData = targetRiversImg->GetData();
 		const auto riverDataSize = targetRiversImg->GetSize().x * targetRiversImg->GetSize().y * 3;
 		if (riverDataSize == imageDataSize)
 			mergeRiverData(imageData, riverData, imageDataSize);

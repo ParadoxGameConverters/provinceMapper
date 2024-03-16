@@ -28,15 +28,19 @@ class ImageFrame: public wxFrame
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
+	void highlightRegionByCommentRow(int commentRow);
 	void toggleProvinceByID(const std::string& ID, bool sourceImage);
 	void shadeProvinceByID(const std::string& ID, bool sourceImage);
+	void centerMapToActiveLink();
 	void centerMap(int ID);
+	void centerMap(wxPoint srcCanvasPoint, wxPoint targetCanvasPoint);
 	void centerProvince(ImageTabSelector selector, const std::string& ID);
 	void deleteActiveLink();
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
+	void clearRegionHighlight();
 
-  private:
+private:
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
