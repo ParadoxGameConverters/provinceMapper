@@ -54,10 +54,15 @@ class LinksTab final : public wxNotebookPage
 
 	int lastClickedRow = 0;
 
+	std::shared_ptr<LinkMappingVersion> version;
+
+	wxGrid* triangulationPointGrid = nullptr;
+	std::optional<int> activeTriangulationPointRow;
+	std::shared_ptr<TriangulationPointPair> activeTriangulationPointPair;
+
 	wxGrid* theGrid = nullptr;
 	std::optional<int> activeRow;
 	std::shared_ptr<LinkMapping> activeLink;
-	std::shared_ptr<LinkMappingVersion> version;
 
 	void focusOnActiveRow();
 	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);

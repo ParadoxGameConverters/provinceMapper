@@ -23,6 +23,18 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_UPDATE_NAME, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
+	triangulationPointGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
+	triangulationPointGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
+	triangulationPointGrid->EnableEditing(false);
+	triangulationPointGrid->HideCellEditControl();
+	triangulationPointGrid->HideRowLabels();
+	triangulationPointGrid->HideColLabels();
+	triangulationPointGrid->SetScrollRate(0, 20);
+	triangulationPointGrid->SetColMinimalAcceptableWidth(600);
+	triangulationPointGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
+	triangulationPointGrid->SetColMinimalWidth(0, 600);
+	GetParent()->Layout();
+
 	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->EnableEditing(false);
@@ -36,6 +48,7 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	GetParent()->Layout();
 
 	auto* gridBox = new wxBoxSizer(wxVERTICAL);
+	gridBox->Add(triangulationPointGrid, wxSizerFlags(1).Expand());
 	gridBox->Add(theGrid, wxSizerFlags(1).Expand());
 	SetSizer(gridBox);
 	gridBox->Fit(this);
