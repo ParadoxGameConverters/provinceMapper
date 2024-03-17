@@ -31,6 +31,7 @@ class LinkMapper: commonItems::parser
 	[[nodiscard]] std::optional<int> addCommentByIndex(const std::string& comment, int index) const;
 	[[nodiscard]] std::optional<int> addRawLink() const;
 	[[nodiscard]] std::optional<int> addRawComment() const;
+	[[nodiscard]] std::optional<int> addRawTriangulationPair() const;
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& addVersion();
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& copyVersion();
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& deleteVersion();

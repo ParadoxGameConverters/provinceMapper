@@ -13,12 +13,8 @@ class TriangulationPointPair: commonItems::parser
 	TriangulationPointPair() = default;
 	explicit TriangulationPointPair(
 		 std::istream& theStream,
-		 std::string theSourceToken,
-		 std::string theTargetToken,
 		 int theID);
 	explicit TriangulationPointPair(
-		 std::string theSourceToken,
-		 std::string theTargetToken,
 		 int theID);
 
 	bool operator==(const TriangulationPointPair& rhs) const;

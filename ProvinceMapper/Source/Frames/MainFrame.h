@@ -60,6 +60,7 @@ class MainFrame final : public wxFrame
 	void onDeleteActiveLink(wxCommandEvent& evt);
 	void onLinksAddLink(wxCommandEvent& evt);
 	void onLinksAddComment(wxCommandEvent& evt);
+	void onLinksAddTriangulationPair(wxCommandEvent& evt);
 	void onVersionsAddVersion(wxCommandEvent& evt);
 	void onVersionsCopyVersion(wxCommandEvent& evt);
 	void onVersionsDeleteVersion(wxCommandEvent& evt);

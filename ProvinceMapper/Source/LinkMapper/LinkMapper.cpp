@@ -107,6 +107,14 @@ std::optional<int> LinkMapper::addRawComment() const
 		return std::nullopt;
 }
 
+std::optional<int> LinkMapper::addRawTriangulationPair() const
+{
+	if (activeVersion)
+		return activeVersion->addRawTriangulationPair();
+	else
+		return std::nullopt;
+}
+
 const std::shared_ptr<LinkMappingVersion>& LinkMapper::addVersion()
 {
 	std::string name = "0.0.0";

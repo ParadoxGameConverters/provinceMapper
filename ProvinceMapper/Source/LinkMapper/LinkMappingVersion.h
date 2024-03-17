@@ -45,6 +45,7 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
+	[[nodiscard]] int addRawTriangulationPair();
 
 	bool operator==(const LinkMappingVersion& rhs) const;
 

@@ -5,22 +5,15 @@
 #include "Provinces/Province.h"
 
 TriangulationPointPair::TriangulationPointPair(std::istream& theStream,
-	 std::string theSourceToken,
-	 std::string theTargetToken,
 	 const int theID):
-	 ID(theID),
-	 sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
+	 ID(theID)
 {
 	registerKeys();
 	parseStream(theStream);
 	clearRegisteredKeywords();
 }
 
-TriangulationPointPair::TriangulationPointPair(std::string theSourceToken,
-	 std::string theTargetToken,
-	 int theID):
-	 ID(theID),
-	 sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
+TriangulationPointPair::TriangulationPointPair(int theID): ID(theID)
 {
 }
 
