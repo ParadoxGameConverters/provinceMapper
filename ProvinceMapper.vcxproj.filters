@@ -93,6 +93,9 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\TriangulationPointPair.cpp">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
+    </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp">
       <Filter>ProvinceMapper\Provinces</Filter>
     </ClCompile>
@@ -173,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\Definitions\Vic3Regions\V3SuperRegion.cpp">
       <Filter>ProvinceMapper\Definitions\Vic3Regions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\TriangulationPointPair.h">
+      <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

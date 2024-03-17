@@ -2,6 +2,7 @@
 #define LINK_MAPPING_VERSION_H
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkMapping.h"
+#include "TriangulationPointPair.h"
 #include "Parser.h"
 
 class LinkMappingVersion: commonItems::parser
@@ -22,6 +23,7 @@ class LinkMappingVersion: commonItems::parser
 		 std::string theTargetToken,
 		 int theID);
 
+	[[nodiscard]] const auto& getTriangulationPointPairs() const { return triangulationPairs; }
 	[[nodiscard]] const auto& getLinks() const { return links; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
 	[[nodiscard]] auto getID() const { return ID; }
@@ -57,6 +59,11 @@ class LinkMappingVersion: commonItems::parser
 
 	int ID = 0;
 	std::string versionName;
+	
+	int triangulationPairCounter = 0;
+	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
+	std::shared_ptr<std::vector<std::shared_ptr<TriangulationPointPair>>> triangulationPairs;
+
 	int linkCounter = 0;
 	int lastActiveLinkIndex = 0;
 	std::shared_ptr<DefinitionsInterface> sourceDefs;

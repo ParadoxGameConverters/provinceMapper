@@ -26,25 +26,17 @@ TriangulationPointPair::TriangulationPointPair(std::string theSourceToken,
 
 void TriangulationPointPair::registerKeys()
 {
-	registerKeyword(sourceToken, [this](std::istream& theStream) {
-		auto id = commonItems::getString(theStream);
-		if (id.substr(0, 2) == "0x")
-		{
-			id = id.substr(1, id.length());
-		}
-		const auto& provinces = sourceDefs->getProvinces();
-		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
-			sources.emplace_back(provItr->second);
+	registerKeyword("srcX", [this](std::istream& theStream) {
+		sourcePoint.x = commonItems::getDouble(theStream);
 	});
-	registerKeyword(targetToken, [this](std::istream& theStream) {
-		auto id = commonItems::getString(theStream);
-		if (id.substr(0, 2) == "0x")
-		{
-			id = id.substr(1, id.length());
-		}
-		const auto& provinces = targetDefs->getProvinces();
-		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
-			targets.emplace_back(provItr->second);
+	registerKeyword("srcY", [this](std::istream& theStream) {
+		sourcePoint.y = commonItems::getDouble(theStream);
+	});
+	registerKeyword("dstX", [this](std::istream& theStream) {
+		targetPoint.x = commonItems::getDouble(theStream);
+	});
+	registerKeyword("dstY", [this](std::istream& theStream) {
+		targetPoint.y = commonItems::getDouble(theStream);
 	});
 	registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);
@@ -55,21 +47,20 @@ void TriangulationPointPair::registerKeys()
 std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair)
 {
 	output << "\tlink = { ";
-	// If this is a comment only output the comment.
-	if (pointPair.comment)
-	{
-		output << "comment = \"" << *pointPair.comment << "\" }\n";
-		return output;
-	}
 
 	// Dump point coordinates
 	output << "srcX = " << pointPair.sourcePoint.x << " ";
 	output << "srcY = " << pointPair.sourcePoint.y << " ";
 	output << "dstX = " << pointPair.targetPoint.x << " ";
 	output << "dstY = " << pointPair.targetPoint.y << " ";
-	output << "}";
 
-	output << "\n";
+	if (pointPair.comment)
+	{
+		output << "comment = \"" << *pointPair.comment << "\" ";
+		return output;
+	}
+
+	output << "}\n";
 	return output;
 }
 

@@ -20,6 +20,7 @@ wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 
 class LinkMappingVersion;
 class LinkMapping;
+class TriangulationPointPair;
 class LinksTab final : public wxNotebookPage
 {
   public:
@@ -54,15 +55,15 @@ class LinksTab final : public wxNotebookPage
 
 	int lastClickedRow = 0;
 
-	std::shared_ptr<LinkMappingVersion> version;
-
 	wxGrid* triangulationPointGrid = nullptr;
 	std::optional<int> activeTriangulationPointRow;
-	std::shared_ptr<TriangulationPointPair> activeTriangulationPointPair;
+	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
+	void focusOnActiveTriangulationPairRow(); // TODO: check if needed
 
 	wxGrid* theGrid = nullptr;
 	std::optional<int> activeRow;
 	std::shared_ptr<LinkMapping> activeLink;
+	std::shared_ptr<LinkMappingVersion> version;
 
 	void focusOnActiveRow();
 	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);
