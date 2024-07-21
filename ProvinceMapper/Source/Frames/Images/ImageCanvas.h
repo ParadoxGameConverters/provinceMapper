@@ -101,6 +101,8 @@ class ImageCanvas: public wxScrolledCanvas
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
 
+	int lastClickedTriangulationPairRow = 0;
+
 	bool triangulate = false;
 	std::vector<wxPoint> points;
 
