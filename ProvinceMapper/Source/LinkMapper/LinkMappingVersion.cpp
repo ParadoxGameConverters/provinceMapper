@@ -74,6 +74,8 @@ void LinkMappingVersion::registerKeys()
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion)
 {
 	output << linkMappingVersion.versionName << " = {\n";
+	for (const auto& triangulationPair: *linkMappingVersion.triangulationPairs)
+		output << *triangulationPair;
 	for (const auto& link: *linkMappingVersion.links)
 		output << *link;
 	output << "}\n";

@@ -39,7 +39,7 @@ void TriangulationPointPair::registerKeys()
 
 std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair)
 {
-	output << "\tlink = { ";
+	output << "\ttriangulation_pair = { ";
 
 	// Dump point coordinates
 	output << "srcX = " << pointPair.sourcePoint.x << " ";

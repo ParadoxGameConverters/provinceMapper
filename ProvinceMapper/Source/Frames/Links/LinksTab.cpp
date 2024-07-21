@@ -182,7 +182,7 @@ void LinksTab::leftUp(const wxGridEvent& event)
 
 		// Case 1: Selecting a new row.
 		if (activeRow)
-			restoreRowColor(*activeRow);
+			restoreLinkRowColor(*activeRow);
 
 		auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
 		evt->SetInt(row);
@@ -192,7 +192,7 @@ void LinksTab::leftUp(const wxGridEvent& event)
 	}
 }
 
-void LinksTab::restoreRowColor(int row) const
+void LinksTab::restoreLinkRowColor(int row) const
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
@@ -201,13 +201,31 @@ void LinksTab::restoreRowColor(int row) const
 		theGrid->SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
 }
 
-void LinksTab::activateRowColor(int row) const
+void LinksTab::activateLinkRowColor(int row) const
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
 		theGrid->SetCellBackgroundColour(row, 0, wxColour(50, 180, 50)); // comment highlight
 	else
 		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 250, 150)); // link highlight
+}
+
+void LinksTab::restoreTriangulationPairRowColor(int pairRow) const
+{
+	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
+	if (pair->getComment())
+		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 150, 150)); // comment regular
+	else
+		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(240, 240, 240)); // link regular
+}
+
+void LinksTab::activateTriangulationPairRowColor(int pairRow) const
+{
+	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
+	if (pair->getComment())
+		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(50, 180, 50)); // comment highlight
+	else
+		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 250, 150)); // link highlight
 }
 
 
@@ -219,7 +237,7 @@ void LinksTab::deactivateLink()
 		if (static_cast<int>(version->getLinks()->size()) == theGrid->GetNumberRows())
 		{
 			// all is well, just deactivate.
-			restoreRowColor(*activeRow);
+			restoreLinkRowColor(*activeRow);
 		}
 		else
 		{
@@ -241,7 +259,7 @@ void LinksTab::activateLinkByID(const int theID)
 
 	// If we're already active, restore color.
 	if (activeRow)
-		restoreRowColor(*activeRow);
+		restoreLinkRowColor(*activeRow);
 
 	auto rowCounter = 0;
 	for (const auto& link: *version->getLinks())
@@ -250,7 +268,7 @@ void LinksTab::activateLinkByID(const int theID)
 		{
 			activeRow = rowCounter;
 			activeLink = link;
-			activateRowColor(rowCounter);
+			activateLinkRowColor(rowCounter);
 			if (!theGrid->IsVisible(rowCounter, 0, false))
 				focusOnActiveRow();
 			lastClickedRow = rowCounter;
@@ -264,7 +282,7 @@ void LinksTab::activateLinkByIndex(const int index)
 {
 	// If we're already active, restore color.
 	if (activeRow)
-		restoreRowColor(*activeRow);
+		restoreLinkRowColor(*activeRow);
 
 	if (index >= static_cast<int>(version->getLinks()->size()))
 		return; // uh-huh
@@ -272,7 +290,7 @@ void LinksTab::activateLinkByIndex(const int index)
 	const auto& link = version->getLinks()->at(index);
 	activeRow = index;
 	activeLink = link;
-	activateRowColor(index);
+	activateLinkRowColor(index);
 	if (!theGrid->IsVisible(index, 0, false))
 		focusOnActiveRow();
 	lastClickedRow = index;
@@ -343,11 +361,11 @@ void LinksTab::createLink(const int linkID)
 				theGrid->SetCellValue(rowCounter, 0, *link->getComment());
 			else // new active link
 				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
-			activateRowColor(rowCounter);
+			activateLinkRowColor(rowCounter);
 			activeLink = link;
 			// If we have an active link, restore its color.
 			if (activeRow)
-				restoreRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
 			activeRow = rowCounter;
 			lastClickedRow = rowCounter;
 			// let's insert it.
@@ -374,13 +392,13 @@ void LinksTab::createTriangulationPair(int pairID)
 				triangulationPointGrid->SetCellValue(rowCounter, 0, *pair->getComment());
 			else // new active link
 				triangulationPointGrid->SetCellValue(rowCounter, 0, triangulationPairToString(pair));
-			activateRowColor(rowCounter);
+			activateTriangulationPairRowColor(rowCounter);
 			activeTriangulationPair = pair;
 			// If we have an active link, restore its color.
-			if (activeRow)
-				restoreRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
-			activeRow = rowCounter;
-			lastClickedRow = rowCounter;
+			if (activeTriangulationPointRow)
+				restoreTriangulationPairRowColor(*activeTriangulationPointRow + 1); // We have a link inserted so we need to fix the following one.
+			activeTriangulationPointRow = rowCounter;
+			lastClickedTriangulationPairRow = rowCounter;
 			// let's insert it.
 			triangulationPointGrid->SetColMinimalWidth(0, 600);
 			triangulationPointGrid->ForceRefresh();

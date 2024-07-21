@@ -28,6 +28,10 @@ class LinksTab final : public wxNotebookPage
 	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
 	void redrawGrid();
 
+	void restoreTriangulationPairRowColor(int pairRow) const;
+
+	void activateTriangulationPairRowColor(int row) const;
+
 	void deactivateLink();
 	void activateLinkByID(int theID);
 	void activateLinkByIndex(int index);
@@ -44,8 +48,8 @@ class LinksTab final : public wxNotebookPage
 	void onUpdateComment(const wxCommandEvent& event);
 	void onKeyDown(wxKeyEvent& event);
 
-	void restoreRowColor(int row) const;
-	void activateRowColor(int row) const;
+	void restoreLinkRowColor(int row) const;
+	void activateLinkRowColor(int row) const;
 	void stageAddComment();
 	void stageDeleteLink() const;
 	void stageMoveUp() const;
@@ -56,6 +60,7 @@ class LinksTab final : public wxNotebookPage
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 
+	int lastClickedTriangulationPairRow = 0;
 	int lastClickedRow = 0;
 
 	wxGrid* triangulationPointGrid = nullptr;
