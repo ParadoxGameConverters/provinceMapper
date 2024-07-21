@@ -130,6 +130,23 @@ std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
 	return name;
 }
 
+std::string LinksTab::triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair)
+{
+	std::string name;
+
+	const auto& sourcePoint = pair->getSourcePoint();
+	wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint.x, sourcePoint.y);
+	name += std::string(sourcePointStr.mb_str());
+
+	name += " -> ";
+
+	const auto& targetPoint = pair->getTargetPoint();
+	wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint.x, targetPoint.y);
+	name += std::string(targetPointStr.mb_str());
+
+	return name;
+}
+
 void LinksTab::leftUp(const wxGridEvent& event)
 {
 	// Left Up means:
@@ -328,6 +345,37 @@ void LinksTab::createLink(const int linkID)
 				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
 			activateRowColor(rowCounter);
 			activeLink = link;
+			// If we have an active link, restore its color.
+			if (activeRow)
+				restoreRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+			activeRow = rowCounter;
+			lastClickedRow = rowCounter;
+			// let's insert it.
+			theGrid->SetColMinimalWidth(0, 600);
+			theGrid->ForceRefresh();
+			break;
+		}
+		++rowCounter;
+	}
+}
+
+void LinksTab::createTriangulationPair(int pairID) // TODO: REVIEW THIS
+{
+	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
+
+	// Where is this new row?
+	auto rowCounter = 0;
+	for (const auto& pair: *version->getTriangulationPointPairs())
+	{
+		if (pair->getID() == pairID)
+		{
+			theGrid->InsertRows(rowCounter, 1, false);
+			if (pair->getComment()) // this is a comment.
+				theGrid->SetCellValue(rowCounter, 0, *pair->getComment());
+			else // new active link
+				theGrid->SetCellValue(rowCounter, 0, triangulationPairToString(pair));
+			activateRowColor(rowCounter);
+			activeTriangulationPair = pair;
 			// If we have an active link, restore its color.
 			if (activeRow)
 				restoreRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.

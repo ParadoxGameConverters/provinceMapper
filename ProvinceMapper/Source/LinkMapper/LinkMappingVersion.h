@@ -62,6 +62,7 @@ class LinkMappingVersion: commonItems::parser
 	std::string versionName;
 	
 	int triangulationPairCounter = 0;
+	int lastActiveTriangulationPairIndex = 0;
 	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	std::shared_ptr<std::vector<std::shared_ptr<TriangulationPointPair>>> triangulationPairs;
 

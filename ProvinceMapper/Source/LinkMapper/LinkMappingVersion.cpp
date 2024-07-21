@@ -257,6 +257,17 @@ int LinkMappingVersion::addRawComment()
 	return link->getID();
 }
 
+int LinkMappingVersion::addRawTriangulationPair()
+{
+	// Create a new pair.
+	const auto pair = std::make_shared<TriangulationPointPair>(triangulationPairCounter);
+	++triangulationPairCounter;
+	const auto& positionItr = triangulationPairs->begin() + lastActiveTriangulationPairIndex;
+	triangulationPairs->insert(positionItr, pair);
+	activeTriangulationPair = pair;
+	return pair->getID();
+}
+
 void LinkMappingVersion::moveActiveLinkUp() const
 {
 	if (activeLink)

@@ -88,6 +88,14 @@ void LinksFrame::createLink(const int linkID) const
 		activePage->createLink(linkID);
 }
 
+void LinksFrame::createTriangulationPair(const int pairID) const
+{
+	if (activePage)
+	{
+		activePage->createTriangulationPair(pairID);
+	}
+}
+
 void LinksFrame::addVersion(const std::shared_ptr<LinkMappingVersion>& version)
 {
 	auto* newTab = new LinksTab(notebook, version);

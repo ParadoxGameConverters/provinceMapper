@@ -702,7 +702,7 @@ void MainFrame::onLinksAddComment(wxCommandEvent& evt)
 void MainFrame::onLinksAddTriangulationPair(wxCommandEvent& evt)
 {
 	// This one creates a new triangulation point pair.
-	const auto newPairID = linkMapper.addTriangulationPair();
+	const auto newPairID = linkMapper.addRawTriangulationPair();
 	if (newPairID)
 	{
 		linksFrame->createTriangulationPair(*newPairID);

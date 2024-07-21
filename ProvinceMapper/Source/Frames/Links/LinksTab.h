@@ -15,6 +15,7 @@ wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 
@@ -32,6 +33,7 @@ class LinksTab final : public wxNotebookPage
 	void activateLinkByIndex(int index);
 	void refreshActiveLink();
 	void createLink(int linkID);
+	void createTriangulationPair(int pairID);
 	void moveActiveLinkUp();
 	void moveActiveLinkDown();
 
@@ -50,6 +52,7 @@ class LinksTab final : public wxNotebookPage
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageAddTriangulationPair() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 
@@ -67,6 +70,8 @@ class LinksTab final : public wxNotebookPage
 
 	void focusOnActiveRow();
 	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);
+
+	std::string triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair);
 
   protected:
 	wxEvtHandler* eventListener = nullptr;
