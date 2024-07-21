@@ -143,7 +143,6 @@ std::string LinksTab::triangulationPairToString(const std::shared_ptr<Triangulat
 	const auto& targetPoint = pair->getTargetPoint();
 	wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint.x, targetPoint.y);
 	name += std::string(targetPointStr.mb_str());
-
 	return name;
 }
 
@@ -359,7 +358,7 @@ void LinksTab::createLink(const int linkID)
 	}
 }
 
-void LinksTab::createTriangulationPair(int pairID) // TODO: REVIEW THIS
+void LinksTab::createTriangulationPair(int pairID)
 {
 	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
 
@@ -369,11 +368,11 @@ void LinksTab::createTriangulationPair(int pairID) // TODO: REVIEW THIS
 	{
 		if (pair->getID() == pairID)
 		{
-			theGrid->InsertRows(rowCounter, 1, false);
+			triangulationPointGrid->InsertRows(rowCounter, 1, false);
 			if (pair->getComment()) // this is a comment.
-				theGrid->SetCellValue(rowCounter, 0, *pair->getComment());
+				triangulationPointGrid->SetCellValue(rowCounter, 0, *pair->getComment());
 			else // new active link
-				theGrid->SetCellValue(rowCounter, 0, triangulationPairToString(pair));
+				triangulationPointGrid->SetCellValue(rowCounter, 0, triangulationPairToString(pair));
 			activateRowColor(rowCounter);
 			activeTriangulationPair = pair;
 			// If we have an active link, restore its color.
@@ -382,8 +381,8 @@ void LinksTab::createTriangulationPair(int pairID) // TODO: REVIEW THIS
 			activeRow = rowCounter;
 			lastClickedRow = rowCounter;
 			// let's insert it.
-			theGrid->SetColMinimalWidth(0, 600);
-			theGrid->ForceRefresh();
+			triangulationPointGrid->SetColMinimalWidth(0, 600);
+			triangulationPointGrid->ForceRefresh();
 			break;
 		}
 		++rowCounter;

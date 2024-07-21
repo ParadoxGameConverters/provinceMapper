@@ -244,6 +244,7 @@ void MainFrame::initLinksFrame()
 	auto* linksDropDown = new wxMenu;
 	linksDropDown->Append(wxEVT_ADD_LINK, "Add Link [F3]\tCtrl-L");
 	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment [F4]\tCtrl-C");
+	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Triangulation Point Pair [F6]");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK, "Delete Selected [Del]\tCtrl-D");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum -");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum +");
