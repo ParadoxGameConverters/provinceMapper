@@ -708,6 +708,7 @@ void MainFrame::onLinksAddTriangulationPair(wxCommandEvent& evt)
 	{
 		linksFrame->createTriangulationPair(*newPairID);
 		imageFrame->deactivateLink();
+		imageFrame->activateTriangulationPairByID(*newPairID);
 	}
 }
 

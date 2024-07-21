@@ -54,6 +54,7 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	gridBox->Add(theGrid, wxSizerFlags(1).Expand());
 	SetSizer(gridBox);
 	gridBox->Fit(this);
+	triangulationPointGrid->ForceRefresh();
 	theGrid->ForceRefresh();
 }
 

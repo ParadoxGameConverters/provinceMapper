@@ -23,6 +23,7 @@ enum class ImageTabSelector
 };
 
 class LinkMappingVersion;
+class TriangulationPointPair;
 class LinkMapping;
 class Definitions;
 class ImageCanvas: public wxScrolledCanvas
@@ -61,6 +62,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
+	void activateTriangulationPairByID(int ID);
 	void toggleProvinceByID(const std::string& ID);
 	void shadeProvinceByID(const std::string& ID);
 	void deleteActiveLink();
@@ -100,6 +102,7 @@ class ImageCanvas: public wxScrolledCanvas
 	bool black = false;
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
+	int lastClickedTriangulationPair = 0;
 
 	bool triangulate = false;
 	std::vector<wxPoint> points;
@@ -120,6 +123,7 @@ class ImageCanvas: public wxScrolledCanvas
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	std::shared_ptr<DefinitionsInterface> definitions;
+	std::shared_ptr<TriangulationPointPair> activeTriangulationPointPair;
 	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;

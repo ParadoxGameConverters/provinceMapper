@@ -2,6 +2,7 @@
 #include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
+#include "LinkMapper/TriangulationPointPair.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 
@@ -175,6 +176,23 @@ void ImageCanvas::deactivateLink()
 	strafedPixels.clear();
 }
 
+void ImageCanvas::activateTriangulationPairByID(int ID)
+{
+	if (!activeVersion)
+		return;
+	auto counter = 0;
+	for (const auto& pair: *activeVersion->getTriangulationPointPairs())
+	{
+		if (pair->getID() == ID)
+		{
+			activeTriangulationPointPair = pair;
+			lastClickedTriangulationPair = counter;
+			break;
+		}
+		++counter;
+	}
+}
+
 void ImageCanvas::onMouseOver(wxMouseEvent& event)
 {
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -212,6 +230,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// 2. add a province to the existing mapping, or
 	// 3. remove it from active mapping.
 	// 4 - special: if we're initing triangulation, we need raw points.
+	// 5. - special: if we're adding a permanent triangulation pair, 
 
 	// What province have we clicked?
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -222,6 +241,21 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+		// case 5: check if we're in the process of editing a triangulation pair
+		if (activeTriangulationPointPair) // TODO: finish this
+		{
+			const auto point = wxPoint(x, y);
+			if (selector == ImageTabSelector::SOURCE)
+			{
+				activeTriangulationPointPair->setSourcePoint(point);
+			}
+			else
+			{
+				activeTriangulationPointPair->setTargetPoint(point);
+			}
+			return;
+		}
+
 		// case 4: special.
 		if (triangulate && points.size() < 3)
 		{

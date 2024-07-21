@@ -331,6 +331,14 @@ void ImageFrame::deleteActiveLink()
 	Refresh();
 }
 
+void ImageFrame::activateTriangulationPairByID(const int ID)
+{
+	sourceCanvas->activateTriangulationPairByID(ID);
+	targetCanvas->activateTriangulationPairByID(ID);
+	render();
+	Refresh();
+}
+
 void ImageFrame::toggleProvinceByID(const std::string& ID, const bool sourceImage)
 {
 	if (sourceImage)
