@@ -57,6 +57,12 @@ void LinkMapper::deactivateLink() const
 		activeVersion->deactivateLink();
 }
 
+void LinkMapper::deactivateTriangulationPair() const
+{
+	if (activeVersion)
+		activeVersion->deactivateTriangulationPair();
+}
+
 void LinkMapper::activateLinkByIndex(const int row) const
 {
 	if (activeVersion)

@@ -9,6 +9,7 @@
 
 wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
@@ -39,15 +40,15 @@ class LinksTab final : public wxNotebookPage
 	void refreshActiveLink();
 	void createLink(int linkID);
 	void createTriangulationPair(int pairID);
-	void moveActiveLinkUp();
-	void moveActiveLinkDown();
+	void moveActiveLinkUp(); // TODO: add triangulation pairs support
+	void moveActiveLinkDown(); // TODO: add triangulation pairs support
 
   private:
-	void rightUp(wxGridEvent& event);
+	void rightUp(wxGridEvent& event); 
 	void leftUp(const wxGridEvent& event);
-	void onGridMotion(wxMouseEvent& event);
-	void onUpdateComment(const wxCommandEvent& event);
-	void onKeyDown(wxKeyEvent& event);
+	void onGridMotion(wxMouseEvent& event); // TODO: add triangulation pairs support
+	void onUpdateComment(const wxCommandEvent& event); // TODO: add triangulation pairs support
+	void onKeyDown(wxKeyEvent& event);	// TODO: add triangulation pairs support
 
 	void restoreLinkRowColor(int row) const;
 	void activateLinkRowColor(int row) const;
@@ -78,6 +79,10 @@ class LinksTab final : public wxNotebookPage
 	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);
 
 	std::string triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair);
+
+	void linksGridLeftUp(const wxGridEvent& event);
+
+	void triangulationPairsGridLeftUp(const wxGridEvent& event);
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

@@ -27,6 +27,9 @@ class TriangulationPointPair: commonItems::parser
 	[[nodiscard]] const auto& getSourcePoint() const { return sourcePoint; }
 	[[nodiscard]] const auto& getTargetPoint() const { return targetPoint; }
 	[[nodiscard]] const auto& getComment() const { return comment; }
+	[[nodiscard]] const bool isEmpty() const {
+		return !sourcePoint && !targetPoint && !comment;
+	}
 
 	friend std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair);
 
@@ -34,11 +37,11 @@ class TriangulationPointPair: commonItems::parser
 	void registerKeys();
 
 	int ID = 0;
-	wxPoint sourcePoint;
-	wxPoint targetPoint;
+	std::optional<wxPoint> sourcePoint;
+	std::optional<wxPoint> targetPoint;
 	std::optional<std::string> comment;
-	std::string sourceToken;
-	std::string targetToken;
+	std::string sourceToken; // TODO: REMOVE THIS
+	std::string targetToken; // TODO: REMOVE THIS
 };
 std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair);
 #endif // TRIANGULATION_POINT_PAIR_H

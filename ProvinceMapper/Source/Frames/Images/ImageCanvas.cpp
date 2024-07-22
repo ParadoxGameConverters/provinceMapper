@@ -321,6 +321,11 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
 	}
+	if (activeTriangulationPointPair)
+	{
+		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
+		eventHandler->QueueEvent(evt->Clone());
+	}
 	event.Skip();
 }
 

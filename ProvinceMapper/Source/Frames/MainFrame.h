@@ -51,6 +51,7 @@ class MainFrame final : public wxFrame
 	void onStartButton(wxCommandEvent& evt);
 	void onSaveLinks(wxCommandEvent& evt);
 	void onDeactivateLink(wxCommandEvent& evt);
+	void onDeactivateTriangulationPair(wxCommandEvent& evt);
 	void onActivateLinkByIndex(const wxCommandEvent& evt);
 	void onActivateLinkByID(const wxCommandEvent& evt);
 	void onToggleProvince(const wxCommandEvent& evt);

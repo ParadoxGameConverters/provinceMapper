@@ -92,6 +92,16 @@ void LinkMappingVersion::deactivateLink()
 	activeLink.reset();
 }
 
+void LinkMappingVersion::deactivateTriangulationPair()
+{
+	if (activeTriangulationPair)
+	{
+		if (activeTriangulationPair->isEmpty())
+			deleteActiveTriangulationPair();
+	}
+	activeTriangulationPair.reset();
+}
+
 void LinkMappingVersion::activateLinkByIndex(const int row)
 {
 	if (row < static_cast<int>(links->size()))
@@ -237,6 +247,25 @@ void LinkMappingVersion::deleteActiveLink()
 			++counter;
 		}
 		activeLink.reset();
+	}
+}
+
+void LinkMappingVersion::deleteActiveTriangulationPair()
+{
+	if (activeTriangulationPair)
+	{
+		auto counter = 0;
+		for (const auto& pair: *triangulationPairs)
+		{
+			if (*pair == *activeTriangulationPair)
+			{
+				// we're deleting it.
+				triangulationPairs->erase((*triangulationPairs).begin() + counter);
+				break;
+			}
+			++counter;
+		}
+		activeTriangulationPair.reset();
 	}
 }
 

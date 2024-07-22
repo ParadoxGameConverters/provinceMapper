@@ -16,6 +16,7 @@ class LinkMapper: commonItems::parser
 
 	void exportMappings(const std::string& linksFile) const;
 	void deactivateLink() const;
+	void deactivateTriangulationPair() const;
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
 	void deleteActiveLink() const;

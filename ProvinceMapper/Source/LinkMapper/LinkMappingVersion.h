@@ -32,9 +32,11 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] Mapping isProvinceMapped(const std::string& provinceID, bool isSource) const;
 
 	void deactivateLink();
+	void deactivateTriangulationPair();
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int theID);
 	void deleteActiveLink();
+	void deleteActiveTriangulationPair();
 	void setName(const std::string& theName) { versionName = theName; }
 	void setID(int theID) { ID = theID; }
 	void copyLinks(const std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>>& theLinks) const { *links = *theLinks; }

@@ -48,6 +48,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onShowUnmapped, this, wxMENU_SHOW_UNMAPPED);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
+	Bind(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, &MainFrame::onDeactivateTriangulationPair, this)
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
@@ -581,6 +582,13 @@ void MainFrame::onDeactivateLink(wxCommandEvent& evt)
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
 	imageFrame->deactivateLink();
+}
+
+void MainFrame::onDeactivateTriangulationPair(wxCommandEvent& evt)
+{
+	linkMapper.deactivateTriangulationPair();
+	linksFrame->deactivateTriangulationPair();
+	imageFrame->deactivateTriangulationPair();
 }
 
 void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)

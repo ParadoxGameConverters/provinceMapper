@@ -6,6 +6,7 @@
 
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
@@ -190,7 +191,7 @@ std::string LinksTab::triangulationPairToString(const std::shared_ptr<Triangulat
 	return name;
 }
 
-void LinksTab::leftUp(const wxGridEvent& event)
+void LinksTab::linksGridLeftUp(const wxGridEvent& event)
 {
 	// Left Up means:
 	// 1. We want to mark a nonworking row as working row
@@ -232,6 +233,64 @@ void LinksTab::leftUp(const wxGridEvent& event)
 		eventListener->QueueEvent(evt->Clone());
 
 		lastClickedRow = row;
+	}
+}
+
+void LinksTab::triangulationPairsGridLeftUp(const wxGridEvent& event) // TODO: move this to TriangulationPairsTab
+{
+	// Left Up means:
+	// 1. We want to mark a nonworking row as working row
+	// 2. We are AGAIN clicking on a working row to center the map
+	// 3. We're AGAIN clicking on a comment to change it.
+
+	// We're selecting some cell. Let's translate that.
+	const auto row = event.GetRow();
+	if (row < static_cast<int>(version->getTriangulationPointPairs()->size()))
+	{
+		// Case 3: This is a comment.
+		if (version->getTriangulationPointPairs()->at(row)->getComment())
+		{
+			// and we're altering it.
+			if (activeTriangulationPointRow && *activeTriangulationPointRow == row)
+			{
+				// spawn a dialog to change the name.
+				// TODO: DialogComment is for links. Implement an equivalent for triangulation pairs.
+				auto* dialog = new DialogComment(this, "Edit Comment", *version->getTriangulationPointPairs()->at(row)->getComment(), row);
+				dialog->ShowModal();
+				return;
+			}
+		}
+
+		// Case 2: if we already clicked here, center the map.
+		if (activeTriangulationPointRow && *activeTriangulationPointRow == row)
+		{
+			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR);
+			centerEvt->SetInt(activeTriangulationPair->getID());
+			eventListener->QueueEvent(centerEvt->Clone());
+			return;
+		}
+
+		// Case 1: Selecting a new row.
+		if (activeTriangulationPointRow)
+			restoreLinkRowColor(*activeTriangulationPointRow);
+
+		auto* evt = new wxCommandEvent(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX);
+		evt->SetInt(row);
+		eventListener->QueueEvent(evt->Clone());
+
+		lastClickedTriangulationPairRow = row;
+	}
+}
+
+void LinksTab::leftUp(const wxGridEvent& event)
+{
+	if (event.GetId() == theGrid->GetId())
+	{
+		linksGridLeftUp(event);
+	}
+	else
+	{
+		
 	}
 }
 
@@ -366,9 +425,17 @@ void LinksTab::refreshActiveLink()
 
 void LinksTab::rightUp(wxGridEvent& event)
 {
-	// Right up means deselect active link, which is serious stuff.
-	// If our active link is dry, we're not deselecting it, we're deleting it.
-	const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+	const wxCommandEvent* evt;
+	if (event.GetId() == theGrid->GetId())
+	{
+		// Right up means deselect active link, which is serious stuff.
+		// If our active link is dry, we're not deselecting it, we're deleting it.
+		evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+	}
+	else
+	{
+		evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
+	}
 	eventListener->QueueEvent(evt->Clone());
 	event.Skip();
 }
