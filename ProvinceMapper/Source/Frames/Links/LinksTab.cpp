@@ -24,6 +24,8 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_UPDATE_NAME, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
+	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+	pairsTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	triangulationPointGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
 	triangulationPointGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	triangulationPointGrid->EnableEditing(false);
@@ -36,26 +38,62 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	triangulationPointGrid->SetColMinimalWidth(0, 600);
 	GetParent()->Layout();
 
+	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+	linksTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
 	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	theGrid->EnableEditing(false);
 	theGrid->HideCellEditControl();
 	theGrid->HideRowLabels();
 	theGrid->HideColLabels();
-	theGrid->SetScrollRate(0, 20);
+	theGrid->SetScrollRate(0, 10);
 	theGrid->SetColMinimalAcceptableWidth(600);
 	theGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
 	theGrid->SetColMinimalWidth(0, 600);
 	GetParent()->Layout();
 
 	auto* gridBox = new wxBoxSizer(wxVERTICAL);
-	gridBox->Add(triangulationPointGrid, wxSizerFlags(1).Expand());
-	gridBox->AddSpacer(100);
+	gridBox->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
+	gridBox->Add(triangulationPointGrid, 1, wxEXPAND | wxALL);
+
+	gridBox->AddSpacer(20); // Visually separate the triangulation pairs grid from the province links grid.
+	gridBox->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
 	gridBox->Add(theGrid, wxSizerFlags(1).Expand());
 	SetSizer(gridBox);
 	gridBox->Fit(this);
 	triangulationPointGrid->ForceRefresh();
 	theGrid->ForceRefresh();
+}
+
+void LinksTab::redrawTriangulationPairsGrid()
+{
+	auto rowCounter = 0;
+	triangulationPointGrid->BeginBatch();
+	triangulationPointGrid->DeleteRows(0, theGrid->GetNumberRows());
+
+	for (const auto& pair: *version->getTriangulationPointPairs())
+	{
+		auto bgColor = wxColour(240, 240, 240);
+		std::string name;
+		name = triangulationPairToString(pair);
+		if (activeTriangulationPair && *pair == *activeTriangulationPair)
+		{
+			bgColor = wxColour(150, 250, 150); // bright green for selected triangulation pairs
+			activeTriangulationPointRow = rowCounter;
+		}
+		triangulationPointGrid->AppendRows(1, false);
+		triangulationPointGrid->SetRowSize(rowCounter, 20);
+		triangulationPointGrid->SetCellValue(rowCounter, 0, name);
+		triangulationPointGrid->SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
+		triangulationPointGrid->SetCellBackgroundColour(rowCounter, 0, bgColor);
+		rowCounter++;
+	}
+	triangulationPointGrid->AutoSizeColumn(0, false);
+	triangulationPointGrid->EndBatch();
+	if (activeTriangulationPointRow)
+		focusOnActiveTriangulationPairRow();
+	GetParent()->Layout();
+	triangulationPointGrid->ForceRefresh();
 }
 
 void LinksTab::redrawGrid()
@@ -145,6 +183,10 @@ std::string LinksTab::triangulationPairToString(const std::shared_ptr<Triangulat
 	const auto& targetPoint = pair->getTargetPoint();
 	wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint.x, targetPoint.y);
 	name += std::string(targetPointStr.mb_str());
+
+	if (pair->getComment())
+		name += " " + *pair->getComment();
+
 	return name;
 }
 
@@ -214,19 +256,13 @@ void LinksTab::activateLinkRowColor(int row) const
 void LinksTab::restoreTriangulationPairRowColor(int pairRow) const
 {
 	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
-	if (pair->getComment())
-		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 150, 150)); // comment regular
-	else
-		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(240, 240, 240)); // link regular
+	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(240, 240, 240)); // link regular
 }
 
 void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 {
 	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
-	if (pair->getComment())
-		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(50, 180, 50)); // comment highlight
-	else
-		triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 250, 150)); // link highlight
+	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 250, 150)); // link highlight
 }
 
 
@@ -305,6 +341,16 @@ void LinksTab::focusOnActiveRow()
 	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
 	theGrid->Scroll(offset);														  // and shoo.
 	theGrid->ForceRefresh();
+}
+
+void LinksTab::focusOnActiveTriangulationPairRow()
+{
+	const auto cellCoords = triangulationPointGrid->CellToRect(*activeTriangulationPointRow, 0);			  // these would be virtual coords, not logical ones.
+	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
+	const auto scrollPageSize = triangulationPointGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
+	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
+	triangulationPointGrid->Scroll(offset);														  // and shoo.
+	triangulationPointGrid->ForceRefresh();
 }
 
 void LinksTab::refreshActiveLink()
@@ -389,10 +435,11 @@ void LinksTab::createTriangulationPair(int pairID)
 		if (pair->getID() == pairID)
 		{
 			triangulationPointGrid->InsertRows(rowCounter, 1, false);
-			if (pair->getComment()) // this is a comment.
-				triangulationPointGrid->SetCellValue(rowCounter, 0, *pair->getComment());
-			else // new active link
-				triangulationPointGrid->SetCellValue(rowCounter, 0, triangulationPairToString(pair));
+			std::string name;
+			name = triangulationPairToString(pair);
+
+			triangulationPointGrid->SetCellValue(rowCounter, 0, name);
+
 			activateTriangulationPairRowColor(rowCounter);
 			activeTriangulationPair = pair;
 			// If we have an active link, restore its color.
