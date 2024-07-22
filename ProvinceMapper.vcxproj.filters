@@ -114,6 +114,12 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksTab.cpp">
       <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\ProvinceMappingsGrid.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairsGrid.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp">
       <Filter>ProvinceMapper\Configuration</Filter>
     </ClCompile>
@@ -236,6 +242,12 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksTab.h">
       <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClInclude>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\ProvinceMappingsGrid.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairsGrid.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h">
       <Filter>ProvinceMapper\Configuration</Filter>
     </ClInclude>

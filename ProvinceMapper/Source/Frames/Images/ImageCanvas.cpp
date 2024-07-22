@@ -1,6 +1,7 @@
 #include "ImageCanvas.h"
 #include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
+#include "Frames/Links/ProvinceMappingsGrid.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "LinkMapper/TriangulationPointPair.h"
 #include "Log.h"

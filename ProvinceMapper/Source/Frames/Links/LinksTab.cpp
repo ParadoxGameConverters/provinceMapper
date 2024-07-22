@@ -3,19 +3,13 @@
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
+#include "TriangulationPairsGrid.h"
+#include "ProvinceMappingsGrid.h"
 
-wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
+
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
+
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), version(std::move(theVersion)), eventListener(parent)
@@ -27,30 +21,12 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 
 	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	pairsTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	triangulationPointGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
-	triangulationPointGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
-	triangulationPointGrid->EnableEditing(false);
-	triangulationPointGrid->HideCellEditControl();
-	triangulationPointGrid->HideRowLabels();
-	triangulationPointGrid->HideColLabels();
-	triangulationPointGrid->SetScrollRate(0, 20);
-	triangulationPointGrid->SetColMinimalAcceptableWidth(600);
-	triangulationPointGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
-	triangulationPointGrid->SetColMinimalWidth(0, 600);
+	triangulationPointGrid = new TriangulationPairsGrid(this, version);
 	GetParent()->Layout();
 
 	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	linksTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	theGrid = new wxGrid(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND);
-	theGrid->CreateGrid(0, 1, wxGrid::wxGridSelectCells);
-	theGrid->EnableEditing(false);
-	theGrid->HideCellEditControl();
-	theGrid->HideRowLabels();
-	theGrid->HideColLabels();
-	theGrid->SetScrollRate(0, 10);
-	theGrid->SetColMinimalAcceptableWidth(600);
-	theGrid->GetGridWindow()->Bind(wxEVT_MOTION, &LinksTab::onGridMotion, this);
-	theGrid->SetColMinimalWidth(0, 600);
+	theGrid = new ProvinceMappingsGrid(this, version);
 	GetParent()->Layout();
 
 	auto* gridBox = new wxBoxSizer(wxVERTICAL);
@@ -99,76 +75,7 @@ void LinksTab::redrawTriangulationPairsGrid()
 
 void LinksTab::redrawGrid()
 {
-	auto rowCounter = 0;
-	theGrid->BeginBatch();
-	theGrid->DeleteRows(0, theGrid->GetNumberRows());
-
-	for (const auto& link: *version->getLinks())
-	{
-		auto bgColor = wxColour(240, 240, 240);
-		std::string name;
-		std::string comma;
-		if (link->getComment())
-		{
-			name = *link->getComment();
-			bgColor = wxColour(150, 150, 150);
-		}
-		else
-		{
-			name = linkToString(link);
-		}
-		if (activeLink && *link == *activeLink)
-		{
-			if (link->getComment())
-				bgColor = wxColour(50, 180, 50); // dark green for selected comments
-			else
-				bgColor = wxColour(150, 250, 150); // bright green for selected links.
-			activeRow = rowCounter;
-		}
-		theGrid->AppendRows(1, false);
-		theGrid->SetRowSize(rowCounter, 20);
-		theGrid->SetCellValue(rowCounter, 0, name);
-		theGrid->SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
-		theGrid->SetCellBackgroundColour(rowCounter, 0, bgColor);
-		rowCounter++;
-	}
-	theGrid->AutoSizeColumn(0, false);
-	theGrid->EndBatch();
-	if (activeRow)
-		focusOnActiveRow();
-	GetParent()->Layout();
-	theGrid->ForceRefresh();
-}
-
-std::string LinksTab::linkToString(const std::shared_ptr<LinkMapping>& link)
-{
-	std::string name;
-	std::string comma;
-	for (const auto& source: link->getSources())
-	{
-		name += comma;
-		if (source->locName)
-			name += *source->locName;
-		else if (!source->mapDataName.empty())
-			name += source->mapDataName;
-		else
-			name += "(No Name)";
-		comma = ", ";
-	}
-	name += " -> ";
-	comma.clear();
-	for (const auto& target: link->getTargets())
-	{
-		name += comma;
-		if (target->locName)
-			name += *target->locName;
-		else if (!target->mapDataName.empty())
-			name += target->mapDataName;
-		else
-			name += "(No Name)";
-		comma = ", ";
-	}
-	return name;
+	theGrid->redraw();
 }
 
 std::string LinksTab::triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair)
@@ -176,64 +83,25 @@ std::string LinksTab::triangulationPairToString(const std::shared_ptr<Triangulat
 	std::string name;
 
 	const auto& sourcePoint = pair->getSourcePoint();
-	wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint.x, sourcePoint.y);
-	name += std::string(sourcePointStr.mb_str());
+	if (sourcePoint)
+	{
+		wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint->x, sourcePoint->y);
+		name += std::string(sourcePointStr.mb_str());
+	}
 
 	name += " -> ";
 
 	const auto& targetPoint = pair->getTargetPoint();
-	wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint.x, targetPoint.y);
-	name += std::string(targetPointStr.mb_str());
+	if (targetPoint)
+	{
+		wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint->x, targetPoint->y);
+		name += std::string(targetPointStr.mb_str());
+	}
 
 	if (pair->getComment())
 		name += " " + *pair->getComment();
 
 	return name;
-}
-
-void LinksTab::linksGridLeftUp(const wxGridEvent& event)
-{
-	// Left Up means:
-	// 1. We want to mark a nonworking row as working row
-	// 2. We are AGAIN clicking on a working row to center the map
-	// 3. We're AGAIN clicking on a comment to change it.
-
-	// We're selecting some cell. Let's translate that.
-	const auto row = event.GetRow();
-	if (row < static_cast<int>(version->getLinks()->size()))
-	{
-		// Case 3: This is a comment.
-		if (version->getLinks()->at(row)->getComment())
-		{
-			// and we're altering it.
-			if (activeRow && *activeRow == row)
-			{
-				// spawn a dialog to change the name.
-				auto* dialog = new DialogComment(this, "Edit Comment", *version->getLinks()->at(row)->getComment(), row);
-				dialog->ShowModal();
-				return;
-			}
-		}
-
-		// Case 2: if we already clicked here, center the map.
-		if (activeRow && *activeRow == row)
-		{
-			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
-			centerEvt->SetInt(activeLink->getID());
-			eventListener->QueueEvent(centerEvt->Clone());
-			return;
-		}
-
-		// Case 1: Selecting a new row.
-		if (activeRow)
-			restoreLinkRowColor(*activeRow);
-
-		auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
-		evt->SetInt(row);
-		eventListener->QueueEvent(evt->Clone());
-
-		lastClickedRow = row;
-	}
 }
 
 void LinksTab::triangulationPairsGridLeftUp(const wxGridEvent& event) // TODO: move this to TriangulationPairsTab
@@ -284,32 +152,14 @@ void LinksTab::triangulationPairsGridLeftUp(const wxGridEvent& event) // TODO: m
 
 void LinksTab::leftUp(const wxGridEvent& event)
 {
-	if (event.GetId() == theGrid->GetId())
+	if (event.GetId() == theGrid->GetId()) // TODO: REMOVE THIS IF BECAUSE THE GRID ARE BEING EXTRACTED TO SEPARATE FILES
 	{
 		linksGridLeftUp(event);
 	}
 	else
 	{
-		
+		triangulationPairsGridLeftUp(event);
 	}
-}
-
-void LinksTab::restoreLinkRowColor(int row) const
-{
-	const auto& link = version->getLinks()->at(row);
-	if (link->getComment())
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 150, 150)); // comment regular
-	else
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
-}
-
-void LinksTab::activateLinkRowColor(int row) const
-{
-	const auto& link = version->getLinks()->at(row);
-	if (link->getComment())
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(50, 180, 50)); // comment highlight
-	else
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 250, 150)); // link highlight
 }
 
 void LinksTab::restoreTriangulationPairRowColor(int pairRow) const
@@ -322,56 +172,6 @@ void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 {
 	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
 	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 250, 150)); // link highlight
-}
-
-
-void LinksTab::deactivateLink()
-{
-	if (activeRow)
-	{
-		// Active link may have been deleted by linkmapper. Check our records.
-		if (static_cast<int>(version->getLinks()->size()) == theGrid->GetNumberRows())
-		{
-			// all is well, just deactivate.
-			restoreLinkRowColor(*activeRow);
-		}
-		else
-		{
-			// We have a row too many. This is unacceptable.
-			theGrid->DeleteRows(*activeRow, 1, false);
-			if (lastClickedRow > 0)
-				--lastClickedRow;
-		}
-	}
-	activeLink.reset();
-	activeRow.reset();
-	theGrid->ForceRefresh();
-}
-
-void LinksTab::activateLinkByID(const int theID)
-{
-	// We need to find not only which link this is, but it's row as well so we can scroll the grid.
-	// Thankfully, we're anal about their order.
-
-	// If we're already active, restore color.
-	if (activeRow)
-		restoreLinkRowColor(*activeRow);
-
-	auto rowCounter = 0;
-	for (const auto& link: *version->getLinks())
-	{
-		if (link->getID() == theID)
-		{
-			activeRow = rowCounter;
-			activeLink = link;
-			activateLinkRowColor(rowCounter);
-			if (!theGrid->IsVisible(rowCounter, 0, false))
-				focusOnActiveRow();
-			lastClickedRow = rowCounter;
-			break;
-		}
-		++rowCounter;
-	}
 }
 
 void LinksTab::activateLinkByIndex(const int index)
@@ -392,16 +192,6 @@ void LinksTab::activateLinkByIndex(const int index)
 	lastClickedRow = index;
 }
 
-void LinksTab::focusOnActiveRow()
-{
-	const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
-	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
-	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-	theGrid->Scroll(offset);														  // and shoo.
-	theGrid->ForceRefresh();
-}
-
 void LinksTab::focusOnActiveTriangulationPairRow()
 {
 	const auto cellCoords = triangulationPointGrid->CellToRect(*activeTriangulationPointRow, 0);			  // these would be virtual coords, not logical ones.
@@ -410,40 +200,6 @@ void LinksTab::focusOnActiveTriangulationPairRow()
 	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
 	triangulationPointGrid->Scroll(offset);														  // and shoo.
 	triangulationPointGrid->ForceRefresh();
-}
-
-void LinksTab::refreshActiveLink()
-{
-	// this is called when we're toggling a province within the active link
-
-	if (activeRow && activeLink)
-	{
-		const auto& name = linkToString(activeLink);
-		theGrid->SetCellValue(*activeRow, 0, name);
-	}
-}
-
-void LinksTab::rightUp(wxGridEvent& event)
-{
-	const wxCommandEvent* evt;
-	if (event.GetId() == theGrid->GetId())
-	{
-		// Right up means deselect active link, which is serious stuff.
-		// If our active link is dry, we're not deselecting it, we're deleting it.
-		evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-	}
-	else
-	{
-		evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
-	}
-	eventListener->QueueEvent(evt->Clone());
-	event.Skip();
-}
-
-void LinksTab::onGridMotion(wxMouseEvent& event)
-{
-	// We do NOT want to select cells, alter their size or similar nonsense.
-	// Thus, we're preventing mouse motion events to propagate by not processing them.
 }
 
 void LinksTab::onUpdateComment(const wxCommandEvent& event)
@@ -457,37 +213,6 @@ void LinksTab::onUpdateComment(const wxCommandEvent& event)
 		// also update screen.
 		theGrid->SetCellValue(index, 0, comment);
 		theGrid->ForceRefresh();
-	}
-}
-
-void LinksTab::createLink(const int linkID)
-{
-	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
-
-	// Where is this new row?
-	auto rowCounter = 0;
-	for (const auto& link: *version->getLinks())
-	{
-		if (link->getID() == linkID)
-		{
-			theGrid->InsertRows(rowCounter, 1, false);
-			if (link->getComment()) // this is a comment.
-				theGrid->SetCellValue(rowCounter, 0, *link->getComment());
-			else // new active link
-				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
-			activateLinkRowColor(rowCounter);
-			activeLink = link;
-			// If we have an active link, restore its color.
-			if (activeRow)
-				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
-			activeRow = rowCounter;
-			lastClickedRow = rowCounter;
-			// let's insert it.
-			theGrid->SetColMinimalWidth(0, 600);
-			theGrid->ForceRefresh();
-			break;
-		}
-		++rowCounter;
 	}
 }
 
@@ -563,14 +288,24 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 
 void LinksTab::stageAddComment()
 {
-	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
-	dialog->ShowModal();
+	if (triangulationPointGrid->activeTriangulationPair)
+	{
+		triangulationPointGrid->stageAddComment();
+	}
+	else
+	{
+		theGrid->stageAddComment();
+	}
 }
 
 void LinksTab::stageDeleteLink() const
 {
+	if (triangulationPointGrid->activeTriangulationPair) {
+		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
+		eventListener->QueueEvent(evt->Clone());
+	}
 	// Do nothing unless working on active link. Don't want accidents here.
-	if (activeLink)
+	else if (activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
@@ -578,8 +313,13 @@ void LinksTab::stageDeleteLink() const
 }
 
 void LinksTab::stageMoveUp() const
-{
-	if (activeLink)
+{	
+	if (triangulationPointGrid->activeTriangulationPair)
+	{
+		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP);
+		eventListener->QueueEvent(evt->Clone());
+	}
+	else if (activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventListener->QueueEvent(evt->Clone());
@@ -588,7 +328,12 @@ void LinksTab::stageMoveUp() const
 
 void LinksTab::stageMoveDown() const
 {
-	if (activeLink)
+	if (triangulationPointGrid->activeTriangulationPair)
+	{
+		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN);
+		eventListener->QueueEvent(evt->Clone());
+	}
+	else if (activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventListener->QueueEvent(evt->Clone());
@@ -597,30 +342,12 @@ void LinksTab::stageMoveDown() const
 
 void LinksTab::moveActiveLinkUp()
 {
-	if (activeLink && activeRow && *activeRow > 0)
-	{
-		const auto text = theGrid->GetCellValue(*activeRow, 0);
-		const auto color = theGrid->GetCellBackgroundColour(*activeRow, 0);
-		theGrid->DeleteRows(*activeRow, 1, false);
-		--*activeRow;
-		theGrid->InsertRows(*activeRow, 1, false);
-		theGrid->SetCellValue(*activeRow, 0, text);
-		theGrid->SetCellBackgroundColour(*activeRow, 0, color);
-	}
+	theGrid->moveActiveLinkUp();
 }
 
 void LinksTab::moveActiveLinkDown()
 {
-	if (activeLink && activeRow && *activeRow < theGrid->GetNumberRows() - 1)
-	{
-		const auto text = theGrid->GetCellValue(*activeRow, 0);
-		const auto color = theGrid->GetCellBackgroundColour(*activeRow, 0);
-		theGrid->DeleteRows(*activeRow, 1, false);
-		++*activeRow;
-		theGrid->InsertRows(*activeRow, 1, false);
-		theGrid->SetCellValue(*activeRow, 0, text);
-		theGrid->SetCellBackgroundColour(*activeRow, 0, color);
-	}
+	theGrid->moveActiveLinkDown();
 }
 
 void LinksTab::stageSave() const

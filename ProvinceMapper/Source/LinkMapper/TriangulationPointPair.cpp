@@ -20,16 +20,24 @@ TriangulationPointPair::TriangulationPointPair(int theID): ID(theID)
 void TriangulationPointPair::registerKeys()
 {
 	registerKeyword("srcX", [this](std::istream& theStream) {
-		sourcePoint.x = commonItems::getDouble(theStream);
+		if (!sourcePoint)
+			sourcePoint = wxPoint();
+		(*sourcePoint).x = commonItems::getDouble(theStream);
 	});
 	registerKeyword("srcY", [this](std::istream& theStream) {
-		sourcePoint.y = commonItems::getDouble(theStream);
+		if (!sourcePoint)
+			sourcePoint = wxPoint();
+		(*sourcePoint).y = commonItems::getDouble(theStream);
 	});
 	registerKeyword("dstX", [this](std::istream& theStream) {
-		targetPoint.x = commonItems::getDouble(theStream);
+		if (!targetPoint)
+			targetPoint = wxPoint();
+		(*targetPoint).x = commonItems::getDouble(theStream);
 	});
 	registerKeyword("dstY", [this](std::istream& theStream) {
-		targetPoint.y = commonItems::getDouble(theStream);
+		if (!targetPoint)
+			targetPoint = wxPoint();
+		(*targetPoint).y = commonItems::getDouble(theStream);
 	});
 	registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);
@@ -42,10 +50,16 @@ std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& poi
 	output << "\ttriangulation_pair = { ";
 
 	// Dump point coordinates
-	output << "srcX = " << pointPair.sourcePoint.x << " ";
-	output << "srcY = " << pointPair.sourcePoint.y << " ";
-	output << "dstX = " << pointPair.targetPoint.x << " ";
-	output << "dstY = " << pointPair.targetPoint.y << " ";
+	if (pointPair.sourcePoint)
+	{
+		output << "srcX = " << pointPair.sourcePoint->x << " ";
+		output << "srcY = " << pointPair.sourcePoint->y << " ";
+	}
+	if (pointPair.targetPoint)
+	{
+		output << "dstX = " << pointPair.targetPoint->x << " ";
+		output << "dstY = " << pointPair.targetPoint->y << " ";
+	}
 
 	if (pointPair.comment)
 	{
