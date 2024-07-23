@@ -1,5 +1,4 @@
 #include "LinksTab.h"
-#include "DialogComment.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
@@ -104,57 +103,11 @@ std::string LinksTab::triangulationPairToString(const std::shared_ptr<Triangulat
 	return name;
 }
 
-void LinksTab::triangulationPairsGridLeftUp(const wxGridEvent& event) // TODO: move this to TriangulationPairsTab
-{
-	// Left Up means:
-	// 1. We want to mark a nonworking row as working row
-	// 2. We are AGAIN clicking on a working row to center the map
-	// 3. We're AGAIN clicking on a comment to change it.
-
-	// We're selecting some cell. Let's translate that.
-	const auto row = event.GetRow();
-	if (row < static_cast<int>(version->getTriangulationPointPairs()->size()))
-	{
-		// Case 3: This is a comment.
-		if (version->getTriangulationPointPairs()->at(row)->getComment())
-		{
-			// and we're altering it.
-			if (activeTriangulationPointRow && *activeTriangulationPointRow == row)
-			{
-				// spawn a dialog to change the name.
-				// TODO: DialogComment is for links. Implement an equivalent for triangulation pairs.
-				auto* dialog = new DialogComment(this, "Edit Comment", *version->getTriangulationPointPairs()->at(row)->getComment(), row);
-				dialog->ShowModal();
-				return;
-			}
-		}
-
-		// Case 2: if we already clicked here, center the map.
-		if (activeTriangulationPointRow && *activeTriangulationPointRow == row)
-		{
-			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR);
-			centerEvt->SetInt(activeTriangulationPair->getID());
-			eventListener->QueueEvent(centerEvt->Clone());
-			return;
-		}
-
-		// Case 1: Selecting a new row.
-		if (activeTriangulationPointRow)
-			restoreLinkRowColor(*activeTriangulationPointRow);
-
-		auto* evt = new wxCommandEvent(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX);
-		evt->SetInt(row);
-		eventListener->QueueEvent(evt->Clone());
-
-		lastClickedTriangulationPairRow = row;
-	}
-}
-
 void LinksTab::leftUp(const wxGridEvent& event)
 {
 	if (event.GetId() == theGrid->GetId()) // TODO: REMOVE THIS IF BECAUSE THE GRID ARE BEING EXTRACTED TO SEPARATE FILES
 	{
-		linksGridLeftUp(event);
+		theGrid->leftUp(event);
 	}
 	else
 	{

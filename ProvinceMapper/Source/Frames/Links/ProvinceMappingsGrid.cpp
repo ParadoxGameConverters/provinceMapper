@@ -1,4 +1,5 @@
 #include "ProvinceMappingsGrid.h"
+#include "DialogComment.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
@@ -18,7 +19,7 @@ wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 
-ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(theVersion) {
+ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(theVersion), eventListener(parent) {
 	CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	EnableEditing(false);
 	HideCellEditControl();
@@ -159,22 +160,22 @@ void ProvinceMappingsGrid::leftUp(const wxGridEvent& event)
 
 
 
-void ProvinceMappingsGrid::restoreLinkRowColor(int row) const
+void ProvinceMappingsGrid::restoreLinkRowColor(int row)
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 150, 150)); // comment regular
+		SetCellBackgroundColour(row, 0, wxColour(150, 150, 150)); // comment regular
 	else
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
+		SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
 }
 
-void ProvinceMappingsGrid::activateLinkRowColor(int row) const
+void ProvinceMappingsGrid::activateLinkRowColor(int row)
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(50, 180, 50)); // comment highlight
+		SetCellBackgroundColour(row, 0, wxColour(50, 180, 50)); // comment highlight
 	else
-		theGrid->SetCellBackgroundColour(row, 0, wxColour(150, 250, 150)); // link highlight
+		SetCellBackgroundColour(row, 0, wxColour(150, 250, 150)); // link highlight
 }
 
 
@@ -183,7 +184,7 @@ void ProvinceMappingsGrid::deactivateLink()
 	if (activeRow)
 	{
 		// Active link may have been deleted by linkmapper. Check our records.
-		if (static_cast<int>(version->getLinks()->size()) == theGrid->GetNumberRows())
+		if (static_cast<int>(version->getLinks()->size()) == GetNumberRows())
 		{
 			// all is well, just deactivate.
 			restoreLinkRowColor(*activeRow);
@@ -191,14 +192,14 @@ void ProvinceMappingsGrid::deactivateLink()
 		else
 		{
 			// We have a row too many. This is unacceptable.
-			theGrid->DeleteRows(*activeRow, 1, false);
+			DeleteRows(*activeRow, 1, false);
 			if (lastClickedRow > 0)
 				--lastClickedRow;
 		}
 	}
 	activeLink.reset();
 	activeRow.reset();
-	theGrid->ForceRefresh();
+	ForceRefresh();
 }
 
 void ProvinceMappingsGrid::activateLinkByID(const int theID)
@@ -218,7 +219,7 @@ void ProvinceMappingsGrid::activateLinkByID(const int theID)
 			activeRow = rowCounter;
 			activeLink = link;
 			activateLinkRowColor(rowCounter);
-			if (!theGrid->IsVisible(rowCounter, 0, false))
+			if (!IsVisible(rowCounter, 0, false))
 				focusOnActiveRow();
 			lastClickedRow = rowCounter;
 			break;
@@ -229,12 +230,12 @@ void ProvinceMappingsGrid::activateLinkByID(const int theID)
 
 void ProvinceMappingsGrid::focusOnActiveRow()
 {
-	const auto cellCoords = theGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
+	const auto cellCoords = CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
 	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-	const auto scrollPageSize = theGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
+	const auto scrollPageSize = GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
 	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-	theGrid->Scroll(offset);														  // and shoo.
-	theGrid->ForceRefresh();
+	Scroll(offset);														  // and shoo.
+	ForceRefresh();
 }
 
 void ProvinceMappingsGrid::refreshActiveLink()

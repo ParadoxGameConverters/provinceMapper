@@ -186,6 +186,9 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\TriangulationPointPair.h">
       <Filter>ProvinceMapper\LinkMapper</Filter>
     </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\DialogCommentBase.cpp">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -316,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="ProvinceMapper\Source\Definitions\Vic3Regions\V3SuperRegion.h">
       <Filter>ProvinceMapper\Definitions\Vic3Regions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\DialogCommentBase.h">
+      <Filter>ProvinceMapper\Frames\Links</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

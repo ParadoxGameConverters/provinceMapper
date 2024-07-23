@@ -3,11 +3,12 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "DialogCommentBase.h";
 
 wxDECLARE_EVENT(wxEVT_UPDATE_NAME, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_COMMENT, wxCommandEvent);
 
-class DialogComment final : public wxDialog
+class DialogComment final : public DialogCommentBase
 {
   public:
 	DialogComment(wxWindow* parent, const wxString& title, const std::string& theComment, const int row);
@@ -31,4 +32,7 @@ class DialogComment final : public wxDialog
 
   protected:
 	wxEvtHandler* eventHandler = nullptr;
+
+	wxEventTypeTag<wxCommandEvent> getUpdateNameCommand() { return wxEVT_UPDATE_NAME; }
+	wxEventTypeTag<wxCommandEvent> getAddCommentCommand() { return wxEVT_ADD_COMMENT; }
 };

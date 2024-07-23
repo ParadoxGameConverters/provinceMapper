@@ -16,6 +16,7 @@
     <ClCompile Include="commonItems\ParserHelpers.cpp" />
     <ClCompile Include="commonItems\StringUtils.cpp" />
     <ClCompile Include="commonItems\WinUtils.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\DialogCommentBase.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\Area.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="commonItems\Parser.h" />
     <ClInclude Include="commonItems\ParserHelpers.h" />
     <ClInclude Include="commonItems\StringUtils.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\DialogCommentBase.h" />
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h" />

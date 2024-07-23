@@ -56,16 +56,10 @@ class LinksTab final: public wxNotebookPage
 	void stageMoveVersionRight() const;
 
 	int lastClickedTriangulationPairRow = 0;
-	int lastClickedRow = 0;
 
 	TriangulationPairsGrid* triangulationPointGrid = nullptr;
-	std::optional<int> activeTriangulationPointRow;
-	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
-	void focusOnActiveTriangulationPairRow(); // TODO: check if needed
 
 	ProvinceMappingsGrid* theGrid = nullptr;
-	std::optional<int> activeRow;
-	std::shared_ptr<LinkMapping> activeLink;
 	std::shared_ptr<LinkMappingVersion> version;
 
 	std::string triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair);
