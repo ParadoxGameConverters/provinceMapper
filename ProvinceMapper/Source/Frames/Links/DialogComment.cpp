@@ -5,7 +5,7 @@ wxDEFINE_EVENT(wxEVT_UPDATE_NAME, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_COMMENT, wxCommandEvent);
 
 DialogComment::DialogComment(wxWindow* parent, const wxString& title, const std::string& theComment, const int row):
-	 wxDialog(parent, -1, title, wxDefaultPosition, wxSize(250, 170)), ID(row), eventHandler(parent)
+	 DialogCommentBase(parent, title, theComment, row), ID(row), eventHandler(parent)
 {
 	initFrame();
 	tc->SetValue(theComment);
@@ -13,7 +13,7 @@ DialogComment::DialogComment(wxWindow* parent, const wxString& title, const std:
 }
 
 DialogComment::DialogComment(wxWindow* parent, const wxString& title, const int row):
-	 wxDialog(parent, -1, title, wxDefaultPosition, wxSize(250, 170)), ID(row), eventHandler(parent)
+	 DialogCommentBase(parent, title, row), ID(row), eventHandler(parent)
 {
 	initFrame();
 	updateMode = false;
