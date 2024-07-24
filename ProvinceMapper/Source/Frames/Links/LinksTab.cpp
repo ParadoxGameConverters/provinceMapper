@@ -89,13 +89,13 @@ void LinksTab::leftUp(const wxGridEvent& event)
 void LinksTab::restoreTriangulationPairRowColor(int pairRow) const
 {
 	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
-	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(240, 240, 240)); // link regular
+	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, pair->getBaseRowColour()); // link regular
 }
 
 void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 {
 	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
-	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, wxColour(150, 250, 150)); // link highlight
+	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, pair->getActiveRowColour()); // link highlight
 }
 
 void LinksTab::activateLinkByIndex(const int index)
@@ -112,18 +112,8 @@ void LinksTab::activateLinkByIndex(const int index)
 	activeLink = link;
 	activateLinkRowColor(index);
 	if (!theGrid->IsVisible(index, 0, false))
-		focusOnActiveRow();
+		theGrid->focusOnActiveRow();
 	lastClickedRow = index;
-}
-
-void LinksTab::focusOnActiveTriangulationPairRow()
-{
-	const auto cellCoords = triangulationPointGrid->CellToRect(*activeTriangulationPointRow, 0);			  // these would be virtual coords, not logical ones.
-	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-	const auto scrollPageSize = triangulationPointGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
-	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-	triangulationPointGrid->Scroll(offset);														  // and shoo.
-	triangulationPointGrid->ForceRefresh();
 }
 
 void LinksTab::onUpdateComment(const wxCommandEvent& event)

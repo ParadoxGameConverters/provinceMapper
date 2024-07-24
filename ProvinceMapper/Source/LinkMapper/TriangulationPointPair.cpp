@@ -18,6 +18,16 @@ TriangulationPointPair::TriangulationPointPair(int theID): LinkBase(theID)
 {
 }
 
+const wxColour TriangulationPointPair::getBaseRowColour()
+{
+	return wxColour(240, 240, 240);
+}
+
+const wxColour TriangulationPointPair::getActiveRowColour()
+{
+	return wxColour(150, 250, 150); // Bright green for selected pairs.
+}
+
 void TriangulationPointPair::registerKeys(commonItems::parser parser)
 {
 	parser.registerKeyword("srcX", [this](std::istream& theStream) {

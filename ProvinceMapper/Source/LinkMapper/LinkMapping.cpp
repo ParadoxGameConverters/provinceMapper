@@ -175,6 +175,37 @@ Mapping LinkMapping::toggleTarget(const std::string& targetID)
 	}
 }
 
+const std::string LinkMapping::toRowString()
+{
+	std::string name;
+	std::string comma;
+	if (comment)
+	{
+		name = *comment;
+	}
+	else
+	{
+		name = linkToString(link);
+	}
+}
+
+const wxColour LinkMapping::getBaseRowColour()
+{
+	if (comment)
+	{
+		return wxColour(150, 150, 150); // TODO: avoid constructing the color every time
+	}
+	return wxColour(240, 240, 240); // TODO: avoid constructing the color every time
+}
+
+const wxColour LinkMapping::getActiveRowColour()
+{
+	if (getComment())
+		return wxColour(50, 180, 50); // dark green for selected comments
+	else
+		return wxColour(150, 250, 150); // bright green for selected links.
+}
+
 bool LinkMapping::operator==(const LinkMapping& rhs) const
 {
 	return ID == rhs.ID;

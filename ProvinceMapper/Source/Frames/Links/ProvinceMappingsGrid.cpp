@@ -47,24 +47,11 @@ void ProvinceMappingsGrid::redraw()
 
 	for (const auto& link: *version->getLinks())
 	{
-		auto bgColor = wxColour(240, 240, 240);
-		std::string name;
-		std::string comma;
-		if (link->getComment())
-		{
-			name = *link->getComment();
-			bgColor = wxColour(150, 150, 150);
-		}
-		else
-		{
-			name = linkToString(link);
-		}
+		auto bgColor = link->getBaseRowColour();
+		std::string name = link->toRowString();
 		if (activeLink && *link == *activeLink)
 		{
-			if (link->getComment())
-				bgColor = wxColour(50, 180, 50); // dark green for selected comments
-			else
-				bgColor = wxColour(150, 250, 150); // bright green for selected links.
+			bgColor = link->getActiveRowColour();
 			activeRow = rowCounter;
 		}
 		AppendRows(1, false);
@@ -163,19 +150,13 @@ void ProvinceMappingsGrid::leftUp(const wxGridEvent& event)
 void ProvinceMappingsGrid::restoreLinkRowColor(int row)
 {
 	const auto& link = version->getLinks()->at(row);
-	if (link->getComment())
-		SetCellBackgroundColour(row, 0, wxColour(150, 150, 150)); // comment regular
-	else
-		SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
+	SetCellBackgroundColour(row, 0, link->getBaseRowColour());
 }
 
 void ProvinceMappingsGrid::activateLinkRowColor(int row)
 {
 	const auto& link = version->getLinks()->at(row);
-	if (link->getComment())
-		SetCellBackgroundColour(row, 0, wxColour(50, 180, 50)); // comment highlight
-	else
-		SetCellBackgroundColour(row, 0, wxColour(150, 250, 150)); // link highlight
+	SetCellBackgroundColour(row, 0, link->getActiveRowColour());
 }
 
 

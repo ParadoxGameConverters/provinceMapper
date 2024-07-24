@@ -1,5 +1,8 @@
-#ifndef LINK_MAPPING_H
-#define LINK_MAPPING_H
+#pragma once
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkBase.h"
 
@@ -34,6 +37,10 @@ class LinkMapping: public LinkBase
 	[[nodiscard]] const auto& getSources() const { return sources; }
 	[[nodiscard]] const auto& getTargets() const { return targets; }
 
+	[[nodiscard]] const std::string toRowString();
+	[[nodiscard]] const wxColour getBaseRowColour();
+	[[nodiscard]] const wxColour getActiveRowColour();
+
 	friend std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 
   private:
@@ -47,4 +54,3 @@ class LinkMapping: public LinkBase
 	std::string targetToken;
 };
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
-#endif // LINK_MAPPING_H
