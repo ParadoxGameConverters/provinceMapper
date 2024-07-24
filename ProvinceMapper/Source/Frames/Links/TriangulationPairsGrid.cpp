@@ -67,17 +67,15 @@ void TriangulationPairsGrid::redraw()
 
 	for (const auto& pair: *version->getTriangulationPointPairs())
 	{
-		auto bgColor = wxColour(240, 240, 240);
-		std::string name;
-		name = triangulationPairToString(pair);
+		auto bgColor = pair->getBaseRowColour();
 		if (activeTriangulationPair && *pair == *activeTriangulationPair)
 		{
-			bgColor = wxColour(150, 250, 150); // bright green for selected triangulation pairs
+			bgColor = pair->getActiveRowColour(); // bright green for selected triangulation pairs
 			activeRow = rowCounter;
 		}
 		AppendRows(1, false);
 		SetRowSize(rowCounter, 20);
-		SetCellValue(rowCounter, 0, name);
+		SetCellValue(rowCounter, 0, pair->toRowString());
 		SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
 		SetCellBackgroundColour(rowCounter, 0, bgColor);
 		rowCounter++;

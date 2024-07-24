@@ -48,32 +48,6 @@ void LinksTab::redraw()
 	theGrid->redraw();
 }
 
-std::string LinksTab::triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair)
-{
-	std::string name;
-
-	const auto& sourcePoint = pair->getSourcePoint();
-	if (sourcePoint)
-	{
-		wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint->x, sourcePoint->y);
-		name += std::string(sourcePointStr.mb_str());
-	}
-
-	name += " -> ";
-
-	const auto& targetPoint = pair->getTargetPoint();
-	if (targetPoint)
-	{
-		wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint->x, targetPoint->y);
-		name += std::string(targetPointStr.mb_str());
-	}
-
-	if (pair->getComment())
-		name += " " + *pair->getComment();
-
-	return name;
-}
-
 void LinksTab::leftUp(const wxGridEvent& event)
 {
 	if (event.GetId() == theGrid->GetId()) // TODO: REMOVE THIS IF BECAUSE THE GRID ARE BEING EXTRACTED TO SEPARATE FILES
@@ -128,10 +102,7 @@ void LinksTab::createTriangulationPair(int pairID)
 		if (pair->getID() == pairID)
 		{
 			triangulationPointGrid->InsertRows(rowCounter, 1, false);
-			std::string name;
-			name = triangulationPairToString(pair);
-
-			triangulationPointGrid->SetCellValue(rowCounter, 0, name);
+			triangulationPointGrid->SetCellValue(rowCounter, 0, pair->toRowString());
 
 			activateTriangulationPairRowColor(rowCounter);
 			activeTriangulationPair = pair;

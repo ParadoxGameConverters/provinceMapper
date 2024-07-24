@@ -18,6 +18,32 @@ TriangulationPointPair::TriangulationPointPair(int theID): LinkBase(theID)
 {
 }
 
+const std::string TriangulationPointPair::toRowString()
+{
+	std::string name;
+
+	const auto& sourcePoint = getSourcePoint();
+	if (sourcePoint)
+	{
+		wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint->x, sourcePoint->y);
+		name += std::string(sourcePointStr.mb_str());
+	}
+
+	name += " -> ";
+
+	const auto& targetPoint = getTargetPoint();
+	if (targetPoint)
+	{
+		wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint->x, targetPoint->y);
+		name += std::string(targetPointStr.mb_str());
+	}
+
+	if (comment)
+		name += " " + *comment;
+
+	return name;
+}
+
 const wxColour TriangulationPointPair::getBaseRowColour()
 {
 	return wxColour(240, 240, 240);

@@ -212,21 +212,28 @@ const std::string LinkMapping::toRowString()
 	return name;
 }
 
+static const wxColour commentColour = wxColour(150, 150, 150);
+static const wxColour regularColour = wxColour(240, 240, 240);
+
 const wxColour LinkMapping::getBaseRowColour()
 {
 	if (comment)
 	{
-		return wxColour(150, 150, 150); // TODO: avoid constructing the color every time
+		return commentColour;
 	}
-	return wxColour(240, 240, 240); // TODO: avoid constructing the color every time
+	return regularColour;
 }
+
+static const wxColour selectedCommentColour = wxColour(50, 180, 50); // dark green for selected comments
+static const wxColour selectedLinkColour = wxColour(150, 250, 150); // bright green for selected links.
 
 const wxColour LinkMapping::getActiveRowColour()
 {
-	if (getComment())
-		return wxColour(50, 180, 50); // dark green for selected comments
-	else
-		return wxColour(150, 250, 150); // bright green for selected links.
+	if (comment)
+	{
+		return selectedCommentColour;
+	}
+	return selectedLinkColour;
 }
 
 bool LinkMapping::operator==(const LinkMapping& rhs) const

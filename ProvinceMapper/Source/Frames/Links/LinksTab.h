@@ -61,8 +61,6 @@ class LinksTab final: public wxNotebookPage
 	ProvinceMappingsGrid* theGrid = nullptr;
 	std::shared_ptr<LinkMappingVersion> version;
 
-	std::string triangulationPairToString(const std::shared_ptr<TriangulationPointPair>& pair);
-
 	void triangulationPairsGridLeftUp(const wxGridEvent& event);
 
   protected:
