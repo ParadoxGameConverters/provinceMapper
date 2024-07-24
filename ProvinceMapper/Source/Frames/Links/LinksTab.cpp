@@ -100,20 +100,7 @@ void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 
 void LinksTab::activateLinkByIndex(const int index)
 {
-	// If we're already active, restore color.
-	if (activeRow)
-		restoreLinkRowColor(*activeRow);
-
-	if (index >= static_cast<int>(version->getLinks()->size()))
-		return; // uh-huh
-
-	const auto& link = version->getLinks()->at(index);
-	activeRow = index;
-	activeLink = link;
-	activateLinkRowColor(index);
-	if (!theGrid->IsVisible(index, 0, false))
-		theGrid->focusOnActiveRow();
-	lastClickedRow = index;
+	theGrid->activateLinkByIndex(index);
 }
 
 void LinksTab::onUpdateComment(const wxCommandEvent& event)

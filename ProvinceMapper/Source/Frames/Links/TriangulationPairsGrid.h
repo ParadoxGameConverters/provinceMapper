@@ -6,6 +6,7 @@
 #include <optional>
 #include <wx/grid.h>
 #include <wx/notebook.h>
+#include "GridBase.h"
 
 
 
@@ -15,7 +16,7 @@ wxDECLARE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
 class LinkMappingVersion;
 class LinkMapping;
 class TriangulationPointPair;
-class TriangulationPairsGrid final: public wxGrid
+class TriangulationPairsGrid final: public GridBase
 {
   public:
 	TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
@@ -24,9 +25,5 @@ class TriangulationPairsGrid final: public wxGrid
 	void redraw();
 
   private:
-	std::optional<int> activeTriangulationPointRow;
-	std::shared_ptr<LinkMappingVersion> version;
-
-	void onGridMotion(wxMouseEvent& event);
 	void triangulationPairsGridLeftUp(const wxGridEvent& event);
 };

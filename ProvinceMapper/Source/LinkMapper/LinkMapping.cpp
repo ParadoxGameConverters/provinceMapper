@@ -177,16 +177,39 @@ Mapping LinkMapping::toggleTarget(const std::string& targetID)
 
 const std::string LinkMapping::toRowString()
 {
-	std::string name;
-	std::string comma;
 	if (comment)
 	{
-		name = *comment;
+		return *comment;
 	}
-	else
+
+	std::string name;
+	std::string comma;
+	for (const auto& source: getSources())
 	{
-		name = linkToString(link);
+		name += comma;
+		if (source->locName)
+			name += *source->locName;
+		else if (!source->mapDataName.empty())
+			name += source->mapDataName;
+		else
+			name += "(No Name)";
+		comma = ", ";
 	}
+	name += " -> ";
+	comma.clear();
+	for (const auto& target: getTargets())
+	{
+		name += comma;
+		if (target->locName)
+			name += *target->locName;
+		else if (!target->mapDataName.empty())
+			name += target->mapDataName;
+		else
+			name += "(No Name)";
+		comma = ", ";
+	}
+
+	return name;
 }
 
 const wxColour LinkMapping::getBaseRowColour()

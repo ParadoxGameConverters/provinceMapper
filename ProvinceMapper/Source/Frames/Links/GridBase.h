@@ -21,13 +21,25 @@ wxDECLARE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 class LinkMappingVersion;
+class LinkBase;
 class GridBase : public wxGrid 
 {
+  public:
+	GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
+
+  private:
+	void onGridMotion(wxMouseEvent& event);
+
   protected:
 	void focusOnActiveRow();
 	void moveActiveLinkUp();
 	void moveActiveLinkDown();
 
-  private:
+	std::shared_ptr<LinkMappingVersion> version;
+
+	std::shared_ptr<LinkBase> activeLink;
 	std::optional<int> activeRow;
+	int lastClickedRow = 0;
+
+	wxEvtHandler* eventListener = nullptr;
 };

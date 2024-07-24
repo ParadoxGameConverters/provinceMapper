@@ -19,23 +19,7 @@ wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 
-ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(theVersion), eventListener(parent) {
-	CreateGrid(0, 1, wxGrid::wxGridSelectCells);
-	EnableEditing(false);
-	HideCellEditControl();
-	HideRowLabels();
-	HideColLabels();
-	SetScrollRate(0, 10);
-	SetColMinimalAcceptableWidth(600);
-	GetGridWindow()->Bind(wxEVT_MOTION, &ProvinceMappingsGrid::onGridMotion, this);
-	SetColMinimalWidth(0, 600);
-}
-
-
-void ProvinceMappingsGrid::onGridMotion(wxMouseEvent& event)
-{
-	// We do NOT want to select cells, alter their size or similar nonsense.
-	// Thus, we're preventing mouse motion events to propagate by not processing them.
+ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion) {
 }
 
 
@@ -67,37 +51,6 @@ void ProvinceMappingsGrid::redraw()
 		focusOnActiveRow();
 	GetParent()->Layout();
 	ForceRefresh();
-}
-
-std::string ProvinceMappingsGrid::linkToString(const std::shared_ptr<LinkMapping>& link)
-{
-	std::string name;
-	std::string comma;
-	for (const auto& source: link->getSources())
-	{
-		name += comma;
-		if (source->locName)
-			name += *source->locName;
-		else if (!source->mapDataName.empty())
-			name += source->mapDataName;
-		else
-			name += "(No Name)";
-		comma = ", ";
-	}
-	name += " -> ";
-	comma.clear();
-	for (const auto& target: link->getTargets())
-	{
-		name += comma;
-		if (target->locName)
-			name += *target->locName;
-		else if (!target->mapDataName.empty())
-			name += target->mapDataName;
-		else
-			name += "(No Name)";
-		comma = ", ";
-	}
-	return name;
 }
 
 void ProvinceMappingsGrid::leftUp(const wxGridEvent& event)
@@ -145,6 +98,24 @@ void ProvinceMappingsGrid::leftUp(const wxGridEvent& event)
 	}
 }
 
+
+void ProvinceMappingsGrid::activateLinkByIndex(const int index)
+{
+	// If we're already active, restore color.
+	if (activeRow)
+		restoreLinkRowColor(*activeRow);
+
+	if (index >= static_cast<int>(version->getLinks()->size()))
+		return; // uh-huh
+
+	const auto& link = version->getLinks()->at(index);
+	activeRow = index;
+	activeLink = link;
+	activateLinkRowColor(index);
+	if (!IsVisible(index, 0, false))
+		focusOnActiveRow();
+	lastClickedRow = index;
+}
 
 
 void ProvinceMappingsGrid::restoreLinkRowColor(int row)

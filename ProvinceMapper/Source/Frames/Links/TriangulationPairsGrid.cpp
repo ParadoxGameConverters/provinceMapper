@@ -8,25 +8,9 @@
 wxDEFINE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
 
 
-TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(theVersion) {
-	CreateGrid(0, 1, wxGrid::wxGridSelectCells);
-	EnableEditing(false);
-	HideCellEditControl();
-	HideRowLabels();
-	HideColLabels();
-	SetScrollRate(0, 10);
-	SetColMinimalAcceptableWidth(600);
-	GetGridWindow()->Bind(wxEVT_MOTION, &TriangulationPairsGrid::onGridMotion, this);
-	SetColMinimalWidth(0, 600);
-}
-
-
-void TriangulationPairsGrid::onGridMotion(wxMouseEvent& event)
+TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion)
 {
-	// We do NOT want to select cells, alter their size or similar nonsense.
-	// Thus, we're preventing mouse motion events to propagate by not processing them.
 }
-
 
 
 void TriangulationPairsGrid::triangulationPairsGridLeftUp(const wxGridEvent& event) // TODO: move this to TriangulationPairsTab

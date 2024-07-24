@@ -31,24 +31,16 @@ class ProvinceMappingsGrid final: public GridBase
 	void redraw();
 	void leftUp(const wxGridEvent& event);
 
+	void activateLinkByIndex(const int index);
+
 	void activateLinkRowColor(int row);
 	void restoreLinkRowColor(int row);
 
-	std::shared_ptr<LinkMapping> activeLink;
-
   private:
-	void onGridMotion(wxMouseEvent& event);
-
-	int lastClickedRow = 0;
-	std::shared_ptr<LinkMappingVersion> version;
 
 	void activateLinkByID(const int theID);
 	void deactivateLink();
 
 	void refreshActiveLink();
 	void stageAddComment();
-	static std::string linkToString(const std::shared_ptr<LinkMapping>& link);
-
-  protected:
-	wxEvtHandler* eventListener = nullptr;
 };
