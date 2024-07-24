@@ -228,16 +228,6 @@ void ProvinceMappingsGrid::activateLinkByID(const int theID)
 	}
 }
 
-void ProvinceMappingsGrid::focusOnActiveRow()
-{
-	const auto cellCoords = CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
-	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-	const auto scrollPageSize = GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
-	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-	Scroll(offset);														  // and shoo.
-	ForceRefresh();
-}
-
 void ProvinceMappingsGrid::refreshActiveLink()
 {
 	// this is called when we're toggling a province within the active link
@@ -278,7 +268,7 @@ void ProvinceMappingsGrid::createLink(const int linkID)
 		{
 			theGrid->InsertRows(rowCounter, 1, false);
 			if (link->getComment()) // this is a comment.
-				theGrid->SetCellValue(rowCounter, 0, *link->getComment());
+				theGrid->SetCellValue(rowCounter, 0, *link->getComment()); // TODO: replace with LinkBase::toString
 			else // new active link
 				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
 			activateLinkRowColor(rowCounter);
@@ -301,36 +291,4 @@ void ProvinceMappingsGrid::stageAddComment()
 {
 	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
 	dialog->ShowModal();
-}
-
-
-
-void ProvinceMappingsGrid::moveActiveLinkUp()
-{
-	if (activeLink && activeRow && *activeRow > 0)
-	{
-		const auto text = GetCellValue(*activeRow, 0);
-		const auto color = GetCellBackgroundColour(*activeRow, 0);
-		DeleteRows(*activeRow, 1, false);
-		--*activeRow;
-		InsertRows(*activeRow, 1, false);
-		SetCellValue(*activeRow, 0, text);
-		SetCellBackgroundColour(*activeRow, 0, color);
-	}
-}
-
-
-
-void ProvinceMappingsGrid::moveActiveLinkDown()
-{
-	if (activeLink && activeRow && *activeRow < GetNumberRows() - 1)
-	{
-		const auto text = GetCellValue(*activeRow, 0);
-		const auto color = GetCellBackgroundColour(*activeRow, 0);
-		DeleteRows(*activeRow, 1, false);
-		++*activeRow;
-		InsertRows(*activeRow, 1, false);
-		SetCellValue(*activeRow, 0, text);
-		SetCellBackgroundColour(*activeRow, 0, color);
-	}
 }

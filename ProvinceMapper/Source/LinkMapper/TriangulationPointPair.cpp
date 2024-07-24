@@ -1,3 +1,4 @@
+#include "Parser.h"
 #include "CommonRegexes.h"
 #include "TriangulationPointPair.h"
 #include "Log.h"
@@ -5,44 +6,44 @@
 #include "Provinces/Province.h"
 
 TriangulationPointPair::TriangulationPointPair(std::istream& theStream,
-	 const int theID):
-	 ID(theID)
+	 const int theID): LinkBase(theID)
 {
-	registerKeys();
-	parseStream(theStream);
-	clearRegisteredKeywords();
+	auto parser = commonItems::parser();
+	registerKeys(parser);
+	parser.parseStream(theStream);
+	parser.clearRegisteredKeywords();
 }
 
-TriangulationPointPair::TriangulationPointPair(int theID): ID(theID)
+TriangulationPointPair::TriangulationPointPair(int theID): LinkBase(theID)
 {
 }
 
-void TriangulationPointPair::registerKeys()
+void TriangulationPointPair::registerKeys(commonItems::parser parser)
 {
-	registerKeyword("srcX", [this](std::istream& theStream) {
+	parser.registerKeyword("srcX", [this](std::istream& theStream) {
 		if (!sourcePoint)
 			sourcePoint = wxPoint();
 		(*sourcePoint).x = commonItems::getDouble(theStream);
 	});
-	registerKeyword("srcY", [this](std::istream& theStream) {
+	parser.registerKeyword("srcY", [this](std::istream& theStream) {
 		if (!sourcePoint)
 			sourcePoint = wxPoint();
 		(*sourcePoint).y = commonItems::getDouble(theStream);
 	});
-	registerKeyword("dstX", [this](std::istream& theStream) {
+	parser.registerKeyword("dstX", [this](std::istream& theStream) {
 		if (!targetPoint)
 			targetPoint = wxPoint();
 		(*targetPoint).x = commonItems::getDouble(theStream);
 	});
-	registerKeyword("dstY", [this](std::istream& theStream) {
+	parser.registerKeyword("dstY", [this](std::istream& theStream) {
 		if (!targetPoint)
 			targetPoint = wxPoint();
 		(*targetPoint).y = commonItems::getDouble(theStream);
 	});
-	registerKeyword("comment", [this](std::istream& theStream) {
+	parser.registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);
 	});
-	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
+	parser.registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
 std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair)

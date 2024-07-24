@@ -5,9 +5,9 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-#include "Parser.h"
+#include "LinkBase.h"
 
-class TriangulationPointPair: commonItems::parser
+class TriangulationPointPair: LinkBase
 {
   public:
 	TriangulationPointPair() = default;
@@ -21,12 +21,9 @@ class TriangulationPointPair: commonItems::parser
 
 	void setSourcePoint(const wxPoint& point) { sourcePoint = point; }
 	void setTargetPoint(const wxPoint& point) { targetPoint = point; }
-	void setComment(const std::string& theComment) { comment = theComment; }
 
-	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getSourcePoint() const { return sourcePoint; }
 	[[nodiscard]] const auto& getTargetPoint() const { return targetPoint; }
-	[[nodiscard]] const auto& getComment() const { return comment; }
 	[[nodiscard]] const bool isEmpty() const {
 		return !sourcePoint && !targetPoint && !comment;
 	}
@@ -34,14 +31,10 @@ class TriangulationPointPair: commonItems::parser
 	friend std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair);
 
   private:
-	void registerKeys();
+	void registerKeys(commonItems::parser parser);
 
-	int ID = 0;
 	std::optional<wxPoint> sourcePoint;
 	std::optional<wxPoint> targetPoint;
-	std::optional<std::string> comment;
-	std::string sourceToken; // TODO: REMOVE THIS
-	std::string targetToken; // TODO: REMOVE THIS
 };
 std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair);
 #endif // TRIANGULATION_POINT_PAIR_H

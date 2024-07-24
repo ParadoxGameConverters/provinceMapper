@@ -10,12 +10,13 @@ LinkMapping::LinkMapping(std::istream& theStream,
 	 std::string theSourceToken,
 	 std::string theTargetToken,
 	 const int theID):
-	 ID(theID),
+	 LinkBase(theID),
 	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
 {
-	registerKeys();
-	parseStream(theStream);
-	clearRegisteredKeywords();
+	auto parser = commonItems::parser();
+	registerKeys(parser);
+	parser.parseStream(theStream);
+	parser.clearRegisteredKeywords();
 }
 
 LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
@@ -23,14 +24,14 @@ LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
 	 std::string theSourceToken,
 	 std::string theTargetToken,
 	 int theID):
-	 ID(theID),
+	 LinkBase(theID),
 	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
 {
 }
 
-void LinkMapping::registerKeys()
+void LinkMapping::registerKeys(commonItems::parser parser)
 {
-	registerKeyword(sourceToken, [this](std::istream& theStream) {
+	parser.registerKeyword(sourceToken, [this](std::istream& theStream) {
 		auto id = commonItems::getString(theStream);
 		if (id.substr(0, 2) == "0x")
 		{
@@ -40,7 +41,7 @@ void LinkMapping::registerKeys()
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
-	registerKeyword(targetToken, [this](std::istream& theStream) {
+	parser.registerKeyword(targetToken, [this](std::istream& theStream) {
 		auto id = commonItems::getString(theStream);
 		if (id.substr(0, 2) == "0x")
 		{
@@ -50,10 +51,10 @@ void LinkMapping::registerKeys()
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			targets.emplace_back(provItr->second);
 	});
-	registerKeyword("comment", [this](std::istream& theStream) {
+	parser.registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);
 	});
-	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
+	parser.registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
