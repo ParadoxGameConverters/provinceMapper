@@ -30,8 +30,7 @@ LinksFrame::LinksFrame(wxWindow* parent,
 		pages.insert(std::pair(version->getID(), newTab));
 		if (version->getName() == activeVersion->getName())
 			activePage = newTab;
-		newTab->redrawTriangulationPairsGrid();
-		newTab->redrawGrid();
+		newTab->redraw();
 	}
 	notebook->ChangeSelection(0); // silently swap to first page.
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
@@ -105,8 +104,7 @@ void LinksFrame::addVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	versionIDs.insert(versionIDs.begin(), version->getID());
 	pages.insert(std::pair(version->getID(), newTab));
 	activePage = newTab;
-	newTab->redrawTriangulationPairsGrid();
-	newTab->redrawGrid();
+	newTab->redraw();
 }
 
 void LinksFrame::deleteActiveAndSwapToVersion(const std::shared_ptr<LinkMappingVersion>& version)

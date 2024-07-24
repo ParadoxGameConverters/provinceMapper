@@ -41,39 +41,10 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	theGrid->ForceRefresh();
 }
 
-void LinksTab::redrawTriangulationPairsGrid()
-{
-	auto rowCounter = 0;
-	triangulationPointGrid->BeginBatch();
-	triangulationPointGrid->DeleteRows(0, theGrid->GetNumberRows());
 
-	for (const auto& pair: *version->getTriangulationPointPairs())
-	{
-		auto bgColor = wxColour(240, 240, 240);
-		std::string name;
-		name = triangulationPairToString(pair);
-		if (activeTriangulationPair && *pair == *activeTriangulationPair)
-		{
-			bgColor = wxColour(150, 250, 150); // bright green for selected triangulation pairs
-			activeTriangulationPointRow = rowCounter;
-		}
-		triangulationPointGrid->AppendRows(1, false);
-		triangulationPointGrid->SetRowSize(rowCounter, 20);
-		triangulationPointGrid->SetCellValue(rowCounter, 0, name);
-		triangulationPointGrid->SetCellAlignment(rowCounter, 0, wxCENTER, wxCENTER);
-		triangulationPointGrid->SetCellBackgroundColour(rowCounter, 0, bgColor);
-		rowCounter++;
-	}
-	triangulationPointGrid->AutoSizeColumn(0, false);
-	triangulationPointGrid->EndBatch();
-	if (activeTriangulationPointRow)
-		focusOnActiveTriangulationPairRow();
-	GetParent()->Layout();
-	triangulationPointGrid->ForceRefresh();
-}
-
-void LinksTab::redrawGrid()
+void LinksTab::redraw()
 {
+	triangulationPointGrid->redraw();
 	theGrid->redraw();
 }
 

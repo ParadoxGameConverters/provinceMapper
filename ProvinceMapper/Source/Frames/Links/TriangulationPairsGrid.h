@@ -21,6 +21,7 @@ class TriangulationPairsGrid final: public wxGrid
 	TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
 	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	void focusOnActiveTriangulationPairRow(); // TODO: check if needed
+	void redraw();
 
   private:
 	std::optional<int> activeTriangulationPointRow;
