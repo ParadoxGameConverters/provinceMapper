@@ -186,24 +186,16 @@ void ProvinceMappingsGrid::refreshActiveLink()
 
 	if (activeRow && activeLink)
 	{
-		const auto& name = linkToString(activeLink);
-		theGrid->SetCellValue(*activeRow, 0, name);
+		SetCellValue(*activeRow, 0, activeLink->toRowString());
 	}
 }
 
 void ProvinceMappingsGrid::rightUp(wxGridEvent& event)
 {
-	const wxCommandEvent* evt;
-	if (event.GetId() == theGrid->GetId())
-	{
-		// Right up means deselect active link, which is serious stuff.
-		// If our active link is dry, we're not deselecting it, we're deleting it.
-		evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
-	}
-	else
-	{
-		evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR); // TODO: move this to TriangulationPairsTab
-	}
+	// Right up means deselect active link, which is serious stuff.
+	// If our active link is dry, we're not deselecting it, we're deleting it.
+	const wxCommandEvent* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+
 	eventListener->QueueEvent(evt->Clone());
 	event.Skip();
 }
@@ -218,11 +210,8 @@ void ProvinceMappingsGrid::createLink(const int linkID)
 	{
 		if (link->getID() == linkID)
 		{
-			theGrid->InsertRows(rowCounter, 1, false);
-			if (link->getComment()) // this is a comment.
-				theGrid->SetCellValue(rowCounter, 0, *link->getComment()); // TODO: replace with LinkBase::toString
-			else // new active link
-				theGrid->SetCellValue(rowCounter, 0, linkToString(link));
+			InsertRows(rowCounter, 1, false);
+			SetCellValue(rowCounter, 0, link->toRowString());
 			activateLinkRowColor(rowCounter);
 			activeLink = link;
 			// If we have an active link, restore its color.
@@ -231,8 +220,8 @@ void ProvinceMappingsGrid::createLink(const int linkID)
 			activeRow = rowCounter;
 			lastClickedRow = rowCounter;
 			// let's insert it.
-			theGrid->SetColMinimalWidth(0, 600);
-			theGrid->ForceRefresh();
+			SetColMinimalWidth(0, 600);
+			ForceRefresh();
 			break;
 		}
 		++rowCounter;

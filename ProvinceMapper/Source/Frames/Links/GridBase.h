@@ -8,7 +8,6 @@
 #include <wx/notebook.h>
 
 
-wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
@@ -27,6 +26,8 @@ class GridBase : public wxGrid
   public:
 	GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
 
+	std::shared_ptr<LinkBase> activeLink;
+
   private:
 	void onGridMotion(wxMouseEvent& event);
 
@@ -37,7 +38,6 @@ class GridBase : public wxGrid
 
 	std::shared_ptr<LinkMappingVersion> version;
 
-	std::shared_ptr<LinkBase> activeLink;
 	std::optional<int> activeRow;
 	int lastClickedRow = 0;
 

@@ -13,8 +13,8 @@ wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), version(std::move(theVersion)), eventListener(parent)
 {
-	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this);
-	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this);
+	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this); // TODO: move this to GridBase
+	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this); // TODO: move this to GridBase
 	Bind(wxEVT_UPDATE_NAME, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
@@ -25,7 +25,7 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 
 	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	linksTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	theGrid = new ProvinceMappingsGrid(this, version);
+	provinceMappingsGrid = new ProvinceMappingsGrid(this, version);
 	GetParent()->Layout();
 
 	auto* gridBox = new wxBoxSizer(wxVERTICAL);
@@ -34,25 +34,25 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 
 	gridBox->AddSpacer(20); // Visually separate the triangulation pairs grid from the province links grid.
 	gridBox->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
-	gridBox->Add(theGrid, wxSizerFlags(1).Expand());
+	gridBox->Add(provinceMappingsGrid, wxSizerFlags(1).Expand());
 	SetSizer(gridBox);
 	gridBox->Fit(this);
 	triangulationPointGrid->ForceRefresh();
-	theGrid->ForceRefresh();
+	provinceMappingsGrid->ForceRefresh();
 }
 
 
 void LinksTab::redraw()
 {
 	triangulationPointGrid->redraw();
-	theGrid->redraw();
+	provinceMappingsGrid->redraw();
 }
 
 void LinksTab::leftUp(const wxGridEvent& event)
 {
-	if (event.GetId() == theGrid->GetId()) // TODO: REMOVE THIS IF BECAUSE THE GRID ARE BEING EXTRACTED TO SEPARATE FILES
+	if (event.GetId() == provinceMappingsGrid->GetId()) // TODO: REMOVE THIS IF BECAUSE THE GRID ARE BEING EXTRACTED TO SEPARATE FILES
 	{
-		theGrid->leftUp(event);
+		provinceMappingsGrid->leftUp(event);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 
 void LinksTab::activateLinkByIndex(const int index)
 {
-	theGrid->activateLinkByIndex(index);
+	provinceMappingsGrid->activateLinkByIndex(index);
 }
 
 void LinksTab::onUpdateComment(const wxCommandEvent& event)
@@ -86,39 +86,21 @@ void LinksTab::onUpdateComment(const wxCommandEvent& event)
 		const auto& link = version->getLinks()->at(index);
 		link->setComment(comment);
 		// also update screen.
-		theGrid->SetCellValue(index, 0, comment);
-		theGrid->ForceRefresh();
+		provinceMappingsGrid->SetCellValue(index, 0, comment);
+		provinceMappingsGrid->ForceRefresh();
 	}
+}
+
+void LinksTab::createLink(int linkID)
+{
+	provinceMappingsGrid->createLink(linkID);
 }
 
 void LinksTab::createTriangulationPair(int pairID)
 {
-	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
-
-	// Where is this new row?
-	auto rowCounter = 0;
-	for (const auto& pair: *version->getTriangulationPointPairs())
-	{
-		if (pair->getID() == pairID)
-		{
-			triangulationPointGrid->InsertRows(rowCounter, 1, false);
-			triangulationPointGrid->SetCellValue(rowCounter, 0, pair->toRowString());
-
-			activateTriangulationPairRowColor(rowCounter);
-			activeTriangulationPair = pair;
-			// If we have an active link, restore its color.
-			if (activeTriangulationPointRow)
-				restoreTriangulationPairRowColor(*activeTriangulationPointRow + 1); // We have a link inserted so we need to fix the following one.
-			activeTriangulationPointRow = rowCounter;
-			lastClickedTriangulationPairRow = rowCounter;
-			// let's insert it.
-			triangulationPointGrid->SetColMinimalWidth(0, 600);
-			triangulationPointGrid->ForceRefresh();
-			break;
-		}
-		++rowCounter;
-	}
+	triangulationPointGrid->createTriangulationPair(pairID);
 }
+
 
 void LinksTab::onKeyDown(wxKeyEvent& event)
 {
@@ -134,7 +116,7 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 		case WXK_F5:
 			stageSave();
 			break;
-		case WXK_F6: // TODO: maybe this should be swapped with F5?
+		case WXK_F6:
 			stageAddTriangulationPair();
 			break;
 		case WXK_DELETE:
@@ -160,24 +142,24 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 
 void LinksTab::stageAddComment()
 {
-	if (triangulationPointGrid->activeTriangulationPair)
+	if (triangulationPointGrid->activeLink)
 	{
 		triangulationPointGrid->stageAddComment();
 	}
 	else
 	{
-		theGrid->stageAddComment();
+		provinceMappingsGrid->stageAddComment();
 	}
 }
 
 void LinksTab::stageDeleteLink() const
 {
-	if (triangulationPointGrid->activeTriangulationPair) {
+	if (triangulationPointGrid->activeLink) {
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
 		eventListener->QueueEvent(evt->Clone());
 	}
 	// Do nothing unless working on active link. Don't want accidents here.
-	else if (activeLink)
+	else if (provinceMappingsGrid->activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
@@ -186,12 +168,12 @@ void LinksTab::stageDeleteLink() const
 
 void LinksTab::stageMoveUp() const
 {	
-	if (triangulationPointGrid->activeTriangulationPair)
+	if (triangulationPointGrid->activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP);
 		eventListener->QueueEvent(evt->Clone());
 	}
-	else if (activeLink)
+	else if (provinceMappingsGrid->activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventListener->QueueEvent(evt->Clone());
@@ -200,12 +182,12 @@ void LinksTab::stageMoveUp() const
 
 void LinksTab::stageMoveDown() const
 {
-	if (triangulationPointGrid->activeTriangulationPair)
+	if (triangulationPointGrid->activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN);
 		eventListener->QueueEvent(evt->Clone());
 	}
-	else if (activeLink)
+	else if (provinceMappingsGrid->activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventListener->QueueEvent(evt->Clone());
@@ -214,12 +196,14 @@ void LinksTab::stageMoveDown() const
 
 void LinksTab::moveActiveLinkUp()
 {
-	theGrid->moveActiveLinkUp();
+	// TODO: handle triangulation pairs 
+	provinceMappingsGrid->moveActiveLinkUp();
 }
 
 void LinksTab::moveActiveLinkDown()
 {
-	theGrid->moveActiveLinkDown();
+	// TODO: handle triangulation pairs 
+	provinceMappingsGrid->moveActiveLinkDown();
 }
 
 void LinksTab::stageSave() const

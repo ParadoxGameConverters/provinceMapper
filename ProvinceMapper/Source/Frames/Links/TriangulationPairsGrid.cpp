@@ -5,6 +5,7 @@
 
 
 
+wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
 
 
@@ -80,8 +81,8 @@ void TriangulationPairsGrid::redraw()
 		SetCellBackgroundColour(rowCounter, 0, bgColor);
 		rowCounter++;
 	}
-	triangulationPointGrid->AutoSizeColumn(0, false);
-	triangulationPointGrid->EndBatch();
+	AutoSizeColumn(0, false);
+	EndBatch();
 	if (activeRow)
 		focusOnActiveRow();
 	GetParent()->Layout();
@@ -91,10 +92,58 @@ void TriangulationPairsGrid::redraw()
 
 void TriangulationPairsGrid::focusOnActiveRow()
 {
-	const auto cellCoords = triangulationPointGrid->CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
+	const auto cellCoords = CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
 	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-	const auto scrollPageSize = triangulationPointGrid->GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
+	const auto scrollPageSize = GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
 	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-	triangulationPointGrid->Scroll(offset);														  // and shoo.
-	triangulationPointGrid->ForceRefresh();
+	Scroll(offset);														  // and shoo.
+	ForceRefresh();
+}
+
+void TriangulationPairsGrid::stageAddComment()
+{
+	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
+	dialog->ShowModal();
+}
+
+void TriangulationPairsGrid::rightUp(wxGridEvent& event)
+{
+	const wxCommandEvent* evt;
+
+	// Right up means deselect active link, which is serious stuff.
+	// If our active link is dry, we're not deselecting it, we're deleting it.
+	evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
+
+	eventListener->QueueEvent(evt->Clone());
+	event.Skip();
+}
+
+
+void TriangulationPairsGrid::createTriangulationPair(int pairID)
+{
+	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
+
+	// Where is this new row?
+	auto rowCounter = 0;
+	for (const auto& pair: *version->getTriangulationPointPairs())
+	{
+		if (pair->getID() == pairID)
+		{
+			InsertRows(rowCounter, 1, false);
+			SetCellValue(rowCounter, 0, pair->toRowString());
+
+			activateTriangulationPairRowColor(rowCounter);
+			activeTriangulationPair = pair;
+			// If we have an active link, restore its color.
+			if (activeRow)
+				restoreTriangulationPairRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+			activeTriangulationPointRow = rowCounter;
+			lastClickedTriangulationPairRow = rowCounter;
+			// let's insert it.
+			triangulationPointGrid->SetColMinimalWidth(0, 600);
+			triangulationPointGrid->ForceRefresh();
+			break;
+		}
+		++rowCounter;
+	}
 }

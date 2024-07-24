@@ -35,6 +35,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxEVT_ADD_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddTriangulationPair, this, wxEVT_ADD_TRIANGULATION_PAIR);
 	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveLink, this, wxEVT_DELETE_ACTIVE_LINK);
+	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveTriangulationPair, this, wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddComment, this, wxMENU_ADD_COMMENT);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsAddVersion, this, wxMENU_ADD_VERSION);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsCopyVersion, this, wxMENU_COPY_VERSION);

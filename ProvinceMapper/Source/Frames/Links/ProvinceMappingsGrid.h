@@ -30,17 +30,20 @@ class ProvinceMappingsGrid final: public GridBase
 
 	void redraw();
 	void leftUp(const wxGridEvent& event);
+	void rightUp(wxGridEvent& event);
 
 	void activateLinkByIndex(const int index);
 
 	void activateLinkRowColor(int row);
 	void restoreLinkRowColor(int row);
 
-  private:
+	void createLink(const int linkID);
 
+	void stageAddComment();
+
+  private:
 	void activateLinkByID(const int theID);
 	void deactivateLink();
 
 	void refreshActiveLink();
-	void stageAddComment();
 };

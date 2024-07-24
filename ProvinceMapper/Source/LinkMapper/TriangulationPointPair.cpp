@@ -44,14 +44,27 @@ const std::string TriangulationPointPair::toRowString()
 	return name;
 }
 
+static const wxColour baseRowColour = wxColour(240, 240, 240);
+static const wxColour commentColour = wxColour(150, 150, 150);
+static const wxColour activeRowColour = wxColour(150, 250, 150); // Bright green for selected pairs.
+static const wxColour selectedCommentColour = wxColour(50, 180, 50); // dark green for selected comments
+
 const wxColour TriangulationPointPair::getBaseRowColour()
 {
-	return wxColour(240, 240, 240);
+	if (!sourcePoint && !targetPoint && comment)
+	{
+		return commentColour;
+	}
+	return baseRowColour;
 }
 
 const wxColour TriangulationPointPair::getActiveRowColour()
 {
-	return wxColour(150, 250, 150); // Bright green for selected pairs.
+	if (!sourcePoint && !targetPoint && comment)
+	{
+		return selectedCommentColour;
+	}
+	return activeRowColour; // Bright green for selected pairs.
 }
 
 void TriangulationPointPair::registerKeys(commonItems::parser parser)
