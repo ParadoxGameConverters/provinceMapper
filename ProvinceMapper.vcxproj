@@ -53,6 +53,7 @@
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\Color.h" />
@@ -102,6 +103,7 @@
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico" />
