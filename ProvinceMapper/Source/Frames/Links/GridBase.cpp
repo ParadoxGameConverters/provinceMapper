@@ -1,9 +1,13 @@
 #include "GridBase.h"
+#include "LinkMapper/LinkBase.h"
 
 
 GridBase::GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
 	 wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(theVersion), eventListener(parent)
 {
+	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &GridBase::leftUp, this);
+	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &GridBase::rightUp, this);
+
 	CreateGrid(0, 1, wxGrid::wxGridSelectCells);
 	EnableEditing(false);
 	HideCellEditControl();
@@ -61,5 +65,15 @@ void GridBase::moveActiveLinkDown()
 		InsertRows(*activeRow, 1, false);
 		SetCellValue(*activeRow, 0, text);
 		SetCellBackgroundColour(*activeRow, 0, color);
+	}
+}
+
+void GridBase::refreshActiveLink()
+{
+	// this is called when we're toggling a province within the active link
+
+	if (activeRow && activeLink)
+	{
+		SetCellValue(*activeRow, 0, activeLink->toRowString());
 	}
 }

@@ -120,8 +120,3 @@ std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& poi
 	output << "}\n";
 	return output;
 }
-
-bool TriangulationPointPair::operator==(const TriangulationPointPair& rhs) const
-{
-	return ID == rhs.ID;
-}

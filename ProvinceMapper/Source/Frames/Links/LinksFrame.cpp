@@ -64,6 +64,12 @@ void LinksFrame::deactivateLink() const
 		activePage->deactivateLink();
 }
 
+void LinksFrame::deactivateTriangulationPair() const
+{
+	if (activePage)
+		activePage->deactivateTriangulationPair();
+}
+
 void LinksFrame::activateLinkByID(const int ID) const
 {
 	if (activePage)

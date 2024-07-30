@@ -97,6 +97,12 @@ void LinkMapper::deleteActiveLink() const
 		activeVersion->deleteActiveLink();
 }
 
+void LinkMapper::deleteActiveTriangulationPair() const
+{
+	if (activeVersion)
+		activeVersion->deleteActiveTriangulationPair();
+}
+
 std::optional<int> LinkMapper::addRawLink() const
 {
 	if (activeVersion)

@@ -323,10 +323,32 @@ void ImageFrame::deactivateLink()
 	Refresh();
 }
 
+void ImageFrame::deactivateTriangulationPair()
+{
+	// TODO: finish implementing this
+	/*
+	sourceCanvas->deactivateTriangulationPair();
+	targetCanvas->deactivateTriangulationPair();
+	*/
+	render();
+	Refresh();
+}
+
 void ImageFrame::deleteActiveLink()
 {
 	sourceCanvas->deleteActiveLink();
 	targetCanvas->deleteActiveLink();
+	render();
+	Refresh();
+}
+
+void ImageFrame::deleteActiveTriangulationPair()
+{
+	// TODO: finish implementing this
+	/*
+	sourceCanvas->deleteActiveTriangulationPair();
+	targetCanvas->deleteActiveTriangulationPair();
+	*/
 	render();
 	Refresh();
 }

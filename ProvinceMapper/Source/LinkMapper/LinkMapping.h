@@ -29,8 +29,6 @@ class LinkMapping: public LinkBase
 		 std::string theTargetToken,
 		 int theID);
 
-	bool operator==(const LinkMapping& rhs) const;
-
 	[[nodiscard]] Mapping toggleSource(const std::string& sourceID);
 	[[nodiscard]] Mapping toggleTarget(const std::string& targetID);
 

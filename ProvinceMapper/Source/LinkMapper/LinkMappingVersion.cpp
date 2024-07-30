@@ -318,6 +318,20 @@ void LinkMappingVersion::moveActiveLinkUp() const
 			++counter;
 		}
 	}
+
+	if (activeTriangulationPair)
+	{
+		size_t counter = 0;
+		for (const auto& pair: *triangulationPairs)
+		{
+			if (*pair == *activeTriangulationPair && counter > 0)
+			{
+				std::swap((*triangulationPairs)[counter], (*triangulationPairs)[counter - 1]);
+				break;
+			}
+			++counter;
+		}
+	}
 }
 
 void LinkMappingVersion::moveActiveLinkDown() const
@@ -330,6 +344,20 @@ void LinkMappingVersion::moveActiveLinkDown() const
 			if (*link == *activeLink && counter < links->size() - 1)
 			{
 				std::swap((*links)[counter], (*links)[counter + 1]);
+				break;
+			}
+			++counter;
+		}
+	}
+
+	if (activeTriangulationPair)
+	{
+		size_t counter = 0;
+		for (const auto& pair: *triangulationPairs)
+		{
+			if (*pair == *activeTriangulationPair && counter < triangulationPairs->size() - 1)
+			{
+				std::swap((*triangulationPairs)[counter], (*triangulationPairs)[counter + 1]);
 				break;
 			}
 			++counter;

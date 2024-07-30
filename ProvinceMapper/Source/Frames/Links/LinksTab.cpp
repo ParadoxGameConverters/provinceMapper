@@ -13,8 +13,6 @@ wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
 	 wxNotebookPage(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), version(std::move(theVersion)), eventListener(parent)
 {
-	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this); // TODO: move this to GridBase
-	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this); // TODO: move this to GridBase
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
 	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
@@ -47,18 +45,6 @@ void LinksTab::redraw()
 	provinceMappingsGrid->redraw();
 }
 
-void LinksTab::leftUp(const wxGridEvent& event)
-{
-	if (event.GetId() == provinceMappingsGrid->GetId()) // TODO: REMOVE THIS IF BECAUSE THE GRID ARE BEING EXTRACTED TO SEPARATE FILES
-	{
-		provinceMappingsGrid->leftUp(event);
-	}
-	else
-	{
-		triangulationPointGrid->leftUp(event);
-	}
-}
-
 void LinksTab::restoreTriangulationPairRowColor(int pairRow) const
 {
 	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
@@ -71,9 +57,29 @@ void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, pair->getActiveRowColour()); // link highlight
 }
 
+void LinksTab::deactivateLink()
+{
+	provinceMappingsGrid->deactivateLink();
+}
+
+void LinksTab::deactivateTriangulationPair()
+{
+	triangulationPointGrid->deactivateTriangulationPair();
+}
+
+void LinksTab::activateLinkByID(int theID)
+{
+	provinceMappingsGrid->activateLinkByID(theID);
+}
+
 void LinksTab::activateLinkByIndex(const int index)
 {
 	provinceMappingsGrid->activateLinkByIndex(index);
+}
+
+void LinksTab::refreshActiveLink()
+{
+	provinceMappingsGrid->refreshActiveLink();
 }
 
 void LinksTab::createLink(int linkID)
@@ -181,14 +187,14 @@ void LinksTab::stageMoveDown() const
 
 void LinksTab::moveActiveLinkUp()
 {
-	// TODO: handle triangulation pairs 
 	provinceMappingsGrid->moveActiveLinkUp();
+	triangulationPointGrid->moveActiveLinkUp();
 }
 
 void LinksTab::moveActiveLinkDown()
 {
-	// TODO: handle triangulation pairs 
 	provinceMappingsGrid->moveActiveLinkDown();
+	triangulationPointGrid->moveActiveLinkDown();
 }
 
 void LinksTab::stageSave() const

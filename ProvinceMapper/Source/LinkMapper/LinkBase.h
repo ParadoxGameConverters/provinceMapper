@@ -1,6 +1,6 @@
-#ifndef LINK_BASE_H
-#define LINK_BASE_H
+#pragma once
 #include "Parser.h"
+
 class wxColour;
 class LinkBase
 {
@@ -9,15 +9,15 @@ class LinkBase
 
 	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getComment() const { return comment; }
-	[[nodiscard]] virtual const std::string toRowString();
-	[[nodiscard]] virtual const wxColour getBaseRowColour();
-	[[nodiscard]] virtual const wxColour getActiveRowColour();
+	[[nodiscard]] virtual const std::string toRowString() = 0;
+	[[nodiscard]] virtual const wxColour getBaseRowColour() = 0;
+	[[nodiscard]] virtual const wxColour getActiveRowColour() = 0;
 
 	void setComment(const std::string& theComment) { comment = theComment; }
+
+	bool operator==(const LinkBase& rhs) const;
 
   protected:
 	int ID = 0;
 	std::optional<std::string> comment;
 };
-
-#endif // LINK_BASE_H

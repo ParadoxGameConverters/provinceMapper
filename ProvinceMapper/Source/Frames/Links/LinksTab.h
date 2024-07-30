@@ -28,20 +28,19 @@ class LinksTab final: public wxNotebookPage
 	void activateTriangulationPairRowColor(int row) const;
 
 	void deactivateLink();
+	void deactivateTriangulationPair();
 	void activateLinkByID(int theID);
 	void activateLinkByIndex(int index);
 	void refreshActiveLink();
 	void createLink(int linkID);
 	void createTriangulationPair(int pairID);
-	void moveActiveLinkUp(); // TODO: add triangulation pairs support
-	void moveActiveLinkDown(); // TODO: add triangulation pairs support
+	void moveActiveLinkUp();
+	void moveActiveLinkDown();
 
   private:
-	void rightUp(wxGridEvent& event); 
-	void leftUp(const wxGridEvent& event);
 	void onKeyDown(wxKeyEvent& event);	// TODO: add triangulation pairs support
 
-	void activateLinkRowColor(int row) const;
+	void activateLinkRowColor(int row) const; // TODO: REMOVE THIS FROM HERE
 	void stageAddComment();
 	void stageDeleteLink() const;
 	void stageMoveUp() const;

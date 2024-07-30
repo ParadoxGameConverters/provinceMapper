@@ -181,16 +181,6 @@ void ProvinceMappingsGrid::activateLinkByID(const int theID)
 	}
 }
 
-void ProvinceMappingsGrid::refreshActiveLink()
-{
-	// this is called when we're toggling a province within the active link
-
-	if (activeRow && activeLink)
-	{
-		SetCellValue(*activeRow, 0, activeLink->toRowString());
-	}
-}
-
 void ProvinceMappingsGrid::rightUp(wxGridEvent& event)
 {
 	// Right up means deselect active link, which is serious stuff.

@@ -8,6 +8,9 @@
 
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
@@ -105,7 +108,7 @@ void TriangulationPairsGrid::focusOnActiveRow()
 
 void TriangulationPairsGrid::stageAddComment()
 {
-	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
+	auto* dialog = new TriangulationPairDialogComment(this, "Add Comment", lastClickedRow);
 	dialog->ShowModal();
 }
 
@@ -147,16 +150,16 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			InsertRows(rowCounter, 1, false);
 			SetCellValue(rowCounter, 0, pair->toRowString());
 
-			activateTriangulationPairRowColor(rowCounter);
+			activateLinkRowColor(rowCounter);
 			activeTriangulationPair = pair;
 			// If we have an active link, restore its color.
 			if (activeRow)
-				restoreTriangulationPairRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
-			activeTriangulationPointRow = rowCounter;
-			lastClickedTriangulationPairRow = rowCounter;
+				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+			activeRow = rowCounter;
+			lastClickedRow = rowCounter;
 			// let's insert it.
-			triangulationPointGrid->SetColMinimalWidth(0, 600);
-			triangulationPointGrid->ForceRefresh();
+			SetColMinimalWidth(0, 600);
+			ForceRefresh();
 			break;
 		}
 		++rowCounter;
@@ -175,4 +178,27 @@ void TriangulationPairsGrid::onUpdateComment(const wxCommandEvent& event)
 		SetCellValue(index, 0, comment);
 		ForceRefresh();
 	}
+}
+
+void TriangulationPairsGrid::deactivateTriangulationPair()
+{
+	if (activeRow)
+	{
+		// Active pair may have been deleted by linkmapper. Check our records.
+		if (static_cast<int>(version->getTriangulationPointPairs()->size()) == GetNumberRows())
+		{
+			// all is well, just deactivate.
+			restoreLinkRowColor(*activeRow);
+		}
+		else
+		{
+			// We have a row too many. This is unacceptable.
+			DeleteRows(*activeRow, 1, false);
+			if (lastClickedRow > 0)
+				--lastClickedRow;
+		}
+	}
+	activeLink.reset();
+	activeRow.reset();
+	ForceRefresh();
 }

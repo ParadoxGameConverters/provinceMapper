@@ -20,6 +20,7 @@ class LinkMapper: commonItems::parser
 	void activateLinkByIndex(int row) const;
 	void activateLinkByID(int ID) const;
 	void deleteActiveLink() const;
+	void deleteActiveTriangulationPair() const;
 	void updateActiveVersionName(const std::string& theName) const;
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;

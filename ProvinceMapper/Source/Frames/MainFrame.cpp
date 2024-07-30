@@ -6,6 +6,8 @@
 #include "Images/ImageFrame.h"
 #include "Links/DialogComment.h"
 #include "Links/LinksFrame.h"
+#include "Links/ProvinceMappingsGrid.h"
+#include "Links/TriangulationPairsGrid.h"
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
 #include "PixelReader/PixelReader.h"
@@ -49,9 +51,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onShowUnmapped, this, wxMENU_SHOW_UNMAPPED);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
-	Bind(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, &MainFrame::onDeactivateTriangulationPair, this)
+	Bind(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, &MainFrame::onDeactivateTriangulationPair, this);
 	Bind(wxEVT_DELETE_ACTIVE_LINK, &MainFrame::onDeleteActiveLink, this);
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
+	Bind(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX, &MainFrame::onActivateTriangulationPairByIndex, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
@@ -594,12 +597,27 @@ void MainFrame::onDeactivateTriangulationPair(wxCommandEvent& evt)
 
 void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)
 {
-	linkMapper.deactivateLink();
-	linksFrame->deactivateLink();
-	imageFrame->deactivateLink();
+	deactiveActiveLinkOrTriangulationPair();
+
 	linkMapper.activateLinkByIndex(evt.GetInt());
 	linksFrame->activateLinkByIndex(evt.GetInt());
 	imageFrame->activateLinkByIndex(evt.GetInt());
+}
+
+void MainFrame::onActivateTriangulationPairByIndex(const wxCommandEvent& evt)
+{
+	deactiveActiveLinkOrTriangulationPair();
+
+	linkMapper.activateLinkByIndex(evt.GetInt());
+	linksFrame->activateLinkByIndex(evt.GetInt());
+	imageFrame->activateLinkByIndex(evt.GetInt());
+}
+
+void MainFrame::deactiveActiveLinkOrTriangulationPair()
+{
+	linkMapper.deactivateLink();
+	linksFrame->deactivateLink();
+	imageFrame->deactivateLink();
 }
 
 void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
@@ -679,10 +697,18 @@ void MainFrame::onAddComment(const wxCommandEvent& evt)
 void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)
 {
 	// We don't need an ID since this works only on active link.
-	imageFrame->deleteActiveLink(); // images first so it knows which provinces to recolor.
+	imageFrame->deleteActiveLink(); // Images first so it knows which provinces to recolor.
 	linkMapper.deleteActiveLink();
 	linksFrame->deactivateLink();
 	unmappedFrame->refreshList();
+}
+
+void MainFrame::onDeleteActiveTriangulationPair(wxCommandEvent& evt) // TODO: bind this
+{
+	// We don't need an ID since this works only on active pair.
+	imageFrame->deleteActiveTriangulationPair(); // Images first so it knows which provinces to recolor.
+	linkMapper.deleteActiveTriangulationPair();
+	linksFrame->deactivateTriangulationPair();
 }
 
 void MainFrame::onLinksAddLink(wxCommandEvent& evt)

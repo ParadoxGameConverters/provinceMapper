@@ -1,6 +1,7 @@
 #include "UnmappedTab.h"
 #include "Frames/Images/ImageCanvas.h"
 #include "Frames/Links/LinksTab.h"
+#include "Frames/Links/ProvinceMappingsGrid.h"
 #include "Frames/MainFrame.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"

@@ -235,8 +235,3 @@ const wxColour LinkMapping::getActiveRowColour()
 	}
 	return selectedLinkColour;
 }
-
-bool LinkMapping::operator==(const LinkMapping& rhs) const
-{
-	return ID == rhs.ID;
-}

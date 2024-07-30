@@ -17,8 +17,6 @@ class TriangulationPointPair: public LinkBase
 	explicit TriangulationPointPair(
 		 int theID);
 
-	bool operator==(const TriangulationPointPair& rhs) const;
-
 	void setSourcePoint(const wxPoint& point) { sourcePoint = point; }
 	void setTargetPoint(const wxPoint& point) { targetPoint = point; }
 

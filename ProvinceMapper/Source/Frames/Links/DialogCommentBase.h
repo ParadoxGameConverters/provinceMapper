@@ -29,6 +29,6 @@ class DialogCommentBase : public wxDialog
   protected:
 	wxEvtHandler* eventHandler = nullptr;
 
-	virtual wxEventTypeTag<wxCommandEvent> getUpdateNameCommand();
-	virtual wxEventTypeTag<wxCommandEvent> getAddCommentCommand();
+	virtual wxEventTypeTag<wxCommandEvent> getUpdateNameCommand() = 0;
+	virtual wxEventTypeTag<wxCommandEvent> getAddCommentCommand() = 0;
 };

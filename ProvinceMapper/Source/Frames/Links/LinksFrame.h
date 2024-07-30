@@ -20,6 +20,7 @@ class LinksFrame final : public wxFrame
 		 std::shared_ptr<Configuration> theConfiguration);
 
 	void deactivateLink() const;
+	void deactivateTriangulationPair() const;
 	void activateLinkByID(int ID) const;
 	void activateLinkByIndex(int index) const;
 	void refreshActiveLink() const;

@@ -8,13 +8,9 @@
 #include <wx/notebook.h>
 
 
-wxDECLARE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent); // TODO: move this to linkstab
 
 
 class LinkMappingVersion;
@@ -24,6 +20,13 @@ class GridBase : public wxGrid
   public:
 	GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
 
+	virtual void leftUp(const wxGridEvent& event) = 0;
+	virtual void rightUp(wxGridEvent& event) = 0;
+	void moveActiveLinkUp();
+	void moveActiveLinkDown();
+
+	void refreshActiveLink();
+
 	std::shared_ptr<LinkBase> activeLink;
 
   private:
@@ -31,8 +34,6 @@ class GridBase : public wxGrid
 
   protected:
 	void focusOnActiveRow();
-	void moveActiveLinkUp();
-	void moveActiveLinkDown();
 
 	std::shared_ptr<LinkMappingVersion> version;
 
