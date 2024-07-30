@@ -95,6 +95,15 @@ void ImageCanvas::activateLinkByID(const int ID)
 	}
 }
 
+void ImageCanvas::activateFirstRegionLink(const int commentRow)
+{
+	const auto firstRegionRow = commentRow + 1;
+	if (activeVersion && firstRegionRow < static_cast<int>(activeVersion->getLinks()->size()))
+	{
+		activeLink = activeVersion->getLinks()->at(firstRegionRow);
+	}
+}
+
 void ImageCanvas::strafeProvinces()
 {
 	for (const auto& province: getRelevantProvinces(activeLink))
@@ -106,6 +115,45 @@ void ImageCanvas::strafeProvince(const std::shared_ptr<Province>& province)
 	for (const auto& pixel: province->innerPixels)
 		if ((pixel.x + pixel.y) % 8 == 0)
 			strafedPixels.emplace_back(pixel);
+}
+
+void ImageCanvas::highlightRegionByCommentRow(const int row)
+{
+	if (!activeVersion)
+	{
+		return;
+	}
+	const auto& links = activeVersion->getLinks();
+	if (row >= static_cast<int>(links->size()))
+	{
+		return;
+	}
+	if (const auto& commentLink = links->at(row); commentLink->getComment())
+	{
+		auto rowUnderComment = row + 1;
+		while (static_cast<unsigned long>(rowUnderComment) < links->size() && !links->at(rowUnderComment)->getComment())
+		{
+			const auto& link = links->at(rowUnderComment);
+			// Highlight our provinces' pixels.
+			highlightProvinces(link);
+			++rowUnderComment;
+		}
+	}
+}
+
+void ImageCanvas::highlightProvinces(const std::shared_ptr<LinkMapping>& linkToHighlight)
+{
+	highlightedLinks.emplace_back(linkToHighlight);
+	for (const auto& province: getRelevantProvinces(linkToHighlight))
+		highlightProvince(province);
+}
+
+void ImageCanvas::highlightProvince(const std::shared_ptr<Province>& province)
+{
+	for (const auto& pixel: province->innerPixels)
+	{
+		highlightedPixels.emplace_back(pixel);
+	}
 }
 
 void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) const
@@ -152,6 +200,27 @@ void ImageCanvas::applyStrafedPixels()
 	}
 }
 
+void ImageCanvas::applyHighlightedPixels()
+{
+	for (const auto& pixel: highlightedPixels)
+	{
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		imageData[offset] = 150;
+		imageData[offset + 1] = 150;
+		imageData[offset + 2] = 150;
+	}
+}
+void ImageCanvas::applyProvinceHighlight(const std::shared_ptr<Province>& province)
+{
+	for (const auto& pixel: province->innerPixels)
+	{
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		imageData[offset] = 150;
+		imageData[offset + 1] = 150;
+		imageData[offset + 2] = 150;
+	}
+}
+
 void ImageCanvas::deactivateLink()
 {
 	activeLink.reset();
@@ -173,6 +242,25 @@ void ImageCanvas::deactivateLink()
 		}
 	}
 	strafedPixels.clear();
+}
+
+void ImageCanvas::clearRegionHighlight()
+{
+	for (const auto& link: highlightedLinks)
+	{
+		const std::vector<std::shared_ptr<Province>>& provinces = selector == ImageTabSelector::SOURCE ? link->getSources() : link->getTargets();
+		for (const auto& province: provinces)
+		{
+			for (const auto& pixel: province->innerPixels)
+			{
+				const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+				imageData[offset] = province->r;
+				imageData[offset + 1] = province->g;
+				imageData[offset + 2] = province->b;
+			}
+		}
+	}
+	clearHighlightedLinks();
 }
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)
@@ -331,6 +419,8 @@ void ImageCanvas::toggleProvinceByID(const std::string& ID)
 		{
 			// mark the province as black if needed.
 			markProvince(province);
+			// highlight province if it's being added to currently highlighted region
+			HighlightProvinceIfInHighlightedRegion(province);
 			// We need to add this province to strafe.
 			strafeProvince(province);
 			applyStrafedPixels();
@@ -349,6 +439,22 @@ void ImageCanvas::toggleProvinceByID(const std::string& ID)
 	applyStrafedPixels();
 }
 
+void ImageCanvas::HighlightProvinceIfInHighlightedRegion(const std::shared_ptr<Province>& province)
+{
+	for (const auto& link: highlightedLinks)
+	{
+		for (const auto& linkProvince: getRelevantProvinces(link))
+		{
+			if (linkProvince->ID == province->ID)
+			{
+				highlightProvince(province);
+				applyProvinceHighlight(province);
+				return;
+			}
+		}
+	}
+}
+
 void ImageCanvas::shadeProvinceByID(const std::string& ID)
 {
 	// this is called when we're marking a province outside of a working link. Often a preface to a new link being initialized.
@@ -361,7 +467,16 @@ void ImageCanvas::shadeProvinceByID(const std::string& ID)
 		markProvince(province);
 }
 
-wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
+wxPoint ImageCanvas::locateActiveLinkCoordinates() const
+{
+	if (activeLink)
+	{
+		return GetCoordinatesForLink(activeLink);
+	}
+	return wxPoint(0, 0);
+}
+
+wxPoint ImageCanvas::locateLinkCoordinates(const int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
 	std::shared_ptr<LinkMapping> link = nullptr;
@@ -382,18 +497,25 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 	// find out first province's pixels.
 	if (link)
 	{
-		const auto& relevantProvinces = getRelevantProvinces(link);
-		if (!relevantProvinces.empty()) // not all links have provinces in them.
+		toReturn = GetCoordinatesForLink(link);
+	}
+	return toReturn;
+}
+
+wxPoint ImageCanvas::GetCoordinatesForLink(const std::shared_ptr<LinkMapping>& link) const
+{
+	auto toReturn = wxPoint(0, 0);
+	const auto& relevantProvinces = getRelevantProvinces(link);
+	if (!relevantProvinces.empty()) // not all links have provinces in them.
+	{
+		const auto& province = relevantProvinces.front();
+		// provinces usually have pixels.
+		if (!province->innerPixels.empty())
 		{
-			const auto& province = relevantProvinces.front();
-			// provinces usually have pixels.
-			if (!province->innerPixels.empty())
-			{
-				const auto& pixel = province->innerPixels.front();
-				// And there we have it.
-				toReturn.x = pixel.x;
-				toReturn.y = pixel.y;
-			}
+			const auto& pixel = province->innerPixels.front();
+			// And there we have it.
+			toReturn.x = pixel.x;
+			toReturn.y = pixel.y;
 		}
 	}
 	return toReturn;

@@ -53,6 +53,8 @@ class MainFrame final : public wxFrame
 	void onDeactivateLink(wxCommandEvent& evt);
 	void onActivateLinkByIndex(const wxCommandEvent& evt);
 	void onActivateLinkByID(const wxCommandEvent& evt);
+	void onHighlightRegion(const wxCommandEvent& evt);
+	void clearRegionHighlight(wxCommandEvent& evt);
 	void onToggleProvince(const wxCommandEvent& evt);
 	void onCenterMap(const wxCommandEvent& evt);
 	void onCenterProvince(const wxCommandEvent& evt);
@@ -109,4 +111,7 @@ class MainFrame final : public wxFrame
 
 	// source/target pickers, links, source/target tokens
 	std::array<bool, 5> sanity = {false, false, false, false, false};
+
+	// for region highlight
+	wxArrayInt linksToHighlight;
 };

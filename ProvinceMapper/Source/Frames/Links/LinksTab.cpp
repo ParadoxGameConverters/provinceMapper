@@ -7,6 +7,8 @@
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DEACTIVATE_LINK, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_INDEX, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_HIGHLIGHT_REGION, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_DISABLE_REGION_HIGHLIGHT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
@@ -125,43 +127,53 @@ void LinksTab::leftUp(const wxGridEvent& event)
 
 	// We're selecting some cell. Let's translate that.
 	const auto row = event.GetRow();
-	if (row < static_cast<int>(version->getLinks()->size()))
+	const auto& links = version->getLinks();
+	const auto& clickedLink = links->at(row);
+	if (row >= static_cast<int>(links->size()))
+		return;
+	// Case 3: This is a comment.
+	if (clickedLink->getComment())
 	{
-		// Case 3: This is a comment.
-		if (version->getLinks()->at(row)->getComment())
-		{
-			// and we're altering it.
-			if (activeRow && *activeRow == row)
-			{
-				// spawn a dialog to change the name.
-				auto* dialog = new DialogComment(this, "Edit Comment", *version->getLinks()->at(row)->getComment(), row);
-				dialog->ShowModal();
-				return;
-			}
-		}
-
-		// Case 2: if we already clicked here, center the map.
+		// and we're altering it.
 		if (activeRow && *activeRow == row)
 		{
-			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
-			centerEvt->SetInt(activeLink->getID());
-			eventListener->QueueEvent(centerEvt->Clone());
+			// spawn a dialog to change the name.
+			auto* dialog = new DialogComment(this, "Edit Comment", *clickedLink->getComment(), row);
+			dialog->ShowModal();
 			return;
 		}
+	}
 
-		// Case 1: Selecting a new row.
-		if (activeRow)
-			restoreRowColor(*activeRow);
+	// Case 2: if we already clicked here, center the map.
+	if (activeRow && *activeRow == row)
+	{
+		auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
+		centerEvt->SetInt(activeLink->getID());
+		eventListener->QueueEvent(centerEvt->Clone());
+		return;
+	}
 
-		auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
+	// Case 1: Selecting a new row.
+	if (activeRow)
+		restoreRowColor(*activeRow);
+
+	auto* evt = new wxCommandEvent(wxEVT_SELECT_LINK_BY_INDEX);
+	evt->SetInt(row);
+	eventListener->QueueEvent(evt->Clone());
+
+	lastClickedRow = row;
+
+	// if the selected row's link is a comment
+	// highlight provinces from all links between the selected comment and the first comment below it
+	if (clickedLink->getComment())
+	{
+		auto* evt = new wxCommandEvent(wxEVT_HIGHLIGHT_REGION);
 		evt->SetInt(row);
 		eventListener->QueueEvent(evt->Clone());
-
-		lastClickedRow = row;
 	}
 }
 
-void LinksTab::restoreRowColor(int row) const
+void LinksTab::restoreRowColor(const int row) const
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
@@ -170,7 +182,7 @@ void LinksTab::restoreRowColor(int row) const
 		theGrid->SetCellBackgroundColour(row, 0, wxColour(240, 240, 240)); // link regular
 }
 
-void LinksTab::activateRowColor(int row) const
+void LinksTab::activateRowColor(const int row) const
 {
 	const auto& link = version->getLinks()->at(row);
 	if (link->getComment())
@@ -274,6 +286,11 @@ void LinksTab::rightUp(wxGridEvent& event)
 	// If our active link is dry, we're not deselecting it, we're deleting it.
 	const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 	eventListener->QueueEvent(evt->Clone());
+
+	// If the link is a comment, disable the region highlight
+	evt = new wxCommandEvent(wxEVT_DISABLE_REGION_HIGHLIGHT);
+	eventListener->QueueEvent(evt->Clone());
+
 	event.Skip();
 }
 
