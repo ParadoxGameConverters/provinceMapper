@@ -15,11 +15,12 @@ wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 
-ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion) {
+ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion): GridBase(parent, theVersion)
+{
+	Bind(wxEVT_UPDATE_NAME, &ProvinceMappingsGrid::onUpdateComment, this);
 }
 
 
@@ -232,4 +233,18 @@ void ProvinceMappingsGrid::stageAddComment()
 {
 	auto* dialog = new DialogComment(this, "Add Comment", lastClickedRow);
 	dialog->ShowModal();
+}
+
+void ProvinceMappingsGrid::onUpdateComment(const wxCommandEvent& event)
+{
+	const auto comment = event.GetString().ToStdString();
+	const auto index = event.GetInt();
+	if (index < static_cast<int>(version->getLinks()->size()))
+	{
+		const auto& link = version->getLinks()->at(index);
+		link->setComment(comment);
+		// Also update screen.
+		SetCellValue(index, 0, comment);
+		ForceRefresh();
+	}
 }

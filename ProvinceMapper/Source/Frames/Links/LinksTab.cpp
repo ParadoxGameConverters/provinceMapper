@@ -15,7 +15,6 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 {
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &LinksTab::leftUp, this); // TODO: move this to GridBase
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &LinksTab::rightUp, this); // TODO: move this to GridBase
-	Bind(wxEVT_UPDATE_NAME, &LinksTab::onUpdateComment, this);
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
 	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
@@ -56,7 +55,7 @@ void LinksTab::leftUp(const wxGridEvent& event)
 	}
 	else
 	{
-		triangulationPairsGridLeftUp(event);
+		triangulationPointGrid->leftUp(event);
 	}
 }
 
@@ -75,20 +74,6 @@ void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 void LinksTab::activateLinkByIndex(const int index)
 {
 	provinceMappingsGrid->activateLinkByIndex(index);
-}
-
-void LinksTab::onUpdateComment(const wxCommandEvent& event)
-{
-	const auto comment = event.GetString().ToStdString();
-	const auto index = event.GetInt();
-	if (index < static_cast<int>(version->getLinks()->size()))
-	{
-		const auto& link = version->getLinks()->at(index);
-		link->setComment(comment);
-		// also update screen.
-		provinceMappingsGrid->SetCellValue(index, 0, comment);
-		provinceMappingsGrid->ForceRefresh();
-	}
 }
 
 void LinksTab::createLink(int linkID)

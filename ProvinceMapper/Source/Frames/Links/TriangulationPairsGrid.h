@@ -12,6 +12,7 @@
 
 wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 class LinkMappingVersion;
@@ -25,12 +26,16 @@ class TriangulationPairsGrid final: public GridBase
 	void redraw();
 	void stageAddComment();
 
+	void leftUp(const wxGridEvent& event);
 	void rightUp(wxGridEvent& event);
+
+	void activateLinkRowColor(int row);
+	void restoreLinkRowColor(int row);
 
 	void createTriangulationPair(int pairID);
 
   private:
-	void triangulationPairsGridLeftUp(const wxGridEvent& event);
-
 	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
+
+	void onUpdateComment(const wxCommandEvent& event);
 };

@@ -39,10 +39,8 @@ class LinksTab final: public wxNotebookPage
   private:
 	void rightUp(wxGridEvent& event); 
 	void leftUp(const wxGridEvent& event);
-	void onUpdateComment(const wxCommandEvent& event); // TODO: add triangulation pairs support
 	void onKeyDown(wxKeyEvent& event);	// TODO: add triangulation pairs support
 
-	void restoreLinkRowColor(int row) const;
 	void activateLinkRowColor(int row) const;
 	void stageAddComment();
 	void stageDeleteLink() const;
@@ -59,8 +57,6 @@ class LinksTab final: public wxNotebookPage
 	TriangulationPairsGrid* triangulationPointGrid = nullptr;
 	ProvinceMappingsGrid* provinceMappingsGrid = nullptr;
 	std::shared_ptr<LinkMappingVersion> version;
-
-	void triangulationPairsGridLeftUp(const wxGridEvent& event);
 
   protected:
 	wxEvtHandler* eventListener = nullptr;

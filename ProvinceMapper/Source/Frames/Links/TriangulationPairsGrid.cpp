@@ -2,19 +2,22 @@
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
+#include "TriangulationPairDialogComment.h"
 
 
 
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion)
 {
+	Bind(wxEVT_UPDATE_TRIANGULATION_PAIR_COMMENT, &TriangulationPairsGrid::onUpdateComment, this);
 }
 
 
-void TriangulationPairsGrid::triangulationPairsGridLeftUp(const wxGridEvent& event) // TODO: move this to TriangulationPairsTab
+void TriangulationPairsGrid::leftUp(const wxGridEvent& event)
 {
 	// Left Up means:
 	// 1. We want to mark a nonworking row as working row
@@ -33,7 +36,7 @@ void TriangulationPairsGrid::triangulationPairsGridLeftUp(const wxGridEvent& eve
 			{
 				// spawn a dialog to change the name.
 				// TODO: DialogComment is for links. Implement an equivalent for triangulation pairs.
-				auto* dialog = new DialogComment(this, "Edit Comment", *version->getTriangulationPointPairs()->at(row)->getComment(), row);
+				auto* dialog = new TriangulationPairDialogComment(this, "Edit Comment", *version->getTriangulationPointPairs()->at(row)->getComment(), row);
 				dialog->ShowModal();
 				return;
 			}
@@ -56,7 +59,7 @@ void TriangulationPairsGrid::triangulationPairsGridLeftUp(const wxGridEvent& eve
 		evt->SetInt(row);
 		eventListener->QueueEvent(evt->Clone());
 
-		lastClickedTriangulationPairRow = row;
+		lastClickedRow = row;
 	}
 }
 
@@ -86,7 +89,7 @@ void TriangulationPairsGrid::redraw()
 	if (activeRow)
 		focusOnActiveRow();
 	GetParent()->Layout();
-	triangulationPointGrid->ForceRefresh();
+	ForceRefresh();
 }
 
 
@@ -118,6 +121,18 @@ void TriangulationPairsGrid::rightUp(wxGridEvent& event)
 	event.Skip();
 }
 
+void TriangulationPairsGrid::activateLinkRowColor(int row)
+{
+	const auto& pair = version->getTriangulationPointPairs()->at(row);
+	SetCellBackgroundColour(row, 0, pair->getBaseRowColour());
+}
+
+void TriangulationPairsGrid::restoreLinkRowColor(int row)
+{
+	const auto& pair = version->getTriangulationPointPairs()->at(row);
+	SetCellBackgroundColour(row, 0, pair->getActiveRowColour());
+}
+
 
 void TriangulationPairsGrid::createTriangulationPair(int pairID)
 {
@@ -145,5 +160,19 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			break;
 		}
 		++rowCounter;
+	}
+}
+
+void TriangulationPairsGrid::onUpdateComment(const wxCommandEvent& event)
+{
+	const auto comment = event.GetString().ToStdString();
+	const auto index = event.GetInt();
+	if (index < static_cast<int>(version->getTriangulationPointPairs()->size()))
+	{
+		const auto& pair = version->getTriangulationPointPairs()->at(index);
+		pair->setComment(comment);
+		// Also update screen.
+		SetCellValue(index, 0, comment);
+		ForceRefresh();
 	}
 }

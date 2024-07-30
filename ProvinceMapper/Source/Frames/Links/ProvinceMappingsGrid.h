@@ -46,4 +46,6 @@ class ProvinceMappingsGrid final: public GridBase
 	void deactivateLink();
 
 	void refreshActiveLink();
+
+	void onUpdateComment(const wxCommandEvent& event);
 };
