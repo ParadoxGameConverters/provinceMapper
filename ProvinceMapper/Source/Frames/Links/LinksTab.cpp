@@ -16,21 +16,23 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
 	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-	pairsTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	pairsTitle->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	triangulationPointGrid = new TriangulationPairsGrid(this, version);
+	triangulationPointGrid->SetMinSize(wxSize(200, 300)); // TODO: remove this
 	GetParent()->Layout();
 
 	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-	linksTitle->SetFont(wxFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	linksTitle->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	provinceMappingsGrid = new ProvinceMappingsGrid(this, version);
 	GetParent()->Layout();
 
 	auto* gridBox = new wxBoxSizer(wxVERTICAL);
 	gridBox->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
-	gridBox->Add(triangulationPointGrid, 1, wxEXPAND | wxALL);
+	//gridBox->Add(triangulationPointGrid, 1, wxEXPAND | wxALL);
+	gridBox->Add(triangulationPointGrid, wxSizerFlags(1).Expand());
 
 	gridBox->AddSpacer(20); // Visually separate the triangulation pairs grid from the province links grid.
-	gridBox->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
+	gridBox->Add(linksTitle, 0, wxALIGN_CENTER | wxALL, 10);
 	gridBox->Add(provinceMappingsGrid, wxSizerFlags(1).Expand());
 	SetSizer(gridBox);
 	gridBox->Fit(this);
@@ -47,13 +49,13 @@ void LinksTab::redraw()
 
 void LinksTab::restoreTriangulationPairRowColor(int pairRow) const
 {
-	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
+	const auto& pair = version->getTriangulationPairs()->at(pairRow);
 	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, pair->getBaseRowColour()); // link regular
 }
 
 void LinksTab::activateTriangulationPairRowColor(int pairRow) const
 {
-	const auto& pair = version->getTriangulationPointPairs()->at(pairRow);
+	const auto& pair = version->getTriangulationPairs()->at(pairRow);
 	triangulationPointGrid->SetCellBackgroundColour(pairRow, 0, pair->getActiveRowColour()); // link highlight
 }
 
@@ -75,6 +77,11 @@ void LinksTab::activateLinkByID(int theID)
 void LinksTab::activateLinkByIndex(const int index)
 {
 	provinceMappingsGrid->activateLinkByIndex(index);
+}
+
+void LinksTab::activateTriangulationPairByIndex(int index)
+{
+	triangulationPointGrid->activatePairByIndex(index);
 }
 
 void LinksTab::refreshActiveLink()

@@ -78,6 +78,16 @@ void ImageCanvas::activateLinkByIndex(const int row)
 	}
 }
 
+void ImageCanvas::activateTriangulationPairByIndex(int row)
+{
+	if (activeVersion && row < static_cast<int>(activeVersion->getTriangulationPairs()->size()))
+	{
+		activeTriangulationPair = activeVersion->getTriangulationPairs()->at(row);
+		lastClickedTriangulationPair = row;
+		// TODO: Draw the pair's points on the map.
+	}
+}
+
 void ImageCanvas::activateLinkByID(const int ID)
 {
 	if (!activeVersion)
@@ -182,11 +192,11 @@ void ImageCanvas::activateTriangulationPairByID(int ID)
 	if (!activeVersion)
 		return;
 	auto counter = 0;
-	for (const auto& pair: *activeVersion->getTriangulationPointPairs())
+	for (const auto& pair: *activeVersion->getTriangulationPairs())
 	{
 		if (pair->getID() == ID)
 		{
-			activeTriangulationPointPair = pair;
+			activeTriangulationPair = pair;
 			lastClickedTriangulationPair = counter;
 			break;
 		}
@@ -243,16 +253,16 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
 		// case 5: check if we're in the process of editing a triangulation pair
-		if (activeTriangulationPointPair) // TODO: finish this
+		if (activeTriangulationPair) // TODO: finish this
 		{
 			const auto point = wxPoint(x, y);
 			if (selector == ImageTabSelector::SOURCE)
 			{
-				activeTriangulationPointPair->setSourcePoint(point);
+				activeTriangulationPair->setSourcePoint(point);
 			}
 			else
 			{
-				activeTriangulationPointPair->setTargetPoint(point);
+				activeTriangulationPair->setTargetPoint(point);
 			}
 			return;
 		}
@@ -322,7 +332,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
 	}
-	if (activeTriangulationPointPair)
+	if (activeTriangulationPair)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
 		eventHandler->QueueEvent(evt->Clone());
@@ -478,6 +488,9 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 		case WXK_F5:
 			stageSave();
 			break;
+		case WXK_F6:
+			stageAddTriangulationPair();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
@@ -630,6 +643,12 @@ void ImageCanvas::stageSave() const
 void ImageCanvas::stageAddLink() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventHandler->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageAddTriangulationPair() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
 	eventHandler->QueueEvent(evt->Clone());
 }
 

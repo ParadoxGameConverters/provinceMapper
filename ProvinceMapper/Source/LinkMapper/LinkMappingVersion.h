@@ -23,7 +23,7 @@ class LinkMappingVersion: commonItems::parser
 		 std::string theTargetToken,
 		 int theID);
 
-	[[nodiscard]] const auto& getTriangulationPointPairs() const { return triangulationPairs; }
+	[[nodiscard]] const auto& getTriangulationPairs() const { return triangulationPairs; }
 	[[nodiscard]] const auto& getLinks() const { return links; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
 	[[nodiscard]] auto getID() const { return ID; }
@@ -33,7 +33,8 @@ class LinkMappingVersion: commonItems::parser
 
 	void deactivateLink();
 	void deactivateTriangulationPair();
-	void activateLinkByIndex(int row);
+	void activateLinkByIndex(const int row);
+	void activateTriangulationPairByIndex(const int row);
 	void activateLinkByID(int theID);
 	void deleteActiveLink();
 	void deleteActiveTriangulationPair();

@@ -69,6 +69,14 @@ void LinkMapper::activateLinkByIndex(const int row) const
 		activeVersion->activateLinkByIndex(row);
 }
 
+void LinkMapper::activateTriangulationPairByIndex(const int row) const
+{
+	if (activeVersion)
+	{
+		activeVersion->activateTriangulationPairByIndex(row);
+	}
+}
+
 void LinkMapper::activateLinkByID(const int ID) const
 {
 	if (activeVersion)

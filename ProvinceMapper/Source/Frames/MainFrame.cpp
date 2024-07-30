@@ -65,6 +65,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MOVE_ACTIVE_LINK_DOWN, &MainFrame::onLinksMoveDown, this);
 	Bind(wxEVT_SAVE_LINKS, &MainFrame::onSaveLinks, this);
 	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
+	Bind(wxEVT_ADD_TRIANGULATION_PAIR, &MainFrame::onLinksAddTriangulationPair, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_LEFT, &MainFrame::onLinksMoveVersionLeft, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, &MainFrame::onLinksMoveVersionRight, this);
 	Bind(wxEVT_PROVINCE_CENTER_MAP, &MainFrame::onCenterProvince, this);
@@ -608,9 +609,9 @@ void MainFrame::onActivateTriangulationPairByIndex(const wxCommandEvent& evt)
 {
 	deactiveActiveLinkOrTriangulationPair();
 
-	linkMapper.activateLinkByIndex(evt.GetInt());
-	linksFrame->activateLinkByIndex(evt.GetInt());
-	imageFrame->activateLinkByIndex(evt.GetInt());
+	linkMapper.activateTriangulationPairByIndex(evt.GetInt());
+	linksFrame->activateTriangulationPairByIndex(evt.GetInt());
+	imageFrame->activateTriangulationPairByIndex(evt.GetInt());
 }
 
 void MainFrame::deactiveActiveLinkOrTriangulationPair()
@@ -618,6 +619,10 @@ void MainFrame::deactiveActiveLinkOrTriangulationPair()
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
 	imageFrame->deactivateLink();
+
+	linkMapper.deactivateTriangulationPair();
+	linksFrame->deactivateTriangulationPair();
+	imageFrame->deactivateTriangulationPair();
 }
 
 void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
@@ -719,6 +724,7 @@ void MainFrame::onLinksAddLink(wxCommandEvent& evt)
 	{
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
+		imageFrame->deactivateTriangulationPair();
 		imageFrame->activateLinkByID(*newLinkID);
 	}
 }
@@ -731,6 +737,7 @@ void MainFrame::onLinksAddComment(wxCommandEvent& evt)
 	{
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
+		imageFrame->deactivateTriangulationPair();
 		imageFrame->activateLinkByID(*newLinkID);
 	}
 }
@@ -743,6 +750,7 @@ void MainFrame::onLinksAddTriangulationPair(wxCommandEvent& evt)
 	{
 		linksFrame->createTriangulationPair(*newPairID);
 		imageFrame->deactivateLink();
+		imageFrame->deactivateTriangulationPair();
 		imageFrame->activateTriangulationPairByID(*newPairID);
 	}
 }

@@ -23,6 +23,7 @@ class LinksFrame final : public wxFrame
 	void deactivateTriangulationPair() const;
 	void activateLinkByID(int ID) const;
 	void activateLinkByIndex(int index) const;
+	void activateTriangulationPairByIndex(int index) const;
 	void refreshActiveLink() const;
 	void createLink(int linkID) const;
 	void createTriangulationPair(const int pairID) const;

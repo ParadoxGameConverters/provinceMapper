@@ -18,6 +18,7 @@ class LinkMapper: commonItems::parser
 	void deactivateLink() const;
 	void deactivateTriangulationPair() const;
 	void activateLinkByIndex(int row) const;
+	void activateTriangulationPairByIndex(const int row) const;
 	void activateLinkByID(int ID) const;
 	void deleteActiveLink() const;
 	void deleteActiveTriangulationPair() const;

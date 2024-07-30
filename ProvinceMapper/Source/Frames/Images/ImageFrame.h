@@ -26,6 +26,7 @@ class ImageFrame: public wxFrame
 		 std::shared_ptr<Configuration> theConfiguration);
 
 	void activateLinkByIndex(int row);
+	void activateTriangulationPairByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
 	void deactivateTriangulationPair();

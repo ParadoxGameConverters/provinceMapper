@@ -305,6 +305,16 @@ void ImageFrame::activateLinkByIndex(const int row)
 	Refresh();
 }
 
+void ImageFrame::activateTriangulationPairByIndex(int row)
+{
+	sourceCanvas->activateTriangulationPairByIndex(row);
+	targetCanvas->activateTriangulationPairByIndex(row);
+	// TODO: sourceCanvas->applyTriangulationPairPoints();
+	// TODO: targetCanvas->applyTriangulationPairPoints();
+	render();
+	Refresh();
+}
+
 void ImageFrame::activateLinkByID(const int ID)
 {
 	sourceCanvas->activateLinkByID(ID);

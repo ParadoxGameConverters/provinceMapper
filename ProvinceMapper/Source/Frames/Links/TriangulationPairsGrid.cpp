@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "Provinces/Province.h"
 #include "TriangulationPairDialogComment.h"
+#include <string> // TODO: REMOVE THIS
 
 
 
@@ -29,17 +30,16 @@ void TriangulationPairsGrid::leftUp(const wxGridEvent& event)
 
 	// We're selecting some cell. Let's translate that.
 	const auto row = event.GetRow();
-	if (row < static_cast<int>(version->getTriangulationPointPairs()->size()))
+	if (row < static_cast<int>(version->getTriangulationPairs()->size()))
 	{
 		// Case 3: This is a comment.
-		if (version->getTriangulationPointPairs()->at(row)->getComment())
+		if (version->getTriangulationPairs()->at(row)->getComment())
 		{
 			// and we're altering it.
 			if (activeRow && *activeRow == row)
 			{
 				// spawn a dialog to change the name.
-				// TODO: DialogComment is for links. Implement an equivalent for triangulation pairs.
-				auto* dialog = new TriangulationPairDialogComment(this, "Edit Comment", *version->getTriangulationPointPairs()->at(row)->getComment(), row);
+				auto* dialog = new TriangulationPairDialogComment(this, "Edit Comment", *version->getTriangulationPairs()->at(row)->getComment(), row);
 				dialog->ShowModal();
 				return;
 			}
@@ -72,7 +72,7 @@ void TriangulationPairsGrid::redraw()
 	BeginBatch();
 	DeleteRows(0, GetNumberRows());
 
-	for (const auto& pair: *version->getTriangulationPointPairs())
+	for (const auto& pair: *version->getTriangulationPairs())
 	{
 		auto bgColor = pair->getBaseRowColour();
 		if (activeTriangulationPair && *pair == *activeTriangulationPair)
@@ -126,14 +126,14 @@ void TriangulationPairsGrid::rightUp(wxGridEvent& event)
 
 void TriangulationPairsGrid::activateLinkRowColor(int row)
 {
-	const auto& pair = version->getTriangulationPointPairs()->at(row);
-	SetCellBackgroundColour(row, 0, pair->getBaseRowColour());
+	const auto& pair = version->getTriangulationPairs()->at(row);
+	SetCellBackgroundColour(row, 0, pair->getActiveRowColour());
 }
 
 void TriangulationPairsGrid::restoreLinkRowColor(int row)
 {
-	const auto& pair = version->getTriangulationPointPairs()->at(row);
-	SetCellBackgroundColour(row, 0, pair->getActiveRowColour());
+	const auto& pair = version->getTriangulationPairs()->at(row);
+	SetCellBackgroundColour(row, 0, pair->getBaseRowColour());
 }
 
 
@@ -143,12 +143,12 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 
 	// Where is this new row?
 	auto rowCounter = 0;
-	for (const auto& pair: *version->getTriangulationPointPairs())
+	for (const auto& pair: *version->getTriangulationPairs())
 	{
 		if (pair->getID() == pairID)
 		{
 			InsertRows(rowCounter, 1, false);
-			SetCellValue(rowCounter, 0, pair->toRowString());
+			SetCellValue(rowCounter, 0, pair->toRowString() + "FUCK");
 
 			activateLinkRowColor(rowCounter);
 			activeTriangulationPair = pair;
@@ -160,6 +160,7 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			// let's insert it.
 			SetColMinimalWidth(0, 600);
 			ForceRefresh();
+			wxMessageBox("GRID has " + std::to_string(GetNumberRows()) + " rows after adding new row.", "Message Box", wxOK | wxICON_INFORMATION);// TODO: REMOVE THIS
 			break;
 		}
 		++rowCounter;
@@ -170,9 +171,9 @@ void TriangulationPairsGrid::onUpdateComment(const wxCommandEvent& event)
 {
 	const auto comment = event.GetString().ToStdString();
 	const auto index = event.GetInt();
-	if (index < static_cast<int>(version->getTriangulationPointPairs()->size()))
+	if (index < static_cast<int>(version->getTriangulationPairs()->size()))
 	{
-		const auto& pair = version->getTriangulationPointPairs()->at(index);
+		const auto& pair = version->getTriangulationPairs()->at(index);
 		pair->setComment(comment);
 		// Also update screen.
 		SetCellValue(index, 0, comment);
@@ -185,7 +186,7 @@ void TriangulationPairsGrid::deactivateTriangulationPair()
 	if (activeRow)
 	{
 		// Active pair may have been deleted by linkmapper. Check our records.
-		if (static_cast<int>(version->getTriangulationPointPairs()->size()) == GetNumberRows())
+		if (static_cast<int>(version->getTriangulationPairs()->size()) == GetNumberRows())
 		{
 			// all is well, just deactivate.
 			restoreLinkRowColor(*activeRow);
@@ -201,4 +202,22 @@ void TriangulationPairsGrid::deactivateTriangulationPair()
 	activeLink.reset();
 	activeRow.reset();
 	ForceRefresh();
+}
+
+void TriangulationPairsGrid::activatePairByIndex(const int index)
+{
+	// If we're already active, restore color.
+	if (activeRow)
+		restoreLinkRowColor(*activeRow);
+
+	if (index >= static_cast<int>(version->getTriangulationPairs()->size()))
+		return; // uh-huh
+
+	const auto& pair = version->getTriangulationPairs()->at(index);
+	activeRow = index;
+	activeLink = pair;
+	activateLinkRowColor(index);
+	if (!IsVisible(index, 0, false))
+		focusOnActiveRow();
+	lastClickedRow = index;
 }

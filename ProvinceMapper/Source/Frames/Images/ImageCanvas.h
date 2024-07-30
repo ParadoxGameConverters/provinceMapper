@@ -60,6 +60,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void clearOldScrollV() { oldScrollPositionV = GetScrollPos(wxVERTICAL); }
 
 	void activateLinkByIndex(int row);
+	void activateTriangulationPairByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
 	void activateTriangulationPairByID(int ID);
@@ -93,6 +94,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageAddTriangulationPair() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 	void stagePointPlaced() const;
@@ -123,7 +125,7 @@ class ImageCanvas: public wxScrolledCanvas
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	std::shared_ptr<DefinitionsInterface> definitions;
-	std::shared_ptr<TriangulationPointPair> activeTriangulationPointPair;
+	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;

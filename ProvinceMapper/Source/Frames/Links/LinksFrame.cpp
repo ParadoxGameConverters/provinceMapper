@@ -82,6 +82,14 @@ void LinksFrame::activateLinkByIndex(const int index) const
 		activePage->activateLinkByIndex(index);
 }
 
+void LinksFrame::activateTriangulationPairByIndex(int index) const
+{
+	if (activePage)
+	{
+		activePage->activateTriangulationPairByIndex(index);
+	}
+}
+
 void LinksFrame::refreshActiveLink() const
 {
 	if (activePage)
