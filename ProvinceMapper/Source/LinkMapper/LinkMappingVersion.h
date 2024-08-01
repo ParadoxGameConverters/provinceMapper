@@ -25,6 +25,7 @@ class LinkMappingVersion: commonItems::parser
 
 	[[nodiscard]] const auto& getTriangulationPairs() const { return triangulationPairs; }
 	[[nodiscard]] const auto& getLinks() const { return links; }
+	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeTriangulationPair; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
 	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getUnmappedSources() const { return unmappedSources; }

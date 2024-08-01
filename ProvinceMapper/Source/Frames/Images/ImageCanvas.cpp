@@ -81,7 +81,6 @@ void ImageCanvas::activateTriangulationPairByIndex(int row)
 {
 	if (activeVersion && row < static_cast<int>(activeVersion->getTriangulationPairs()->size()))
 	{
-		activeTriangulationPair = activeVersion->getTriangulationPairs()->at(row);
 		lastClickedTriangulationPair = row;
 	}
 }
@@ -194,7 +193,6 @@ void ImageCanvas::activateTriangulationPairByID(int ID)
 	{
 		if (pair->getID() == ID)
 		{
-			activeTriangulationPair = pair;
 			lastClickedTriangulationPair = counter;
 			break;
 		}
@@ -251,6 +249,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
 		// case 5: check if we're in the process of editing a triangulation pair
+		const auto& activeTriangulationPair = getActiveTriangulationPair();
 		if (activeTriangulationPair)
 		{
 			const auto point = wxPoint(x, y);
@@ -332,7 +331,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
 	}
-	if (activeTriangulationPair)
+	if (getActiveTriangulationPair())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
 		eventHandler->QueueEvent(evt->Clone());

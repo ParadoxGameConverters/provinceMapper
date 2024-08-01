@@ -46,7 +46,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
 	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
 	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
-	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeTriangulationPair; }
+	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeVersion->getActiveTriangulationPair(); }
 	[[nodiscard]] const auto& getTriangulationPairs() const { return activeVersion->getTriangulationPairs(); }
  
 	void clearShadedPixels() { shadedPixels.clear(); }
@@ -107,7 +107,7 @@ class ImageCanvas: public wxScrolledCanvas
 	bool black = false;
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
-	int lastClickedTriangulationPair = 0;
+	int lastClickedTriangulationPair = 0; // TODO: check if this can be removed
 
 	bool triangulate = false;
 	std::vector<wxPoint> points;
@@ -128,7 +128,6 @@ class ImageCanvas: public wxScrolledCanvas
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	std::shared_ptr<DefinitionsInterface> definitions;
-	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;
