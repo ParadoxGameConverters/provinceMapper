@@ -21,8 +21,6 @@ TriangulationPointPair::TriangulationPointPair(int theID): LinkBase(theID)
 const std::string TriangulationPointPair::toRowString()
 {
 	std::string name;
-	name += std::to_string(ID); // TODO: REMOVE THIS
-	name += " "; // TODO: REMOVE THIS
 
 	const auto& sourcePoint = getSourcePoint();
 	if (sourcePoint)

@@ -42,7 +42,5 @@ class TriangulationPairsGrid final: public GridBase
 	void createTriangulationPair(int pairID);
 
   private:
-	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
-
 	void onUpdateComment(const wxCommandEvent& event);
 };

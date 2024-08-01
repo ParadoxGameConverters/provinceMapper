@@ -55,7 +55,6 @@ void LinkMappingVersion::registerKeys()
 		links->push_back(link);
 		for (const auto& source: link->getSources())
 		{
-			Log(LogLevel::Info) << "Source province " << source->ID ; // TODO: REMOVE THIS
 			if (seenSources.contains(source->ID))
 				Log(LogLevel::Error) << "Source province " << source->ID << " is double-mapped!";
 			else
@@ -63,7 +62,6 @@ void LinkMappingVersion::registerKeys()
 		}
 		for (const auto& target: link->getTargets())
 		{
-			Log(LogLevel::Info) << "TARGET province " << target->ID ; // TODO: REMOVE THIS
 			if (seenTargets.contains(target->ID))
 				Log(LogLevel::Error) << "Target province " << target->ID << " is double-mapped!";
 			else

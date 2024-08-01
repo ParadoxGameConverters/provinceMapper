@@ -50,7 +50,7 @@ void TriangulationPairsGrid::leftUp(const wxGridEvent& event)
 		if (activeRow && *activeRow == row)
 		{
 			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR);
-			centerEvt->SetInt(activeTriangulationPair->getID());
+			centerEvt->SetInt(activeLink->getID());
 			eventListener->QueueEvent(centerEvt->Clone());
 			return;
 		}
@@ -76,7 +76,7 @@ void TriangulationPairsGrid::redraw()
 	for (const auto& pair: *version->getTriangulationPairs())
 	{
 		auto bgColor = pair->getBaseRowColour();
-		if (activeTriangulationPair && *pair == *activeTriangulationPair)
+		if (activeLink && *pair == *activeLink)
 		{
 			bgColor = pair->getActiveRowColour(); // bright green for selected triangulation pairs
 			activeRow = rowCounter;
@@ -150,7 +150,7 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			SetCellValue(rowCounter, 0, pair->toRowString());
 
 			activateLinkRowColor(rowCounter);
-			activeTriangulationPair = pair;
+			activeLink = pair;
 			// If we have an active link, restore its color.
 			if (activeRow)
 				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
