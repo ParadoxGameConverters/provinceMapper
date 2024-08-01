@@ -62,10 +62,8 @@ class ImageCanvas: public wxScrolledCanvas
 	void clearOldScrollV() { oldScrollPositionV = GetScrollPos(wxVERTICAL); }
 
 	void activateLinkByIndex(int row);
-	void activateTriangulationPairByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
-	void activateTriangulationPairByID(int ID);
 	void toggleProvinceByID(const std::string& ID);
 	void shadeProvinceByID(const std::string& ID);
 	void deleteActiveLink();
@@ -107,7 +105,6 @@ class ImageCanvas: public wxScrolledCanvas
 	bool black = false;
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
-	int lastClickedTriangulationPair = 0; // TODO: check if this can be removed
 
 	bool triangulate = false;
 	std::vector<wxPoint> points;

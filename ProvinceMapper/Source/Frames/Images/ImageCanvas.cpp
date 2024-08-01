@@ -77,14 +77,6 @@ void ImageCanvas::activateLinkByIndex(const int row)
 	}
 }
 
-void ImageCanvas::activateTriangulationPairByIndex(int row)
-{
-	if (activeVersion && row < static_cast<int>(activeVersion->getTriangulationPairs()->size()))
-	{
-		lastClickedTriangulationPair = row;
-	}
-}
-
 void ImageCanvas::activateLinkByID(const int ID)
 {
 	if (!activeVersion)
@@ -182,22 +174,6 @@ void ImageCanvas::deactivateLink()
 		}
 	}
 	strafedPixels.clear();
-}
-
-void ImageCanvas::activateTriangulationPairByID(int ID)
-{
-	if (!activeVersion)
-		return;
-	auto counter = 0;
-	for (const auto& pair: *activeVersion->getTriangulationPairs())
-	{
-		if (pair->getID() == ID)
-		{
-			lastClickedTriangulationPair = counter;
-			break;
-		}
-		++counter;
-	}
 }
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)

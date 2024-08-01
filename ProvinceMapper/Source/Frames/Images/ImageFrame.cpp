@@ -361,10 +361,6 @@ void ImageFrame::activateLinkByIndex(const int row)
 
 void ImageFrame::activateTriangulationPairByIndex(int row)
 {
-	sourceCanvas->activateTriangulationPairByIndex(row);
-	targetCanvas->activateTriangulationPairByIndex(row);
-	// TODO: sourceCanvas->applyTriangulationPairPoints();
-	// TODO: targetCanvas->applyTriangulationPairPoints();
 	render();
 	Refresh();
 }
@@ -408,19 +404,14 @@ void ImageFrame::deleteActiveLink()
 
 void ImageFrame::deleteActiveTriangulationPair()
 {
-	// TODO: finish implementing this
-	/*
-	sourceCanvas->deleteActiveTriangulationPair();
-	targetCanvas->deleteActiveTriangulationPair();
-	*/
+	// Re-render will cause the triangulation pair's points to disappear.
 	render();
 	Refresh();
 }
 
 void ImageFrame::activateTriangulationPairByID(const int ID)
 {
-	sourceCanvas->activateTriangulationPairByID(ID);
-	targetCanvas->activateTriangulationPairByID(ID);
+	// Re-render will cause the triangulation pair's points to appear.
 	render();
 	Refresh();
 }
