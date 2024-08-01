@@ -42,7 +42,7 @@ class LinkMapping: public LinkBase
 	friend std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping);
 
   private:
-	void registerKeys(commonItems::parser parser);
+	void registerKeys(commonItems::parser& parser);
 
 	std::vector<std::shared_ptr<Province>> sources;
 	std::vector<std::shared_ptr<Province>> targets;

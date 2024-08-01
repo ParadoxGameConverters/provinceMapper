@@ -31,7 +31,7 @@ class TriangulationPointPair: public LinkBase
 	friend std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair);
 
   private:
-	void registerKeys(commonItems::parser parser);
+	void registerKeys(commonItems::parser& parser);
 
 	std::optional<wxPoint> sourcePoint;
 	std::optional<wxPoint> targetPoint;

@@ -67,7 +67,7 @@ const wxColour TriangulationPointPair::getActiveRowColour()
 	return activeRowColour; // Bright green for selected pairs.
 }
 
-void TriangulationPointPair::registerKeys(commonItems::parser parser)
+void TriangulationPointPair::registerKeys(commonItems::parser& parser)
 {
 	parser.registerKeyword("srcX", [this](std::istream& theStream) {
 		if (!sourcePoint)

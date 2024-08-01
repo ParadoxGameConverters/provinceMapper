@@ -18,7 +18,7 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	pairsTitle->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	triangulationPointGrid = new TriangulationPairsGrid(this, version);
-	triangulationPointGrid->SetMinSize(wxSize(200, 300)); // TODO: remove this
+	triangulationPointGrid->SetMinSize(wxSize(600, triangulationPointGrid->GetDefaultRowSize()));
 	GetParent()->Layout();
 
 	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);

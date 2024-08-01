@@ -148,7 +148,7 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 		if (pair->getID() == pairID)
 		{
 			InsertRows(rowCounter, 1, false);
-			SetCellValue(rowCounter, 0, pair->toRowString() + "FUCK");
+			SetCellValue(rowCounter, 0, pair->toRowString());
 
 			activateLinkRowColor(rowCounter);
 			activeTriangulationPair = pair;
@@ -159,8 +159,16 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			lastClickedRow = rowCounter;
 			// let's insert it.
 			SetColMinimalWidth(0, 600);
+
+
+			auto defaultRowHeight = GetDefaultRowSize();
+			if (GetSize().GetHeight() <= defaultRowHeight * 6)
+			{
+				SetMinSize(wxSize(600, GetNumberRows() * defaultRowHeight)); // TODO: test this
+				redraw();
+			}
+
 			ForceRefresh();
-			wxMessageBox("GRID has " + std::to_string(GetNumberRows()) + " rows after adding new row.", "Message Box", wxOK | wxICON_INFORMATION);// TODO: REMOVE THIS
 			break;
 		}
 		++rowCounter;

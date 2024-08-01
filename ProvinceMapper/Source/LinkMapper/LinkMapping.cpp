@@ -29,7 +29,7 @@ LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
 {
 }
 
-void LinkMapping::registerKeys(commonItems::parser parser)
+void LinkMapping::registerKeys(commonItems::parser& parser)
 {
 	parser.registerKeyword(sourceToken, [this](std::istream& theStream) {
 		auto id = commonItems::getString(theStream);
