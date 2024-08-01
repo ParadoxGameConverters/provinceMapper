@@ -183,6 +183,8 @@ const std::string LinkMapping::toRowString()
 	}
 
 	std::string name;
+	name += std::to_string(ID) + " "; // TODO: remove 
+
 	std::string comma;
 	for (const auto& source: getSources())
 	{

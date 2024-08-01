@@ -46,7 +46,7 @@ void LinkMappingVersion::registerKeys()
 {	
 	registerKeyword("triangulation_pair", [this](std::istream& theStream) {
 		++triangulationPairCounter;
-		const auto pair = std::make_shared<TriangulationPointPair>(theStream, linkCounter);
+		const auto pair = std::make_shared<TriangulationPointPair>(theStream, triangulationPairCounter);
 		triangulationPairs->push_back(pair);
 	});
 	registerKeyword("link", [this](std::istream& theStream) {

@@ -6,6 +6,7 @@
 #include "ProvinceMappingsGrid.h"
 
 
+wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);

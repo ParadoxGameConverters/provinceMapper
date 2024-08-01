@@ -8,6 +8,7 @@
 #include <wx/notebook.h>
 
 
+wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
@@ -43,7 +44,6 @@ class LinksTab final: public wxNotebookPage
   private:
 	void onKeyDown(wxKeyEvent& event);	// TODO: add triangulation pairs support
 
-	void activateLinkRowColor(int row) const; // TODO: REMOVE THIS FROM HERE
 	void stageAddComment();
 	void stageDeleteLink() const;
 	void stageMoveUp() const;

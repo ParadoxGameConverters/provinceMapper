@@ -61,6 +61,7 @@ class MainFrame final : public wxFrame
 	void onAddComment(const wxCommandEvent& evt);
 	void onDeleteActiveLink(wxCommandEvent& evt);
 	void onDeleteActiveTriangulationPair(wxCommandEvent& evt);
+	void onDeleteActiveLinkOrTriangulationPair(wxCommandEvent& evt);
 	void onLinksAddLink(wxCommandEvent& evt);
 	void onLinksAddComment(wxCommandEvent& evt);
 	void onLinksAddTriangulationPair(wxCommandEvent& evt);
