@@ -385,11 +385,6 @@ void ImageFrame::deactivateLink()
 
 void ImageFrame::deactivateTriangulationPair()
 {
-	// TODO: finish implementing this
-	/*
-	sourceCanvas->deactivateTriangulationPair();
-	targetCanvas->deactivateTriangulationPair();
-	*/
 	render();
 	Refresh();
 }

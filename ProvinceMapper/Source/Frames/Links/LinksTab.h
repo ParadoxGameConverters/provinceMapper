@@ -42,7 +42,7 @@ class LinksTab final: public wxNotebookPage
 	void moveActiveLinkDown();
 
   private:
-	void onKeyDown(wxKeyEvent& event);	// TODO: add triangulation pairs support
+	void onKeyDown(wxKeyEvent& event);
 
 	void stageAddComment();
 	void stageDeleteLink() const;
@@ -53,8 +53,6 @@ class LinksTab final: public wxNotebookPage
 	void stageAddTriangulationPair() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
-
-	int lastClickedTriangulationPairRow = 0; // TODO: move this to TriangulationPairsGrid
 
 	TriangulationPairsGrid* triangulationPointGrid = nullptr;
 	ProvinceMappingsGrid* provinceMappingsGrid = nullptr;

@@ -3,7 +3,7 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
-#include "DialogCommentBase.h";
+#include "DialogCommentBase.h"
 
 wxDECLARE_EVENT(wxEVT_UPDATE_NAME, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_COMMENT, wxCommandEvent);
