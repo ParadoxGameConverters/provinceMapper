@@ -69,6 +69,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_LEFT, &MainFrame::onLinksMoveVersionLeft, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, &MainFrame::onLinksMoveVersionRight, this);
 	Bind(wxEVT_PROVINCE_CENTER_MAP, &MainFrame::onCenterProvince, this);
+	Bind(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR, &MainFrame::onRefreshActiveTriangulationPair, this);
 }
 
 void MainFrame::initFrame()
@@ -623,6 +624,11 @@ void MainFrame::deactiveActiveLinkOrTriangulationPair()
 	linkMapper.deactivateTriangulationPair();
 	linksFrame->deactivateTriangulationPair();
 	imageFrame->deactivateTriangulationPair();
+}
+
+void MainFrame::onRefreshActiveTriangulationPair(wxCommandEvent& evt)
+{
+	linksFrame->refreshActiveTriangulationPair();
 }
 
 void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)

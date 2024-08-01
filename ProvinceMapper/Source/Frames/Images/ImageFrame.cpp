@@ -162,6 +162,18 @@ void ImageFrame::renderSource() const
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
 
+	// If we have an active triangulation point pair with the source point set, draw it.
+	const auto& activeTriangulationPair = sourceCanvas->getActiveTriangulationPair();
+	if (activeTriangulationPair && activeTriangulationPair->getSourcePoint())
+	{
+		wxPen pen = sourceDC.GetPen();
+		pen.SetColour("white");
+		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+		sourceDC.SetPen(pen);
+		sourceDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulatin points per canvas
+		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
+	}
+
 	if (statusBar->isTriangulate())
 	{
 		wxPen pen = sourceDC.GetPen();
@@ -208,6 +220,18 @@ void ImageFrame::renderTarget() const
 	targetDC.Clear();
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
+
+	// If we have an active triangulation point pair with the source point set, draw it.
+	const auto& activeTriangulationPair = targetCanvas->getActiveTriangulationPair();
+	if (activeTriangulationPair && activeTriangulationPair->getTargetPoint())
+	{
+		wxPen pen = targetDC.GetPen();
+		pen.SetColour("white");
+		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+		targetDC.SetPen(pen);
+		targetDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulatin points per canvas
+		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
+	}
 
 	if (statusBar->isTriangulate())
 	{

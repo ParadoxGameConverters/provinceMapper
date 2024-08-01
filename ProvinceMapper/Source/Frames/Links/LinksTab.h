@@ -10,6 +10,7 @@
 
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
 
 
 class LinkMappingVersion;
@@ -33,6 +34,7 @@ class LinksTab final: public wxNotebookPage
 	void activateLinkByIndex(int index);
 	void activateTriangulationPairByIndex(int index);
 	void refreshActiveLink();
+	void refreshActiveTriangulationPair();
 	void createLink(int linkID);
 	void createTriangulationPair(int pairID);
 	void moveActiveLinkUp();

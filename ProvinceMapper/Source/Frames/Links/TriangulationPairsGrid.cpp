@@ -7,12 +7,14 @@
 
 
 
+wxDEFINE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 
 
 TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion)
@@ -139,8 +141,6 @@ void TriangulationPairsGrid::restoreLinkRowColor(int row)
 
 void TriangulationPairsGrid::createTriangulationPair(int pairID)
 {
-	// We could just redraw the entire grid but that flickers. This is more complicated but cleaner on the eyes.
-
 	// Where is this new row?
 	auto rowCounter = 0;
 	for (const auto& pair: *version->getTriangulationPairs())
@@ -160,12 +160,11 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			// let's insert it.
 			SetColMinimalWidth(0, 600);
 
-
-			auto defaultRowHeight = GetDefaultRowSize();
-			if (GetSize().GetHeight() <= defaultRowHeight * 6)
+			// If we only have a few rows, redraw to expand the grid height.
+			if (GetNumberRows() < 6)
 			{
-				SetMinSize(wxSize(600, GetNumberRows() * defaultRowHeight)); // TODO: test this
 				redraw();
+				break;
 			}
 
 			ForceRefresh();

@@ -8,9 +8,7 @@
 #include <wx/notebook.h>
 
 
-wxDECLARE_EVENT(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent); // TODO: move this to linkstab
 
 
 class LinkMappingVersion;

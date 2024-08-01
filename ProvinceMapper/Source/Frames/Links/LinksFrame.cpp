@@ -96,6 +96,14 @@ void LinksFrame::refreshActiveLink() const
 		activePage->refreshActiveLink();
 }
 
+void LinksFrame::refreshActiveTriangulationPair() const
+{
+	if (activePage)
+	{
+		activePage->refreshActiveTriangulationPair();
+	}
+}
+
 void LinksFrame::createLink(const int linkID) const
 {
 	if (activePage)

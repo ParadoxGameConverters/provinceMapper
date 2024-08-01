@@ -77,6 +77,7 @@ class MainFrame final : public wxFrame
 	void onShowToolbar(wxCommandEvent& evt);
 	void onShowUnmapped(wxCommandEvent& evt);
 	void deactiveActiveLinkOrTriangulationPair();
+	void onRefreshActiveTriangulationPair(wxCommandEvent& evt);
 
 	LinksFrame* linksFrame = nullptr;
 	UnmappedFrame* unmappedFrame = nullptr;

@@ -25,6 +25,7 @@ class LinksFrame final : public wxFrame
 	void activateLinkByIndex(int index) const;
 	void activateTriangulationPairByIndex(int index) const;
 	void refreshActiveLink() const;
+	void refreshActiveTriangulationPair() const;
 	void createLink(int linkID) const;
 	void createTriangulationPair(const int pairID) const;
 	void addVersion(const std::shared_ptr<LinkMappingVersion>& version);

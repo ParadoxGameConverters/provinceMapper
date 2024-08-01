@@ -2,8 +2,8 @@
 #include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
 #include "Frames/Links/ProvinceMappingsGrid.h"
+#include "Frames/Links/TriangulationPairsGrid.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "LinkMapper/TriangulationPointPair.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 
@@ -253,7 +253,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
 		// case 5: check if we're in the process of editing a triangulation pair
-		if (activeTriangulationPair) // TODO: finish this
+		if (activeTriangulationPair)
 		{
 			const auto point = wxPoint(x, y);
 			if (selector == ImageTabSelector::SOURCE)
@@ -264,6 +264,8 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 			{
 				activeTriangulationPair->setTargetPoint(point);
 			}
+			stageTriangulationPairPointPlaced();
+			stageRefresh();
 			return;
 		}
 
@@ -603,6 +605,12 @@ void ImageCanvas::stageRefresh() const
 		evt.SetId(0);
 	else if (selector == ImageTabSelector::TARGET)
 		evt.SetId(1);
+	eventHandler->QueueEvent(evt.Clone());
+}
+
+void ImageCanvas::stageTriangulationPairPointPlaced() const
+{
+	wxCommandEvent evt(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR);
 	eventHandler->QueueEvent(evt.Clone());
 }
 

@@ -8,6 +8,7 @@
 
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_LEFT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SAVE_LINKS, wxCommandEvent);
 
 
 LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
@@ -16,26 +17,24 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
 	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-	pairsTitle->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	pairsTitle->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	triangulationPointGrid = new TriangulationPairsGrid(this, version);
-	triangulationPointGrid->SetMinSize(wxSize(600, triangulationPointGrid->GetDefaultRowSize()));
 	GetParent()->Layout();
 
 	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
-	linksTitle->SetFont(wxFont(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	linksTitle->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 	provinceMappingsGrid = new ProvinceMappingsGrid(this, version);
 	GetParent()->Layout();
 
-	auto* gridBox = new wxBoxSizer(wxVERTICAL);
-	gridBox->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
-	//gridBox->Add(triangulationPointGrid, 1, wxEXPAND | wxALL);
-	gridBox->Add(triangulationPointGrid, wxSizerFlags(1).Expand());
+	auto* gridSizer = new wxFlexGridSizer(1);
+	gridSizer->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
+	gridSizer->Add(triangulationPointGrid, wxSizerFlags(1).Expand());
 
-	gridBox->AddSpacer(20); // Visually separate the triangulation pairs grid from the province links grid.
-	gridBox->Add(linksTitle, 0, wxALIGN_CENTER | wxALL, 10);
-	gridBox->Add(provinceMappingsGrid, wxSizerFlags(1).Expand());
-	SetSizer(gridBox);
-	gridBox->Fit(this);
+	gridSizer->AddSpacer(20); // Visually separate the triangulation pairs grid from the province links grid.
+	gridSizer->Add(linksTitle, 0, wxALIGN_CENTER | wxALL, 10);
+	gridSizer->Add(provinceMappingsGrid, wxSizerFlags(3).Expand());
+	SetSizer(gridSizer);
+	gridSizer->Fit(this);
 	triangulationPointGrid->ForceRefresh();
 	provinceMappingsGrid->ForceRefresh();
 }
@@ -87,6 +86,11 @@ void LinksTab::activateTriangulationPairByIndex(int index)
 void LinksTab::refreshActiveLink()
 {
 	provinceMappingsGrid->refreshActiveLink();
+}
+
+void LinksTab::refreshActiveTriangulationPair()
+{
+	triangulationPointGrid->refreshActiveLink();
 }
 
 void LinksTab::createLink(int linkID)
