@@ -162,7 +162,22 @@ void ImageFrame::renderSource() const
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
 
-	// If we have an active triangulation point pair with the source point set, draw it.
+	// Draw all the triangulation pair points.
+	for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+	{
+		if (!pair->getSourcePoint())
+		{
+			continue;
+		}
+		wxPen pen = sourceDC.GetPen();
+		pen.SetColour("white");
+		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+		sourceDC.SetPen(pen);
+		sourceDC.SetBrush(*wxGREY_BRUSH);
+		sourceDC.DrawCircle(*pair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
+	}
+
+	// Draw the active triangulation pair point with a different colour.
 	const auto& activeTriangulationPair = sourceCanvas->getActiveTriangulationPair();
 	if (activeTriangulationPair && activeTriangulationPair->getSourcePoint())
 	{
@@ -221,7 +236,22 @@ void ImageFrame::renderTarget() const
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
 
-	// If we have an active triangulation point pair with the source point set, draw it.
+	// Draw all the triangulation pair points.
+	for (const auto& pair: *targetCanvas->getTriangulationPairs())
+	{
+		if (!pair->getTargetPoint())
+		{
+			continue;
+		}
+		wxPen pen = targetDC.GetPen();
+		pen.SetColour("white");
+		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+		targetDC.SetPen(pen);
+		targetDC.SetBrush(*wxGREY_BRUSH);
+		targetDC.DrawCircle(*pair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
+	}
+
+	// Draw the active triangulation pair point with a different colour.
 	const auto& activeTriangulationPair = targetCanvas->getActiveTriangulationPair();
 	if (activeTriangulationPair && activeTriangulationPair->getTargetPoint())
 	{

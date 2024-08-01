@@ -3,7 +3,6 @@
 #include "Frames/Links/LinksTab.h"
 #include "Frames/Links/ProvinceMappingsGrid.h"
 #include "Frames/Links/TriangulationPairsGrid.h"
-#include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 
@@ -84,7 +83,6 @@ void ImageCanvas::activateTriangulationPairByIndex(int row)
 	{
 		activeTriangulationPair = activeVersion->getTriangulationPairs()->at(row);
 		lastClickedTriangulationPair = row;
-		// TODO: Draw the pair's points on the map.
 	}
 }
 
