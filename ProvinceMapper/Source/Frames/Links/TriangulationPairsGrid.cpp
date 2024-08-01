@@ -96,17 +96,6 @@ void TriangulationPairsGrid::redraw()
 	ForceRefresh();
 }
 
-
-void TriangulationPairsGrid::focusOnActiveRow()
-{
-	const auto cellCoords = CellToRect(*activeRow, 0);			  // these would be virtual coords, not logical ones.
-	const auto units = cellCoords.y / 20;										  // pixels into scroll units, 20 is our scroll rate defined in constructor.
-	const auto scrollPageSize = GetScrollPageSize(wxVERTICAL); // this is how much "scrolls" a pageful of cells scrolls.
-	const auto offset = wxPoint(0, units - scrollPageSize / 2);			  // position ourselves at our cell, minus half a screen of scrolls.
-	Scroll(offset);														  // and shoo.
-	ForceRefresh();
-}
-
 void TriangulationPairsGrid::stageAddComment()
 {
 	auto* dialog = new TriangulationPairDialogComment(this, "Add Comment", lastClickedRow);

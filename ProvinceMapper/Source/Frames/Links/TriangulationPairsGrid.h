@@ -27,7 +27,6 @@ class TriangulationPairsGrid final: public GridBase
 {
   public:
 	TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
-	void focusOnActiveRow();
 	void redraw();
 	void stageAddComment();
 
