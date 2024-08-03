@@ -16,9 +16,12 @@ class LinkMapper: commonItems::parser
 
 	void exportMappings(const std::string& linksFile) const;
 	void deactivateLink() const;
+	void deactivateTriangulationPair() const;
 	void activateLinkByIndex(int row) const;
+	void activateTriangulationPairByIndex(const int row) const;
 	void activateLinkByID(int ID) const;
 	void deleteActiveLink() const;
+	void deleteActiveTriangulationPair() const;
 	void updateActiveVersionName(const std::string& theName) const;
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;
@@ -31,6 +34,7 @@ class LinkMapper: commonItems::parser
 	[[nodiscard]] std::optional<int> addCommentByIndex(const std::string& comment, int index) const;
 	[[nodiscard]] std::optional<int> addRawLink() const;
 	[[nodiscard]] std::optional<int> addRawComment() const;
+	[[nodiscard]] std::optional<int> addRawTriangulationPair() const;
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& addVersion();
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& copyVersion();
 	[[nodiscard]] const std::shared_ptr<LinkMappingVersion>& deleteVersion();

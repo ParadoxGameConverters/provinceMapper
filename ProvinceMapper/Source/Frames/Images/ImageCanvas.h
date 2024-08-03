@@ -5,6 +5,8 @@
 #endif
 #include "Definitions/DefinitionsInterface.h"
 #include "Provinces/Pixel.h"
+#include "LinkMapper/LinkMappingVersion.h"
+#include "LinkMapper/TriangulationPointPair.h"
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
@@ -22,7 +24,6 @@ enum class ImageTabSelector
 	TARGET
 };
 
-class LinkMappingVersion;
 class LinkMapping;
 class Definitions;
 class ImageCanvas: public wxScrolledCanvas
@@ -45,7 +46,9 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
 	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
 	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
-
+	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeVersion->getActiveTriangulationPair(); }
+	[[nodiscard]] const auto& getTriangulationPairs() const { return activeVersion->getTriangulationPairs(); }
+ 
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
 	void generateShadedPixels();
@@ -87,10 +90,12 @@ class ImageCanvas: public wxScrolledCanvas
 	void zoomIn();
 	void zoomOut();
 	void stageRefresh() const;
+	void stageTriangulationPairPointPlaced() const;
 	void stageMoveUp() const;
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageAddTriangulationPair() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 	void stagePointPlaced() const;

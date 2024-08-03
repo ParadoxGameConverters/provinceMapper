@@ -2,6 +2,7 @@
 #define LINK_MAPPING_VERSION_H
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkMapping.h"
+#include "TriangulationPointPair.h"
 #include "Parser.h"
 
 class LinkMappingVersion: commonItems::parser
@@ -22,7 +23,9 @@ class LinkMappingVersion: commonItems::parser
 		 std::string theTargetToken,
 		 int theID);
 
+	[[nodiscard]] const auto& getTriangulationPairs() const { return triangulationPairs; }
 	[[nodiscard]] const auto& getLinks() const { return links; }
+	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeTriangulationPair; }
 	[[nodiscard]] const auto& getName() const { return versionName; }
 	[[nodiscard]] auto getID() const { return ID; }
 	[[nodiscard]] const auto& getUnmappedSources() const { return unmappedSources; }
@@ -30,9 +33,12 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] Mapping isProvinceMapped(const std::string& provinceID, bool isSource) const;
 
 	void deactivateLink();
-	void activateLinkByIndex(int row);
+	void deactivateTriangulationPair();
+	void activateLinkByIndex(const int row);
+	void activateTriangulationPairByIndex(const int row);
 	void activateLinkByID(int theID);
 	void deleteActiveLink();
+	void deleteActiveTriangulationPair();
 	void setName(const std::string& theName) { versionName = theName; }
 	void setID(int theID) { ID = theID; }
 	void copyLinks(const std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>>& theLinks) const { *links = *theLinks; }
@@ -43,6 +49,7 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
+	[[nodiscard]] int addRawTriangulationPair();
 
 	bool operator==(const LinkMappingVersion& rhs) const;
 
@@ -57,6 +64,12 @@ class LinkMappingVersion: commonItems::parser
 
 	int ID = 0;
 	std::string versionName;
+	
+	int triangulationPairCounter = 0;
+	int lastActiveTriangulationPairIndex = 0;
+	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
+	std::shared_ptr<std::vector<std::shared_ptr<TriangulationPointPair>>> triangulationPairs;
+
 	int linkCounter = 0;
 	int lastActiveLinkIndex = 0;
 	std::shared_ptr<DefinitionsInterface> sourceDefs;

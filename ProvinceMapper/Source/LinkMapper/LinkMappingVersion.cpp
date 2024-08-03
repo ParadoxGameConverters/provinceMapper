@@ -15,7 +15,9 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 int theID):
 	 ID(theID),
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
-	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
+	 targetToken(std::move(theTargetToken)), 
+	 triangulationPairs(std::make_shared<std::vector<std::shared_ptr<TriangulationPointPair>>>()),
+	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
 	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	registerKeys();
@@ -32,14 +34,21 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 int theID):
 	 ID(theID),
 	 versionName(std::move(theVersionName)), sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)),
-	 targetToken(std::move(theTargetToken)), links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
+	 targetToken(std::move(theTargetToken)),
+	 triangulationPairs(std::make_shared<std::vector<std::shared_ptr<TriangulationPointPair>>>()),
+	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
 	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	generateUnmapped();
 }
 
 void LinkMappingVersion::registerKeys()
-{
+{	
+	registerKeyword("triangulation_pair", [this](std::istream& theStream) {
+		++triangulationPairCounter;
+		const auto pair = std::make_shared<TriangulationPointPair>(theStream, triangulationPairCounter);
+		triangulationPairs->push_back(pair);
+	});
 	registerKeyword("link", [this](std::istream& theStream) {
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
@@ -65,6 +74,8 @@ void LinkMappingVersion::registerKeys()
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion)
 {
 	output << linkMappingVersion.versionName << " = {\n";
+	for (const auto& triangulationPair: *linkMappingVersion.triangulationPairs)
+		output << *triangulationPair;
 	for (const auto& link: *linkMappingVersion.links)
 		output << *link;
 	output << "}\n";
@@ -81,12 +92,31 @@ void LinkMappingVersion::deactivateLink()
 	activeLink.reset();
 }
 
+void LinkMappingVersion::deactivateTriangulationPair()
+{
+	if (activeTriangulationPair)
+	{
+		if (activeTriangulationPair->isEmpty())
+			deleteActiveTriangulationPair();
+	}
+	activeTriangulationPair.reset();
+}
+
 void LinkMappingVersion::activateLinkByIndex(const int row)
 {
 	if (row < static_cast<int>(links->size()))
 	{
 		activeLink = links->at(row);
 		lastActiveLinkIndex = row;
+	}
+}
+
+void LinkMappingVersion::activateTriangulationPairByIndex(const int row)
+{
+	if (row < static_cast<int>(triangulationPairs->size()))
+	{
+		activeTriangulationPair = triangulationPairs->at(row);
+		lastActiveTriangulationPairIndex = row;
 	}
 }
 
@@ -229,6 +259,25 @@ void LinkMappingVersion::deleteActiveLink()
 	}
 }
 
+void LinkMappingVersion::deleteActiveTriangulationPair()
+{
+	if (activeTriangulationPair)
+	{
+		auto counter = 0;
+		for (const auto& pair: *triangulationPairs)
+		{
+			if (*pair == *activeTriangulationPair)
+			{
+				// we're deleting it.
+				triangulationPairs->erase((*triangulationPairs).begin() + counter);
+				break;
+			}
+			++counter;
+		}
+		activeTriangulationPair.reset();
+	}
+}
+
 int LinkMappingVersion::addRawLink()
 {
 	// Create a new link
@@ -252,6 +301,17 @@ int LinkMappingVersion::addRawComment()
 	return link->getID();
 }
 
+int LinkMappingVersion::addRawTriangulationPair()
+{
+	// Create a new pair.
+	const auto pair = std::make_shared<TriangulationPointPair>(triangulationPairCounter);
+	++triangulationPairCounter;
+	const auto& positionItr = triangulationPairs->begin() + lastActiveTriangulationPairIndex;
+	triangulationPairs->insert(positionItr, pair);
+	activeTriangulationPair = pair;
+	return pair->getID();
+}
+
 void LinkMappingVersion::moveActiveLinkUp() const
 {
 	if (activeLink)
@@ -262,6 +322,20 @@ void LinkMappingVersion::moveActiveLinkUp() const
 			if (*link == *activeLink && counter > 0)
 			{
 				std::swap((*links)[counter], (*links)[counter - 1]);
+				break;
+			}
+			++counter;
+		}
+	}
+
+	if (activeTriangulationPair)
+	{
+		size_t counter = 0;
+		for (const auto& pair: *triangulationPairs)
+		{
+			if (*pair == *activeTriangulationPair && counter > 0)
+			{
+				std::swap((*triangulationPairs)[counter], (*triangulationPairs)[counter - 1]);
 				break;
 			}
 			++counter;
@@ -279,6 +353,20 @@ void LinkMappingVersion::moveActiveLinkDown() const
 			if (*link == *activeLink && counter < links->size() - 1)
 			{
 				std::swap((*links)[counter], (*links)[counter + 1]);
+				break;
+			}
+			++counter;
+		}
+	}
+
+	if (activeTriangulationPair)
+	{
+		size_t counter = 0;
+		for (const auto& pair: *triangulationPairs)
+		{
+			if (*pair == *activeTriangulationPair && counter < triangulationPairs->size() - 1)
+			{
+				std::swap((*triangulationPairs)[counter], (*triangulationPairs)[counter + 1]);
 				break;
 			}
 			++counter;

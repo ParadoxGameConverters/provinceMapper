@@ -36,6 +36,7 @@ class UnmappedTab final: public wxNotebookPage
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
+	void stageAddTriangulationPair() const;
 	void stageUpdateProvinceCount() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;

@@ -1,7 +1,8 @@
 #include "ImageCanvas.h"
 #include "Frames/Links/DialogComment.h"
 #include "Frames/Links/LinksTab.h"
-#include "LinkMapper/LinkMappingVersion.h"
+#include "Frames/Links/ProvinceMappingsGrid.h"
+#include "Frames/Links/TriangulationPairsGrid.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 
@@ -212,6 +213,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// 2. add a province to the existing mapping, or
 	// 3. remove it from active mapping.
 	// 4 - special: if we're initing triangulation, we need raw points.
+	// 5. - special: if we're adding a permanent triangulation pair, 
 
 	// What province have we clicked?
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -222,6 +224,24 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+		// case 5: check if we're in the process of editing a triangulation pair
+		const auto& activeTriangulationPair = getActiveTriangulationPair();
+		if (activeTriangulationPair)
+		{
+			const auto point = wxPoint(x, y);
+			if (selector == ImageTabSelector::SOURCE)
+			{
+				activeTriangulationPair->setSourcePoint(point);
+			}
+			else
+			{
+				activeTriangulationPair->setTargetPoint(point);
+			}
+			stageTriangulationPairPointPlaced();
+			stageRefresh();
+			return;
+		}
+
 		// case 4: special.
 		if (triangulate && points.size() < 3)
 		{
@@ -285,6 +305,11 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 	if (activeLink)
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
+		eventHandler->QueueEvent(evt->Clone());
+	}
+	if (getActiveTriangulationPair())
+	{
+		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
 		eventHandler->QueueEvent(evt->Clone());
 	}
 	event.Skip();
@@ -438,6 +463,9 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 		case WXK_F5:
 			stageSave();
 			break;
+		case WXK_F6:
+			stageAddTriangulationPair();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
@@ -553,6 +581,12 @@ void ImageCanvas::stageRefresh() const
 	eventHandler->QueueEvent(evt.Clone());
 }
 
+void ImageCanvas::stageTriangulationPairPointPlaced() const
+{
+	wxCommandEvent evt(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR);
+	eventHandler->QueueEvent(evt.Clone());
+}
+
 void ImageCanvas::stagePointPlaced() const
 {
 	wxCommandEvent evt(wxEVT_POINT_PLACED);
@@ -590,6 +624,12 @@ void ImageCanvas::stageSave() const
 void ImageCanvas::stageAddLink() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventHandler->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageAddTriangulationPair() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
 	eventHandler->QueueEvent(evt->Clone());
 }
 

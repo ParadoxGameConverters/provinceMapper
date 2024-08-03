@@ -10,12 +10,13 @@ LinkMapping::LinkMapping(std::istream& theStream,
 	 std::string theSourceToken,
 	 std::string theTargetToken,
 	 const int theID):
-	 ID(theID),
+	 LinkBase(theID),
 	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
 {
-	registerKeys();
-	parseStream(theStream);
-	clearRegisteredKeywords();
+	auto parser = commonItems::parser();
+	registerKeys(parser);
+	parser.parseStream(theStream);
+	parser.clearRegisteredKeywords();
 }
 
 LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
@@ -23,14 +24,14 @@ LinkMapping::LinkMapping(std::shared_ptr<DefinitionsInterface> theSourceDefs,
 	 std::string theSourceToken,
 	 std::string theTargetToken,
 	 int theID):
-	 ID(theID),
+	 LinkBase(theID),
 	 sourceDefs(std::move(theSourceDefs)), targetDefs(std::move(theTargetDefs)), sourceToken(std::move(theSourceToken)), targetToken(std::move(theTargetToken))
 {
 }
 
-void LinkMapping::registerKeys()
+void LinkMapping::registerKeys(commonItems::parser& parser)
 {
-	registerKeyword(sourceToken, [this](std::istream& theStream) {
+	parser.registerKeyword(sourceToken, [this](std::istream& theStream) {
 		auto id = commonItems::getString(theStream);
 		if (id.substr(0, 2) == "0x")
 		{
@@ -40,7 +41,7 @@ void LinkMapping::registerKeys()
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			sources.emplace_back(provItr->second);
 	});
-	registerKeyword(targetToken, [this](std::istream& theStream) {
+	parser.registerKeyword(targetToken, [this](std::istream& theStream) {
 		auto id = commonItems::getString(theStream);
 		if (id.substr(0, 2) == "0x")
 		{
@@ -50,10 +51,10 @@ void LinkMapping::registerKeys()
 		if (const auto& provItr = provinces.find(id); provItr != provinces.end())
 			targets.emplace_back(provItr->second);
 	});
-	registerKeyword("comment", [this](std::istream& theStream) {
+	parser.registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);
 	});
-	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
+	parser.registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
 std::ostream& operator<<(std::ostream& output, const LinkMapping& linkMapping)
@@ -174,7 +175,63 @@ Mapping LinkMapping::toggleTarget(const std::string& targetID)
 	}
 }
 
-bool LinkMapping::operator==(const LinkMapping& rhs) const
+const std::string LinkMapping::toRowString()
 {
-	return ID == rhs.ID;
+	if (comment)
+	{
+		return *comment;
+	}
+
+	std::string name;
+	std::string comma;
+	for (const auto& source: getSources())
+	{
+		name += comma;
+		if (source->locName)
+			name += *source->locName;
+		else if (!source->mapDataName.empty())
+			name += source->mapDataName;
+		else
+			name += "(No Name)";
+		comma = ", ";
+	}
+	name += " -> ";
+	comma.clear();
+	for (const auto& target: getTargets())
+	{
+		name += comma;
+		if (target->locName)
+			name += *target->locName;
+		else if (!target->mapDataName.empty())
+			name += target->mapDataName;
+		else
+			name += "(No Name)";
+		comma = ", ";
+	}
+
+	return name;
+}
+
+static const wxColour commentColour = wxColour(150, 150, 150);
+static const wxColour regularColour = wxColour(240, 240, 240);
+
+const wxColour LinkMapping::getBaseRowColour()
+{
+	if (comment)
+	{
+		return commentColour;
+	}
+	return regularColour;
+}
+
+static const wxColour selectedCommentColour = wxColour(50, 180, 50); // dark green for selected comments
+static const wxColour selectedLinkColour = wxColour(150, 250, 150); // bright green for selected links.
+
+const wxColour LinkMapping::getActiveRowColour()
+{
+	if (comment)
+	{
+		return selectedCommentColour;
+	}
+	return selectedLinkColour;
 }

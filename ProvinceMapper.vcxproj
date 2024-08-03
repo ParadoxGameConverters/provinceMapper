@@ -16,6 +16,9 @@
     <ClCompile Include="commonItems\ParserHelpers.cpp" />
     <ClCompile Include="commonItems\StringUtils.cpp" />
     <ClCompile Include="commonItems\WinUtils.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkBase.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\GridBase.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\DialogCommentBase.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Configuration\Configuration.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\Definitions.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Definitions\EU4Regions\Area.cpp" />
@@ -32,6 +35,8 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\DialogComment.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\LinksTab.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\ProvinceMappingsGrid.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairsGrid.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\MainFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\PixelReader\PixelReader.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedFrame.cpp" />
@@ -39,6 +44,7 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMapping.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\TriangulationPointPair.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\CsvScraper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\LocalizationMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.cpp" />
@@ -47,6 +53,7 @@
     <ClCompile Include="ProvinceMapper\Source\ProvinceMapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\Color.h" />
@@ -58,6 +65,9 @@
     <ClInclude Include="commonItems\Parser.h" />
     <ClInclude Include="commonItems\ParserHelpers.h" />
     <ClInclude Include="commonItems\StringUtils.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkBase.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\GridBase.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\DialogCommentBase.h" />
     <ClInclude Include="ProvinceMapper\Source\Configuration\Configuration.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\Definitions.h" />
     <ClInclude Include="ProvinceMapper\Source\Definitions\DefinitionsInterface.h" />
@@ -75,6 +85,8 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\DialogComment.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\LinksTab.h" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\ProvinceMappingsGrid.h" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairsGrid.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\MainFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\PixelReader\PixelReader.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Unmapped\UnmappedFrame.h" />
@@ -82,6 +94,7 @@
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMapping.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkMappingVersion.h" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\TriangulationPointPair.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\CsvScraper.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\LocalizationMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Localization\Vic3StateRegionScraper.h" />
@@ -90,6 +103,7 @@
     <ClInclude Include="ProvinceMapper\Source\ProvinceMapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico" />

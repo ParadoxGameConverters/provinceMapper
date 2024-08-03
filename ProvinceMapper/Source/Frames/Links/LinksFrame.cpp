@@ -30,7 +30,7 @@ LinksFrame::LinksFrame(wxWindow* parent,
 		pages.insert(std::pair(version->getID(), newTab));
 		if (version->getName() == activeVersion->getName())
 			activePage = newTab;
-		newTab->redrawGrid();
+		newTab->redraw();
 	}
 	notebook->ChangeSelection(0); // silently swap to first page.
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));
@@ -64,6 +64,12 @@ void LinksFrame::deactivateLink() const
 		activePage->deactivateLink();
 }
 
+void LinksFrame::deactivateTriangulationPair() const
+{
+	if (activePage)
+		activePage->deactivateTriangulationPair();
+}
+
 void LinksFrame::activateLinkByID(const int ID) const
 {
 	if (activePage)
@@ -76,16 +82,40 @@ void LinksFrame::activateLinkByIndex(const int index) const
 		activePage->activateLinkByIndex(index);
 }
 
+void LinksFrame::activateTriangulationPairByIndex(int index) const
+{
+	if (activePage)
+	{
+		activePage->activateTriangulationPairByIndex(index);
+	}
+}
+
 void LinksFrame::refreshActiveLink() const
 {
 	if (activePage)
 		activePage->refreshActiveLink();
 }
 
+void LinksFrame::refreshActiveTriangulationPair() const
+{
+	if (activePage)
+	{
+		activePage->refreshActiveTriangulationPair();
+	}
+}
+
 void LinksFrame::createLink(const int linkID) const
 {
 	if (activePage)
 		activePage->createLink(linkID);
+}
+
+void LinksFrame::createTriangulationPair(const int pairID) const
+{
+	if (activePage)
+	{
+		activePage->createTriangulationPair(pairID);
+	}
 }
 
 void LinksFrame::addVersion(const std::shared_ptr<LinkMappingVersion>& version)
@@ -96,7 +126,7 @@ void LinksFrame::addVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	versionIDs.insert(versionIDs.begin(), version->getID());
 	pages.insert(std::pair(version->getID(), newTab));
 	activePage = newTab;
-	newTab->redrawGrid();
+	newTab->redraw();
 }
 
 void LinksFrame::deleteActiveAndSwapToVersion(const std::shared_ptr<LinkMappingVersion>& version)

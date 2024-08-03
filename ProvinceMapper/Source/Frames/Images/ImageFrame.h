@@ -26,13 +26,17 @@ class ImageFrame: public wxFrame
 		 std::shared_ptr<Configuration> theConfiguration);
 
 	void activateLinkByIndex(int row);
+	void activateTriangulationPairByIndex(int row);
 	void activateLinkByID(int ID);
 	void deactivateLink();
+	void deactivateTriangulationPair();
 	void toggleProvinceByID(const std::string& ID, bool sourceImage);
 	void shadeProvinceByID(const std::string& ID, bool sourceImage);
 	void centerMap(int ID);
 	void centerProvince(ImageTabSelector selector, const std::string& ID);
 	void deleteActiveLink();
+	void deleteActiveTriangulationPair();
+	void activateTriangulationPairByID(const int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
 

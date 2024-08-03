@@ -1,6 +1,7 @@
 #include "UnmappedTab.h"
 #include "Frames/Images/ImageCanvas.h"
 #include "Frames/Links/LinksTab.h"
+#include "Frames/Links/ProvinceMappingsGrid.h"
 #include "Frames/MainFrame.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
@@ -139,6 +140,9 @@ void UnmappedTab::onKeyDown(wxKeyEvent& event)
 		case WXK_F5:
 			stageSave();
 			break;
+		case WXK_F6:
+			stageAddTriangulationPair();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
@@ -194,6 +198,12 @@ void UnmappedTab::stageSave() const
 void UnmappedTab::stageAddLink() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_LINK);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void UnmappedTab::stageAddTriangulationPair() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
 	eventListener->QueueEvent(evt->Clone());
 }
 

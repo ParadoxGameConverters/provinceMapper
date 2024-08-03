@@ -57,10 +57,24 @@ void LinkMapper::deactivateLink() const
 		activeVersion->deactivateLink();
 }
 
+void LinkMapper::deactivateTriangulationPair() const
+{
+	if (activeVersion)
+		activeVersion->deactivateTriangulationPair();
+}
+
 void LinkMapper::activateLinkByIndex(const int row) const
 {
 	if (activeVersion)
 		activeVersion->activateLinkByIndex(row);
+}
+
+void LinkMapper::activateTriangulationPairByIndex(const int row) const
+{
+	if (activeVersion)
+	{
+		activeVersion->activateTriangulationPairByIndex(row);
+	}
 }
 
 void LinkMapper::activateLinkByID(const int ID) const
@@ -91,6 +105,12 @@ void LinkMapper::deleteActiveLink() const
 		activeVersion->deleteActiveLink();
 }
 
+void LinkMapper::deleteActiveTriangulationPair() const
+{
+	if (activeVersion)
+		activeVersion->deleteActiveTriangulationPair();
+}
+
 std::optional<int> LinkMapper::addRawLink() const
 {
 	if (activeVersion)
@@ -103,6 +123,14 @@ std::optional<int> LinkMapper::addRawComment() const
 {
 	if (activeVersion)
 		return activeVersion->addRawComment();
+	else
+		return std::nullopt;
+}
+
+std::optional<int> LinkMapper::addRawTriangulationPair() const
+{
+	if (activeVersion)
+		return activeVersion->addRawTriangulationPair();
 	else
 		return std::nullopt;
 }
