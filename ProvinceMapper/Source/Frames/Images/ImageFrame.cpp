@@ -3,6 +3,7 @@
 #include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
 #include "StatusBar.h"
+#include "LinkMapper/TriangulationPointPair.h"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
@@ -521,10 +522,246 @@ void ImageFrame::showToolbar() const
 	statusBar->Show();
 }
 
+double getDistanceFromCornerToLine(const wxPoint& linePoint1, const wxPoint& linePoint2, const wxPoint& cornerPoint)
+{
+	const double x1 = linePoint1.x;
+   const double y1 = linePoint1.y;
+   const double x2 = linePoint2.x;
+   const double y2 = linePoint2.y;
+
+	// Get the A, B, and C values for the equation of the line.
+	const double A = y2 - y1;
+	const double B = x1 - x2;
+	const double C = x2 * y1 - x1 * y2;
+
+   // Calculate the distance between the corner point and the line.
+   const double dist = std::abs(A * cornerPoint.x + B * cornerPoint.y + C) / std::sqrt(A * A + B * B);
+   return dist;
+}
+
+wxPoint calculateCoordinates(double a, double b, double x1, double y1, double d) // TODO: verify in practice if this is correct
+{
+	// Magnitude of the direction vector (b, -a)
+	double magnitude = std::sqrt(b * b + a * a);
+
+	// Unit vector in the direction of (b, -a)
+	double unitX = b / magnitude;
+	double unitY = -a / magnitude;
+
+	// First point (x1 + d * unitX, y1 + d * unitY)
+	const double X1 = x1 + d * unitX;
+	const double Y1 = y1 + d * unitY;
+
+	return wxPoint(X1, Y1);
+}
+
+void ImageFrame::delaunayTriangulate() // TODO: call this when a triangulation pair is added or removed
+{
+	triangles.clear();
+
+	// We need to have at least 3 point pairs to triangulate.
+	std::vector<std::shared_ptr<TriangulationPointPair>> validPairs;
+
+	for (const auto& pair: sourceCanvas->getTriangulationPairs())
+	{
+		// A pair must have both a source and a target point.
+		if (!pair->getSourcePoint() || !pair->getTargetPoint())
+		{
+			continue;
+		}
+
+		validPairs.push_back(pair);
+	}
+
+	if (validPairs.size() < 3)
+	{
+		Log(LogLevel::Info) << "Cannot triangulate with less than 3 point pairs.";
+		return;
+	}
+
+	// Create a virtual point pair for each map corner.
+	const auto& sourceMapWidth = sourceCanvas->getWidth();
+   const auto& sourceMapHeight = sourceCanvas->getHeight();
+
+   wxPoint topLeftPoint(0, 0);
+   wxPoint topRightPoint(sourceMapWidth, 0); // TODO: check if x shouldn't be sourceMapWidth - 1
+   wxPoint bottomLeftPoint(0, sourceMapHeight); // TODO: check if y shouldn't be sourceMapHeight - 1
+   wxPoint bottomRightPoint(sourceMapWidth, sourceMapHeight);
+
+   std::vector cornerPoints = {topLeftPoint, topRightPoint, bottomLeftPoint, bottomRightPoint};
+
+   // For each corner, find 2 closest points and calculate coefficients for the linear equation.
+	for (const auto& cornerPoint : cornerPoints)
+	{
+		std::optional<std::shared_ptr<TriangulationPointPair>> closestPair1;
+		std::optional<std::shared_ptr<TriangulationPointPair>> closestPair2;
+
+		// Calculate the closest 2 points as 2 points with the smallest distance to the corner.
+		for (const auto& pair: validPairs)
+		{
+			const auto& sourcePoint = pair->getSourcePoint();
+			const auto& distance = std::sqrt(std::pow(cornerPoint.x - sourcePoint->x, 2) + std::pow(cornerPoint.y - sourcePoint->y, 2));
+
+			if (!closestPair1 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair1)->getSourcePoint()->x, 2) + std::pow(cornerPoint.y - (*closestPair1)->getSourcePoint()->y, 2)))
+			{
+				closestPair2 = closestPair1;
+				closestPair1 = pair;
+			}
+			else if (!closestPair2 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair2)->getSourcePoint()->x, 2) + std::pow(cornerPoint.y - (*closestPair2)->getSourcePoint()->y, 2)))
+			{
+				closestPair2 = pair;
+			}
+		}
+
+	  const auto& closestPoint1 = (*closestPair1)->getSourcePoint();
+	  const auto& closestPoint2 = (*closestPair2)->getSourcePoint();
+	  // closestPoint1 and closestPoint2 form the line.
+
+		double srcLineA = static_cast<double>(closestPoint1->y - closestPoint2->y) / (closestPoint1->x - closestPoint2->x);
+	  double srcLineB = static_cast<double>(closestPoint1->y) - srcLineA * closestPoint1->x;
+
+		// Calculate the straight perpendicular to the line.
+		double srcAPerpendicular = -1 / srcLineA;
+	  double bPerpendicular = static_cast<double>(cornerPoint.y) - srcAPerpendicular * cornerPoint.x; // TODO: check if this is correct
+
+		// Calculate the distance between the corner point and the line.
+		double cornerDist = getDistanceFromCornerToLine(*closestPoint1, *closestPoint2, cornerPoint);
+
+	  // Calculate the intersection point.
+	  double intersectionX = (bPerpendicular - srcLineB) / (srcLineA - srcAPerpendicular);
+		double intersectionY = srcLineA * intersectionX + srcLineB;
+
+	  // Calculate the distance between the two closest points.
+	  double closestPointsDist = std::sqrt(std::pow(closestPoint1->x - closestPoint2->x, 2) + std::pow(closestPoint1->y - closestPoint2->y, 2));
+
+	  // Calculate the distance between the intersection point and closestPoint1.
+	  double intersectionDistFromPoint1 = std::sqrt(std::pow(intersectionX - closestPoint1->x, 2) + std::pow(intersectionY - closestPoint1->y, 2));
+
+
+	  // NOW WE CALCULATE THE EQUIVALENTS FOR THE TARGET MAP
+
+	  // Calculate the linear equation for the target map's closest points pair.
+	  double tgtLineA = static_cast<double>((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y) / ((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x);
+	  double tgtLineB = static_cast<double>((*closestPair1)->getTargetPoint()->y) - tgtLineA * (*closestPair1)->getTargetPoint()->x;
+
+	  // Calculate the distance between the two closest points on the target map.
+	  double tgtClosestPointsDist = std::sqrt(std::pow((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x, 2) + std::pow((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y, 2));
+
+	  // Calculate the distance between the intersection point and closestPoint1 on the target map, using the same ratio as on the source map.
+	  double tgtIntersectionDistFromPoint1 = intersectionDistFromPoint1 * tgtClosestPointsDist / closestPointsDist;
+
+	  // Find the intersection point on the target map.
+	  wxPoint tgtIntersectionPoint = calculateCoordinates(tgtLineA, tgtLineB, (*closestPair1)->getTargetPoint()->x, (*closestPair1)->getTargetPoint()->y, tgtIntersectionDistFromPoint1);
+
+	  // Calculate the line perpendicular to the target map's tgtLine, passing through tgtIntersectionPoint.
+	  double tgtAPerpendicular = -1 / tgtLineA;
+	  double tgtBPerpendicular = static_cast<double>(tgtIntersectionPoint.y) - tgtAPerpendicular * tgtIntersectionPoint.x;
+
+	  // Scale cornerDist to the target map.
+	  double tgtCornerDist = cornerDist * tgtClosestPointsDist / closestPointsDist;
+
+	  // Calculate tgtCornerPoint as the point on the perpendicular line that is tgtCornerDist away from tgtIntersectionPoint.
+	  double tgtCornerX = (tgtBPerpendicular - tgtLineB ) / (tgtLineA - tgtAPerpendicular); // TODO: check if this is correct
+	  double tgtCornerY = tgtLineA * tgtCornerX + tgtLineB;
+
+	  wxPoint tgtCornerPoint(tgtCornerX, tgtCornerY); // TODO: check if this is correct
+
+	  int idToUse;
+	  std::set<int> usedIds;
+	  for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+	  {
+		  usedIds.insert(pair->getID());
+	  }
+	  // Find an ID of TriangulationPointPair that's not used.
+	  for (int i = 0; i < INT_MAX; i++)
+	  {
+		  if (!usedIds.contains(i))
+		  {
+			  idToUse = i;
+			  break;
+		  }
+	  }
+	  auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
+	  cornerPair->setSourcePoint(cornerPoint);
+	  cornerPair->setTargetPoint(tgtCornerPoint);
+
+	  validPairs.push_back(cornerPair);
+	  
+
+
+
+
+		//double bPerpendicular = static_cast<double>(cornerPoint.y) - aPerpendicular * cornerPoint.x;
+
+	 // 	// Calculate the intersection point.
+	 //  double x = (bPerpendicular - b) / (a - aPerpendicular);
+		//double y = a * x + b;
+
+	 // // Calculate the distance between the two closest points.
+	 // double distBetweenClosestPoints = std::sqrt(std::pow(closestPoint1->x - closestPoint2->x, 2) + std::pow(closestPoint1->y - closestPoint2->y, 2));
+
+		//// Calculate the distance between the intersection point and closestPoint1.
+	 // double distToX = std::sqrt(std::pow(x - closestPoint1->x, 2) + std::pow(y - closestPoint1->y, 2));
+
+	 // // Calculate the distance between the intersection point and the corner.
+	 // double cornerDist = std::sqrt(std::pow(x - cornerPoint.x, 2) + std::pow(y - cornerPoint.y, 2));
+
+	 // // Now translate the source map corner point to a target map point.
+	 // // First, calculate the linear equation for the target map's closest points pair.
+	 // double tgtA = static_cast<double>((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y) / ((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x);
+	 // double tgtB = static_cast<double>((*closestPair1)->getTargetPoint()->y) - tgtA * (*closestPair1)->getTargetPoint()->x;
+
+	 // // Calculate the distance between the two closest points on the target map.
+	 // double tgtDistBetweenClosestPoints = std::sqrt(std::pow((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x, 2) + std::pow((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y, 2));
+
+
+	 // 
+	 // // Scale the distance from the target's map closestPair1 point to the corner.
+	 // double tgtCornerDist = cornerDist * tgtDistBetweenClosestPoints / distBetweenClosestPoints;
+
+	}
+
+
+
+
+	std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
+
+	std::vector<Delaunay::Point> delaunaySourceInput;
+	for (const auto& pair: validPairs)
+	{
+		const auto& sourcePoint = pair->getSourcePoint();
+		pointToPairMap[std::make_pair(sourcePoint->x, sourcePoint->y)] = pair;
+
+		delaunaySourceInput.emplace_back(sourcePoint->x, sourcePoint->y);
+	}
+
+	// Use standard (non-constrained) Delaunay triangulation.
+	Delaunay sourceTriangulator(delaunaySourceInput);
+	sourceTriangulator.Triangulate();
+
+	for (const auto& t: sourceTriangulator.faces())
+	{
+		// Get triangle's vertices.
+		const auto& vertex1 = delaunaySourceInput[t.Org()];
+		const auto& vertex2 = delaunaySourceInput[t.Dest()];
+		const auto& vertex3 = delaunaySourceInput[t.Apex()];
+
+		auto intPair1 = std::make_pair(static_cast<int>(vertex1[0]), static_cast<int>(vertex1[1]));
+		auto intPair2 = std::make_pair(static_cast<int>(vertex2[0]), static_cast<int>(vertex2[1]));
+		auto intPair3 = std::make_pair(static_cast<int>(vertex3[0]), static_cast<int>(vertex3[1]));
+
+		const auto& pair1 = pointToPairMap[intPair1];
+		const auto& pair2 = pointToPairMap[intPair2];
+		const auto& pair3 = pointToPairMap[intPair3];
+
+		Triangle triangle(pair1, pair2, pair3);
+
+		triangles.push_back(triangle);
+	}
+}
+
 void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const
 {
-	const auto& triangles = sourceCanvas->getTriangles();
-
    if (triangles.empty())
 	{
 	   return;

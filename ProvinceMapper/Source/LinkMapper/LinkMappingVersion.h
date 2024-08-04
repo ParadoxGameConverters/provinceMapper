@@ -48,15 +48,12 @@ class LinkMappingVersion
 	void moveActiveLinkDown() const;
 	void autogenerateMappings(); // TODO: FINISH THIS
 	void deleteLinkByID(const int theID);
-	void delaunayTriangulate();
 
 	[[nodiscard]] std::optional<int> toggleProvinceByID(const std::string& provinceID, bool isSource);
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
 	[[nodiscard]] int addRawTriangulationPair();
-	[[nodiscard]] const auto& getTriangles() { return triangles; }
-
 
 	bool operator==(const LinkMappingVersion& rhs) const;
 
@@ -76,7 +73,6 @@ class LinkMappingVersion
 	int lastActiveTriangulationPairIndex = 0;
 	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	std::shared_ptr<std::vector<std::shared_ptr<TriangulationPointPair>>> triangulationPairs;
-	std::vector<Triangle> triangles;
 
 	int linkCounter = 0;
 	int lastActiveLinkIndex = 0;

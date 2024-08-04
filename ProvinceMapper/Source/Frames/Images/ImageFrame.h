@@ -6,6 +6,7 @@
 #include "Definitions/DefinitionsInterface.h"
 #include <optional>
 
+class Triangle;
 class StatusBar;
 class LinkMappingVersion;
 class wxSplitterWindow;
@@ -40,6 +41,7 @@ class ImageFrame: public wxFrame
 	void activateTriangulationPairByID(const int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
+	void delaunayTriangulate();
 
   private:
 	void onScrollPaint(wxPaintEvent& event);
@@ -60,6 +62,8 @@ class ImageFrame: public wxFrame
 	void renderSource() const;
 	void renderTarget() const;
 	void renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const;
+	[[nodiscard]] const auto& getTriangles() { return triangles; }
+	std::vector<Triangle> triangles;
 
 	void determineTriangulationSanity();
 	void buildBounds();

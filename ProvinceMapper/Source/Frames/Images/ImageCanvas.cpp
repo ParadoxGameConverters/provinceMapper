@@ -238,7 +238,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 				activeTriangulationPair->setTargetPoint(point);
 			}
 			// Update the triangle generator.
-			activeVersion->delaunayTriangulate();
+			stageDelaunayTriangulate(); // THIS SHOULD CAUSE A REDRAW OF THE ImageFrame
 
 			stageTriangulationPairPointPlaced();
 			stageRefresh();

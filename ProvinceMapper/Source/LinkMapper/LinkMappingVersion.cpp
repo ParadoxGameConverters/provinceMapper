@@ -27,12 +27,6 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	parser.parseStream(theStream);
 	parser.clearRegisteredKeywords();
 	generateUnmapped();
-
-   Log(LogLevel::Info) << "LinkMappingVersion " << versionName << " loaded with " << links->size() << " links and " << triangulationPairs->size() << " triangulation pairs."; // TODO: REMOVE
-	Log(LogLevel::Info) << "Fuck1";
-	delaunayTriangulate();
-
-   Log(LogLevel::Info) << "End of constructor for " << versionName; // TODO: REMOVE
 }
 
 LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
@@ -49,10 +43,6 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	generateUnmapped();
-	Log(LogLevel::Info) << "LinkMappingVersion " << versionName << " loaded with " << links->size() << " links and " << triangulationPairs->size()
-							  << " triangulation pairs."; // TODO: REMOVE
-
-	delaunayTriangulate();
 }
 
 void LinkMappingVersion::registerKeys(commonItems::parser& parser)
@@ -288,7 +278,6 @@ void LinkMappingVersion::deleteActiveTriangulationPair()
 			++counter;
 		}
 		activeTriangulationPair.reset();
-		delaunayTriangulate();
 	}
 }
 
@@ -389,72 +378,6 @@ void LinkMappingVersion::moveActiveLinkDown() const
 			++counter;
 		}
 	}
-}
-
-void LinkMappingVersion::delaunayTriangulate() // TODO: call this when a triangulation pair is added or removed
-{
-	triangles.clear();
-
-	// We need to have at least 3 point pairs to triangulate.
-	std::vector<std::shared_ptr<TriangulationPointPair>> validPairs;
-
-	for (const auto& pair: *triangulationPairs)
-	{
-		// A pair must have both a source and a target point.
-		if (!pair->getSourcePoint() || !pair->getTargetPoint()){
-			continue;
-		}
-
-		validPairs.push_back(pair);
-	}
-
-	if (validPairs.size() < 3)
-	{
-		Log(LogLevel::Info) << "Cannot triangulate with less than 3 point pairs.";
-		return;
-	}
-
-   std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
-
-	std::vector<Delaunay::Point> delaunaySourceInput;
-	for (const auto& pair: validPairs)
-	{
-		const auto& sourcePoint = pair->getSourcePoint();
-		pointToPairMap[std::make_pair(sourcePoint->x, sourcePoint->y)] = pair;
-
-		delaunaySourceInput.push_back(Delaunay::Point(sourcePoint->x, sourcePoint->y));
-	}
-
-	// Use standard (non-constrained) Delaunay triangulation.
-	Delaunay sourceTriangulator(delaunaySourceInput);
-	sourceTriangulator.Triangulate();
-
-   for (const auto& f : sourceTriangulator.faces())
-   {
-		int vertexIdx1 = f.Org();
-		int vertexIdx2 = f.Dest();
-		int vertexIdx3 = f.Apex();
-
-		// access point's coordinates:
-		const auto& vertex1 = delaunaySourceInput[vertexIdx1];
-		const auto& vertex2 = delaunaySourceInput[vertexIdx2];
-		const auto& vertex3 = delaunaySourceInput[vertexIdx3];
-
-   	auto intPair1 = std::make_pair(static_cast<int>(vertex1[0]), static_cast<int>(vertex1[1]));
-		auto intPair2 = std::make_pair(static_cast<int>(vertex2[0]), static_cast<int>(vertex2[1]));
-		auto intPair3 = std::make_pair(static_cast<int>(vertex3[0]), static_cast<int>(vertex3[1]));
-
-   	const auto& pair1 = pointToPairMap[intPair1];
-   	const auto& pair2 = pointToPairMap[intPair2];
-   	const auto& pair3 = pointToPairMap[intPair3];
-
-   	Triangle triangle(pair1, pair2, pair3);
-
-   	triangles.push_back(triangle);
-   }
-
-   // TODO: TARGET TRIANGLES SHOULD BE BASED ON SOURCE TRIANGLES, NOT GENERATED INDEPENDENTLY
-
 }
 
 void LinkMappingVersion::autogenerateMappings() // TODO: FINISH THIS
