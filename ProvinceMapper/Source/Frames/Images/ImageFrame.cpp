@@ -3,8 +3,12 @@
 #include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
 #include "StatusBar.h"
+#include "tpp_interface.hpp"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
+
+
+using Delaunay = tpp::Delaunay;
 
 ImageFrame::ImageFrame(wxWindow* parent,
 	 const wxPoint& position,
@@ -162,6 +166,8 @@ void ImageFrame::renderSource() const
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
 
+	renderTriangulationMesh(sourceDC, true); // TODO: add a toggle for this, like for the shade
+
 	// Draw all the triangulation pair points.
 	for (const auto& pair: *sourceCanvas->getTriangulationPairs())
 	{
@@ -235,6 +241,8 @@ void ImageFrame::renderTarget() const
 	targetDC.Clear();
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
+	
+	renderTriangulationMesh(targetDC, false); // TODO: add a toggle for this, like for the shade
 
 	// Draw all the triangulation pair points.
 	for (const auto& pair: *targetCanvas->getTriangulationPairs())
@@ -512,6 +520,40 @@ void ImageFrame::showToolbar() const
 	configuration->setStatusBarOn(true);
 	configuration->save();
 	statusBar->Show();
+}
+
+void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const // TODO: finish this
+{
+	auto& delaunayFaces = isSourceMap ? sourceCanvas->getSourceDelaunayFaces() : targetCanvas->getTargetDelaunayFaces(); // tuple
+	auto& vertices = std::get<0>(delaunayFaces);
+	auto& faces = std::get<1>(delaunayFaces);
+
+	wxPen pen = paintDC.GetPen();
+	pen.SetColour("red");
+	paintDC.SetPen(pen);
+
+	// iterate over triangles
+	for (const auto& f: faces)
+	{
+		int vertexIdx1 = f.Org();
+		int vertexIdx2 = f.Dest();
+		int vertexIdx3 = f.Apex();
+
+		// access point's coordinates:
+		double x1 = vertices[vertexIdx1][0];
+		double y1 = vertices[vertexIdx1][1];
+
+		double x2 = vertices[vertexIdx2][0];
+		double y2 = vertices[vertexIdx2][1];
+
+		double x3 = vertices[vertexIdx3][0];
+		double y3 = vertices[vertexIdx3][1];
+
+		// Draw the triangle
+		paintDC.DrawLine(x1, y1, x2, y2);
+		paintDC.DrawLine(x2, y2, x3, y3);
+		paintDC.DrawLine(x3, y3, x1, y1);
+	}
 }
 
 void ImageFrame::onTriangulate(wxCommandEvent& event)

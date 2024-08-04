@@ -122,6 +122,9 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 		case WXK_F6:
 			stageAddTriangulationPair();
 			break;
+		case WXK_F7:
+			stageAutogenerateMappings();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
@@ -224,6 +227,12 @@ void LinksTab::stageAddLink() const
 void LinksTab::stageAddTriangulationPair() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void LinksTab::stageAutogenerateMappings() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_AUTOGENERATE_MAPPINGS);
 	eventListener->QueueEvent(evt->Clone());
 }
 

@@ -54,6 +54,8 @@
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
+    <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
+    <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\Color.h" />
@@ -153,7 +155,7 @@
       </PrecompiledHeader>
       <PreprocessorDefinitions>WXUSINGDLL;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)ProvinceMapper\Source;$(ProjectDir)wxWidgets\3.2.1\include\msvc;$(ProjectDir)commonItems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ProvinceMapper\Source;$(ProjectDir)wxWidgets\3.2.1\include\msvc;$(ProjectDir)commonItems;$(ProjectDir)TrianglePP\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

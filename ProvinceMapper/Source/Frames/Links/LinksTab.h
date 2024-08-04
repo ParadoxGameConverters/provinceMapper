@@ -51,6 +51,7 @@ class LinksTab final: public wxNotebookPage
 	void stageSave() const;
 	void stageAddLink() const;
 	void stageAddTriangulationPair() const;
+	void stageAutogenerateMappings() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 

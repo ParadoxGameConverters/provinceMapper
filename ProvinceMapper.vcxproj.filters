@@ -192,6 +192,8 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\GridBase.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\LinkBase.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
+    <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
+    <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">

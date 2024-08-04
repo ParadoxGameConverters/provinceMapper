@@ -36,6 +36,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onSaveLinks, this, wxID_SAVE);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxEVT_ADD_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddTriangulationPair, this, wxEVT_ADD_TRIANGULATION_PAIR);
+	Bind(wxEVT_MENU, &MainFrame::onAutogenerateMappings, this, wxEVT_AUTOGENERATE_MAPPINGS);
 	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveLinkOrTriangulationPair, this, wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddComment, this, wxMENU_ADD_COMMENT);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsAddVersion, this, wxMENU_ADD_VERSION);
@@ -67,6 +68,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SAVE_LINKS, &MainFrame::onSaveLinks, this);
 	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
 	Bind(wxEVT_ADD_TRIANGULATION_PAIR, &MainFrame::onLinksAddTriangulationPair, this);
+	Bind(wxEVT_AUTOGENERATE_MAPPINGS, &MainFrame::onAutogenerateMappings, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_LEFT, &MainFrame::onLinksMoveVersionLeft, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, &MainFrame::onLinksMoveVersionRight, this);
 	Bind(wxEVT_PROVINCE_CENTER_MAP, &MainFrame::onCenterProvince, this);
@@ -253,6 +255,7 @@ void MainFrame::initLinksFrame()
 	linksDropDown->Append(wxEVT_ADD_LINK, "Add Link [F3]\tCtrl-L");
 	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment [F4]\tCtrl-C");
 	linksDropDown->Append(wxEVT_ADD_TRIANGULATION_PAIR, "Add Triangulation Point Pair [F6]");
+	linksDropDown->Append(wxEVT_AUTOGENERATE_MAPPINGS, "Autogenerate mappings from triangulation pairs [F7]");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, "Delete Selected [Del]\tCtrl-D");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum -");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum +");
@@ -630,6 +633,12 @@ void MainFrame::deactiveActiveLinkOrTriangulationPair()
 void MainFrame::onRefreshActiveTriangulationPair(wxCommandEvent& evt)
 {
 	linksFrame->refreshActiveTriangulationPair();
+}
+
+void MainFrame::onAutogenerateMappings(const wxCommandEvent& evt)
+{
+	linkMapper.autogenerateMappings();
+	// TODO: check if we need to refresh stuff here
 }
 
 void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)

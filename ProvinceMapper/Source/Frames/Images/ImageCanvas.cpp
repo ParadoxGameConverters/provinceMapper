@@ -237,6 +237,9 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 			{
 				activeTriangulationPair->setTargetPoint(point);
 			}
+			// Update the triangle generator.
+			activeVersion->delaunayTriangulate();
+
 			stageTriangulationPairPointPlaced();
 			stageRefresh();
 			return;
@@ -466,6 +469,9 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 		case WXK_F6:
 			stageAddTriangulationPair();
 			break;
+		case WXK_F7:
+			stageAutogenerateMappings();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
 			stageDeleteLink();
@@ -630,6 +636,12 @@ void ImageCanvas::stageAddLink() const
 void ImageCanvas::stageAddTriangulationPair() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
+	eventHandler->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageAutogenerateMappings() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_AUTOGENERATE_MAPPINGS);
 	eventHandler->QueueEvent(evt->Clone());
 }
 

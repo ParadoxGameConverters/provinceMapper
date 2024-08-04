@@ -9,3 +9,4 @@ configuration.txt
 target_adjacencies.txt
 source_adjacencies.txt
 .idea/
+.vscode/

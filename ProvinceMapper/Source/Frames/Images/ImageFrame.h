@@ -12,6 +12,7 @@ class wxSplitterWindow;
 class ImageCanvas;
 enum class ImageTabSelector;
 class Configuration;
+class wxAutoBufferedPaintDC;
 class ImageFrame: public wxFrame
 {
   public:
@@ -58,6 +59,7 @@ class ImageFrame: public wxFrame
 	void render() const;
 	void renderSource() const;
 	void renderTarget() const;
+	void renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const;
 
 	void determineTriangulationSanity();
 	void buildBounds();

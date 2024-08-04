@@ -27,6 +27,7 @@ class LinkMapper: commonItems::parser
 	void moveActiveLinkDown() const;
 	void moveActiveVersionLeft();
 	void moveActiveVersionRight();
+	void autogenerateMappings();
 
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getVersions() const { return versions; }

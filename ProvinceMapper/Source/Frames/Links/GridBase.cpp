@@ -53,7 +53,6 @@ void GridBase::moveActiveLinkUp()
 }
 
 
-
 void GridBase::moveActiveLinkDown()
 {
 	if (activeLink && activeRow && *activeRow < GetNumberRows() - 1)

@@ -48,6 +48,8 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
 	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeVersion->getActiveTriangulationPair(); }
 	[[nodiscard]] const auto& getTriangulationPairs() const { return activeVersion->getTriangulationPairs(); }
+	[[nodiscard]] const auto& getSourceDelaunayFaces() const { return activeVersion->getSourceDelaunayFaces(); }
+	[[nodiscard]] const auto& getTargetDelaunayFaces() const { return activeVersion->getTargetDelaunayFaces(); }
  
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
@@ -96,6 +98,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void stageSave() const;
 	void stageAddLink() const;
 	void stageAddTriangulationPair() const;
+	void stageAutogenerateMappings() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 	void stagePointPlaced() const;

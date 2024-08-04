@@ -4,3 +4,6 @@
 [submodule "wxWidgets"]
 	path = wxWidgets
 	url = https://github.com/ParadoxGameConverters/wxWidgets
+[submodule "TrianglePP"]
+	path = TrianglePP
+	url = https://github.com/mrkkrj/TrianglePP.git
