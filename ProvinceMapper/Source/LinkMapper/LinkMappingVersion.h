@@ -6,7 +6,7 @@
 #include "TriangulationPointPair.h"
 #include "Parser.h"
 
-class LinkMappingVersion: commonItems::parser
+class LinkMappingVersion
 {
   public:
 	LinkMappingVersion(std::istream& theStream,
@@ -54,8 +54,11 @@ class LinkMappingVersion: commonItems::parser
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
 	[[nodiscard]] int addRawTriangulationPair();
-	[[nodiscard]] const auto& getSourceDelaunayFaces() { return sourceDelaunayFaces; }
-	[[nodiscard]] const auto& getTargetDelaunayFaces() { return targetDelaunayFaces; }
+	[[nodiscard]] const auto& getSourceDelaunayVertices () { return sourceDelaunayVertices; }
+	[[nodiscard]] const auto& getTargetDelaunayVertices() { return targetDelaunayVertices; }
+	[[nodiscard]] auto& getSourceTriangulator() { return sourceTriangulator; }
+	[[nodiscard]] auto& getTargetTriangulator() { return targetTriangulator; }
+
 
 	bool operator==(const LinkMappingVersion& rhs) const;
 
@@ -75,8 +78,10 @@ class LinkMappingVersion: commonItems::parser
 	int lastActiveTriangulationPairIndex = 0;
 	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	std::shared_ptr<std::vector<std::shared_ptr<TriangulationPointPair>>> triangulationPairs;
-	std::tuple<std::vector<tpp::Delaunay::Point>, tpp::FacesList> sourceDelaunayFaces;
-	std::tuple<std::vector<tpp::Delaunay::Point>, tpp::FacesList> targetDelaunayFaces;
+	std::vector<tpp::Delaunay::Point> sourceDelaunayVertices;
+	tpp::Delaunay sourceTriangulator;
+   std::vector<tpp::Delaunay::Point> targetDelaunayVertices;
+	tpp::Delaunay targetTriangulator;
 
 	int linkCounter = 0;
 	int lastActiveLinkIndex = 0;
@@ -87,7 +92,7 @@ class LinkMappingVersion: commonItems::parser
 
 	std::shared_ptr<LinkMapping> activeLink;
 
-	void registerKeys();
+	void registerKeys(commonItems::parser& parser);
 	std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>> links;
 	std::shared_ptr<std::vector<std::shared_ptr<Province>>> unmappedSources;
 	std::shared_ptr<std::vector<std::shared_ptr<Province>>> unmappedTargets;

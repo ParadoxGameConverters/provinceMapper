@@ -3,7 +3,6 @@
 #include "ImageCanvas.h"
 #include "OSCompatibilityLayer.h"
 #include "StatusBar.h"
-#include "tpp_interface.hpp"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
@@ -522,18 +521,33 @@ void ImageFrame::showToolbar() const
 	statusBar->Show();
 }
 
-void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const // TODO: finish this
+void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const
 {
-	auto& delaunayFaces = isSourceMap ? sourceCanvas->getSourceDelaunayFaces() : targetCanvas->getTargetDelaunayFaces(); // tuple
-	auto& vertices = std::get<0>(delaunayFaces);
-	auto& faces = std::get<1>(delaunayFaces);
+	Log(LogLevel::Info) << "Rendering triangulation mesh.";
+	const auto& vertices = isSourceMap ? sourceCanvas->getSourceDelaunayVertices() : targetCanvas->getTargetDelaunayVertices();
+   auto& triangulator = isSourceMap ? sourceCanvas->getSourceTriangulator() : targetCanvas->getTargetTriangulator();
+
+	Log(LogLevel::Info) << "Rendering triangulation mesh PART 1."; // TODO: REMOVE THIS
+
+   Log(LogLevel::Info) << "Triangulating " << vertices.size() << " points.";
+
+   if (vertices.size() < 3)
+	{
+		Log(LogLevel::Info) << "Not enough points to triangulate.";
+	   return;
+	}
+	if (triangulator.triangleCount() < 1)
+	{
+		Log(LogLevel::Info) << "No triangles to draw.";
+		return;	
+	}
 
 	wxPen pen = paintDC.GetPen();
 	pen.SetColour("red");
 	paintDC.SetPen(pen);
 
 	// iterate over triangles
-	for (const auto& f: faces)
+	for (const auto& f: triangulator.faces())
 	{
 		int vertexIdx1 = f.Org();
 		int vertexIdx2 = f.Dest();

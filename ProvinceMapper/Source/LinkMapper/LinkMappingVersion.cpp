@@ -22,11 +22,17 @@ LinkMappingVersion::LinkMappingVersion(std::istream& theStream,
 	 links(std::make_shared<std::vector<std::shared_ptr<LinkMapping>>>()),
 	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
-	registerKeys();
-	parseStream(theStream);
-	clearRegisteredKeywords();
+	commonItems::parser parser;
+	registerKeys(parser);
+	parser.parseStream(theStream);
+	parser.clearRegisteredKeywords();
 	generateUnmapped();
+
+   Log(LogLevel::Info) << "LinkMappingVersion " << versionName << " loaded with " << links->size() << " links and " << triangulationPairs->size() << " triangulation pairs."; // TODO: REMOVE
+	Log(LogLevel::Info) << "Fuck1";
 	delaunayTriangulate();
+
+   Log(LogLevel::Info) << "End of constructor for " << versionName; // TODO: REMOVE
 }
 
 LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
@@ -43,17 +49,20 @@ LinkMappingVersion::LinkMappingVersion(std::string theVersionName,
 	 unmappedSources(std::make_shared<std::vector<std::shared_ptr<Province>>>()), unmappedTargets(std::make_shared<std::vector<std::shared_ptr<Province>>>())
 {
 	generateUnmapped();
+	Log(LogLevel::Info) << "LinkMappingVersion " << versionName << " loaded with " << links->size() << " links and " << triangulationPairs->size()
+							  << " triangulation pairs."; // TODO: REMOVE
+
 	delaunayTriangulate();
 }
 
-void LinkMappingVersion::registerKeys()
+void LinkMappingVersion::registerKeys(commonItems::parser& parser)
 {	
-	registerKeyword("triangulation_pair", [this](std::istream& theStream) {
+	parser.registerKeyword("triangulation_pair", [this](std::istream& theStream) {
 		++triangulationPairCounter;
 		const auto pair = std::make_shared<TriangulationPointPair>(theStream, triangulationPairCounter);
 		triangulationPairs->push_back(pair);
 	});
-	registerKeyword("link", [this](std::istream& theStream) {
+	parser.registerKeyword("link", [this](std::istream& theStream) {
 		++linkCounter;
 		const auto link = std::make_shared<LinkMapping>(theStream, sourceDefs, targetDefs, sourceToken, targetToken, linkCounter);
 		links->push_back(link);
@@ -72,7 +81,7 @@ void LinkMappingVersion::registerKeys()
 				seenTargets.emplace(target->ID);
 		}
 	});
-	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
+	parser.registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
 std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion)
@@ -386,6 +395,7 @@ void LinkMappingVersion::delaunayTriangulate() // TODO: call this when a triangu
 {
 	// We need to have at least 3 point pairs to triangulate.
 	std::vector<std::shared_ptr<TriangulationPointPair>> validPairs;
+
 	for (const auto& pair: *triangulationPairs)
 	{
 		// A pair must have both a source and a target point.
@@ -411,13 +421,16 @@ void LinkMappingVersion::delaunayTriangulate() // TODO: call this when a triangu
 	}
 
 	// Use standard (non-constrained) Delaunay triangulation.
-	Delaunay sourceTriangleGenerator(delaunaySourceInput);
-	sourceTriangleGenerator.Triangulate();
-	Delaunay targetTriangleGenerator(delaunayTargetInput);
-	targetTriangleGenerator.Triangulate();
+	sourceTriangulator = Delaunay(delaunaySourceInput);
+	sourceTriangulator.Triangulate();
 
-	sourceDelaunayFaces = std::make_tuple(delaunaySourceInput, sourceTriangleGenerator.faces());
-	targetDelaunayFaces = std::make_tuple(delaunayTargetInput, targetTriangleGenerator.faces());
+   // TODO: TARGET TRIANGLES SHOULD BE BASED ON SOURCE TRIANGLES, NOT GENERATED INDEPENDENTLY
+
+	targetTriangulator = Delaunay(delaunayTargetInput);
+	targetTriangulator.Triangulate();
+
+   sourceDelaunayVertices = delaunaySourceInput;
+   targetDelaunayVertices = delaunayTargetInput;
 }
 
 void LinkMappingVersion::autogenerateMappings() // TODO: FINISH THIS
