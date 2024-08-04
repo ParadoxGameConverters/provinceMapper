@@ -54,6 +54,7 @@
     <ClCompile Include="ProvinceMapper\Source\Provinces\Pixel.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Provinces\Province.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\Triangle.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
   </ItemGroup>
@@ -106,6 +107,7 @@
     <ClInclude Include="ProvinceMapper\Source\Provinces\Pixel.h" />
     <ClInclude Include="ProvinceMapper\Source\Provinces\Province.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico" />

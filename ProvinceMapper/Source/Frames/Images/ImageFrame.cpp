@@ -523,23 +523,11 @@ void ImageFrame::showToolbar() const
 
 void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const
 {
-	Log(LogLevel::Info) << "Rendering triangulation mesh.";
-	const auto& vertices = isSourceMap ? sourceCanvas->getSourceDelaunayVertices() : targetCanvas->getTargetDelaunayVertices();
-   auto& triangulator = isSourceMap ? sourceCanvas->getSourceTriangulator() : targetCanvas->getTargetTriangulator();
+	const auto& triangles = sourceCanvas->getTriangles();
 
-	Log(LogLevel::Info) << "Rendering triangulation mesh PART 1."; // TODO: REMOVE THIS
-
-   Log(LogLevel::Info) << "Triangulating " << vertices.size() << " points.";
-
-   if (vertices.size() < 3)
+   if (triangles.empty())
 	{
-		Log(LogLevel::Info) << "Not enough points to triangulate.";
 	   return;
-	}
-	if (triangulator.triangleCount() < 1)
-	{
-		Log(LogLevel::Info) << "No triangles to draw.";
-		return;	
 	}
 
 	wxPen pen = paintDC.GetPen();
@@ -547,26 +535,30 @@ void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool is
 	paintDC.SetPen(pen);
 
 	// iterate over triangles
-	for (const auto& f: triangulator.faces())
+	for (const auto& [pair1, pair2, pair3]: triangles)
 	{
-		int vertexIdx1 = f.Org();
-		int vertexIdx2 = f.Dest();
-		int vertexIdx3 = f.Apex();
 
-		// access point's coordinates:
-		double x1 = vertices[vertexIdx1][0];
-		double y1 = vertices[vertexIdx1][1];
+		// Draw the triangle.
+		if (isSourceMap)
+		{
+			const auto& srcPoint1 = pair1->getSourcePoint();
+			const auto& srcPoint2 = pair2->getSourcePoint();
+			const auto& srcPoint3 = pair3->getSourcePoint();
+			paintDC.DrawLine(srcPoint1->x, srcPoint1->y, srcPoint2->x, srcPoint2->y);
+			paintDC.DrawLine(srcPoint2->x, srcPoint2->y, srcPoint3->x, srcPoint3->y);
+			paintDC.DrawLine(srcPoint3->x, srcPoint3->y, srcPoint1->x, srcPoint1->y);
+		}
+	  else
+	  {
+		  const auto& tgtPoint1 = pair1->getTargetPoint();
+			const auto& tgtPoint2 = pair2->getTargetPoint();
+	   	const auto& tgtPoint3 = pair3->getTargetPoint();
 
-		double x2 = vertices[vertexIdx2][0];
-		double y2 = vertices[vertexIdx2][1];
+		  paintDC.DrawLine(tgtPoint1->x, tgtPoint1->y, tgtPoint2->x, tgtPoint2->y);
+		  paintDC.DrawLine(tgtPoint2->x, tgtPoint2->y, tgtPoint3->x, tgtPoint3->y);
+		  paintDC.DrawLine(tgtPoint3->x, tgtPoint3->y, tgtPoint1->x, tgtPoint1->y);
 
-		double x3 = vertices[vertexIdx3][0];
-		double y3 = vertices[vertexIdx3][1];
-
-		// Draw the triangle
-		paintDC.DrawLine(x1, y1, x2, y2);
-		paintDC.DrawLine(x2, y2, x3, y3);
-		paintDC.DrawLine(x3, y3, x1, y1);
+	  }
 	}
 }
 

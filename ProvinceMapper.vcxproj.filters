@@ -194,6 +194,7 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\LinkMapper\Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -331,6 +332,7 @@
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\GridBase.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\LinkBase.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.h" />
+    <ClInclude Include="ProvinceMapper\Source\LinkMapper\Triangle.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico">

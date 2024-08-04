@@ -393,6 +393,8 @@ void LinkMappingVersion::moveActiveLinkDown() const
 
 void LinkMappingVersion::delaunayTriangulate() // TODO: call this when a triangulation pair is added or removed
 {
+	triangles.clear();
+
 	// We need to have at least 3 point pairs to triangulate.
 	std::vector<std::shared_ptr<TriangulationPointPair>> validPairs;
 
@@ -412,25 +414,47 @@ void LinkMappingVersion::delaunayTriangulate() // TODO: call this when a triangu
 		return;
 	}
 
+   std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
+
 	std::vector<Delaunay::Point> delaunaySourceInput;
-	std::vector<Delaunay::Point> delaunayTargetInput;
 	for (const auto& pair: validPairs)
 	{
-		delaunaySourceInput.push_back(Delaunay::Point(pair->getSourcePoint()->x, pair->getSourcePoint()->y));
-		delaunayTargetInput.push_back(Delaunay::Point(pair->getTargetPoint()->x, pair->getTargetPoint()->y));
+		const auto& sourcePoint = pair->getSourcePoint();
+		pointToPairMap[std::make_pair(sourcePoint->x, sourcePoint->y)] = pair;
+
+		delaunaySourceInput.push_back(Delaunay::Point(sourcePoint->x, sourcePoint->y));
 	}
 
 	// Use standard (non-constrained) Delaunay triangulation.
-	sourceTriangulator = Delaunay(delaunaySourceInput);
+	Delaunay sourceTriangulator(delaunaySourceInput);
 	sourceTriangulator.Triangulate();
+
+   for (const auto& f : sourceTriangulator.faces())
+   {
+		int vertexIdx1 = f.Org();
+		int vertexIdx2 = f.Dest();
+		int vertexIdx3 = f.Apex();
+
+		// access point's coordinates:
+		const auto& vertex1 = delaunaySourceInput[vertexIdx1];
+		const auto& vertex2 = delaunaySourceInput[vertexIdx2];
+		const auto& vertex3 = delaunaySourceInput[vertexIdx3];
+
+   	auto intPair1 = std::make_pair(static_cast<int>(vertex1[0]), static_cast<int>(vertex1[1]));
+		auto intPair2 = std::make_pair(static_cast<int>(vertex2[0]), static_cast<int>(vertex2[1]));
+		auto intPair3 = std::make_pair(static_cast<int>(vertex3[0]), static_cast<int>(vertex3[1]));
+
+   	const auto& pair1 = pointToPairMap[intPair1];
+   	const auto& pair2 = pointToPairMap[intPair2];
+   	const auto& pair3 = pointToPairMap[intPair3];
+
+   	Triangle triangle(pair1, pair2, pair3);
+
+   	triangles.push_back(triangle);
+   }
 
    // TODO: TARGET TRIANGLES SHOULD BE BASED ON SOURCE TRIANGLES, NOT GENERATED INDEPENDENTLY
 
-	targetTriangulator = Delaunay(delaunayTargetInput);
-	targetTriangulator.Triangulate();
-
-   sourceDelaunayVertices = delaunaySourceInput;
-   targetDelaunayVertices = delaunayTargetInput;
 }
 
 void LinkMappingVersion::autogenerateMappings() // TODO: FINISH THIS

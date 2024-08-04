@@ -5,6 +5,7 @@
 #include "LinkMapping.h"
 #include "TriangulationPointPair.h"
 #include "Parser.h"
+#include "Triangle.h"
 
 class LinkMappingVersion
 {
@@ -54,10 +55,7 @@ class LinkMappingVersion
 	[[nodiscard]] int addRawLink();
 	[[nodiscard]] int addRawComment();
 	[[nodiscard]] int addRawTriangulationPair();
-	[[nodiscard]] const auto& getSourceDelaunayVertices () { return sourceDelaunayVertices; }
-	[[nodiscard]] const auto& getTargetDelaunayVertices() { return targetDelaunayVertices; }
-	[[nodiscard]] auto& getSourceTriangulator() { return sourceTriangulator; }
-	[[nodiscard]] auto& getTargetTriangulator() { return targetTriangulator; }
+	[[nodiscard]] const auto& getTriangles() { return triangles; }
 
 
 	bool operator==(const LinkMappingVersion& rhs) const;
@@ -78,10 +76,7 @@ class LinkMappingVersion
 	int lastActiveTriangulationPairIndex = 0;
 	std::shared_ptr<TriangulationPointPair> activeTriangulationPair;
 	std::shared_ptr<std::vector<std::shared_ptr<TriangulationPointPair>>> triangulationPairs;
-	std::vector<tpp::Delaunay::Point> sourceDelaunayVertices;
-	tpp::Delaunay sourceTriangulator;
-   std::vector<tpp::Delaunay::Point> targetDelaunayVertices;
-	tpp::Delaunay targetTriangulator;
+	std::vector<Triangle> triangles;
 
 	int linkCounter = 0;
 	int lastActiveLinkIndex = 0;

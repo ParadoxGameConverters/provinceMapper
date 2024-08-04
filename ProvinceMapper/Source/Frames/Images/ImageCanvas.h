@@ -48,10 +48,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
 	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeVersion->getActiveTriangulationPair(); }
 	[[nodiscard]] const auto& getTriangulationPairs() const { return activeVersion->getTriangulationPairs(); }
-	[[nodiscard]] auto& getSourceDelaunayVertices() const { return activeVersion->getSourceDelaunayVertices(); }
-	[[nodiscard]] auto& getTargetDelaunayVertices() const { return activeVersion->getTargetDelaunayVertices(); }
-	[[nodiscard]] auto& getSourceTriangulator() const { return activeVersion->getSourceTriangulator(); }
-	[[nodiscard]] auto& getTargetTriangulator() const { return activeVersion->getTargetTriangulator(); }
+	[[nodiscard]] auto& getTriangles() const { return activeVersion->getTriangles(); }
  
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
