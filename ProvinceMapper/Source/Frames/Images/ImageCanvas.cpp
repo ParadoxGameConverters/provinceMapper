@@ -13,6 +13,7 @@ wxDEFINE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_DELAUNAY_TRIANGULATE, wxCommandEvent);
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -238,7 +239,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 				activeTriangulationPair->setTargetPoint(point);
 			}
 			// Update the triangle generator.
-			stageDelaunayTriangulate(); // THIS SHOULD CAUSE A REDRAW OF THE ImageFrame
+			stageDelaunayTriangulate(); // TODO: THIS SHOULD CAUSE A REDRAW OF THE ImageFrame
 
 			stageTriangulationPairPointPlaced();
 			stageRefresh();
@@ -600,6 +601,12 @@ void ImageCanvas::stagePointPlaced() const
 		evt.SetInt(static_cast<int>(points.size()));
 	else if (selector == ImageTabSelector::TARGET)
 		evt.SetInt(3 + static_cast<int>(points.size())); // gotta be creative.
+	eventHandler->QueueEvent(evt.Clone());
+}
+
+void ImageCanvas::stageDelaunayTriangulate() const
+{
+	wxCommandEvent evt(wxEVT_DELAUNAY_TRIANGULATE);
 	eventHandler->QueueEvent(evt.Clone());
 }
 

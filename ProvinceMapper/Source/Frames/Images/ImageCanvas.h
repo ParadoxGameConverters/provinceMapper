@@ -15,6 +15,7 @@ wxDECLARE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_DELAUNAY_TRIANGULATE, wxCommandEvent);
 
 class wxTipWindow;
 struct Province;
@@ -100,6 +101,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 	void stagePointPlaced() const;
+	void stageDelaunayTriangulate() const;
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 

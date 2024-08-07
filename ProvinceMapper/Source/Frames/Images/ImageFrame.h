@@ -41,7 +41,6 @@ class ImageFrame: public wxFrame
 	void activateTriangulationPairByID(const int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
-	void delaunayTriangulate();
 
   private:
 	void onScrollPaint(wxPaintEvent& event);
@@ -57,6 +56,7 @@ class ImageFrame: public wxFrame
 	void onLock(const wxCommandEvent& event);
 	void onScrollReleaseH(const wxCommandEvent& event);
 	void onScrollReleaseV(const wxCommandEvent& event);
+	void onDelaunayTriangulate(const wxCommandEvent& event);
 
 	void render() const;
 	void renderSource() const;

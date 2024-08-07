@@ -34,6 +34,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_SCROLL_RELEASE_H, &ImageFrame::onScrollReleaseH, this);
 	Bind(wxEVT_SCROLL_RELEASE_V, &ImageFrame::onScrollReleaseV, this);
 	Bind(wxEVT_LOCK, &ImageFrame::onLock, this);
+	Bind(wxEVT_DELAUNAY_TRIANGULATE, &ImageFrame::onDelaunayTriangulate, this);
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
 
@@ -539,30 +540,30 @@ double getDistanceFromCornerToLine(const wxPoint& linePoint1, const wxPoint& lin
    return dist;
 }
 
-wxPoint calculateCoordinates(double a, double b, double x1, double y1, double d) // TODO: verify in practice if this is correct
+wxPoint calculateCoordinates(const double a, const double b, const double x1, const double y1, const double d) // TODO: verify in practice if this is correct
 {
 	// Magnitude of the direction vector (b, -a)
-	double magnitude = std::sqrt(b * b + a * a);
+	const double magnitude = std::sqrt(b * b + a * a);
 
 	// Unit vector in the direction of (b, -a)
-	double unitX = b / magnitude;
-	double unitY = -a / magnitude;
+	const double unitX = b / magnitude;
+	const double unitY = -a / magnitude;
 
 	// First point (x1 + d * unitX, y1 + d * unitY)
 	const double X1 = x1 + d * unitX;
 	const double Y1 = y1 + d * unitY;
 
-	return wxPoint(X1, Y1);
+	return {static_cast<int>(X1), static_cast<int>(Y1)};
 }
 
-void ImageFrame::delaunayTriangulate() // TODO: call this when a triangulation pair is added or removed
+void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event) // TODO: call this when a triangulation pair is added or removed
 {
 	triangles.clear();
 
 	// We need to have at least 3 point pairs to triangulate.
 	std::vector<std::shared_ptr<TriangulationPointPair>> validPairs;
 
-	for (const auto& pair: sourceCanvas->getTriangulationPairs())
+	for (auto& pair: *sourceCanvas->getTriangulationPairs())
 	{
 		// A pair must have both a source and a target point.
 		if (!pair->getSourcePoint() || !pair->getTargetPoint())
@@ -588,7 +589,12 @@ void ImageFrame::delaunayTriangulate() // TODO: call this when a triangulation p
    wxPoint bottomLeftPoint(0, sourceMapHeight); // TODO: check if y shouldn't be sourceMapHeight - 1
    wxPoint bottomRightPoint(sourceMapWidth, sourceMapHeight);
 
-   std::vector cornerPoints = {topLeftPoint, topRightPoint, bottomLeftPoint, bottomRightPoint};
+   std::vector cornerPoints = {
+   	topLeftPoint,
+   	//topRightPoint,// TODO: REENABLE WHEN TOPLEFTPOINT IS FIXED
+   	//bottomLeftPoint,// TODO: REENABLE WHEN TOPLEFTPOINT IS FIXED
+   	//bottomRightPoint, // TODO: REENABLE WHEN TOPLEFTPOINT IS FIXED
+   };
 
    // For each corner, find 2 closest points and calculate coefficients for the linear equation.
 	for (const auto& cornerPoint : cornerPoints)
