@@ -548,6 +548,72 @@ void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event)
 	delaunayTriangulate();
 }
 
+wxPoint findMapCornerPointEquivalent(const std::vector<std::shared_ptr<TriangulationPointPair>>& validPairs, const auto& cornerPoint)
+{
+	std::optional<std::shared_ptr<TriangulationPointPair>> closestPair1;
+	std::optional<std::shared_ptr<TriangulationPointPair>> closestPair2;
+
+	// Calculate the closest 2 points as 2 points with the smallest distance to the corner.
+	for (const auto& pair: validPairs)
+	{
+		const auto& sourcePoint = pair->getSourcePoint();
+		const auto& distance = std::sqrt(std::pow(cornerPoint.x - sourcePoint->x, 2) + std::pow(cornerPoint.y - sourcePoint->y, 2));
+
+		if (!closestPair1 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair1)->getSourcePoint()->x, 2) +
+																std::pow(cornerPoint.y - (*closestPair1)->getSourcePoint()->y, 2)))
+		{
+			closestPair2 = closestPair1;
+			closestPair1 = pair;
+		}
+		else if (!closestPair2 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair2)->getSourcePoint()->x, 2) +
+																	  std::pow(cornerPoint.y - (*closestPair2)->getSourcePoint()->y, 2)))
+		{
+			closestPair2 = pair;
+		}
+	}
+
+	// Let A and B be the two closest source points to the corner.
+	// Let C be the corner point.
+
+	const auto& a = (*closestPair1)->getSourcePoint();
+	const auto& b = (*closestPair2)->getSourcePoint();
+
+	const auto& c = cornerPoint;
+
+	// Let D and E be the equivalents of A and B on the target map.
+	// Let F be the target map's equivalent of the corner point.
+	// The ABC and DEF triangles should be similar.
+	// We're calculating F.
+	const auto& d = (*closestPair1)->getTargetPoint();
+	const auto& e = (*closestPair2)->getTargetPoint();
+
+	// 1. Calculate the scale factor between the source and target triangles.
+	const double abDistance = std::sqrt(std::pow(b->x - a->x, 2) + std::pow(b->y - a->y, 2));
+	const double deDistance = std::sqrt(std::pow(e->x - d->x, 2) + std::pow(e->y - d->y, 2));
+	const double scale = deDistance / abDistance;
+
+	// 2. Determine the rotation and translation.
+	const double abAngle = std::atan2(b->y - a->y, b->x - a->x);
+	const double deAngle = std::atan2(e->y - d->y, e->x - d->x);
+	const double angle = deAngle - abAngle;
+
+	// 3. Apply the transformation to find F.
+	// 3.1. Rotate the vector AC by the angle.
+	const double acX = c.x - a->x;
+	const double acY = c.y - a->y;
+	const double rotatedX = acX * std::cos(angle) - acY * std::sin(angle);
+	const double rotatedY = acX * std::sin(angle) + acY * std::cos(angle);
+	// 3.2. Scale the vector by the scale factor.
+	const double scaledX = rotatedX * scale;
+	const double scaledY = rotatedY * scale;
+	// 3.3. Translate the scaled coordinates by D.
+	const double fX = d->x + scaledX;
+	const double fY = d->y + scaledY;
+
+	const auto f = wxPoint(static_cast<int>(fX), static_cast<int>(fY));
+	return f;
+}
+
 void ImageFrame::delaunayTriangulate()
 {
 	triangles.clear();
@@ -573,89 +639,27 @@ void ImageFrame::delaunayTriangulate()
 	}
 
 	// Create a virtual point pair for each map corner.
+   // For each source map corner, find the equivalent point on the target map.
 	const auto& sourceMapWidth = sourceCanvas->getWidth();
    const auto& sourceMapHeight = sourceCanvas->getHeight();
 
-   wxPoint topLeftPoint(0, 0);
-   wxPoint topRightPoint(sourceMapWidth - 1, 0);
-   wxPoint bottomLeftPoint(0, sourceMapHeight - 1);
-   wxPoint bottomRightPoint(sourceMapWidth - 1, sourceMapHeight - 1);
-
    std::vector cornerPoints = {
-   	topLeftPoint,
-   	topRightPoint,
-   	bottomLeftPoint,
-   	bottomRightPoint,
+		wxPoint(0, 0),
+		wxPoint(sourceMapWidth - 1, 0),
+		wxPoint(0, sourceMapHeight - 1),
+		wxPoint(sourceMapWidth - 1, sourceMapHeight - 1),
    };
 
-   // For each corner, find 2 closest points and calculate coefficients for the linear equation.
 	for (const auto& cornerPoint : cornerPoints)
 	{
-		std::optional<std::shared_ptr<TriangulationPointPair>> closestPair1;
-		std::optional<std::shared_ptr<TriangulationPointPair>> closestPair2;
+		const auto cornerEquivalentPoint = findMapCornerPointEquivalent(validPairs, cornerPoint);
 
-		// Calculate the closest 2 points as 2 points with the smallest distance to the corner.
-		for (const auto& pair: validPairs)
+		int idToUse;
+		std::set<int> usedIds;
+		for (const auto& pair: *sourceCanvas->getTriangulationPairs())
 		{
-			const auto& sourcePoint = pair->getSourcePoint();
-			const auto& distance = std::sqrt(std::pow(cornerPoint.x - sourcePoint->x, 2) + std::pow(cornerPoint.y - sourcePoint->y, 2));
-
-			if (!closestPair1 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair1)->getSourcePoint()->x, 2) + std::pow(cornerPoint.y - (*closestPair1)->getSourcePoint()->y, 2)))
-			{
-				closestPair2 = closestPair1;
-				closestPair1 = pair;
-			}
-			else if (!closestPair2 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair2)->getSourcePoint()->x, 2) + std::pow(cornerPoint.y - (*closestPair2)->getSourcePoint()->y, 2)))
-			{
-				closestPair2 = pair;
-			}
+			usedIds.insert(pair->getID());
 		}
-
-		 // Let A and B be the two closest source points to the corner.
-		// Let C be the corner point.
-
-		const auto& a = (*closestPair1)->getSourcePoint();
-		const auto& b = (*closestPair2)->getSourcePoint();
-
-		const auto& c = cornerPoint;
-
-	  // Let D and E be the equivalents of A and B on the target map.
-	  // Let F be the target map's equivalent of the corner point.
-	  // The ABC and DEF triangles should be similar.
-	  // We're calculating F.
-		const auto& d = (*closestPair1)->getTargetPoint();
-		const auto& e = (*closestPair2)->getTargetPoint();
-
-	  // 1. Calculate the scale factor between the source and target triangles.
-	  const double abDistance = std::sqrt(std::pow(b->x - a->x, 2) + std::pow(b->y - a->y, 2));
-	  const double deDistance = std::sqrt(std::pow(e->x - d->x, 2) + std::pow(e->y - d->y, 2));
-	  const double scale = deDistance / abDistance;
-
-	  // 2. Determine the rotation and translation.
-	  const double abAngle = std::atan2(b->y - a->y, b->x - a->x);
-	  const double deAngle = std::atan2(e->y - d->y, e->x - d->x);
-	  const double angle = deAngle - abAngle;
-
-	  // 3. Apply the transformation to find F.
-	  // 3.1. Rotate the vector AC by the angle.
-	  const double acX = c.x - a->x;
-	  const double acY = c.y - a->y;
-	  const double rotatedX = acX * std::cos(angle) - acY * std::sin(angle);
-	  const double rotatedY = acX * std::sin(angle) + acY * std::cos(angle);
-	  // 3.2. Scale the vector by the scale factor.
-	  const double scaledX = rotatedX * scale;
-	  const double scaledY = rotatedY * scale;
-	  // 3.3. Translate the scaled coordinates by D.
-	  const double fX = d->x + scaledX;
-	  const double fY = d->y + scaledY;
-	  const auto f = wxPoint(static_cast<int>(fX), static_cast<int>(fY));
-
-	  int idToUse;
-	  std::set<int> usedIds;
-	  for (const auto& pair: *sourceCanvas->getTriangulationPairs())
-	  {
-		  usedIds.insert(pair->getID());
-	  }
 	  // Find an ID of TriangulationPointPair that's not used.
 	  for (int i = 0; i < INT_MAX; i++)
 	  {
@@ -666,8 +670,8 @@ void ImageFrame::delaunayTriangulate()
 		  }
 	  }
 	  auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
-	  cornerPair->setSourcePoint(c);
-	  cornerPair->setTargetPoint(f);
+	  cornerPair->setSourcePoint(cornerPoint);
+	  cornerPair->setTargetPoint(cornerEquivalentPoint);
 
 	  validPairs.push_back(cornerPair);
 	}
