@@ -543,39 +543,6 @@ void ImageFrame::showToolbar() const
 	statusBar->Show();
 }
 
-double getDistanceFromCornerToLine(const wxPoint& linePoint1, const wxPoint& linePoint2, const wxPoint& cornerPoint)
-{
-	const double x1 = linePoint1.x;
-   const double y1 = linePoint1.y;
-   const double x2 = linePoint2.x;
-   const double y2 = linePoint2.y;
-
-	// Get the A, B, and C values for the equation of the line.
-	const double A = y2 - y1;
-	const double B = x1 - x2;
-	const double C = x2 * y1 - x1 * y2;
-
-   // Calculate the distance between the corner point and the line.
-   const double dist = std::abs(A * cornerPoint.x + B * cornerPoint.y + C) / std::sqrt(A * A + B * B);
-   return dist;
-}
-
-wxPoint calculateCoordinates(const double a, const double b, const double x1, const double y1, const double d) // TODO: verify in practice if this is correct
-{
-	// Magnitude of the direction vector (b, -a)
-	const double magnitude = std::sqrt(b * b + a * a);
-
-	// Unit vector in the direction of (b, -a)
-	const double unitX = b / magnitude;
-	const double unitY = -a / magnitude;
-
-	// First point (x1 + d * unitX, y1 + d * unitY)
-	const double X1 = x1 + d * unitX;
-	const double Y1 = y1 + d * unitY;
-
-	return {static_cast<int>(X1), static_cast<int>(Y1)};
-}
-
 void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event)
 {
 	delaunayTriangulate();
@@ -644,10 +611,10 @@ void ImageFrame::delaunayTriangulate()
 			}
 		}
 
-	  // Let A and B be the two closest source points to the corner.
-	  // Let C be the corner point.
+		 // Let A and B be the two closest source points to the corner.
+		// Let C be the corner point.
 
-	  const auto& a = (*closestPair1)->getSourcePoint();
+		const auto& a = (*closestPair1)->getSourcePoint();
 		const auto& b = (*closestPair2)->getSourcePoint();
 
 		const auto& c = cornerPoint;
@@ -656,8 +623,8 @@ void ImageFrame::delaunayTriangulate()
 	  // Let F be the target map's equivalent of the corner point.
 	  // The ABC and DEF triangles should be similar.
 	  // We're calculating F.
-	  const auto& d = (*closestPair1)->getTargetPoint();
-	  const auto& e = (*closestPair2)->getTargetPoint();
+		const auto& d = (*closestPair1)->getTargetPoint();
+		const auto& e = (*closestPair2)->getTargetPoint();
 
 	  // 1. Calculate the scale factor between the source and target triangles.
 	  const double abDistance = std::sqrt(std::pow(b->x - a->x, 2) + std::pow(b->y - a->y, 2));
@@ -703,43 +670,7 @@ void ImageFrame::delaunayTriangulate()
 	  cornerPair->setTargetPoint(f);
 
 	  validPairs.push_back(cornerPair);
-	  
-
-
-
-
-		//double bPerpendicular = static_cast<double>(cornerPoint.y) - aPerpendicular * cornerPoint.x;
-
-	 // 	// Calculate the intersection point.
-	 //  double x = (bPerpendicular - b) / (a - aPerpendicular);
-		//double y = a * x + b;
-
-	 // // Calculate the distance between the two closest points.
-	 // double distBetweenClosestPoints = std::sqrt(std::pow(closestPoint1->x - closestPoint2->x, 2) + std::pow(closestPoint1->y - closestPoint2->y, 2));
-
-		//// Calculate the distance between the intersection point and closestPoint1.
-	 // double distToX = std::sqrt(std::pow(x - closestPoint1->x, 2) + std::pow(y - closestPoint1->y, 2));
-
-	 // // Calculate the distance between the intersection point and the corner.
-	 // double cornerDist = std::sqrt(std::pow(x - cornerPoint.x, 2) + std::pow(y - cornerPoint.y, 2));
-
-	 // // Now translate the source map corner point to a target map point.
-	 // // First, calculate the linear equation for the target map's closest points pair.
-	 // double tgtA = static_cast<double>((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y) / ((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x);
-	 // double tgtB = static_cast<double>((*closestPair1)->getTargetPoint()->y) - tgtA * (*closestPair1)->getTargetPoint()->x;
-
-	 // // Calculate the distance between the two closest points on the target map.
-	 // double tgtDistBetweenClosestPoints = std::sqrt(std::pow((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x, 2) + std::pow((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y, 2));
-
-
-	 // 
-	 // // Scale the distance from the target's map closestPair1 point to the corner.
-	 // double tgtCornerDist = cornerDist * tgtDistBetweenClosestPoints / distBetweenClosestPoints;
-
 	}
-
-
-
 
 	std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
 
