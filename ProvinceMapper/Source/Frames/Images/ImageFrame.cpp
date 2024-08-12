@@ -629,8 +629,10 @@ void ImageFrame::delaunayTriangulate()
 			}
 		}
 
+
 	  const auto& closestPoint1 = (*closestPair1)->getSourcePoint();
 		const auto& closestPoint2 = (*closestPair2)->getSourcePoint();
+	  Log(LogLevel::Info) << "\n\n\nSource map";
 		Log(LogLevel::Info) << "Closest point 1: " << closestPoint1->x << ", " << closestPoint1->y;
 		Log(LogLevel::Info) << "Closest point 2: " << closestPoint2->x << ", " << closestPoint2->y;
 	  // closestPoint1 and closestPoint2 form the line.
@@ -664,23 +666,31 @@ void ImageFrame::delaunayTriangulate()
 
 
 	  // NOW WE CALCULATE THE EQUIVALENTS FOR THE TARGET MAP
+	  Log(LogLevel::Info) << "\n\n\nTARGET MAP";
 
 	  // Calculate the linear equation for the target map's closest points pair.
 	  double tgtLineA = static_cast<double>((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y) / ((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x);
 	  double tgtLineB = static_cast<double>((*closestPair1)->getTargetPoint()->y) - tgtLineA * (*closestPair1)->getTargetPoint()->x;
+	  Log(LogLevel::Info) << "Line A: " << tgtLineA; // TODO: REMOVE THIS
+	  Log(LogLevel::Info) << "Line B: " << tgtLineB; // TODO: REMOVE THIS
 
 	  // Calculate the distance between the two closest points on the target map.
 	  double tgtClosestPointsDist = std::sqrt(std::pow((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x, 2) + std::pow((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y, 2));
+	  Log(LogLevel::Info) << "Distance between closest points on the target map: " << tgtClosestPointsDist; // TODO: REMOVE THIS
 
 	  // Calculate the distance between the intersection point and closestPoint1 on the target map, using the same ratio as on the source map.
 	  double tgtIntersectionDistFromPoint1 = intersectionDistFromPoint1 * tgtClosestPointsDist / closestPointsDist;
+	  LOG(LogLevel::Info) << "Distance between intersection point and closestPoint1 on the target map: " << tgtIntersectionDistFromPoint1; // TODO: REMOVE THIS
 
 	  // Find the intersection point on the target map.
 	  wxPoint tgtIntersectionPoint = calculateCoordinates(tgtLineA, tgtLineB, (*closestPair1)->getTargetPoint()->x, (*closestPair1)->getTargetPoint()->y, tgtIntersectionDistFromPoint1);
+	  Log(LogLevel::Info) << "Intersection point on the target map: " << tgtIntersectionPoint.x << ", " << tgtIntersectionPoint.y; // TODO: REMOVE THIS
 
 	  // Calculate the line perpendicular to the target map's tgtLine, passing through tgtIntersectionPoint.
 	  double tgtAPerpendicular = -1 / tgtLineA;
+	  Log(LogLevel::Info) << "Perpendicular A: " << tgtAPerpendicular; // TODO: REMOVE THIS
 	  double tgtBPerpendicular = static_cast<double>(tgtIntersectionPoint.y) - tgtAPerpendicular * tgtIntersectionPoint.x;
+	  Log(LogLevel::Info) << "Perpendicular B: " << tgtBPerpendicular; // TODO: REMOVE THIS
 
 	  // Scale cornerDist to the target map.
 	  double tgtCornerDist = cornerDist * tgtClosestPointsDist / closestPointsDist;
@@ -688,8 +698,9 @@ void ImageFrame::delaunayTriangulate()
 	  // Calculate tgtCornerPoint as the point on the perpendicular line that is tgtCornerDist away from tgtIntersectionPoint.
 	  double tgtCornerX = (tgtBPerpendicular - tgtLineB ) / (tgtLineA - tgtAPerpendicular); // TODO: check if this is correct
 	  double tgtCornerY = tgtLineA * tgtCornerX + tgtLineB;
+	  Log(LogLevel::Info) << "Corner point on the target map: " << tgtCornerX << ", " << tgtCornerY; // TODO: REMOVE THIS
 
-	  wxPoint tgtCornerPoint(tgtCornerX, tgtCornerY); // TODO: check if this is correct
+	  wxPoint tgtCornerPoint(static_cast<int>(tgtCornerX), static_cast<int>(tgtCornerY)); // TODO: check if this is correct
 
 	  int idToUse;
 	  std::set<int> usedIds;
