@@ -509,7 +509,7 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	targetCanvas->clearStrafedPixels();
 	sourceCanvas->restoreImageData();
 	targetCanvas->restoreImageData();
-	delaunayTriangulate();
+   delaunayTriangulate();
 
 	if (black == true)
 	{
