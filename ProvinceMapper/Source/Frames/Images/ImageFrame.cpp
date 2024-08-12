@@ -24,6 +24,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
+	Bind(wxEVT_MENU, &ImageFrame::onToggleTriangulationMesh, this, wxID_VIEW_SMALLICONS);
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
 	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
@@ -169,22 +170,25 @@ void ImageFrame::renderSource() const
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
 
-	renderTriangulationMesh(sourceDC, true); // TODO: add a toggle for this, like for the shade
+   if (showTriangulationMesh)
+   {
+		renderTriangulationMesh(sourceDC, true);
 
-	// Draw all the triangulation pair points.
-	for (const auto& pair: *sourceCanvas->getTriangulationPairs())
-	{
-		if (!pair->getSourcePoint())
+		// Draw all the triangulation pair points.
+		for (const auto& pair: *sourceCanvas->getTriangulationPairs())
 		{
-			continue;
+			if (!pair->getSourcePoint())
+			{
+				continue;
+			}
+			wxPen pen = sourceDC.GetPen();
+			pen.SetColour("white");
+			pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+			sourceDC.SetPen(pen);
+			sourceDC.SetBrush(*wxGREY_BRUSH);
+			sourceDC.DrawCircle(*pair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 		}
-		wxPen pen = sourceDC.GetPen();
-		pen.SetColour("white");
-		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
-		sourceDC.SetPen(pen);
-		sourceDC.SetBrush(*wxGREY_BRUSH);
-		sourceDC.DrawCircle(*pair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
-	}
+   }
 
 	// Draw the active triangulation pair point with a different colour.
 	const auto& activeTriangulationPair = sourceCanvas->getActiveTriangulationPair();
@@ -244,22 +248,25 @@ void ImageFrame::renderTarget() const
 	targetDC.Clear();
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
-	
-	renderTriangulationMesh(targetDC, false); // TODO: add a toggle for this, like for the shade
 
-	// Draw all the triangulation pair points.
-	for (const auto& pair: *targetCanvas->getTriangulationPairs())
+   if (showTriangulationMesh)
 	{
-		if (!pair->getTargetPoint())
+		renderTriangulationMesh(targetDC, false);
+
+		// Draw all the triangulation pair points.
+		for (const auto& pair: *targetCanvas->getTriangulationPairs())
 		{
-			continue;
+			if (!pair->getTargetPoint())
+			{
+				continue;
+			}
+			wxPen pen = targetDC.GetPen();
+			pen.SetColour("white");
+			pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+			targetDC.SetPen(pen);
+			targetDC.SetBrush(*wxGREY_BRUSH);
+			targetDC.DrawCircle(*pair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 		}
-		wxPen pen = targetDC.GetPen();
-		pen.SetColour("white");
-		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
-		targetDC.SetPen(pen);
-		targetDC.SetBrush(*wxGREY_BRUSH);
-		targetDC.DrawCircle(*pair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 	}
 
 	// Draw the active triangulation pair point with a different colour.
@@ -350,6 +357,13 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 		sourceCanvas->applyStrafedPixels();
 		targetCanvas->applyStrafedPixels();
 	}
+	render();
+	Refresh();
+}
+
+void ImageFrame::onToggleTriangulationMesh(wxCommandEvent& event)
+{
+	showTriangulationMesh = !showTriangulationMesh;
 	render();
 	Refresh();
 }

@@ -401,6 +401,7 @@ void MainFrame::initImageFrame()
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
+	menuDropDown->Append(wxID_VIEW_SMALLICONS, "Toggle the Triangulation Mesh");
 	auto* toolbarDropDown = new wxMenu;
 	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");
 	auto* unmappedDropDown = new wxMenu;

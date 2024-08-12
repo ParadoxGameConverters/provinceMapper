@@ -46,6 +46,7 @@ class ImageFrame: public wxFrame
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
+	void onToggleTriangulationMesh(wxCommandEvent& event);
 	void onClose(const wxCloseEvent& event);
 	void onRefresh(const wxCommandEvent& event);
 	void onTriangulate(wxCommandEvent& event);
@@ -65,6 +66,7 @@ class ImageFrame: public wxFrame
 
 	void delaunayTriangulate();
 	std::vector<Triangle> triangles;
+	bool showTriangulationMesh = false;
 
 	void determineTriangulationSanity();
 	void buildBounds();
