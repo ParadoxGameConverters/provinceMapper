@@ -595,15 +595,15 @@ void ImageFrame::delaunayTriangulate()
    const auto& sourceMapHeight = sourceCanvas->getHeight();
 
    wxPoint topLeftPoint(0, 0);
-   wxPoint topRightPoint(sourceMapWidth, 0); // TODO: check if x shouldn't be sourceMapWidth - 1
-   wxPoint bottomLeftPoint(0, sourceMapHeight); // TODO: check if y shouldn't be sourceMapHeight - 1
-   wxPoint bottomRightPoint(sourceMapWidth, sourceMapHeight);
+   wxPoint topRightPoint(sourceMapWidth - 1, 0);
+   wxPoint bottomLeftPoint(0, sourceMapHeight - 1);
+   wxPoint bottomRightPoint(sourceMapWidth - 1, sourceMapHeight - 1);
 
    std::vector cornerPoints = {
    	topLeftPoint,
-   	//topRightPoint,// TODO: REENABLE WHEN topLeftPoint IS FIXED
-   	//bottomLeftPoint,// TODO: REENABLE WHEN topLeftPoint IS FIXED
-   	//bottomRightPoint, // TODO: REENABLE WHEN topLeftPoint IS FIXED
+   	topRightPoint,
+   	bottomLeftPoint,
+   	bottomRightPoint,
    };
 
    // For each corner, find 2 closest points and calculate coefficients for the linear equation.
@@ -629,78 +629,44 @@ void ImageFrame::delaunayTriangulate()
 			}
 		}
 
+	  // Let A and B be the two closest source points to the corner.
+	  // Let C be the corner point.
 
-	  const auto& closestPoint1 = (*closestPair1)->getSourcePoint();
-		const auto& closestPoint2 = (*closestPair2)->getSourcePoint();
-	  Log(LogLevel::Info) << "\n\n\nSource map";
-		Log(LogLevel::Info) << "Closest point 1: " << closestPoint1->x << ", " << closestPoint1->y;
-		Log(LogLevel::Info) << "Closest point 2: " << closestPoint2->x << ", " << closestPoint2->y;
-	  // closestPoint1 and closestPoint2 form the line.
+	  const auto& a = (*closestPair1)->getSourcePoint();
+		const auto& b = (*closestPair2)->getSourcePoint();
 
-		double srcLineA = static_cast<double>(closestPoint1->y - closestPoint2->y) / (closestPoint1->x - closestPoint2->x);
-		Log(LogLevel::Info) << "Line A: " << srcLineA;
-	  double srcLineB = static_cast<double>(closestPoint1->y) - srcLineA * closestPoint1->x;
-		Log(LogLevel::Info) << "Line B: " << srcLineB;
+		const auto& c = cornerPoint;
 
-		// Calculate the straight perpendicular to the line.
-		double srcAPerpendicular = -1 / srcLineA;
-		Log(LogLevel::Info) << "Perpendicular A: " << srcAPerpendicular;
-	  double bPerpendicular = static_cast<double>(cornerPoint.y) - srcAPerpendicular * cornerPoint.x; // TODO: check if this is correct
-		Log(LogLevel::Info) << "Perpendicular B: " << bPerpendicular;
+	  // Let D and E be the equivalents of A and B on the target map.
+	  // Let F be the target map's equivalent of the corner point.
+	  // The ABC and DEF triangles should be similar.
+	  // We're calculating F.
+	  const auto& d = (*closestPair1)->getTargetPoint();
+	  const auto& e = (*closestPair2)->getTargetPoint();
 
-		// Calculate the distance between the corner point and the line.
-		double cornerDist = getDistanceFromCornerToLine(*closestPoint1, *closestPoint2, cornerPoint);
-		Log(LogLevel::Info) << "distance between the corner point and the line: " << cornerDist;
+	  // 1. Calculate the scale factor between the source and target triangles.
+	  const double abDistance = std::sqrt(std::pow(b->x - a->x, 2) + std::pow(b->y - a->y, 2));
+	  const double deDistance = std::sqrt(std::pow(e->x - d->x, 2) + std::pow(e->y - d->y, 2));
+	  const double scale = deDistance / abDistance;
 
-	  // Calculate the intersection point.
-	  double intersectionX = (bPerpendicular - srcLineB) / (srcLineA - srcAPerpendicular);
-		Log(LogLevel::Info) << "Intersection X: " << intersectionX;
-		double intersectionY = srcLineA * intersectionX + srcLineB;
-		Log(LogLevel::Info) << "Intersection Y: " << intersectionY;
+	  // 2. Determine the rotation and translation.
+	  const double abAngle = std::atan2(b->y - a->y, b->x - a->x);
+	  const double deAngle = std::atan2(e->y - d->y, e->x - d->x);
+	  const double angle = deAngle - abAngle;
 
-	  // Calculate the distance between the two closest points.
-	  double closestPointsDist = std::sqrt(std::pow(closestPoint1->x - closestPoint2->x, 2) + std::pow(closestPoint1->y - closestPoint2->y, 2));
-
-	  // Calculate the distance between the intersection point and closestPoint1.
-	  double intersectionDistFromPoint1 = std::sqrt(std::pow(intersectionX - closestPoint1->x, 2) + std::pow(intersectionY - closestPoint1->y, 2));
-
-
-	  // NOW WE CALCULATE THE EQUIVALENTS FOR THE TARGET MAP
-	  Log(LogLevel::Info) << "\n\n\nTARGET MAP";
-
-	  // Calculate the linear equation for the target map's closest points pair.
-	  double tgtLineA = static_cast<double>((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y) / ((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x);
-	  double tgtLineB = static_cast<double>((*closestPair1)->getTargetPoint()->y) - tgtLineA * (*closestPair1)->getTargetPoint()->x;
-	  Log(LogLevel::Info) << "Line A: " << tgtLineA; // TODO: REMOVE THIS
-	  Log(LogLevel::Info) << "Line B: " << tgtLineB; // TODO: REMOVE THIS
-
-	  // Calculate the distance between the two closest points on the target map.
-	  double tgtClosestPointsDist = std::sqrt(std::pow((*closestPair1)->getTargetPoint()->x - (*closestPair2)->getTargetPoint()->x, 2) + std::pow((*closestPair1)->getTargetPoint()->y - (*closestPair2)->getTargetPoint()->y, 2));
-	  Log(LogLevel::Info) << "Distance between closest points on the target map: " << tgtClosestPointsDist; // TODO: REMOVE THIS
-
-	  // Calculate the distance between the intersection point and closestPoint1 on the target map, using the same ratio as on the source map.
-	  double tgtIntersectionDistFromPoint1 = intersectionDistFromPoint1 * tgtClosestPointsDist / closestPointsDist;
-	  LOG(LogLevel::Info) << "Distance between intersection point and closestPoint1 on the target map: " << tgtIntersectionDistFromPoint1; // TODO: REMOVE THIS
-
-	  // Find the intersection point on the target map.
-	  wxPoint tgtIntersectionPoint = calculateCoordinates(tgtLineA, tgtLineB, (*closestPair1)->getTargetPoint()->x, (*closestPair1)->getTargetPoint()->y, tgtIntersectionDistFromPoint1);
-	  Log(LogLevel::Info) << "Intersection point on the target map: " << tgtIntersectionPoint.x << ", " << tgtIntersectionPoint.y; // TODO: REMOVE THIS
-
-	  // Calculate the line perpendicular to the target map's tgtLine, passing through tgtIntersectionPoint.
-	  double tgtAPerpendicular = -1 / tgtLineA;
-	  Log(LogLevel::Info) << "Perpendicular A: " << tgtAPerpendicular; // TODO: REMOVE THIS
-	  double tgtBPerpendicular = static_cast<double>(tgtIntersectionPoint.y) - tgtAPerpendicular * tgtIntersectionPoint.x;
-	  Log(LogLevel::Info) << "Perpendicular B: " << tgtBPerpendicular; // TODO: REMOVE THIS
-
-	  // Scale cornerDist to the target map.
-	  double tgtCornerDist = cornerDist * tgtClosestPointsDist / closestPointsDist;
-
-	  // Calculate tgtCornerPoint as the point on the perpendicular line that is tgtCornerDist away from tgtIntersectionPoint.
-	  double tgtCornerX = (tgtBPerpendicular - tgtLineB ) / (tgtLineA - tgtAPerpendicular); // TODO: check if this is correct
-	  double tgtCornerY = tgtLineA * tgtCornerX + tgtLineB;
-	  Log(LogLevel::Info) << "Corner point on the target map: " << tgtCornerX << ", " << tgtCornerY; // TODO: REMOVE THIS
-
-	  wxPoint tgtCornerPoint(static_cast<int>(tgtCornerX), static_cast<int>(tgtCornerY)); // TODO: check if this is correct
+	  // 3. Apply the transformation to find F.
+	  // 3.1. Rotate the vector AC by the angle.
+	  const double acX = c.x - a->x;
+	  const double acY = c.y - a->y;
+	  const double rotatedX = acX * std::cos(angle) - acY * std::sin(angle);
+	  const double rotatedY = acX * std::sin(angle) + acY * std::cos(angle);
+	  // 3.2. Scale the vector by the scale factor.
+	  const double scaledX = rotatedX * scale;
+	  const double scaledY = rotatedY * scale;
+	  // 3.3. Translate the scaled coordinates by D.
+	  const double fX = d->x + scaledX;
+	  const double fY = d->y + scaledY;
+	  const auto f = wxPoint(static_cast<int>(fX), static_cast<int>(fY));
 
 	  int idToUse;
 	  std::set<int> usedIds;
@@ -718,8 +684,8 @@ void ImageFrame::delaunayTriangulate()
 		  }
 	  }
 	  auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
-	  cornerPair->setSourcePoint(cornerPoint);
-	  cornerPair->setTargetPoint(tgtCornerPoint);
+	  cornerPair->setSourcePoint(c);
+	  cornerPair->setTargetPoint(f);
 
 	  validPairs.push_back(cornerPair);
 	  

@@ -105,11 +105,10 @@ void TriangulationPairsGrid::stageAddComment()
 
 void TriangulationPairsGrid::rightUp(wxGridEvent& event)
 {
-	const wxCommandEvent* evt;
 
 	// Right up means deselect active link, which is serious stuff.
 	// If our active link is dry, we're not deselecting it, we're deleting it.
-	evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
+	const wxCommandEvent* evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
 
 	eventListener->QueueEvent(evt->Clone());
 	event.Skip();
