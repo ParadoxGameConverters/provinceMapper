@@ -62,7 +62,8 @@ class ImageFrame: public wxFrame
 	void renderSource() const;
 	void renderTarget() const;
 	void renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const;
-	[[nodiscard]] const auto& getTriangles() { return triangles; }
+
+	void delaunayTriangulate();
 	std::vector<Triangle> triangles;
 
 	void determineTriangulationSanity();

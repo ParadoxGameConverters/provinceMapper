@@ -727,9 +727,9 @@ void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)
 void MainFrame::onDeleteActiveTriangulationPair(wxCommandEvent& evt)
 {
 	// We don't need an ID since this works only on active pair.
-	imageFrame->deleteActiveTriangulationPair(); // Images first so it knows which provinces to recolor.
 	linkMapper.deleteActiveTriangulationPair();
 	linksFrame->deactivateTriangulationPair();
+	imageFrame->deleteActiveTriangulationPair();
 }
 
 void MainFrame::onDeleteActiveLinkOrTriangulationPair(wxCommandEvent& evt)

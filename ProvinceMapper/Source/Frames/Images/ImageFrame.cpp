@@ -64,6 +64,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	statusBar = new StatusBar(this, sbPosition, configuration);
 	if (configuration->isStatusBarOn())
 		statusBar->Show();
+
+   delaunayTriangulate();
 }
 
 void ImageFrame::onScrollPaint(wxPaintEvent& event)
@@ -408,6 +410,9 @@ void ImageFrame::deleteActiveLink()
 
 void ImageFrame::deleteActiveTriangulationPair()
 {
+	// Recalculate the triangulation mesh.
+	delaunayTriangulate();
+
 	// Re-render will cause the triangulation pair's points to disappear.
 	render();
 	Refresh();
@@ -556,7 +561,12 @@ wxPoint calculateCoordinates(const double a, const double b, const double x1, co
 	return {static_cast<int>(X1), static_cast<int>(Y1)};
 }
 
-void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event) // TODO: call this when a triangulation pair is added or removed
+void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event)
+{
+	delaunayTriangulate();
+}
+
+void ImageFrame::delaunayTriangulate()
 {
 	triangles.clear();
 
@@ -591,9 +601,9 @@ void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event) // TODO: cal
 
    std::vector cornerPoints = {
    	topLeftPoint,
-   	//topRightPoint,// TODO: REENABLE WHEN TOPLEFTPOINT IS FIXED
-   	//bottomLeftPoint,// TODO: REENABLE WHEN TOPLEFTPOINT IS FIXED
-   	//bottomRightPoint, // TODO: REENABLE WHEN TOPLEFTPOINT IS FIXED
+   	//topRightPoint,// TODO: REENABLE WHEN topLeftPoint IS FIXED
+   	//bottomLeftPoint,// TODO: REENABLE WHEN topLeftPoint IS FIXED
+   	//bottomRightPoint, // TODO: REENABLE WHEN topLeftPoint IS FIXED
    };
 
    // For each corner, find 2 closest points and calculate coefficients for the linear equation.
@@ -620,22 +630,31 @@ void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event) // TODO: cal
 		}
 
 	  const auto& closestPoint1 = (*closestPair1)->getSourcePoint();
-	  const auto& closestPoint2 = (*closestPair2)->getSourcePoint();
+		const auto& closestPoint2 = (*closestPair2)->getSourcePoint();
+		Log(LogLevel::Info) << "Closest point 1: " << closestPoint1->x << ", " << closestPoint1->y;
+		Log(LogLevel::Info) << "Closest point 2: " << closestPoint2->x << ", " << closestPoint2->y;
 	  // closestPoint1 and closestPoint2 form the line.
 
 		double srcLineA = static_cast<double>(closestPoint1->y - closestPoint2->y) / (closestPoint1->x - closestPoint2->x);
+		Log(LogLevel::Info) << "Line A: " << srcLineA;
 	  double srcLineB = static_cast<double>(closestPoint1->y) - srcLineA * closestPoint1->x;
+		Log(LogLevel::Info) << "Line B: " << srcLineB;
 
 		// Calculate the straight perpendicular to the line.
 		double srcAPerpendicular = -1 / srcLineA;
+		Log(LogLevel::Info) << "Perpendicular A: " << srcAPerpendicular;
 	  double bPerpendicular = static_cast<double>(cornerPoint.y) - srcAPerpendicular * cornerPoint.x; // TODO: check if this is correct
+		Log(LogLevel::Info) << "Perpendicular B: " << bPerpendicular;
 
 		// Calculate the distance between the corner point and the line.
 		double cornerDist = getDistanceFromCornerToLine(*closestPoint1, *closestPoint2, cornerPoint);
+		Log(LogLevel::Info) << "distance between the corner point and the line: " << cornerDist;
 
 	  // Calculate the intersection point.
 	  double intersectionX = (bPerpendicular - srcLineB) / (srcLineA - srcAPerpendicular);
+		Log(LogLevel::Info) << "Intersection X: " << intersectionX;
 		double intersectionY = srcLineA * intersectionX + srcLineB;
+		Log(LogLevel::Info) << "Intersection Y: " << intersectionY;
 
 	  // Calculate the distance between the two closest points.
 	  double closestPointsDist = std::sqrt(std::pow(closestPoint1->x - closestPoint2->x, 2) + std::pow(closestPoint1->y - closestPoint2->y, 2));
