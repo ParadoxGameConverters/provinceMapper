@@ -5,7 +5,7 @@
 
 
 GridBase::GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
-	 wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(std::move(theVersion)), eventListener(parent)
+	 wxGrid(parent, wxID_ANY, wxPoint(0, 22), wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(std::move(theVersion)), eventListener(parent)
 {
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &GridBase::leftUp, this);
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &GridBase::rightUp, this);
