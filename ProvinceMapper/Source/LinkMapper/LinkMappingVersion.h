@@ -46,7 +46,6 @@ class LinkMappingVersion
 	void copyLinks(const std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>>& theLinks) const { *links = *theLinks; }
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;
-	void autogenerateMappings(); // TODO: FINISH THIS
 	void deleteLinkByID(const int theID);
 
 	[[nodiscard]] std::optional<int> toggleProvinceByID(const std::string& provinceID, bool isSource);

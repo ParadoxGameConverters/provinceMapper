@@ -638,7 +638,7 @@ void MainFrame::onRefreshActiveTriangulationPair(wxCommandEvent& evt)
 
 void MainFrame::onAutogenerateMappings(const wxCommandEvent& evt)
 {
-	linkMapper.autogenerateMappings();
+	imageFrame->autogenerateMappings();
 	// TODO: check if we need to refresh stuff here
 }
 

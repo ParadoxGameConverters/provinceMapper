@@ -13,6 +13,8 @@ struct Province
 	[[nodiscard]] std::string miscName() const;
 	[[nodiscard]] bool isWater() const;
 	[[nodiscard]] bool isImpassable() const;
+	[[nodiscard]] std::vector<Pixel> getAllPixels() const;
+
 
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;

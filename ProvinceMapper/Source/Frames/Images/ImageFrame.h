@@ -41,6 +41,7 @@ class ImageFrame: public wxFrame
 	void activateTriangulationPairByID(const int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
+	void autogenerateMappings();
 
   private:
 	void onScrollPaint(wxPaintEvent& event);
@@ -65,7 +66,7 @@ class ImageFrame: public wxFrame
 	void renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const;
 
 	void delaunayTriangulate();
-	std::vector<Triangle> triangles;
+	std::vector<std::shared_ptr<Triangle>> triangles;
 	bool showTriangulationMesh = false;
 
 	void determineTriangulationSanity();
