@@ -42,8 +42,10 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	linksPanelSizer->Add(provinceMappingsGrid, 1, wxEXPAND);
 	linksPanel->SetSizer(linksPanelSizer);
 
-	splitter->SetSashGravity(0.5);
 	splitter->SplitHorizontally(triangulationPairsPanel, linksPanel);
+	splitter->SetSashInvisible(false);
+	splitter->SetSashGravity(0.5);
+	splitter->SetSashPosition(200);
 	sizer->Add(splitter, 1, wxEXPAND);
 
    this->SetSizer(sizer);
