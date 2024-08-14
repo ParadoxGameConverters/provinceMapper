@@ -1,9 +1,9 @@
 #include "ImageFrame.h"
 #include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
+#include "LinkMapper/TriangulationPointPair.h"
 #include "OSCompatibilityLayer.h"
 #include "StatusBar.h"
-#include "LinkMapper/TriangulationPointPair.h"
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
@@ -66,7 +66,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	if (configuration->isStatusBarOn())
 		statusBar->Show();
 
-   delaunayTriangulate();
+	delaunayTriangulate();
 }
 
 void ImageFrame::onScrollPaint(wxPaintEvent& event)
@@ -170,8 +170,8 @@ void ImageFrame::renderSource() const
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
 
-   if (showTriangulationMesh)
-   {
+	if (showTriangulationMesh)
+	{
 		renderTriangulationMesh(sourceDC, true);
 
 		// Draw all the triangulation pair points.
@@ -188,7 +188,7 @@ void ImageFrame::renderSource() const
 			sourceDC.SetBrush(*wxGREY_BRUSH);
 			sourceDC.DrawCircle(*pair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 		}
-   }
+	}
 
 	// Draw the active triangulation pair point with a different colour.
 	const auto& activeTriangulationPair = sourceCanvas->getActiveTriangulationPair();
@@ -249,7 +249,7 @@ void ImageFrame::renderTarget() const
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
 
-   if (showTriangulationMesh)
+	if (showTriangulationMesh)
 	{
 		renderTriangulationMesh(targetDC, false);
 
@@ -639,18 +639,18 @@ void ImageFrame::delaunayTriangulate()
 	}
 
 	// Create a virtual point pair for each map corner.
-   // For each source map corner, find the equivalent point on the target map.
+	// For each source map corner, find the equivalent point on the target map.
 	const auto& sourceMapWidth = sourceCanvas->getWidth();
-   const auto& sourceMapHeight = sourceCanvas->getHeight();
+	const auto& sourceMapHeight = sourceCanvas->getHeight();
 
-   std::vector cornerPoints = {
-		wxPoint(0, 0),
-		wxPoint(sourceMapWidth - 1, 0),
-		wxPoint(0, sourceMapHeight - 1),
-		wxPoint(sourceMapWidth - 1, sourceMapHeight - 1),
-   };
+	std::vector cornerPoints = {
+		 wxPoint(0, 0),
+		 wxPoint(sourceMapWidth - 1, 0),
+		 wxPoint(0, sourceMapHeight - 1),
+		 wxPoint(sourceMapWidth - 1, sourceMapHeight - 1),
+	};
 
-	for (const auto& cornerPoint : cornerPoints)
+	for (const auto& cornerPoint: cornerPoints)
 	{
 		const auto cornerEquivalentPoint = findMapCornerPointEquivalent(validPairs, cornerPoint);
 
@@ -660,20 +660,20 @@ void ImageFrame::delaunayTriangulate()
 		{
 			usedIds.insert(pair->getID());
 		}
-	  // Find an ID of TriangulationPointPair that's not used.
-	  for (int i = 0; i < INT_MAX; i++)
-	  {
-		  if (!usedIds.contains(i))
-		  {
-			  idToUse = i;
-			  break;
-		  }
-	  }
-	  auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
-	  cornerPair->setSourcePoint(cornerPoint);
-	  cornerPair->setTargetPoint(cornerEquivalentPoint);
+		// Find an ID of TriangulationPointPair that's not used.
+		for (int i = 0; i < INT_MAX; i++)
+		{
+			if (!usedIds.contains(i))
+			{
+				idToUse = i;
+				break;
+			}
+		}
+		auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
+		cornerPair->setSourcePoint(cornerPoint);
+		cornerPair->setTargetPoint(cornerEquivalentPoint);
 
-	  validPairs.push_back(cornerPair);
+		validPairs.push_back(cornerPair);
 	}
 
 	std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
@@ -714,9 +714,9 @@ void ImageFrame::delaunayTriangulate()
 
 void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const
 {
-   if (triangles.empty())
+	if (triangles.empty())
 	{
-	   return;
+		return;
 	}
 
 	wxPen pen = paintDC.GetPen();
@@ -737,17 +737,16 @@ void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool is
 			paintDC.DrawLine(srcPoint2->x, srcPoint2->y, srcPoint3->x, srcPoint3->y);
 			paintDC.DrawLine(srcPoint3->x, srcPoint3->y, srcPoint1->x, srcPoint1->y);
 		}
-	  else
-	  {
-		  const auto& tgtPoint1 = pair1->getTargetPoint();
+		else
+		{
+			const auto& tgtPoint1 = pair1->getTargetPoint();
 			const auto& tgtPoint2 = pair2->getTargetPoint();
-	   	const auto& tgtPoint3 = pair3->getTargetPoint();
+			const auto& tgtPoint3 = pair3->getTargetPoint();
 
-		  paintDC.DrawLine(tgtPoint1->x, tgtPoint1->y, tgtPoint2->x, tgtPoint2->y);
-		  paintDC.DrawLine(tgtPoint2->x, tgtPoint2->y, tgtPoint3->x, tgtPoint3->y);
-		  paintDC.DrawLine(tgtPoint3->x, tgtPoint3->y, tgtPoint1->x, tgtPoint1->y);
-
-	  }
+			paintDC.DrawLine(tgtPoint1->x, tgtPoint1->y, tgtPoint2->x, tgtPoint2->y);
+			paintDC.DrawLine(tgtPoint2->x, tgtPoint2->y, tgtPoint3->x, tgtPoint3->y);
+			paintDC.DrawLine(tgtPoint3->x, tgtPoint3->y, tgtPoint1->x, tgtPoint1->y);
+		}
 	}
 }
 

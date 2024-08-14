@@ -745,6 +745,7 @@ void MainFrame::onLinksAddLink(wxCommandEvent& evt)
 	const auto newLinkID = linkMapper.addRawLink();
 	if (newLinkID)
 	{
+		linksFrame->deactivateTriangulationPair();
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
 		imageFrame->deactivateTriangulationPair();
@@ -758,6 +759,7 @@ void MainFrame::onLinksAddComment(wxCommandEvent& evt)
 	const auto newLinkID = linkMapper.addRawComment();
 	if (newLinkID)
 	{
+		linksFrame->deactivateTriangulationPair();
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
 		imageFrame->deactivateTriangulationPair();
@@ -771,6 +773,7 @@ void MainFrame::onLinksAddTriangulationPair(wxCommandEvent& evt)
 	const auto newPairID = linkMapper.addRawTriangulationPair();
 	if (newPairID)
 	{
+		linksFrame->deactivateLink();
 		linksFrame->createTriangulationPair(*newPairID);
 		imageFrame->deactivateLink();
 		imageFrame->deactivateTriangulationPair();

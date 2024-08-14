@@ -1,4 +1,6 @@
 #include "TriangulationPairsGrid.h"
+
+#include <utility>
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
@@ -17,7 +19,7 @@ wxDEFINE_EVENT(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_AUTOGENERATE_MAPPINGS, wxCommandEvent);
 
 
-TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion)
+TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, std::move(theVersion))
 {
 	Bind(wxEVT_UPDATE_TRIANGULATION_PAIR_COMMENT, &TriangulationPairsGrid::onUpdateComment, this);
 }
@@ -180,7 +182,7 @@ void TriangulationPairsGrid::deactivateTriangulationPair()
 {
 	if (activeRow)
 	{
-		// Active pair may have been deleted by linkmapper. Check our records.
+		// Active pair may have been deleted by the LinkMapper. Check our records.
 		if (static_cast<int>(version->getTriangulationPairs()->size()) == GetNumberRows())
 		{
 			// all is well, just deactivate.
