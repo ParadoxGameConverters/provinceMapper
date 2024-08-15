@@ -4,6 +4,8 @@
 #include "LinkMapper/TriangulationPointPair.h"
 #include "OSCompatibilityLayer.h"
 #include "StatusBar.h"
+#include "Provinces/Province.h"
+
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
@@ -1025,7 +1027,6 @@ void ImageFrame::onScrollReleaseV(const wxCommandEvent& event)
 	targetCanvas->clearOldScrollV();
 }
 
-
 bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const wxPoint& vertex2, const wxPoint& vertex3)
 {
 	const auto sign = [](const wxPoint& p1, const wxPoint& p2, const wxPoint& p3) {
@@ -1082,8 +1083,42 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 		}
 	}
 
-   // For every source map province, determine all its pixels.
-	std::map<int, std::vector<wxPoint>> provinceIdToPixelsMap;
+   auto targetMapWidth = targetCanvas->getWidth();
+	auto targetMapHeight = targetCanvas->getHeight();
+
+   for (const auto& [provinceId, province]: sourceCanvas->getDefinitions()->getProvinces())
+   {
+		// No need to map water provinces.
+		if (province->isWater())
+		{
+			continue;
+		}
+
+		// Determine which target province every pixel of the source province corresponds to.
+		std::map<std::string, int> targetProvinceIdToPixelCountMap;
+
+		for (const auto& sourcePixel: province->getAllPixels())
+		{
+			auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
+
+			const auto& triangle = pointToTriangleMap[sourcePoint];
+			const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
+
+			// Skip if tgtPoint is outside the target map.
+			if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
+			{
+				continue;
+			}
+
+		 // TODO: skip if tgtPoint's province is water.
+			
+			 // auto tgtProvince = targetCanvas->
+
+			// provinceIdToPixelsMap[provinceId].emplace_back(pixel.x, pixel.y); // TODO: check if this is needed
+		}
+   }
+
+
 	// TODO: FINISH THIS
 
 

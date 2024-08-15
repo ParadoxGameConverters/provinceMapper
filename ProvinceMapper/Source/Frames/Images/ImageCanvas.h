@@ -50,6 +50,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeVersion->getActiveTriangulationPair(); }
 	[[nodiscard]] const auto& getTriangulationPairs() const { return activeVersion->getTriangulationPairs(); }
+	[[nodiscard]] const auto& getDefinitions() const { return definitions; }
  
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
@@ -111,7 +112,7 @@ class ImageCanvas: public wxScrolledCanvas
 	int lastClickedRow = 0;
 
 	bool triangulate = false;
-	std::vector<wxPoint> points;
+	std::vector<wxPoint> points; // points used for the old triangulation version
 
 	wxImage* image;
 	unsigned char* imageData;
