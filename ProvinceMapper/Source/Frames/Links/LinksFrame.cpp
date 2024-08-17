@@ -90,6 +90,14 @@ void LinksFrame::activateTriangulationPairByIndex(int index) const
 	}
 }
 
+void LinksFrame::redrawProvinceLinksGrid() const
+{
+	if (activePage)
+	{
+		activePage->redrawProvinceLinksGrid();
+	}
+}
+
 void LinksFrame::refreshActiveLink() const
 {
 	if (activePage)

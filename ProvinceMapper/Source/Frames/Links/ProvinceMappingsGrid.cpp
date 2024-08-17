@@ -13,6 +13,7 @@ wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_REDRAW_LINKS_GRID, wxCommandEvent);
 
 
 

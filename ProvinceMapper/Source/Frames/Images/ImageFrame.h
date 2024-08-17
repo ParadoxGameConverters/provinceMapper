@@ -35,6 +35,7 @@ class ImageFrame: public wxFrame
 	void toggleProvinceByID(const std::string& ID, bool sourceImage);
 	void shadeProvinceByID(const std::string& ID, bool sourceImage);
 	void centerMap(int ID);
+	void centerMapToTriangulationPair(int pairID);
 	void centerProvince(ImageTabSelector selector, const std::string& ID);
 	void deleteActiveLink();
 	void deleteActiveTriangulationPair();
@@ -43,7 +44,7 @@ class ImageFrame: public wxFrame
 	void showToolbar() const;
 	void autogenerateMappings();
 
-  private:
+private:
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);

@@ -23,7 +23,8 @@ class LinksTab final: public wxNotebookPage
 {
   public:
 	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
-	void redraw();
+	void redraw() const;
+	void redrawProvinceLinksGrid() const;
 
 	void restoreTriangulationPairRowColor(int pairRow) const;
 

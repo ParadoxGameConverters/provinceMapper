@@ -493,6 +493,11 @@ void ImageFrame::centerMap(int ID)
 	Refresh();
 }
 
+void ImageFrame::centerMapToTriangulationPair(int pairID)
+{
+   // TODO: implement this
+}
+
 void ImageFrame::centerProvince(ImageTabSelector selector, const std::string& ID)
 {
 	if (selector == ImageTabSelector::SOURCE)
@@ -1057,7 +1062,8 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 	}
 
    // For every triangle, determine all the pixels/points inside it.
-	std::map<wxPoint, std::shared_ptr<Triangle>> pointToTriangleMap;
+	// wxPoint can't be used as a key in a map, so we'll use a pair of integers instead.
+	std::map<std::pair<int, int>, std::shared_ptr<Triangle>> pointToTriangleMap;
 	for (const auto& triangle: triangles)
 	{
 		const auto& sourcePoint1 = triangle->pair1->getSourcePoint();
@@ -1078,28 +1084,35 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 				const auto point = wxPoint(x, y);
 				if (isPointInsideTriangle(point, *sourcePoint1, *sourcePoint2, *sourcePoint3))
 				{
-					pointToTriangleMap[point] = triangle;
+					pointToTriangleMap[std::make_pair(x, y)] = triangle;
 				}
 			}
 		}
 	}
 
+   Log(LogLevel::Debug) << "Determined triangles for all source map points.";
+
    const auto targetMapWidth = targetCanvas->getWidth();
 	const auto targetMapHeight = targetCanvas->getHeight();
 
-   for (const auto& province: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
+   for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
    {
-		// Source water provinces should only be linked to target water provinces.
-		const bool water = province->isWater();
+		const bool water = sourceProvince->isWater();
 
 		// Determine which target province every pixel of the source province corresponds to.
-		std::map<std::string, int> targetProvinceIdToPixelCountMap;
+		std::map<std::string, int> targetProvinceIdToPixelCountMap; // TODO: REMOVE THIS
 
-		for (const auto& sourcePixel: province->getAllPixels())
+		for (const auto& sourcePixel: sourceProvince->getAllPixels())
 		{
+			// Only map every 5th row and column to speed up the process while keeping a decent accuracy.
+			if (sourcePixel.x % 5 != 0 || sourcePixel.y % 5 != 0)
+			{
+				continue;
+			}
+
 			auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
 
-			const auto& triangle = pointToTriangleMap[sourcePoint];
+			const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
 			const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
 
 			// Skip if tgtPoint is outside the target map.
@@ -1121,14 +1134,29 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 				continue;
 			}
 
+		 if (activeVersion->isProvinceMapped(tgtProvince->ID, false) != Mapping::MAPPED &&
+				 activeVersion->isProvinceMapped(sourceProvince->ID, true) != Mapping::MAPPED) // TODO: REWORK THIS
+		 {
+			 const auto newLinkID = activeVersion->addRawLink(); // TODO: rework this
+		 	 // The link ID returned by both toggleProvinceByID should be nullopt, because we're adding the provinces to an existing link.
+			 if (activeVersion->toggleProvinceByID(sourceProvince->ID, true) != std::nullopt)
+			 {
+				 Log(LogLevel::Error) << "Failed to add source province to link " << newLinkID;
+			 }
+			 if (activeVersion->toggleProvinceByID(tgtProvince->ID, false) != std::nullopt)
+			 {
+				 Log(LogLevel::Error) << "Failed to add target province to link " << newLinkID;
+			 }
+		 }
+
 			// provinceIdToPixelsMap[provinceId].emplace_back(pixel.x, pixel.y); // TODO: check if this is needed
 		}
+
+	  Log(LogLevel::Debug) << "Determined target provinces for all pixels of source province " << sourceProvince->ID;
    }
 
+   
 
 	// TODO: FINISH THIS
-
-
-	// TODO: Create new links.
 
 }

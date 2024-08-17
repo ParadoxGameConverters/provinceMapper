@@ -258,13 +258,6 @@ void LinkMapper::moveActiveVersionRight()
 	}
 }
 
-void LinkMapper::autogenerateMappings()
-{
-	if (activeVersion){
-		activeVersion->autogenerateMappings();
-	}
-}
-
 Mapping LinkMapper::isProvinceMapped(const std::string& provinceID, bool isSource) const
 {
 	if (activeVersion)

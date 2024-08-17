@@ -58,6 +58,7 @@ class MainFrame final : public wxFrame
 	void onToggleProvince(const wxCommandEvent& evt);
 	void onCenterMap(const wxCommandEvent& evt);
 	void onCenterProvince(const wxCommandEvent& evt);
+	void onCenterMapToTriangulationPair(const wxCommandEvent& evt);
 	void onAddComment(const wxCommandEvent& evt);
 	void onDeleteActiveLink(wxCommandEvent& evt);
 	void onDeleteActiveTriangulationPair(wxCommandEvent& evt);

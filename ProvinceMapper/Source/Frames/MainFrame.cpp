@@ -60,6 +60,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
+	Bind(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, &MainFrame::onCenterMapToTriangulationPair, this);
 	Bind(wxEVT_ADD_COMMENT, &MainFrame::onAddComment, this);
 	Bind(wxEVT_UPDATE_NAME, &MainFrame::onRenameVersion, this);
 	Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &MainFrame::onChangeTab, this);
@@ -639,7 +640,7 @@ void MainFrame::onRefreshActiveTriangulationPair(wxCommandEvent& evt)
 void MainFrame::onAutogenerateMappings(const wxCommandEvent& evt)
 {
 	imageFrame->autogenerateMappings();
-	// TODO: check if we need to refresh stuff here
+	linksFrame->redrawProvinceLinksGrid();
 }
 
 void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
@@ -703,6 +704,11 @@ void MainFrame::onCenterProvince(const wxCommandEvent& evt)
 	else
 		selector = ImageTabSelector::TARGET;
 	imageFrame->centerProvince(selector, evt.GetString().ToStdString());
+}
+
+void MainFrame::onCenterMapToTriangulationPair(const wxCommandEvent& evt)
+{
+	imageFrame->centerMapToTriangulationPair(evt.GetInt());
 }
 
 void MainFrame::onAddComment(const wxCommandEvent& evt)

@@ -55,9 +55,14 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 }
 
 
-void LinksTab::redraw()
+void LinksTab::redraw() const
 {
 	triangulationPointGrid->redraw();
+	redrawProvinceLinksGrid();
+}
+
+void LinksTab::redrawProvinceLinksGrid() const
+{
 	provinceMappingsGrid->redraw();
 }
 

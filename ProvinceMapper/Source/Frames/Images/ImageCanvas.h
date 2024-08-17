@@ -6,7 +6,6 @@
 #include "Definitions/DefinitionsInterface.h"
 #include "Provinces/Pixel.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "LinkMapper/TriangulationPointPair.h"
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);

@@ -16,6 +16,7 @@ wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_REDRAW_LINKS_GRID, wxCommandEvent);
 
 
 class LinkMappingVersion;
