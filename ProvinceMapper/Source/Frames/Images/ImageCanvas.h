@@ -45,6 +45,7 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] wxPoint locateProvinceCoordinates(const std::string& ID) const;
 	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
+	[[nodiscard]] std::shared_ptr<Province> provinceAtCoords(const wxPoint& point) const;
 	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
 	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
 	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }

@@ -711,6 +711,14 @@ std::string ImageCanvas::nameAtCoords(const wxPoint& point)
 	return name;
 }
 
+std::shared_ptr<Province> ImageCanvas::provinceAtCoords(const wxPoint& point) const
+{
+	const auto offs = coordsToOffset(point.x, point.y, width);
+	const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
+
+   return definitions->getProvinceForChroma(chroma);
+}
+
 void ImageCanvas::onScrollRelease(wxScrollWinEvent& event)
 {
 	int select;

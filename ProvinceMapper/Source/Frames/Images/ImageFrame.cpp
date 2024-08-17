@@ -6,6 +6,7 @@
 #include "StatusBar.h"
 #include "Provinces/Province.h"
 
+#include <ranges>
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
@@ -1083,16 +1084,13 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 		}
 	}
 
-   auto targetMapWidth = targetCanvas->getWidth();
-	auto targetMapHeight = targetCanvas->getHeight();
+   const auto targetMapWidth = targetCanvas->getWidth();
+	const auto targetMapHeight = targetCanvas->getHeight();
 
-   for (const auto& [provinceId, province]: sourceCanvas->getDefinitions()->getProvinces())
+   for (const auto& province: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
    {
-		// No need to map water provinces.
-		if (province->isWater())
-		{
-			continue;
-		}
+		// Source water provinces should only be linked to target water provinces.
+		const bool water = province->isWater();
 
 		// Determine which target province every pixel of the source province corresponds to.
 		std::map<std::string, int> targetProvinceIdToPixelCountMap;
@@ -1110,9 +1108,18 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 				continue;
 			}
 
-		 // TODO: skip if tgtPoint's province is water.
-			
-			 // auto tgtProvince = targetCanvas->
+			const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
+			if (!tgtProvince)
+			{
+				continue;
+			}
+
+			// If source is water, target should be water.
+			// If source is land, target should be land.
+			if (water != tgtProvince->isWater())
+			{
+				continue;
+			}
 
 			// provinceIdToPixelsMap[provinceId].emplace_back(pixel.x, pixel.y); // TODO: check if this is needed
 		}
