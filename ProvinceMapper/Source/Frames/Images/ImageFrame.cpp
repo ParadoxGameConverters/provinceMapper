@@ -476,26 +476,22 @@ void ImageFrame::centerMap(int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
-	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
-	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
-	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
-	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
 
-	auto units = wxPoint(static_cast<int>(pt1.x * sourceCanvas->getScale()), static_cast<int>(pt1.y * sourceCanvas->getScale()));
-	auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
-	sourceCanvas->Scroll(offset);
-
-	units = wxPoint(static_cast<int>(pt2.x * targetCanvas->getScale()), static_cast<int>(pt2.y * targetCanvas->getScale()));
-	offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
-	targetCanvas->Scroll(offset);
-
-	render();
-	Refresh();
+   centerMap(pt1, pt2);
 }
 
 void ImageFrame::centerMapToTriangulationPair(int pairID)
 {
-   // TODO: implement this
+	for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+	{
+		if (pair->getID() != pairID)
+		{
+			continue;
+		}
+
+		centerMap(pair->getSourcePoint(), pair->getTargetPoint());
+		break;
+	}
 }
 
 void ImageFrame::centerProvince(ImageTabSelector selector, const std::string& ID)
@@ -554,6 +550,33 @@ void ImageFrame::showToolbar() const
 void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event)
 {
 	delaunayTriangulate();
+}
+
+void ImageFrame::centerMap(const std::optional<wxPoint>& sourceMapPoint, const std::optional<wxPoint>& targetMapPoint)
+{
+	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
+
+   wxPoint units;
+	wxPoint offset;
+	if (sourceMapPoint)
+	{
+		units = wxPoint(static_cast<int>(sourceMapPoint->x * sourceCanvas->getScale()), static_cast<int>(sourceMapPoint->y * sourceCanvas->getScale()));
+		offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
+		sourceCanvas->Scroll(offset);
+	}
+
+   if (targetMapPoint)
+   {
+		units = wxPoint(static_cast<int>(targetMapPoint->x * targetCanvas->getScale()), static_cast<int>(targetMapPoint->y * targetCanvas->getScale()));
+		offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
+		targetCanvas->Scroll(offset);
+   }
+
+	render();
+	Refresh();
 }
 
 wxPoint findMapCornerPointEquivalent(const std::vector<std::shared_ptr<TriangulationPointPair>>& validPairs, const auto& cornerPoint)

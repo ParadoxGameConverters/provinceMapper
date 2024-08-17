@@ -60,6 +60,7 @@ private:
 	void onScrollReleaseH(const wxCommandEvent& event);
 	void onScrollReleaseV(const wxCommandEvent& event);
 	void onDelaunayTriangulate(const wxCommandEvent& event);
+	void centerMap(const std::optional<wxPoint>& sourceMapPoint, const std::optional<wxPoint>& targetMapPoint);
 
 	void render() const;
 	void renderSource() const;
