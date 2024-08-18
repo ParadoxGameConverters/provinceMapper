@@ -26,6 +26,10 @@ void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, con
 		// When registering a new source province, update the cache of impassable source provinces.
 		if (srcProvince->isImpassable())
 		{
+			if (srcProvinceID == "5961")
+			{
+				Log(LogLevel::Warning) << "ADDED SRC PROV 5961 TO IMPASSABLES CACHE";
+			}
 			srcImpassablesCache.insert(srcProvinceID);
 		}
 	}
@@ -136,7 +140,7 @@ void Automapper::generateLinks()
    activeVersion->deactivateLink();
 
 	// 1. For all non-impassable target provinces:
-	//	   If the most matching source province is available, map them.
+	//	   If the most matching source province is available and not impassable, map them.
 	// auto commentID = activeVersion->addRawComment();		// todo: remove this
 	// activeVersion->activateLinkByID(commentID);				// todo: remove this
 	// activeVersion->getActiveLink()->setComment("STEP 1"); // todo: remove this
@@ -153,6 +157,10 @@ void Automapper::generateLinks()
 		auto highestSrcMatches = getHighestMatches(srcProvMatches);
 
 		const auto& srcProvID = highestSrcMatches.begin()->second;
+		if (srcImpassablesCache.contains(srcProvID))
+		{
+			continue;
+		}
 		if (!isSourceProvinceAvailable(srcProvID))
 		{
 			// Log(LogLevel::Info) << "--------> Source province " << srcProvinceID << " not available"; // TODO: REMOVE THIS
@@ -173,7 +181,7 @@ void Automapper::generateLinks()
 	Log(LogLevel::Debug) << "Automapping step 1 complete.";
 
 	// 2. For all yet unmapped non-impassable source provinces:
-	//	   If the most matching target province is available, map them.
+	//	   If the most matching target province is available and not impassable, map them.
 	// commentID = activeVersion->addRawComment();				// todo: remove this
 	// activeVersion->activateLinkByID(commentID);				// todo: remove this
 	// activeVersion->getActiveLink()->setComment("STEP 2"); // todo: remove this
@@ -187,6 +195,10 @@ void Automapper::generateLinks()
 		auto highestTgtMatches = getHighestMatches(tgtProvMatches);
 
 		const auto& tgtProvID = highestTgtMatches.begin()->second;
+		if (tgtImpassablesCache.contains(tgtProvID))
+		{
+			continue;
+		}
 		if (!isTargetProvinceAvailable(tgtProvID))
 		{
 			continue;
@@ -218,12 +230,10 @@ void Automapper::generateLinks()
 		auto highestSrcMatches = getHighestMatches(srcProvMatches);
 		for (const auto& [share, srcProvID]: highestSrcMatches)
 		{
-
 			if (srcImpassablesCache.contains(srcProvID))
 			{
 				continue;
 			}
-
 			if (!isSourceProvinceAvailable(srcProvID))
 			{
 				continue;
@@ -261,7 +271,6 @@ void Automapper::generateLinks()
 			{
 				continue;
 			}
-
 			if (!isTargetProvinceAvailable(tgtProvID))
 			{
 				continue;
