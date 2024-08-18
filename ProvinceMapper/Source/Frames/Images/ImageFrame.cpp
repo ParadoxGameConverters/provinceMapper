@@ -1166,9 +1166,11 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 
 		 automapper.registerMatch(sourceProvince, tgtProvince);
 		}
-
-		Log(LogLevel::Debug) << "Determined target provinces for all pixels of source province " << sourceProvince->ID;
 	}
+
+
+	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
+	Log(LogLevel::Debug) << "Generating links...";
 
    automapper.generateLinks();
 
