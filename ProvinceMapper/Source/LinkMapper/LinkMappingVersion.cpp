@@ -464,3 +464,29 @@ Mapping LinkMappingVersion::isProvinceMapped(const std::string& provinceID, bool
 	}
 	return Mapping::FAIL;
 }
+
+const std::shared_ptr<LinkMapping>& LinkMappingVersion::getLinkForSourceProvince(const std::string& sourceProvinceID) const
+{
+	for (const auto& province: *unmappedSources)
+		if (province->ID == sourceProvinceID)
+			return nullptr;
+	for (const auto& link: *links)
+		for (const auto& province: link->getSources())
+			if (province->ID == sourceProvinceID)
+				return link;
+
+   return nullptr;
+}
+
+const std::shared_ptr<LinkMapping>& LinkMappingVersion::getLinkForTargetProvince(const std::string& targetProvinceID) const
+{
+	for (const auto& province: *unmappedTargets)
+		if (province->ID == targetProvinceID)
+			return nullptr;
+	for (const auto& link: *links)
+		for (const auto& province: link->getTargets())
+			if (province->ID == targetProvinceID)
+				return link;
+
+   return nullptr;
+}

@@ -34,6 +34,8 @@ class LinkMappingVersion
 	[[nodiscard]] const auto& getUnmappedSources() const { return unmappedSources; }
 	[[nodiscard]] const auto& getUnmappedTargets() const { return unmappedTargets; }
 	[[nodiscard]] Mapping isProvinceMapped(const std::string& provinceID, bool isSource) const;
+	[[nodiscard]] const std::shared_ptr<LinkMapping>& getLinkForSourceProvince(const std::string& sourceProvinceID) const;
+	[[nodiscard]] const std::shared_ptr<LinkMapping>& getLinkForTargetProvince(const std::string& targetProvinceID) const;
 
 	void deactivateLink();
 	void deactivateTriangulationPair();
@@ -59,7 +61,7 @@ class LinkMappingVersion
 
 	friend std::ostream& operator<<(std::ostream& output, const LinkMappingVersion& linkMappingVersion);
 
-  private:
+private:
 	void generateUnmapped() const;
 	void removeUnmappedSourceByID(const std::string& provinceID) const;
 	void removeUnmappedTargetByID(const std::string& provinceID) const;
