@@ -3,8 +3,8 @@
 #include "ImageCanvas.h"
 #include "LinkMapper/TriangulationPointPair.h"
 #include "OSCompatibilityLayer.h"
-#include "StatusBar.h"
 #include "Provinces/Province.h"
+#include "StatusBar.h"
 
 #include <ranges>
 #include <wx/dcbuffer.h>
@@ -477,7 +477,7 @@ void ImageFrame::centerMap(int ID)
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
 
-   centerMap(pt1, pt2);
+	centerMap(pt1, pt2);
 }
 
 void ImageFrame::centerMapToTriangulationPair(int pairID)
@@ -559,7 +559,7 @@ void ImageFrame::centerMap(const std::optional<wxPoint>& sourceMapPoint, const s
 	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
 	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
 
-   wxPoint units;
+	wxPoint units;
 	wxPoint offset;
 	if (sourceMapPoint)
 	{
@@ -568,12 +568,12 @@ void ImageFrame::centerMap(const std::optional<wxPoint>& sourceMapPoint, const s
 		sourceCanvas->Scroll(offset);
 	}
 
-   if (targetMapPoint)
-   {
+	if (targetMapPoint)
+	{
 		units = wxPoint(static_cast<int>(targetMapPoint->x * targetCanvas->getScale()), static_cast<int>(targetMapPoint->y * targetCanvas->getScale()));
 		offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
 		targetCanvas->Scroll(offset);
-   }
+	}
 
 	render();
 	Refresh();
@@ -1084,7 +1084,7 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 		}
 	}
 
-   // For every triangle, determine all the pixels/points inside it.
+	// For every triangle, determine all the pixels/points inside it.
 	// wxPoint can't be used as a key in a map, so we'll use a pair of integers instead.
 	std::map<std::pair<int, int>, std::shared_ptr<Triangle>> pointToTriangleMap;
 	for (const auto& triangle: triangles)
@@ -1099,7 +1099,7 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 		const auto maxX = std::max({sourcePoint1->x, sourcePoint2->x, sourcePoint3->x});
 		const auto maxY = std::max({sourcePoint1->y, sourcePoint2->y, sourcePoint3->y});
 
-	   // For every pixel in the bounding box, determine if it's inside the triangle.
+		// For every pixel in the bounding box, determine if it's inside the triangle.
 		for (auto x = minX; x <= maxX; x++)
 		{
 			for (auto y = minY; y <= maxY; y++)
@@ -1113,13 +1113,13 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 		}
 	}
 
-   Log(LogLevel::Debug) << "Determined triangles for all source map points.";
+	Log(LogLevel::Debug) << "Determined triangles for all source map points.";
 
-   const auto targetMapWidth = targetCanvas->getWidth();
+	const auto targetMapWidth = targetCanvas->getWidth();
 	const auto targetMapHeight = targetCanvas->getHeight();
 
-   for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
-   {
+	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
+	{
 		const bool water = sourceProvince->isWater();
 
 		// Determine which target province every pixel of the source province corresponds to.
@@ -1157,29 +1157,57 @@ void ImageFrame::autogenerateMappings() // TODO: FINISH THIS
 				continue;
 			}
 
-		 if (activeVersion->isProvinceMapped(tgtProvince->ID, false) != Mapping::MAPPED &&
-				 activeVersion->isProvinceMapped(sourceProvince->ID, true) != Mapping::MAPPED) // TODO: REWORK THIS
-		 {
-			 const auto newLinkID = activeVersion->addRawLink(); // TODO: rework this
-		 	 // The link ID returned by both toggleProvinceByID should be nullopt, because we're adding the provinces to an existing link.
-			 if (activeVersion->toggleProvinceByID(sourceProvince->ID, true) != std::nullopt)
-			 {
-				 Log(LogLevel::Error) << "Failed to add source province to link " << newLinkID;
-			 }
-			 if (activeVersion->toggleProvinceByID(tgtProvince->ID, false) != std::nullopt)
-			 {
-				 Log(LogLevel::Error) << "Failed to add target province to link " << newLinkID;
-			 }
-		 }
+			// General rules for the automapping:
+			// - We don't modify the hand-made links.
+			// - Provinces belonging to hand-made links are excluded from the automapping.
+			// - We don't create many-to-many mappings.
+			// - A source province is considered available for further mapping if it's not mapped to multiple target provinces.
+			// - A target province is considered available for further mapping if it's not mapped to multiple source provinces.
+
+			// 1. For all non-impassable target provinces:
+			//	   If the most matching source province is available, map them.
+
+			// 2. For all yet unmapped non-impassable source provinces:
+			//	   If the most matching target province is available, map them.
+
+			// 3. For all yet unmapped non-impassable target provinces:
+			//	   Try to use the most matching available non-impassable source province to map them.
+
+			// 4. For all yet unmapped non-impassable source provinces:target
+			//	   Try to use the most matching available non-impassable target province to map them.
+
+			// 5. For all yet unmapped target provinces:
+			//    Try to use the most matching available source province to map them.
+
+			// 6. For all yet unmapped source provinces:
+			//    Try to use the most matching available target province to map them.
+
+
+			sourceProvince->isImpa
+
+				 if (activeVersion->isProvinceMapped(tgtProvince->ID, false) != Mapping::MAPPED &&
+					  activeVersion->isProvinceMapped(sourceProvince->ID, true) != Mapping::MAPPED) // TODO: REWORK THIS
+			{
+				const auto newLinkID = activeVersion->addRawLink(); // TODO: rework this
+				// The link ID returned by both toggleProvinceByID should be nullopt, because we're adding the provinces to an existing link.
+				if (activeVersion->toggleProvinceByID(sourceProvince->ID, true) != std::nullopt)
+				{
+					Log(LogLevel::Error) << "Failed to add source province to link " << newLinkID;
+				}
+				if (activeVersion->toggleProvinceByID(tgtProvince->ID, false) != std::nullopt)
+				{
+					Log(LogLevel::Error) << "Failed to add target province to link " << newLinkID;
+				}
+			}
 
 			// provinceIdToPixelsMap[provinceId].emplace_back(pixel.x, pixel.y); // TODO: check if this is needed
 		}
 
-	  Log(LogLevel::Debug) << "Determined target provinces for all pixels of source province " << sourceProvince->ID;
-   }
+		Log(LogLevel::Debug) << "Determined target provinces for all pixels of source province " << sourceProvince->ID;
+	}
 
-   
+	// TODO: for every link generated, mark it as autogenerated.
+
 
 	// TODO: FINISH THIS
-
 }
