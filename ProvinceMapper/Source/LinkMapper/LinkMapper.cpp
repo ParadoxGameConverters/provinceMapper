@@ -33,7 +33,6 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 void LinkMapper::registerKeys()
 {
 	registerRegex(commonItems::stringRegex, [this](const std::string& versionName, std::istream& theStream) {
-		Log(LogLevel::Info) << "Loading version " << versionName; // TODO: REMOVE THIS
 		const auto version = std::make_shared<LinkMappingVersion>(theStream, versionName, sourceDefs, targetDefs, sourceToken, targetToken, versionCounter);
 		++versionCounter;
 		versions.emplace_back(version);

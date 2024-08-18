@@ -9,7 +9,7 @@ class Automapper
 public:
 	explicit Automapper(std::shared_ptr<LinkMappingVersion> activeVersion): activeVersion(std::move(activeVersion)) {}
 	void registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince);
-	void generateLinks(); // TODO: USE THIS
+	void generateLinks();
 
 private:
 	[[nodiscard]] bool isSourceProvinceAvailable(const std::string& srcProvID);
