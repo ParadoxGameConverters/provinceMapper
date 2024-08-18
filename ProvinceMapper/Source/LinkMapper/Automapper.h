@@ -14,6 +14,7 @@ class Automapper
   private:
 	[[nodiscard]] bool isSourceProvinceAvailable(const std::string& srcProvID);
 	[[nodiscard]] bool isTargetProvinceAvailable(const std::string& tgtProvID);
+	void mapProvinces(const std::string& srcProvID, const std::string& tgtProvID);
 
 	void cleanUpSourceProvinceShares();
 	void cleanUpTargetProvinceShares();
@@ -26,8 +27,12 @@ class Automapper
 	std::set<std::string> srcImpassablesCache;
 	std::set<std::string> tgtImpassablesCache;
 
+   std::set<std::string> alreadyMappedSrcProvincesCache;
+	std::set<std::string> alreadyMappedTgtProvincesCache;
+
 	std::set<std::string> unavailableSources;
 	std::set<std::string> unavailableTargets;
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 };
+// TODO: fix that after automapping, clicking on a province in the imageframe doesn't focus to the link on the links tab

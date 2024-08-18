@@ -71,7 +71,6 @@ void ImageCanvas::activateLinkByIndex(const int row)
 {
 	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
 	{
-		activeLink = activeVersion->getLinks()->at(row);
 		lastClickedRow = row;
 		// Strafe our provinces' pixels.
 		strafeProvinces();
@@ -87,7 +86,6 @@ void ImageCanvas::activateLinkByID(const int ID)
 	{
 		if (link->getID() == ID)
 		{
-			activeLink = link;
 			lastClickedRow = counter;
 			// Strafe our provinces' pixels.
 			strafeProvinces();
@@ -99,6 +97,13 @@ void ImageCanvas::activateLinkByID(const int ID)
 
 void ImageCanvas::strafeProvinces()
 {
+	if (!activeVersion)
+		return;
+
+   const auto& activeLink = activeVersion->getActiveLink();
+	if (!activeLink)
+		return;
+
 	for (const auto& province: getRelevantProvinces(activeLink))
 		strafeProvince(province);
 }
@@ -156,7 +161,6 @@ void ImageCanvas::applyStrafedPixels()
 
 void ImageCanvas::deactivateLink()
 {
-	activeLink.reset();
 	// restore color
 	for (const auto& pixel: strafedPixels)
 	{
@@ -271,6 +275,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 		}
 
 		// Case 1: DESELECT PROVINCE if we have an active link with this province inside.
+		const auto& activeLink = activeVersion->getActiveLink();
 		if (activeLink)
 		{
 			for (const auto& relevantProvince: getRelevantProvinces(activeLink))
@@ -306,7 +311,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 {
 	// Right up means deselect active link, which is serious stuff.
 	// If our active link is dry, we're not deselecting it, we're deleting it.
-	if (activeLink)
+	if (activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
@@ -350,6 +355,10 @@ void ImageCanvas::stageToggleProvinceByID(const std::string& provinceID) const
 
 void ImageCanvas::toggleProvinceByID(const std::string& ID)
 {
+	if (!activeVersion)
+		return;
+
+   const auto& activeLink = activeVersion->getActiveLink();
 	if (!activeLink)
 		return;
 
@@ -394,7 +403,8 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
 	std::shared_ptr<LinkMapping> link = nullptr;
-	// We're presumably operating on our own activeLink
+	// We're presumably operating on the activeLink.
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (activeLink && activeLink->getID() == ID)
 		link = activeLink;
 	else
@@ -443,13 +453,13 @@ wxPoint ImageCanvas::locateProvinceCoordinates(const std::string& ID) const
 
 void ImageCanvas::deleteActiveLink()
 {
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (activeLink)
 	{
 		// We need to restore full color to our provinces.
 		for (const auto& province: getRelevantProvinces(activeLink))
 			dismarkProvince(province);
 		strafedPixels.clear();
-		activeLink.reset();
 	}
 }
 
@@ -503,7 +513,7 @@ void ImageCanvas::stageAddComment()
 void ImageCanvas::stageDeleteLink() const
 {
 	// Do nothing unless working on active link. Don't want accidents here.
-	if (activeLink)
+	if (activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
@@ -606,13 +616,13 @@ void ImageCanvas::stagePointPlaced() const
 
 void ImageCanvas::stageDelaunayTriangulate() const
 {
-	wxCommandEvent evt(wxEVT_DELAUNAY_TRIANGULATE);
+	const wxCommandEvent evt(wxEVT_DELAUNAY_TRIANGULATE);
 	eventHandler->QueueEvent(evt.Clone());
 }
 
 void ImageCanvas::stageMoveUp() const
 {
-	if (activeLink)
+	if (activeVersion && activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventHandler->QueueEvent(evt->Clone());
@@ -621,7 +631,7 @@ void ImageCanvas::stageMoveUp() const
 
 void ImageCanvas::stageMoveDown() const
 {
-	if (activeLink)
+	if (activeVersion && activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventHandler->QueueEvent(evt->Clone());

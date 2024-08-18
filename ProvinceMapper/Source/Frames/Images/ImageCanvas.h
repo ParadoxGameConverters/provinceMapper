@@ -130,7 +130,6 @@ class ImageCanvas: public wxScrolledCanvas
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	std::shared_ptr<DefinitionsInterface> definitions;
-	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;
 
