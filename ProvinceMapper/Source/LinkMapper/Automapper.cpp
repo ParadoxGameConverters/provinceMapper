@@ -67,7 +67,7 @@ static std::map<int, std::string, std::greater<>> getHighestMatches(const std::m
 	return sharesMap;
 }
 
-bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID) const
+bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID, const bool allowAddingToExistingLink) const
 {
 	// Avoid many-to-many mappings.
 	if (alreadyMappedSrcProvincesCache.contains(srcProvID) && alreadyMappedTgtProvincesCache.contains(tgtProvID))
@@ -75,28 +75,42 @@ bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::s
 		return false;
 	}
 
-	// If link already has multiple targets and a different source, we can't add another source.
-	const auto& tgtLink = activeVersion->getLinkForTargetProvince(tgtProvID);
-	if (tgtLink && tgtLink->getTargets().size() > 1)
+	if (const auto& tgtLink = activeVersion->getLinkForTargetProvince(tgtProvID))
 	{
-		for (const auto& srcProv: tgtLink->getSources())
+		if (!allowAddingToExistingLink)
 		{
-			if (srcProv->ID != srcProvID)
+			return false;
+		}
+
+		// If link already has multiple targets and a different source, we can't add another source.
+		if (tgtLink->getTargets().size() > 1)
+		{
+			for (const auto& srcProv: tgtLink->getSources())
 			{
-				return false;
+				if (srcProv->ID != srcProvID)
+				{
+					return false;
+				}
 			}
 		}
 	}
 
-	// If link already has multiple sources and a different target, we can't add another target.
-	const auto& srcLink = activeVersion->getLinkForSourceProvince(srcProvID);
-	if (srcLink && srcLink->getSources().size() > 1)
+	if (const auto& srcLink = activeVersion->getLinkForSourceProvince(srcProvID))
 	{
-		for (const auto& tgtProv: srcLink->getTargets())
+		if (!allowAddingToExistingLink)
 		{
-			if (tgtProv->ID != tgtProvID)
+			return false;
+		}
+
+		// If link already has multiple sources and a different target, we can't add another target.
+		if (srcLink->getSources().size() > 1)
+		{
+			for (const auto& tgtProv: srcLink->getTargets())
 			{
-				return false;
+				if (tgtProv->ID != tgtProvID)
+				{
+					return false;
+				}
 			}
 		}
 	}
@@ -157,7 +171,7 @@ void Automapper::generateLinks()
 		{
 			continue;
 		}
-		if (!canProvincesBeMapped(srcProvID, tgtProvID))
+		if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
 		{
 			continue;
 		}
@@ -191,7 +205,7 @@ void Automapper::generateLinks()
 		{
 			continue;
 		}
-		if (!canProvincesBeMapped(srcProvID, tgtProvID))
+		if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
 		{
 			continue;
 		}
@@ -223,7 +237,7 @@ void Automapper::generateLinks()
 			{
 				continue;
 			}
-			if (!canProvincesBeMapped(srcProvID, tgtProvID))
+			if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
 			{
 				continue;
 			}
@@ -257,7 +271,7 @@ void Automapper::generateLinks()
 			{
 				continue;
 			}
-			if (!canProvincesBeMapped(srcProvID, tgtProvID))
+			if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
 			{
 				continue;
 			}
@@ -278,7 +292,7 @@ void Automapper::generateLinks()
 		auto highestSrcMatches = getHighestMatches(srcProvMatches);
 		for (const auto& srcProvID: highestSrcMatches | std::views::values)
 		{
-			if (!canProvincesBeMapped(srcProvID, tgtProvID))
+			if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
 			{
 				continue;
 			}
@@ -299,7 +313,7 @@ void Automapper::generateLinks()
 		auto highestTgtMatches = getHighestMatches(tgtProvMatches);
 		for (const auto& tgtProvID: highestTgtMatches | std::views::values)
 		{
-			if (!canProvincesBeMapped(srcProvID, tgtProvID))
+			if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
 			{
 				continue;
 			}

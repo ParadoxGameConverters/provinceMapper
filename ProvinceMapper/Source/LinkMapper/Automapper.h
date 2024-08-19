@@ -12,7 +12,7 @@ class Automapper
 	void generateLinks();
 
   private:
-	[[nodiscard]] bool canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID) const;
+	[[nodiscard]] bool canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID, bool allowAddingToExistingLink) const;
 	void mapProvinces(const std::string& srcProvID, const std::string& tgtProvID);
 
 	void cleanUpSourceProvinceShares();
