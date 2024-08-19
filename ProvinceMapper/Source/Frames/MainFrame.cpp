@@ -58,6 +58,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
 	Bind(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX, &MainFrame::onActivateTriangulationPairByIndex, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
+	Bind(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, &MainFrame::onActivateTriangulationPairByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
 	Bind(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, &MainFrame::onCenterMapToTriangulationPair, this);
@@ -605,7 +606,7 @@ void MainFrame::onDeactivateTriangulationPair(wxCommandEvent& evt)
 
 void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)
 {
-	deactiveActiveLinkOrTriangulationPair();
+	deactivateActiveLinkOrTriangulationPair();
 
 	linkMapper.activateLinkByIndex(evt.GetInt());
 	linksFrame->activateLinkByIndex(evt.GetInt());
@@ -614,14 +615,14 @@ void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)
 
 void MainFrame::onActivateTriangulationPairByIndex(const wxCommandEvent& evt)
 {
-	deactiveActiveLinkOrTriangulationPair();
+	deactivateActiveLinkOrTriangulationPair();
 
 	linkMapper.activateTriangulationPairByIndex(evt.GetInt());
 	linksFrame->activateTriangulationPairByIndex(evt.GetInt());
 	imageFrame->activateTriangulationPairByIndex(evt.GetInt());
 }
 
-void MainFrame::deactiveActiveLinkOrTriangulationPair()
+void MainFrame::deactivateActiveLinkOrTriangulationPair()
 {
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
@@ -652,6 +653,15 @@ void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 	linkMapper.activateLinkByID(evt.GetInt());
 	imageFrame->activateLinkByID(evt.GetInt());
 	linksFrame->activateLinkByID(evt.GetInt());
+}
+
+void MainFrame::onActivateTriangulationPairByID(const wxCommandEvent& evt)
+{
+	deactivateActiveLinkOrTriangulationPair();
+
+	linkMapper.activateTriangulationPairByID(evt.GetInt());
+	linksFrame->activateTriangulationPairByID(evt.GetInt());
+	imageFrame->activateTriangulationPairByID(evt.GetInt());
 }
 
 void MainFrame::onToggleProvince(const wxCommandEvent& evt)

@@ -55,6 +55,7 @@ class MainFrame final : public wxFrame
 	void onActivateLinkByIndex(const wxCommandEvent& evt);
 	void onActivateTriangulationPairByIndex(const wxCommandEvent& evt);
 	void onActivateLinkByID(const wxCommandEvent& evt);
+	void onActivateTriangulationPairByID(const wxCommandEvent& evt);
 	void onToggleProvince(const wxCommandEvent& evt);
 	void onCenterMap(const wxCommandEvent& evt);
 	void onCenterProvince(const wxCommandEvent& evt);
@@ -78,7 +79,7 @@ class MainFrame final : public wxFrame
 	void onLinksMoveVersionRight(wxCommandEvent& evt);
 	void onShowToolbar(wxCommandEvent& evt);
 	void onShowUnmapped(wxCommandEvent& evt);
-	void deactiveActiveLinkOrTriangulationPair();
+	void deactivateActiveLinkOrTriangulationPair();
 	void onRefreshActiveTriangulationPair(wxCommandEvent& evt);
 	void onAutogenerateMappings(const wxCommandEvent& evt);
 

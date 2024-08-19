@@ -83,6 +83,12 @@ void LinkMapper::activateLinkByID(const int ID) const
 		activeVersion->activateLinkByID(ID);
 }
 
+void LinkMapper::activateTriangulationPairByID(const int ID) const
+{
+	if (activeVersion)
+		activeVersion->activateTriangulationPairByID(ID);
+}
+
 std::optional<int> LinkMapper::toggleProvinceByID(const std::string& provinceID, const bool isSource) const
 {
 	if (activeVersion)

@@ -98,6 +98,11 @@ void LinksTab::activateLinkByIndex(const int index)
 	provinceMappingsGrid->activateLinkByIndex(index);
 }
 
+void LinksTab::activateTriangulationPairByID(const int theID) const
+{
+	triangulationPointGrid->activatePairByID(theID);
+}
+
 void LinksTab::activateTriangulationPairByIndex(int index)
 {
 	triangulationPointGrid->activatePairByIndex(index);

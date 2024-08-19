@@ -9,6 +9,7 @@
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
@@ -73,6 +74,7 @@ class ImageCanvas final: public wxScrolledCanvas
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
 	void pushZoomLevel(int zoomLevel);
 	void toggleTriangulate();
+	void toggleTriangulationMesh() { showTriangulationMesh = !showTriangulationMesh; }
 
   private:
 	void onMouseOver(wxMouseEvent& event);
@@ -104,12 +106,15 @@ class ImageCanvas final: public wxScrolledCanvas
 	void stageMoveVersionRight() const;
 	void stagePointPlaced() const;
 	void stageDelaunayTriangulate() const;
+	void stageActivateTriangulationPairByID(int ID) const;
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
 	bool black = false;
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
+
+	bool showTriangulationMesh = false;
 
 	bool triangulate = false;
 	std::vector<wxPoint> points; // points used for the old triangulation version

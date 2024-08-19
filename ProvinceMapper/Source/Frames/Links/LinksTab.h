@@ -34,6 +34,7 @@ class LinksTab final: public wxNotebookPage
 	void deactivateTriangulationPair();
 	void activateLinkByID(int theID);
 	void activateLinkByIndex(int index);
+	void activateTriangulationPairByID(int theID) const;
 	void activateTriangulationPairByIndex(int index);
 	void refreshActiveLink();
 	void refreshActiveTriangulationPair();

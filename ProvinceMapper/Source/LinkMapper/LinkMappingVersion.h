@@ -41,6 +41,7 @@ class LinkMappingVersion
 	void activateLinkByIndex(int row);
 	void activateTriangulationPairByIndex(int row);
 	void activateLinkByID(int theID);
+	void activateTriangulationPairByID(int theID);
 	void deleteActiveLink();
 	void deleteActiveTriangulationPair();
 	void setName(const std::string& theName) { versionName = theName; }

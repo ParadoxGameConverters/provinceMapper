@@ -136,6 +136,21 @@ void LinkMappingVersion::activateLinkByID(const int theID)
 	}
 }
 
+void LinkMappingVersion::activateTriangulationPairByID(int theID)
+{
+	auto counter = 0;
+	for (const auto& pair: *triangulationPairs)
+	{
+		if (pair->getID() == theID)
+		{
+			activeTriangulationPair = pair;
+			lastActiveTriangulationPairIndex = counter;
+			break;
+		}
+		++counter;
+	}
+}
+
 std::optional<int> LinkMappingVersion::toggleProvinceByID(const std::string& provinceID, const bool isSource)
 {
 	if (activeLink)

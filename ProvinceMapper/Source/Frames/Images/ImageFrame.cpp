@@ -369,6 +369,8 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 void ImageFrame::onToggleTriangulationMesh(wxCommandEvent& event)
 {
 	showTriangulationMesh = !showTriangulationMesh;
+	sourceCanvas->toggleTriangulationMesh();
+	targetCanvas->toggleTriangulationMesh();
 	render();
 	Refresh();
 }

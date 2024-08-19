@@ -200,6 +200,31 @@ void TriangulationPairsGrid::deactivateTriangulationPair()
 	ForceRefresh();
 }
 
+void TriangulationPairsGrid::activatePairByID(const int ID)
+{
+	// We need to find not only which pair this is, but its row as well, so we can scroll the grid.
+	// Thankfully, we're anal about their order.
+
+	// If we're already active, restore color.
+	if (activeRow)
+		restoreLinkRowColor(*activeRow);
+
+	auto rowCounter = 0;
+	for (const auto& pair: *version->getTriangulationPairs())
+	{
+		if (pair->getID() == ID)
+		{
+			activeRow = rowCounter;
+			activateLinkRowColor(rowCounter);
+			if (!IsVisible(rowCounter, 0, false))
+				focusOnActiveRow();
+			lastClickedRow = rowCounter;
+			break;
+		}
+		++rowCounter;
+	}
+}
+
 void TriangulationPairsGrid::activatePairByIndex(const int index)
 {
 	// If we're already active, restore color.

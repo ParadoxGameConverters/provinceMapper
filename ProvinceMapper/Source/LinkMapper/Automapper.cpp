@@ -101,7 +101,7 @@ bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::s
 		}
 	}
 
-   return true;
+	return true;
 }
 
 void Automapper::mapProvinces(const std::string& srcProvID, const std::string& tgtProvID)

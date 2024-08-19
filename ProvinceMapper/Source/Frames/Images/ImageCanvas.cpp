@@ -8,6 +8,7 @@
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
@@ -100,7 +101,7 @@ void ImageCanvas::strafeProvinces()
 	if (!activeVersion)
 		return;
 
-   const auto& activeLink = activeVersion->getActiveLink();
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (!activeLink)
 		return;
 
@@ -181,6 +182,13 @@ void ImageCanvas::deactivateLink()
 	strafedPixels.clear();
 }
 
+void ImageCanvas::stageActivateTriangulationPairByID(const int ID) const
+{
+	auto* evt = new wxCommandEvent(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID);
+	evt->SetInt(ID);
+	eventHandler->QueueEvent(evt->Clone());
+}
+
 void ImageCanvas::onMouseOver(wxMouseEvent& event)
 {
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -217,9 +225,9 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// 1. select a mapping, or
 	// 2. add a province to the existing mapping, or
 	// 3. remove it from active mapping.
-	// 4 - special: if we're initing triangulation, we need raw points.
-	// 5. - special: if we're adding a permanent triangulation pair, add source/target point
-   // TODO: 6. when triangulation mesh is enabled and we clicked within the radius of a triangulation pair point, activate the pair.
+	// 4. special: if we're initing triangulation, we need raw points.
+	// 5. special: if we're adding a permanent triangulation pair, add source/target point
+	// 6. when triangulation mesh is enabled, and we clicked within the radius of a triangulation pair point, activate the pair.
 
 	// What province have we clicked?
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -230,6 +238,43 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+
+		// case 6: enable triangulation pair if the user clicked within the radius of a point.
+		if (showTriangulationMesh)
+		{
+			const auto pointRadius = static_cast<int>(std::round(5.0 / getScale()));
+			if (selector == ImageTabSelector::SOURCE)
+			{
+				for (const auto& pair: *activeVersion->getTriangulationPairs())
+				{
+					const auto& sourcePoint = pair->getSourcePoint();
+					if (!sourcePoint)
+						continue;
+					const auto clickDistToPoint = std::sqrt(std::pow(sourcePoint->x - x, 2) + std::pow(sourcePoint->y - y, 2));
+					if (clickDistToPoint <= pointRadius)
+					{
+						stageActivateTriangulationPairByID(pair->getID());
+						return;
+					}
+				}
+			}
+			else
+			{
+				for (const auto& pair: *activeVersion->getTriangulationPairs())
+				{
+					const auto& targetPoint = pair->getTargetPoint();
+					if (!targetPoint)
+						continue;
+					const auto clickDistToPoint = std::sqrt(std::pow(targetPoint->x - x, 2) + std::pow(targetPoint->y - y, 2));
+					if (clickDistToPoint <= pointRadius)
+					{
+						stageActivateTriangulationPairByID(pair->getID());
+						return;
+					}
+				}
+			}
+		}
+
 		// case 5: check if we're in the process of editing a triangulation pair
 		if (const auto& activeTriangulationPair = getActiveTriangulationPair())
 		{
@@ -358,7 +403,7 @@ void ImageCanvas::toggleProvinceByID(const std::string& ID)
 	if (!activeVersion)
 		return;
 
-   const auto& activeLink = activeVersion->getActiveLink();
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (!activeLink)
 		return;
 
@@ -726,7 +771,7 @@ std::shared_ptr<Province> ImageCanvas::provinceAtCoords(const wxPoint& point) co
 	const auto offs = coordsToOffset(point.x, point.y, width);
 	const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
 
-   return definitions->getProvinceForChroma(chroma);
+	return definitions->getProvinceForChroma(chroma);
 }
 
 void ImageCanvas::onScrollRelease(wxScrollWinEvent& event)

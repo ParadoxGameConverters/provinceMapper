@@ -26,7 +26,7 @@ class Automapper
 	std::set<std::string> srcImpassablesCache;
 	std::set<std::string> tgtImpassablesCache;
 
-   std::set<std::string> alreadyMappedSrcProvincesCache;
+	std::set<std::string> alreadyMappedSrcProvincesCache;
 	std::set<std::string> alreadyMappedTgtProvincesCache;
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;

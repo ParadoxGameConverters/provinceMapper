@@ -39,6 +39,7 @@ class TriangulationPairsGrid final: public GridBase
 	void restoreLinkRowColor(int row);
 
 	void deactivateTriangulationPair();
+	void activatePairByID(int ID);
 	void activatePairByIndex(int index);
 	void createTriangulationPair(int pairID);
 

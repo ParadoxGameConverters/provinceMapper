@@ -20,6 +20,7 @@ class LinkMapper: commonItems::parser
 	void activateLinkByIndex(int row) const;
 	void activateTriangulationPairByIndex(const int row) const;
 	void activateLinkByID(int ID) const;
+	void activateTriangulationPairByID(int ID) const;
 	void deleteActiveLink() const;
 	void deleteActiveTriangulationPair() const;
 	void updateActiveVersionName(const std::string& theName) const;
