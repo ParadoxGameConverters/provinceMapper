@@ -429,7 +429,7 @@ void LinkMappingVersion::deleteLinkByID(const int theID)
 				if (add)
 					unmappedSources->emplace_back(province);
 			}
-				
+
 			for (const auto& province: link->getTargets())
 			{
 				// If province already belongs to unmappedTargets, don't add it again.
@@ -539,7 +539,7 @@ const std::shared_ptr<LinkMapping>& LinkMappingVersion::getLinkForTargetProvince
 {
 	static const std::shared_ptr<LinkMapping> nullLink = nullptr;
 
-   for (const auto& province: *unmappedTargets)
+	for (const auto& province: *unmappedTargets)
 		if (province->ID == targetProvinceID)
 			return nullLink;
 

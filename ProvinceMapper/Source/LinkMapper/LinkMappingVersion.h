@@ -3,7 +3,6 @@
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkMapping.h"
 #include "Parser.h"
-#include "Triangle.h"
 #include "TriangulationPointPair.h"
 #include "tpp_interface.hpp"
 
@@ -39,13 +38,13 @@ class LinkMappingVersion
 
 	void deactivateLink();
 	void deactivateTriangulationPair();
-	void activateLinkByIndex(const int row);
-	void activateTriangulationPairByIndex(const int row);
+	void activateLinkByIndex(int row);
+	void activateTriangulationPairByIndex(int row);
 	void activateLinkByID(int theID);
 	void deleteActiveLink();
 	void deleteActiveTriangulationPair();
 	void setName(const std::string& theName) { versionName = theName; }
-	void setID(int theID) { ID = theID; }
+	void setID(const int theID) { ID = theID; }
 	void copyLinks(const std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>>& theLinks) const { *links = *theLinks; }
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;

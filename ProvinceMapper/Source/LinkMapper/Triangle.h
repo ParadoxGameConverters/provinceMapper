@@ -16,7 +16,7 @@ class Triangle
 	[[nodiscard]] auto getTargetPoint2() const { return *pair2->getTargetPoint(); }
 	[[nodiscard]] auto getTargetPoint3() const { return *pair3->getTargetPoint(); }
 
-   [[nodiscard]] std::vector<wxPoint> getSourcePoints() const;
+	[[nodiscard]] std::vector<wxPoint> getSourcePoints() const;
 	[[nodiscard]] std::vector<wxPoint> getTargetPoints() const;
 
   private:

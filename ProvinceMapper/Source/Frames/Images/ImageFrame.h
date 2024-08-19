@@ -39,7 +39,7 @@ class ImageFrame: public wxFrame
 	void centerProvince(ImageTabSelector selector, const std::string& ID);
 	void deleteActiveLink();
 	void deleteActiveTriangulationPair();
-	void activateTriangulationPairByID(const int ID);
+	void activateTriangulationPairByID(int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
 	void autogenerateMappings() const;

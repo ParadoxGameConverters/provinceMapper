@@ -11,11 +11,8 @@ class TriangulationPointPair final: public LinkBase
 {
   public:
 	TriangulationPointPair() = default;
-	explicit TriangulationPointPair(
-		 std::istream& theStream,
-		 int theID);
-	explicit TriangulationPointPair(
-		 int theID);
+	explicit TriangulationPointPair(std::istream& theStream, int theID);
+	explicit TriangulationPointPair(int theID);
 
 	void setSourcePoint(const wxPoint& point) { sourcePoint = point; }
 	void setTargetPoint(const wxPoint& point) { targetPoint = point; }

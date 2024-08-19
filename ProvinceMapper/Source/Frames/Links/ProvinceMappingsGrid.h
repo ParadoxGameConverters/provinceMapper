@@ -3,11 +3,11 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "GridBase.h"
+#include "LinkMapper/LinkMappingVersion.h"
 #include <optional>
 #include <wx/grid.h>
 #include <wx/notebook.h>
-#include "GridBase.h"
-#include "LinkMapper/LinkMappingVersion.h"
 
 
 wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
@@ -28,17 +28,17 @@ class ProvinceMappingsGrid final: public GridBase
 	ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
 
 	void redraw();
-	void leftUp(const wxGridEvent& event);
-	void rightUp(wxGridEvent& event);
+	void leftUp(const wxGridEvent& event) override;
+	void rightUp(wxGridEvent& event) override;
 
 	void deactivateLink();
-	void activateLinkByID(const int theID);
-	void activateLinkByIndex(const int index);
+	void activateLinkByID(int theID);
+	void activateLinkByIndex(int index);
 
 	void activateLinkRowColor(int row);
 	void restoreLinkRowColor(int row);
 
-	void createLink(const int linkID);
+	void createLink(int linkID);
 
 	void stageAddComment();
 

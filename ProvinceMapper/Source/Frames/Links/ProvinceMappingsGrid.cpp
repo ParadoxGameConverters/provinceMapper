@@ -109,7 +109,6 @@ void ProvinceMappingsGrid::activateLinkByIndex(const int index)
 	if (index >= static_cast<int>(version->getLinks()->size()))
 		return; // uh-huh
 
-	const auto& link = version->getLinks()->at(index);
 	activeRow = index;
 	activateLinkRowColor(index);
 	if (!IsVisible(index, 0, false))

@@ -32,19 +32,18 @@ class TriangulationPairsGrid final: public GridBase
 	void redraw();
 	void stageAddComment();
 
-	void leftUp(const wxGridEvent& event);
-	void rightUp(wxGridEvent& event);
+	void leftUp(const wxGridEvent& event) override;
+	void rightUp(wxGridEvent& event) override;
 
 	void activateLinkRowColor(int row);
 	void restoreLinkRowColor(int row);
 
 	void deactivateTriangulationPair();
-	void activatePairByIndex(const int index);
+	void activatePairByIndex(int index);
 	void createTriangulationPair(int pairID);
 
 	[[nodiscard]] const std::shared_ptr<LinkBase> getActiveLink() override { return version->getActiveTriangulationPair(); }
 
   private:
-
 	void onUpdateComment(const wxCommandEvent& event);
 };

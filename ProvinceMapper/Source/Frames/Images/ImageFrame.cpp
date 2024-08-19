@@ -2,6 +2,7 @@
 #include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
 #include "LinkMapper/Automapper.h"
+#include "LinkMapper/Triangle.h"
 #include "LinkMapper/TriangulationPointPair.h"
 #include "OSCompatibilityLayer.h"
 #include "Provinces/Province.h"

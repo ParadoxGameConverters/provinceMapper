@@ -1,10 +1,10 @@
 #include "TriangulationPairsGrid.h"
 
-#include <utility>
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 #include "TriangulationPairDialogComment.h"
+#include <utility>
 
 
 
@@ -19,7 +19,7 @@ wxDEFINE_EVENT(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_AUTOGENERATE_MAPPINGS, wxCommandEvent);
 
 
-TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, std::move(theVersion))
+TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion): GridBase(parent, std::move(theVersion))
 {
 	Bind(wxEVT_UPDATE_TRIANGULATION_PAIR_COMMENT, &TriangulationPairsGrid::onUpdateComment, this);
 }
@@ -144,7 +144,7 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			activateLinkRowColor(rowCounter);
 			// If we have an active link, restore its color.
 			if (activeRow)
-				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+				restoreLinkRowColor(*activeRow + 1); // We have a link inserted, so we need to fix the following one.
 			activeRow = rowCounter;
 			lastClickedRow = rowCounter;
 			// let's insert it.
@@ -209,7 +209,6 @@ void TriangulationPairsGrid::activatePairByIndex(const int index)
 	if (index >= static_cast<int>(version->getTriangulationPairs()->size()))
 		return; // uh-huh
 
-	const auto& pair = version->getTriangulationPairs()->at(index);
 	activeRow = index;
 	activateLinkRowColor(index);
 	if (!IsVisible(index, 0, false))

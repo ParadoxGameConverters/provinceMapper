@@ -14,7 +14,7 @@ wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 
 class LinkBase;
 class LinkMappingVersion;
-class GridBase : public wxGrid 
+class GridBase: public wxGrid
 {
   public:
 	GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);

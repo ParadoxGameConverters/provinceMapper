@@ -26,7 +26,7 @@ enum class ImageTabSelector
 
 class LinkMapping;
 class Definitions;
-class ImageCanvas: public wxScrolledCanvas
+class ImageCanvas final: public wxScrolledCanvas
 {
   public:
 	ImageCanvas(wxWindow* parent,
