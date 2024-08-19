@@ -75,6 +75,34 @@ bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::s
 		return false;
 	}
 
+	// If link already has multiple targets and a different source, we can't add another source.
+	const auto& tgtLink = activeVersion->getLinkForTargetProvince(tgtProvID);
+	if (tgtLink && tgtLink->getTargets().size() > 1)
+	{
+		for (const auto& srcProv: tgtLink->getSources())
+		{
+			if (srcProv->ID != srcProvID)
+			{
+				return false;
+			}
+		}
+	}
+
+	// If link already has multiple sources and a different target, we can't add another target.
+	const auto& srcLink = activeVersion->getLinkForSourceProvince(srcProvID);
+	if (srcLink && srcLink->getSources().size() > 1)
+	{
+		for (const auto& tgtProv: srcLink->getTargets())
+		{
+			if (tgtProv->ID != tgtProvID)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
    return true;
 }
 
