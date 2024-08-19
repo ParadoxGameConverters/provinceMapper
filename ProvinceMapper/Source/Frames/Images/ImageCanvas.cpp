@@ -218,7 +218,8 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// 2. add a province to the existing mapping, or
 	// 3. remove it from active mapping.
 	// 4 - special: if we're initing triangulation, we need raw points.
-	// 5. - special: if we're adding a permanent triangulation pair, 
+	// 5. - special: if we're adding a permanent triangulation pair, add source/target point
+   // TODO: 6. when triangulation mesh is enabled and we clicked within the radius of a triangulation pair point, activate the pair.
 
 	// What province have we clicked?
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -230,8 +231,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
 		// case 5: check if we're in the process of editing a triangulation pair
-		const auto& activeTriangulationPair = getActiveTriangulationPair();
-		if (activeTriangulationPair)
+		if (const auto& activeTriangulationPair = getActiveTriangulationPair())
 		{
 			const auto point = wxPoint(x, y);
 			if (selector == ImageTabSelector::SOURCE)
@@ -260,7 +260,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 				if (knownPoint == point)
 					return;
 			// insert and ping.
-			points.emplace_back(wxPoint(x, y));
+			points.emplace_back(x, y);
 			stagePointPlaced();
 			return;
 		}
