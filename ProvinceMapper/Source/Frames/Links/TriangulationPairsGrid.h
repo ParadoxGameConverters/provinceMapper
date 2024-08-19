@@ -8,7 +8,6 @@
 
 #include <optional>
 #include <wx/grid.h>
-#include <wx/notebook.h>
 
 
 

@@ -35,4 +35,3 @@ class Automapper
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 };
-// TODO: fix that after automapping, clicking on a province in the imageframe doesn't focus to the link on the links tab
