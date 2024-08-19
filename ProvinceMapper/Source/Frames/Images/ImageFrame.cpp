@@ -1180,5 +1180,16 @@ void ImageFrame::autogenerateMappings()
 	Log(LogLevel::Debug) << "Generating links...";
 	automapper.generateLinks();
 
+	if (black == true)
+	{
+		// Refresh The Shade.
+		sourceCanvas->generateShadedPixels();
+		sourceCanvas->applyShadedPixels();
+		targetCanvas->generateShadedPixels();
+		targetCanvas->applyShadedPixels();
+		sourceCanvas->applyStrafedPixels();
+		targetCanvas->applyStrafedPixels();
+	}
 	render();
+	Refresh();
 }
