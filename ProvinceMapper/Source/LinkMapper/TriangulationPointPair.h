@@ -7,7 +7,7 @@
 #endif
 #include "LinkBase.h"
 
-class TriangulationPointPair: public LinkBase
+class TriangulationPointPair final: public LinkBase
 {
   public:
 	TriangulationPointPair() = default;
@@ -22,11 +22,11 @@ class TriangulationPointPair: public LinkBase
 
 	[[nodiscard]] const auto& getSourcePoint() const { return sourcePoint; }
 	[[nodiscard]] const auto& getTargetPoint() const { return targetPoint; }
-	[[nodiscard]] const bool isEmpty() const { return !sourcePoint && !targetPoint && !comment; }
+	[[nodiscard]] bool isEmpty() const { return !sourcePoint && !targetPoint && !comment; }
 
-	[[nodiscard]] const std::string toRowString();
-	[[nodiscard]] const wxColour getBaseRowColour();
-	[[nodiscard]] const wxColour getActiveRowColour();
+	[[nodiscard]] const std::string toRowString() override;
+	[[nodiscard]] const wxColour getBaseRowColour() override;
+	[[nodiscard]] const wxColour getActiveRowColour() override;
 
 	friend std::ostream& operator<<(std::ostream& output, const TriangulationPointPair& pointPair);
 

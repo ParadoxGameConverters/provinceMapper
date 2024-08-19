@@ -5,6 +5,7 @@ class wxColour;
 class LinkBase
 {
   public:
+	virtual ~LinkBase() = default;
 	explicit LinkBase(int theID);
 
 	[[nodiscard]] auto getID() const { return ID; }

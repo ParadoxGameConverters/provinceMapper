@@ -67,48 +67,6 @@ static std::map<int, std::string, std::greater<>> getHighestMatches(const std::m
 	return sharesMap;
 }
 
-bool Automapper::isSourceProvinceAvailable(const std::string& srcProvID)
-{
-	if (unavailableSources.contains(srcProvID))
-	{
-		return false;
-	}
-
-	const auto& link = activeVersion->getLinkForSourceProvince(srcProvID);
-	if (!link)
-	{
-		return true;
-	}
-
-	if (link->getTargets().size() == 1)
-	{
-		return true;
-	}
-	unavailableSources.insert(srcProvID);
-	return false;
-}
-
-bool Automapper::isTargetProvinceAvailable(const std::string& tgtProvID)
-{
-	if (unavailableTargets.contains(tgtProvID))
-	{
-		return false;
-	}
-
-	const auto& link = activeVersion->getLinkForTargetProvince(tgtProvID);
-	if (!link)
-	{
-		return true;
-	}
-
-	if (link->getSources().size() == 1)
-	{
-		return true;
-	}
-	unavailableTargets.insert(tgtProvID);
-	return false;
-}
-
 bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID) const
 {
 	// Avoid many-to-many mappings.
@@ -159,7 +117,6 @@ void Automapper::generateLinks()
 	// 1. For all non-impassable target provinces:
 	//	   If the most matching source province is available and not impassable, map them.
 	Log(LogLevel::Debug) << "\nLink generation step 1...";
-	Log(LogLevel::Info) << "Shares count for src prov 1332: " << sourceProvinceShares["1332"].size(); // TODO: remove this
 	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
 	{
 		if (tgtImpassablesCache.contains(tgtProvID))
@@ -178,10 +135,6 @@ void Automapper::generateLinks()
 		{
 			continue;
 		}
-		if (!isSourceProvinceAvailable(srcProvID))
-		{
-			continue;
-		}
 
 		mapProvinces(srcProvID, tgtProvID);
 
@@ -194,7 +147,6 @@ void Automapper::generateLinks()
 	// 2. For all yet unmapped non-impassable source provinces:
 	//	   If the most matching target province is available and not impassable, map them.
 	Log(LogLevel::Debug) << "\nLink generation step 2...";
-	Log(LogLevel::Info) << "Shares count for src prov 1332: " << sourceProvinceShares["1332"].size(); // TODO: remove this
 	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
 	{
 		if (srcImpassablesCache.contains(srcProvID))
@@ -217,10 +169,6 @@ void Automapper::generateLinks()
 		{
 			continue;
 		}
-		if (!isTargetProvinceAvailable(tgtProvID))
-		{
-			continue;
-		}
 
 		mapProvinces(srcProvID, tgtProvID);
 
@@ -231,7 +179,6 @@ void Automapper::generateLinks()
 	// 3. For all yet unmapped non-impassable target provinces:
 	//	   Try to use the most matching available non-impassable source province to map them.
 	Log(LogLevel::Debug) << "\nLink generation step 3...";
-	Log(LogLevel::Info) << "Shares count for src prov 1332: " << sourceProvinceShares["1332"].size(); // TODO: remove this
 	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
 	{
 		if (tgtImpassablesCache.contains(tgtProvID))
@@ -254,10 +201,6 @@ void Automapper::generateLinks()
 			{
 				continue;
 			}
-			if (!isSourceProvinceAvailable(srcProvID))
-			{
-				continue;
-			}
 
 			mapProvinces(srcProvID, tgtProvID);
 
@@ -270,7 +213,6 @@ void Automapper::generateLinks()
 	// 4. For all yet unmapped non-impassable source provinces:target
 	//	   Try to use the most matching available non-impassable target province to map them.
 	Log(LogLevel::Debug) << "\nLink generation step 4...";
-	Log(LogLevel::Info) << "Shares count for src prov 1332: " << sourceProvinceShares["1332"].size(); // TODO: remove this
 	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
 	{
 		if (srcImpassablesCache.contains(srcProvID))
@@ -293,10 +235,6 @@ void Automapper::generateLinks()
 			{
 				continue;
 			}
-			if (!isTargetProvinceAvailable(tgtProvID))
-			{
-				continue;
-			}
 
 			mapProvinces(srcProvID, tgtProvID);
 
@@ -309,17 +247,12 @@ void Automapper::generateLinks()
 	// 5. For all yet unmapped target provinces:
 	//    Try to use the most matching available source province to map them.
 	Log(LogLevel::Debug) << "\nLink generation step 5...";
-	Log(LogLevel::Info) << "Shares count for src prov 1332: " << sourceProvinceShares["1332"].size(); // TODO: remove this
 	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
 	{
 		auto highestSrcMatches = getHighestMatches(srcProvMatches);
 		for (const auto& srcProvID: highestSrcMatches | std::views::values)
 		{
 			if (!canProvincesBeMapped(srcProvID, tgtProvID))
-			{
-				continue;
-			}
-			if (!isSourceProvinceAvailable(srcProvID))
 			{
 				continue;
 			}
@@ -335,26 +268,15 @@ void Automapper::generateLinks()
 	// 6. For all yet unmapped source provinces:
 	//    Try to use the most matching available target province to map them.
 	Log(LogLevel::Debug) << "\nLink generation step 6...";
-	Log(LogLevel::Info) << "Shares count for src prov 1332: " << sourceProvinceShares["1332"].size(); // TODO: remove this
 	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
 	{
 		auto highestTgtMatches = getHighestMatches(tgtProvMatches);
 		for (const auto& tgtProvID: highestTgtMatches | std::views::values)
 		{
-			if (srcProvID == "1332") // TODO: remove this
-				Log(LogLevel::Info) << "EVALUATING " << tgtProvID; // TODO: remove this
 			if (!canProvincesBeMapped(srcProvID, tgtProvID))
 			{
 				continue;
 			}
-			if (srcProvID == "1332") // TODO: remove this
-				Log(LogLevel::Info) << "TGT PROV " << tgtProvID << " PASSED FIRST TEST";
-			if (!isTargetProvinceAvailable(tgtProvID))
-			{
-				continue;
-			}
-			if (srcProvID == "1332") // TODO: remove this
-				Log(LogLevel::Info) << "TGT PROV " << tgtProvID << " PASSED SECOND TEST";
 
 			mapProvinces(srcProvID, tgtProvID);
 

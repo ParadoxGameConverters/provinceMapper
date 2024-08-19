@@ -13,7 +13,7 @@ enum class Mapping
 	FAIL
 };
 struct Province;
-class LinkMapping: public LinkBase
+class LinkMapping final: public LinkBase
 {
   public:
 	LinkMapping() = default;

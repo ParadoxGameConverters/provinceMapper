@@ -72,22 +72,22 @@ void TriangulationPointPair::registerKeys(commonItems::parser& parser)
 	parser.registerKeyword("srcX", [this](std::istream& theStream) {
 		if (!sourcePoint)
 			sourcePoint = wxPoint();
-		(*sourcePoint).x = commonItems::getDouble(theStream);
+		sourcePoint->x = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("srcY", [this](std::istream& theStream) {
 		if (!sourcePoint)
 			sourcePoint = wxPoint();
-		(*sourcePoint).y = commonItems::getDouble(theStream);
+		sourcePoint->y = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("dstX", [this](std::istream& theStream) {
 		if (!targetPoint)
 			targetPoint = wxPoint();
-		(*targetPoint).x = commonItems::getDouble(theStream);
+		targetPoint->x = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("dstY", [this](std::istream& theStream) {
 		if (!targetPoint)
 			targetPoint = wxPoint();
-		(*targetPoint).y = commonItems::getDouble(theStream);
+		targetPoint->y = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);
