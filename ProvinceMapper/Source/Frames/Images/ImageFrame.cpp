@@ -1129,6 +1129,7 @@ void ImageFrame::autogenerateMappings() const
 
 	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
 	{
+		// Skip if the source province is already mapped (implying a hand-made mapping).
 		if (activeVersion->isProvinceMapped(sourceProvince->ID, true) == Mapping::MAPPED)
 			continue;
 
@@ -1160,6 +1161,7 @@ void ImageFrame::autogenerateMappings() const
 				continue;
 			}
 
+			// Skip if the target province is already mapped (implying a hand-made mapping).
 			if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
 				continue;
 

@@ -14,6 +14,7 @@ class Automapper
   private:
 	[[nodiscard]] bool isSourceProvinceAvailable(const std::string& srcProvID);
 	[[nodiscard]] bool isTargetProvinceAvailable(const std::string& tgtProvID);
+	[[nodiscard]] bool canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID);
 	void mapProvinces(const std::string& srcProvID, const std::string& tgtProvID);
 
 	void cleanUpSourceProvinceShares();

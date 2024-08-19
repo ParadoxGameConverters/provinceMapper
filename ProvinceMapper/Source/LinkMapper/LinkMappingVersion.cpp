@@ -199,18 +199,6 @@ void LinkMappingVersion::removeUnmappedSourceByID(const std::string& provinceID)
 
 void LinkMappingVersion::removeUnmappedTargetByID(const std::string& provinceID) const
 {
-	if (provinceID == "7210") // TODO: REMOVE THIS
-	{
-
-		Log(LogLevel::Error) << "Removing 7210 from unmapped targets";
-
-	  Log(LogLevel::Info) << "All unmapped targets before removal: " << (*unmappedTargets).size();
-		for (const auto& province: *unmappedTargets)
-		{
-			Log(LogLevel::Info) << "   UNMAPPED:   " << province->ID;
-		}
-	}
-
 	auto counter = 0;
 	for (const auto& province: *unmappedTargets)
 	{
