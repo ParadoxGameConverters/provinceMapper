@@ -7,6 +7,7 @@
 #include <wx/grid.h>
 #include <wx/notebook.h>
 #include "GridBase.h"
+#include "LinkMapper/LinkMappingVersion.h"
 
 
 wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
@@ -40,6 +41,8 @@ class ProvinceMappingsGrid final: public GridBase
 	void createLink(const int linkID);
 
 	void stageAddComment();
+
+	[[nodiscard]] const std::shared_ptr<LinkBase> getActiveLink() override { return version->getActiveLink(); }
 
   private:
 	void onUpdateComment(const wxCommandEvent& event);

@@ -3,6 +3,7 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+
 #include <optional>
 #include <wx/grid.h>
 #include <wx/notebook.h>
@@ -11,8 +12,8 @@
 wxDECLARE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 
 
-class LinkMappingVersion;
 class LinkBase;
+class LinkMappingVersion;
 class GridBase : public wxGrid 
 {
   public:
@@ -25,7 +26,7 @@ class GridBase : public wxGrid
 
 	void refreshActiveLink();
 
-	std::shared_ptr<LinkBase> activeLink;
+	[[nodiscard]] virtual const std::shared_ptr<LinkBase> getActiveLink() = 0;
 
   private:
 	void onGridMotion(wxMouseEvent& event);

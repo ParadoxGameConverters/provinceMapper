@@ -167,7 +167,7 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 
 void LinksTab::stageAddComment()
 {
-	if (triangulationPointGrid->activeLink)
+	if (triangulationPointGrid->getActiveLink())
 	{
 		triangulationPointGrid->stageAddComment();
 	}
@@ -179,12 +179,12 @@ void LinksTab::stageAddComment()
 
 void LinksTab::stageDeleteLink() const
 {
-	if (triangulationPointGrid->activeLink) {
+	if (triangulationPointGrid->getActiveLink()) {
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
 		eventListener->QueueEvent(evt->Clone());
 	}
 	// Do nothing unless working on active link. Don't want accidents here.
-	else if (provinceMappingsGrid->activeLink)
+	else if (provinceMappingsGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
@@ -193,12 +193,12 @@ void LinksTab::stageDeleteLink() const
 
 void LinksTab::stageMoveUp() const
 {	
-	if (triangulationPointGrid->activeLink)
+	if (triangulationPointGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP);
 		eventListener->QueueEvent(evt->Clone());
 	}
-	else if (provinceMappingsGrid->activeLink)
+	else if (provinceMappingsGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventListener->QueueEvent(evt->Clone());
@@ -207,12 +207,12 @@ void LinksTab::stageMoveUp() const
 
 void LinksTab::stageMoveDown() const
 {
-	if (triangulationPointGrid->activeLink)
+	if (triangulationPointGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN);
 		eventListener->QueueEvent(evt->Clone());
 	}
-	else if (provinceMappingsGrid->activeLink)
+	else if (provinceMappingsGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventListener->QueueEvent(evt->Clone());

@@ -3,10 +3,12 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "GridBase.h"
+#include "LinkMapper/LinkMappingVersion.h"
+
 #include <optional>
 #include <wx/grid.h>
 #include <wx/notebook.h>
-#include "GridBase.h"
 
 
 
@@ -41,6 +43,9 @@ class TriangulationPairsGrid final: public GridBase
 	void activatePairByIndex(const int index);
 	void createTriangulationPair(int pairID);
 
+	[[nodiscard]] const std::shared_ptr<LinkBase> getActiveLink() override { return version->getActiveTriangulationPair(); }
+
   private:
+
 	void onUpdateComment(const wxCommandEvent& event);
 };
