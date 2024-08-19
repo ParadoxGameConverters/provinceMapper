@@ -129,22 +129,18 @@ void Automapper::mapProvinces(const std::string& srcProvID, const std::string& t
 
 void Automapper::cleanUpSourceProvinceShares()
 {
-	for (const auto& key: srcProvincesToRemove)
+	for (const auto& ID: alreadyMappedSrcProvincesCache)
 	{
-		sourceProvinceShares.erase(key);
+		sourceProvinceShares.erase(ID);
 	}
-
-   srcProvincesToRemove.clear();
 }
 
 void Automapper::cleanUpTargetProvinceShares()
 {
-	for (const auto& key: tgtProvincesToRemove)
+	for (const auto& ID: alreadyMappedTgtProvincesCache)
 	{
-		targetProvinceShares.erase(key);
+		targetProvinceShares.erase(ID);
 	}
-
-   tgtProvincesToRemove.clear();
 }
 
 void Automapper::generateLinks()
@@ -179,10 +175,6 @@ void Automapper::generateLinks()
 		}
 
 		mapProvinces(srcProvID, tgtProvID);
-
-		// tgtProvID can be removed from targetProvinceShares because it's already mapped.
-		// Schedule it for removal after the loop to avoid iterator invalidation.
-		tgtProvincesToRemove.insert(tgtProvID);
 	}
 	cleanUpTargetProvinceShares();
 
@@ -214,7 +206,6 @@ void Automapper::generateLinks()
 		}
 
 		mapProvinces(srcProvID, tgtProvID);
-		srcProvincesToRemove.insert(srcProvID);
 	}
 	cleanUpSourceProvinceShares();
 
@@ -240,7 +231,6 @@ void Automapper::generateLinks()
 		}
 
 		mapProvinces(srcProvID, tgtProvID);
-		tgtProvincesToRemove.insert(tgtProvID);
 	}
 	cleanUpTargetProvinceShares();
 
@@ -271,7 +261,6 @@ void Automapper::generateLinks()
 		}
 
 		mapProvinces(srcProvID, tgtProvID);
-		srcProvincesToRemove.insert(srcProvID);
 	}
 	cleanUpSourceProvinceShares();
 
@@ -302,7 +291,6 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-			tgtProvincesToRemove.insert(tgtProvID);
 			break;
 		}
 	}
@@ -335,7 +323,6 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-			srcProvincesToRemove.insert(srcProvID);
 			break;
 		}
 	}
@@ -355,7 +342,6 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-			tgtProvincesToRemove.insert(tgtProvID);
 			break;
 		}
 	}
@@ -375,11 +361,60 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-			srcProvincesToRemove.insert(srcProvID);
 			break;
 		}
 	}
 	cleanUpSourceProvinceShares();
+
+	// 9. For all yet unmapped non-impassable target provinces, we're running out of options, so we turn to theft.
+	//    Check if we can steal a source province from an existing many-to-one link.
+	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
+	{
+		if (tgtImpassablesCache.contains(tgtProvID))
+			continue;
+
+		auto highestSrcMatches = getHighestMatches(srcProvMatches);
+		for (const auto& srcProvID: highestSrcMatches | std::views::values)
+		{
+			if (srcImpassablesCache.contains(srcProvID))
+				continue;
+
+			const auto& srcLinkToBeMugged = activeVersion->getLinkForSourceProvince(srcProvID);
+			if (!srcLinkToBeMugged || srcLinkToBeMugged->getSources().size() <= 1)
+				continue;
+
+			Log(LogLevel::Debug) << "Stealing source province " << srcProvID << " in order to map target province " << tgtProvID;
+			activeVersion->activateLinkByID(srcLinkToBeMugged->getID());
+			activeVersion->toggleProvinceByID(srcProvID, true);
+			mapProvinces(srcProvID, tgtProvID);
+			break;
+		}
+	}
+
+	// 10. For all yet unmapped non-impassable source provinces, we're running out of options, so we turn to theft.
+	//     Check if we can steal a target province from an existing one-to-many link.
+	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
+	{
+		if (srcImpassablesCache.contains(srcProvID))
+			continue;
+
+		auto highestTgtMatches = getHighestMatches(tgtProvMatches);
+		for (const auto& tgtProvID: highestTgtMatches | std::views::values)
+		{
+			if (tgtImpassablesCache.contains(tgtProvID))
+				continue;
+
+			const auto& tgtLinkToBeMugged = activeVersion->getLinkForTargetProvince(tgtProvID);
+			if (!tgtLinkToBeMugged || tgtLinkToBeMugged->getTargets().size() <= 1)
+				continue;
+
+			Log(LogLevel::Debug) << "Stealing target province " << tgtProvID << " in order to map source province " << srcProvID;
+			activeVersion->activateLinkByID(tgtLinkToBeMugged->getID());
+			activeVersion->toggleProvinceByID(tgtProvID, false);
+			mapProvinces(srcProvID, tgtProvID);
+			break;
+		}
+	}
 
 	Log(LogLevel::Info) << "<> Automapping complete.";
 }

@@ -17,8 +17,6 @@ class Automapper final
 
 	void cleanUpSourceProvinceShares();
 	void cleanUpTargetProvinceShares();
-	std::set<std::string> srcProvincesToRemove;
-	std::set<std::string> tgtProvincesToRemove;
 
 	std::map<std::string, std::map<std::string, int>> sourceProvinceShares; // src prov ID, <target prov ID, shares>
 	std::map<std::string, std::map<std::string, int>> targetProvinceShares; // target prov ID, <src prov ID, shares>
