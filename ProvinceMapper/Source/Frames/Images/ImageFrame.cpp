@@ -202,7 +202,7 @@ void ImageFrame::renderSource() const
 		pen.SetColour("white");
 		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
 		sourceDC.SetPen(pen);
-		sourceDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulatin points per canvas
+		sourceDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulation points per canvas
 		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 	}
 
@@ -281,7 +281,7 @@ void ImageFrame::renderTarget() const
 		pen.SetColour("white");
 		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
 		targetDC.SetPen(pen);
-		targetDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulatin points per canvas
+		targetDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulation points per canvas
 		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 	}
 
@@ -758,29 +758,26 @@ void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool is
 	// iterate over triangles
 	for (const auto& triangle: triangles)
 	{
-		const auto& pair1 = triangle->pair1;
-		const auto& pair2 = triangle->pair2;
-		const auto& pair3 = triangle->pair3;
 
 		// Draw the triangle.
 		if (isSourceMap)
 		{
-			const auto& srcPoint1 = pair1->getSourcePoint();
-			const auto& srcPoint2 = pair2->getSourcePoint();
-			const auto& srcPoint3 = pair3->getSourcePoint();
-			paintDC.DrawLine(srcPoint1->x, srcPoint1->y, srcPoint2->x, srcPoint2->y);
-			paintDC.DrawLine(srcPoint2->x, srcPoint2->y, srcPoint3->x, srcPoint3->y);
-			paintDC.DrawLine(srcPoint3->x, srcPoint3->y, srcPoint1->x, srcPoint1->y);
+			const auto& srcPoint1 = triangle->getSourcePoint1();
+			const auto& srcPoint2 = triangle->getSourcePoint2();
+			const auto& srcPoint3 = triangle->getSourcePoint3();
+			paintDC.DrawLine(srcPoint1.x, srcPoint1.y, srcPoint2.x, srcPoint2.y);
+			paintDC.DrawLine(srcPoint2.x, srcPoint2.y, srcPoint3.x, srcPoint3.y);
+			paintDC.DrawLine(srcPoint3.x, srcPoint3.y, srcPoint1.x, srcPoint1.y);
 		}
 		else
 		{
-			const auto& tgtPoint1 = pair1->getTargetPoint();
-			const auto& tgtPoint2 = pair2->getTargetPoint();
-			const auto& tgtPoint3 = pair3->getTargetPoint();
+			const auto& tgtPoint1 = triangle->getTargetPoint1();
+			const auto& tgtPoint2 = triangle->getTargetPoint2();
+			const auto& tgtPoint3 = triangle->getTargetPoint3();
 
-			paintDC.DrawLine(tgtPoint1->x, tgtPoint1->y, tgtPoint2->x, tgtPoint2->y);
-			paintDC.DrawLine(tgtPoint2->x, tgtPoint2->y, tgtPoint3->x, tgtPoint3->y);
-			paintDC.DrawLine(tgtPoint3->x, tgtPoint3->y, tgtPoint1->x, tgtPoint1->y);
+			paintDC.DrawLine(tgtPoint1.x, tgtPoint1.y, tgtPoint2.x, tgtPoint2.y);
+			paintDC.DrawLine(tgtPoint2.x, tgtPoint2.y, tgtPoint3.x, tgtPoint3.y);
+			paintDC.DrawLine(tgtPoint3.x, tgtPoint3.y, tgtPoint1.x, tgtPoint1.y);
 		}
 	}
 }
@@ -1096,15 +1093,15 @@ void ImageFrame::autogenerateMappings() const
 	std::map<std::pair<int, int>, std::shared_ptr<Triangle>> pointToTriangleMap;
 	for (const auto& triangle: triangles)
 	{
-		const auto& sourcePoint1 = triangle->pair1->getSourcePoint();
-		const auto& sourcePoint2 = triangle->pair2->getSourcePoint();
-		const auto& sourcePoint3 = triangle->pair3->getSourcePoint();
+		const auto& sourcePoint1 = triangle->getSourcePoint1();
+		const auto& sourcePoint2 = triangle->getSourcePoint2();
+		const auto& sourcePoint3 = triangle->getSourcePoint3();
 
 		// Determine the bounding box of the triangle.
-		const auto minX = std::min({sourcePoint1->x, sourcePoint2->x, sourcePoint3->x});
-		const auto minY = std::min({sourcePoint1->y, sourcePoint2->y, sourcePoint3->y});
-		const auto maxX = std::max({sourcePoint1->x, sourcePoint2->x, sourcePoint3->x});
-		const auto maxY = std::max({sourcePoint1->y, sourcePoint2->y, sourcePoint3->y});
+		const auto minX = std::min({sourcePoint1.x, sourcePoint2.x, sourcePoint3.x});
+		const auto minY = std::min({sourcePoint1.y, sourcePoint2.y, sourcePoint3.y});
+		const auto maxX = std::max({sourcePoint1.x, sourcePoint2.x, sourcePoint3.x});
+		const auto maxY = std::max({sourcePoint1.y, sourcePoint2.y, sourcePoint3.y});
 
 		// For every pixel in the bounding box, determine if it's inside the triangle.
 		for (auto x = minX; x <= maxX; x++)
@@ -1112,7 +1109,7 @@ void ImageFrame::autogenerateMappings() const
 			for (auto y = minY; y <= maxY; y++)
 			{
 				const auto point = wxPoint(x, y);
-				if (isPointInsideTriangle(point, *sourcePoint1, *sourcePoint2, *sourcePoint3))
+				if (isPointInsideTriangle(point, sourcePoint1, sourcePoint2, sourcePoint3))
 				{
 					pointToTriangleMap[std::make_pair(x, y)] = triangle;
 				}
