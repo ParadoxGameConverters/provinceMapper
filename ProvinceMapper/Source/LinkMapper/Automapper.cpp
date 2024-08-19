@@ -99,8 +99,6 @@ bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::s
 				return false;
 			}
 		}
-
-		return true;
 	}
 
    return true;
