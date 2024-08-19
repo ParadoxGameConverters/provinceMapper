@@ -1138,13 +1138,13 @@ void ImageFrame::autogenerateMappings()
 		// Determine which target province every pixel of the source province corresponds to.
 		for (const auto& sourcePixel: sourceProvince->getAllPixels())
 		{
-			// Only map every 5th row and column to speed up the process while keeping a decent accuracy.
-			if (sourcePixel.x % 5 != 0 || sourcePixel.y % 5 != 0)
+			// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
+			if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
 			{
 				continue;
 			}
 
-			auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
+			const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
 
 			const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
 			const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
@@ -1175,7 +1175,6 @@ void ImageFrame::autogenerateMappings()
 			automapper.registerMatch(sourceProvince, tgtProvince);
 		}
 	}
-
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 

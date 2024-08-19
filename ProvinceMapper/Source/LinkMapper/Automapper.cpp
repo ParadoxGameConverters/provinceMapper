@@ -69,19 +69,22 @@ static std::map<int, std::string, std::greater<>> getHighestMatches(const std::m
 
 bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID, const bool allowAddingToExistingLink) const
 {
+	const bool srcAlreadyMapped = alreadyMappedSrcProvincesCache.contains(srcProvID);
+	const bool tgtAlreadyMapped = alreadyMappedTgtProvincesCache.contains(tgtProvID);
+
+	if (!allowAddingToExistingLink && (srcAlreadyMapped || tgtAlreadyMapped))
+	{
+		return false;
+	}
+
 	// Avoid many-to-many mappings.
-	if (alreadyMappedSrcProvincesCache.contains(srcProvID) && alreadyMappedTgtProvincesCache.contains(tgtProvID))
+	if (srcAlreadyMapped && tgtAlreadyMapped)
 	{
 		return false;
 	}
 
 	if (const auto& tgtLink = activeVersion->getLinkForTargetProvince(tgtProvID))
 	{
-		if (!allowAddingToExistingLink)
-		{
-			return false;
-		}
-
 		// If link already has multiple targets and a different source, we can't add another source.
 		if (tgtLink->getTargets().size() > 1)
 		{
@@ -97,11 +100,6 @@ bool Automapper::canProvincesBeMapped(const std::string& srcProvID, const std::s
 
 	if (const auto& srcLink = activeVersion->getLinkForSourceProvince(srcProvID))
 	{
-		if (!allowAddingToExistingLink)
-		{
-			return false;
-		}
-
 		// If link already has multiple sources and a different target, we can't add another target.
 		if (srcLink->getSources().size() > 1)
 		{
@@ -135,6 +133,8 @@ void Automapper::cleanUpSourceProvinceShares()
 	{
 		sourceProvinceShares.erase(key);
 	}
+
+   srcProvincesToRemove.clear();
 }
 
 void Automapper::cleanUpTargetProvinceShares()
@@ -143,6 +143,8 @@ void Automapper::cleanUpTargetProvinceShares()
 	{
 		targetProvinceShares.erase(key);
 	}
+
+   tgtProvincesToRemove.clear();
 }
 
 void Automapper::generateLinks()
@@ -156,6 +158,7 @@ void Automapper::generateLinks()
 
 	// 1. For all non-impassable target provinces:
 	//	   If the most matching source province is available and not impassable, map them.
+	//	   Require both sides to be currently unmapped.
 	Log(LogLevel::Debug) << "Link generation step 1...";
 	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
 	{
@@ -165,13 +168,12 @@ void Automapper::generateLinks()
 		}
 
 		auto highestSrcMatches = getHighestMatches(srcProvMatches);
-
 		const auto& srcProvID = highestSrcMatches.begin()->second;
 		if (srcImpassablesCache.contains(srcProvID))
 		{
 			continue;
 		}
-		if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
+		if (!canProvincesBeMapped(srcProvID, tgtProvID, false))
 		{
 			continue;
 		}
@@ -186,7 +188,65 @@ void Automapper::generateLinks()
 
 	// 2. For all yet unmapped non-impassable source provinces:
 	//	   If the most matching target province is available and not impassable, map them.
+	//	   Require both sides to be currently unmapped.
 	Log(LogLevel::Debug) << "Link generation step 2...";
+	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
+	{
+		if (srcImpassablesCache.contains(srcProvID))
+		{
+			continue;
+		}
+		if (tgtProvMatches.empty())
+		{
+			continue;
+		}
+
+		auto highestTgtMatches = getHighestMatches(tgtProvMatches);
+
+		const auto& tgtProvID = highestTgtMatches.begin()->second;
+		if (tgtImpassablesCache.contains(tgtProvID))
+		{
+			continue;
+		}
+		if (!canProvincesBeMapped(srcProvID, tgtProvID, false))
+		{
+			continue;
+		}
+
+		mapProvinces(srcProvID, tgtProvID);
+		srcProvincesToRemove.insert(srcProvID);
+	}
+	cleanUpSourceProvinceShares();
+
+	// 3. For all non-impassable target provinces:
+	//	   If the most matching source province is available and not impassable, map them.
+	Log(LogLevel::Debug) << "Link generation step 3...";
+	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
+	{
+		if (tgtImpassablesCache.contains(tgtProvID))
+		{
+			continue;
+		}
+
+		auto highestSrcMatches = getHighestMatches(srcProvMatches);
+		const auto& srcProvID = highestSrcMatches.begin()->second;
+		if (srcImpassablesCache.contains(srcProvID))
+		{
+			continue;
+		}
+		if (!canProvincesBeMapped(srcProvID, tgtProvID, true))
+		{
+			continue;
+		}
+
+		mapProvinces(srcProvID, tgtProvID);
+		tgtProvincesToRemove.insert(tgtProvID);
+	}
+	cleanUpTargetProvinceShares();
+
+	// 4. For all yet unmapped non-impassable source provinces:
+	//	   If the most matching target province is available and not impassable, map them.
+	Log(LogLevel::Debug) << "Link generation step 4...";
 	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
 	{
 		if (srcImpassablesCache.contains(srcProvID))
@@ -211,14 +271,13 @@ void Automapper::generateLinks()
 		}
 
 		mapProvinces(srcProvID, tgtProvID);
-
 		srcProvincesToRemove.insert(srcProvID);
 	}
 	cleanUpSourceProvinceShares();
 
-	// 3. For all yet unmapped non-impassable target provinces:
+	// 5. For all yet unmapped non-impassable target provinces:
 	//	   Try to use the most matching available non-impassable source province to map them.
-	Log(LogLevel::Debug) << "Link generation step 3...";
+	Log(LogLevel::Debug) << "Link generation step 5...";
 	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
 	{
 		if (tgtImpassablesCache.contains(tgtProvID))
@@ -243,16 +302,15 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-
 			tgtProvincesToRemove.insert(tgtProvID);
 			break;
 		}
 	}
 	cleanUpTargetProvinceShares();
 
-	// 4. For all yet unmapped non-impassable source provinces:target
+	// 6. For all yet unmapped non-impassable source provinces:target
 	//	   Try to use the most matching available non-impassable target province to map them.
-	Log(LogLevel::Debug) << "Link generation step 4...";
+	Log(LogLevel::Debug) << "Link generation step 6...";
 	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
 	{
 		if (srcImpassablesCache.contains(srcProvID))
@@ -277,16 +335,15 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-
 			srcProvincesToRemove.insert(srcProvID);
 			break;
 		}
 	}
 	cleanUpSourceProvinceShares();
 
-	// 5. For all yet unmapped target provinces:
+	// 7. For all yet unmapped target provinces:
 	//    Try to use the most matching available source province to map them.
-	Log(LogLevel::Debug) << "Link generation step 5...";
+	Log(LogLevel::Debug) << "Link generation step 7...";
 	for (const auto& [tgtProvID, srcProvMatches]: targetProvinceShares)
 	{
 		auto highestSrcMatches = getHighestMatches(srcProvMatches);
@@ -298,16 +355,15 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-
 			tgtProvincesToRemove.insert(tgtProvID);
 			break;
 		}
 	}
 	cleanUpTargetProvinceShares();
 
-	// 6. For all yet unmapped source provinces:
+	// 8. For all yet unmapped source provinces:
 	//    Try to use the most matching available target province to map them.
-	Log(LogLevel::Debug) << "Link generation step 6...";
+	Log(LogLevel::Debug) << "Link generation step 8...";
 	for (const auto& [srcProvID, tgtProvMatches]: sourceProvinceShares)
 	{
 		auto highestTgtMatches = getHighestMatches(tgtProvMatches);
@@ -319,7 +375,6 @@ void Automapper::generateLinks()
 			}
 
 			mapProvinces(srcProvID, tgtProvID);
-
 			srcProvincesToRemove.insert(srcProvID);
 			break;
 		}

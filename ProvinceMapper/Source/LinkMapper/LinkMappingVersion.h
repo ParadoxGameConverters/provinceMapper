@@ -49,7 +49,7 @@ class LinkMappingVersion
 	void copyLinks(const std::shared_ptr<std::vector<std::shared_ptr<LinkMapping>>>& theLinks) const { *links = *theLinks; }
 	void moveActiveLinkUp() const;
 	void moveActiveLinkDown() const;
-	void deleteLinkByID(const int theID);
+	void deleteLinkByID(int theID);
 
 	[[nodiscard]] std::optional<int> toggleProvinceByID(const std::string& provinceID, bool isSource);
 	[[nodiscard]] int addCommentByIndex(const std::string& comment, int index);

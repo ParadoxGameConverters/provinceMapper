@@ -259,6 +259,7 @@ void MainFrame::initLinksFrame()
 	linksDropDown->Append(wxEVT_ADD_TRIANGULATION_PAIR, "Add Triangulation Point Pair [F6]");
 	linksDropDown->Append(wxEVT_AUTOGENERATE_MAPPINGS, "Autogenerate mappings from triangulation pairs [F7]");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, "Delete Selected [Del]\tCtrl-D");
+   // TODO: check why Del doesn't work on active triangulation pair in the grid
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum -");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum +");
 	auto* versionsDropDown = new wxMenu;

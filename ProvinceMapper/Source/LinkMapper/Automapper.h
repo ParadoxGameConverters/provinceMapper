@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-class Automapper
+class Automapper final
 {
   public:
 	explicit Automapper(std::shared_ptr<LinkMappingVersion> activeVersion): activeVersion(std::move(activeVersion)) {}
