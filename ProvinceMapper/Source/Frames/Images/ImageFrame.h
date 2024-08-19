@@ -42,9 +42,9 @@ class ImageFrame: public wxFrame
 	void activateTriangulationPairByID(int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
-	void autogenerateMappings() const;
+	void autogenerateMappings();
 
-private:
+  private:
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
