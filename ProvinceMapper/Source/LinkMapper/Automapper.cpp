@@ -385,7 +385,11 @@ void Automapper::generateLinks()
 
 			Log(LogLevel::Debug) << "Stealing source province " << srcProvID << " in order to map target province " << tgtProvID;
 			activeVersion->activateLinkByID(srcLinkToBeMugged->getID());
-			activeVersion->toggleProvinceByID(srcProvID, true);
+			if (activeVersion->toggleProvinceByID(srcProvID, true) != std::nullopt)
+			{
+				// The function should have returned nullopt because we're not creating a new link.
+				Log(LogLevel::Error) << "Failed to correctly remove province " << srcProvID << " from a link.";
+			}
 			mapProvinces(srcProvID, tgtProvID);
 			break;
 		}
@@ -410,7 +414,11 @@ void Automapper::generateLinks()
 
 			Log(LogLevel::Debug) << "Stealing target province " << tgtProvID << " in order to map source province " << srcProvID;
 			activeVersion->activateLinkByID(tgtLinkToBeMugged->getID());
-			activeVersion->toggleProvinceByID(tgtProvID, false);
+			if (activeVersion->toggleProvinceByID(tgtProvID, false) != std::nullopt)
+			{
+				// The function should have returned nullopt because we're not creating a new link.
+				Log(LogLevel::Error) << "Failed to correctly remove province " << tgtProvID << " from a link.";
+			}
 			mapProvinces(srcProvID, tgtProvID);
 			break;
 		}
