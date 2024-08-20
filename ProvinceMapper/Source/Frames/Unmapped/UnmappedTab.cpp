@@ -5,7 +5,6 @@
 #include "Frames/Links/TriangulationPairsGrid.h"
 #include "Frames/MainFrame.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "Log.h"
 #include "Provinces/Province.h"
 #include <ranges>
 
@@ -149,7 +148,7 @@ void UnmappedTab::onKeyDown(wxKeyEvent& event)
 			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
-			stageDeleteLink();
+			stageDeleteLinkOrTriangulationPair();
 			break;
 		case WXK_NUMPAD_SUBTRACT:
 			stageMoveUp();
@@ -174,10 +173,10 @@ void UnmappedTab::stageAddComment() const
 	eventListener->QueueEvent(evt->Clone());
 }
 
-void UnmappedTab::stageDeleteLink() const
+void UnmappedTab::stageDeleteLinkOrTriangulationPair() const
 {
 	// Do nothing unless working on active link. Don't want accidents here.
-	const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
+	const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR);
 	eventListener->QueueEvent(evt->Clone());
 }
 

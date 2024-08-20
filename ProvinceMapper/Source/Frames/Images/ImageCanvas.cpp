@@ -530,7 +530,7 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
-			stageDeleteLink();
+			stageDeleteLinkOrTriangulationPair();
 			break;
 		case WXK_NUMPAD_SUBTRACT:
 			stageMoveUp();
@@ -555,9 +555,14 @@ void ImageCanvas::stageAddComment()
 	dialog->ShowModal();
 }
 
-void ImageCanvas::stageDeleteLink() const
+void ImageCanvas::stageDeleteLinkOrTriangulationPair() const
 {
 	// Do nothing unless working on active link. Don't want accidents here.
+	if (activeVersion->getActiveTriangulationPair())
+	{
+		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
+		eventHandler->QueueEvent(evt->Clone());
+	}
 	if (activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);

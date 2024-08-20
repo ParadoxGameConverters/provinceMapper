@@ -47,7 +47,7 @@ class LinksTab final: public wxNotebookPage
 	void onKeyDown(wxKeyEvent& event);
 
 	void stageAddComment();
-	void stageDeleteLink() const;
+	void stageDeleteLinkOrTriangulationPair() const;
 	void stageMoveUp() const;
 	void stageMoveDown() const;
 	void stageSave() const;

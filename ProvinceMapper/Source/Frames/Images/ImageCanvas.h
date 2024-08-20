@@ -85,7 +85,7 @@ class ImageCanvas final: public wxScrolledCanvas
 	void onScrollRelease(wxScrollWinEvent& event);
 
 	void stageAddComment();
-	void stageDeleteLink() const;
+	void stageDeleteLinkOrTriangulationPair() const;
 	void stageToggleProvinceByID(const std::string& provinceID) const;
 	void strafeProvinces();
 	void strafeProvince(const std::shared_ptr<Province>& province);

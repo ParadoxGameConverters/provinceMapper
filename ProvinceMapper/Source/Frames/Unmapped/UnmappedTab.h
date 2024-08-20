@@ -31,7 +31,7 @@ class UnmappedTab final: public wxNotebookPage
 	void onGridMotion(wxMouseEvent& event);
 
 	void stageAddComment() const;
-	void stageDeleteLink() const;
+	void stageDeleteLinkOrTriangulationPair() const;
 	void stageMoveUp() const;
 	void stageMoveDown() const;
 	void stageSave() const;

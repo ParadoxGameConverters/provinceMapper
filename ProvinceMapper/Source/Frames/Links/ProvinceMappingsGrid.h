@@ -7,7 +7,6 @@
 #include "LinkMapper/LinkMappingVersion.h"
 #include <optional>
 #include <wx/grid.h>
-#include <wx/notebook.h>
 
 
 wxDECLARE_EVENT(wxEVT_DELETE_ACTIVE_LINK, wxCommandEvent);
