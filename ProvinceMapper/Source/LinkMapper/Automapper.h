@@ -15,6 +15,17 @@ class Automapper final
 	[[nodiscard]] bool canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID, bool allowAddingToExistingLink) const;
 	void mapProvinces(const std::string& srcProvID, const std::string& tgtProvID);
 
+	void forUnmappedTargetsMapUnmappedSources();
+	void forUnmappedSourcesMapUnmappedTargets();
+	void forNonImpassableTargetsMapTryToMapFirstChoices();
+	void forNonImpassableSourcesMapTryToMapFirstChoices();
+	void forUnmappedTargetsEvaluateAllNonImpassableMatches();
+	void forUnmappedSourcesEvaluateAllNonImpassableMatches();
+	void forUnmappedTargetsEvaluateAllMatches();
+	void forUnmappedSourcesEvaluateAllMatches();
+	void forUnmappedTargetsTryToStealSourcesFromExistingLinks();
+	void forUnmappedSourcesTryToStealTargetsFromExistingLinks();
+
 	void cleanUpSourceProvinceShares();
 	void cleanUpTargetProvinceShares();
 
