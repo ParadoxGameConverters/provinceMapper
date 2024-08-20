@@ -383,7 +383,8 @@ void Automapper::generateLinks()
 			if (!srcLinkToBeMugged || srcLinkToBeMugged->getSources().size() <= 1)
 				continue;
 
-			Log(LogLevel::Debug) << "Stealing source province " << srcProvID << " in order to map target province " << tgtProvID;
+			Log(LogLevel::Debug) << "Stealing source province " << srcProvID << " from existing mapping that contains target province "
+										<< srcLinkToBeMugged->getTargets()[0]->ID << " in order to map target province " << tgtProvID;
 			activeVersion->activateLinkByID(srcLinkToBeMugged->getID());
 			if (activeVersion->toggleProvinceByID(srcProvID, true) != std::nullopt)
 			{
@@ -412,7 +413,8 @@ void Automapper::generateLinks()
 			if (!tgtLinkToBeMugged || tgtLinkToBeMugged->getTargets().size() <= 1)
 				continue;
 
-			Log(LogLevel::Debug) << "Stealing target province " << tgtProvID << " in order to map source province " << srcProvID;
+			Log(LogLevel::Debug) << "Stealing target province " << tgtProvID << " from existing mapping that contains source province "
+										<< tgtLinkToBeMugged->getSources()[0]->ID << " in order to map source province " << srcProvID;
 			activeVersion->activateLinkByID(tgtLinkToBeMugged->getID());
 			if (activeVersion->toggleProvinceByID(tgtProvID, false) != std::nullopt)
 			{
