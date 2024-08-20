@@ -13,10 +13,11 @@ wxDEFINE_EVENT(wxEVT_CENTER_MAP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_LINK_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_LINK, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_REDRAW_LINKS_GRID, wxCommandEvent);
 
 
 
-ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion): GridBase(parent, theVersion)
+ProvinceMappingsGrid::ProvinceMappingsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion): GridBase(parent, std::move(theVersion))
 {
 	Bind(wxEVT_UPDATE_NAME, &ProvinceMappingsGrid::onUpdateComment, this);
 }
@@ -32,6 +33,7 @@ void ProvinceMappingsGrid::redraw()
 	{
 		auto bgColor = link->getBaseRowColour();
 		std::string name = link->toRowString();
+		const auto& activeLink = getActiveLink();
 		if (activeLink && *link == *activeLink)
 		{
 			bgColor = link->getActiveRowColour();
@@ -80,7 +82,7 @@ void ProvinceMappingsGrid::leftUp(const wxGridEvent& event)
 		if (activeRow && *activeRow == row)
 		{
 			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP);
-			centerEvt->SetInt(activeLink->getID());
+			centerEvt->SetInt(getActiveLink()->getID());
 			eventListener->QueueEvent(centerEvt->Clone());
 			return;
 		}
@@ -107,9 +109,7 @@ void ProvinceMappingsGrid::activateLinkByIndex(const int index)
 	if (index >= static_cast<int>(version->getLinks()->size()))
 		return; // uh-huh
 
-	const auto& link = version->getLinks()->at(index);
 	activeRow = index;
-	activeLink = link;
 	activateLinkRowColor(index);
 	if (!IsVisible(index, 0, false))
 		focusOnActiveRow();
@@ -148,7 +148,6 @@ void ProvinceMappingsGrid::deactivateLink()
 				--lastClickedRow;
 		}
 	}
-	activeLink.reset();
 	activeRow.reset();
 	ForceRefresh();
 }
@@ -168,7 +167,6 @@ void ProvinceMappingsGrid::activateLinkByID(const int theID)
 		if (link->getID() == theID)
 		{
 			activeRow = rowCounter;
-			activeLink = link;
 			activateLinkRowColor(rowCounter);
 			if (!IsVisible(rowCounter, 0, false))
 				focusOnActiveRow();
@@ -202,7 +200,6 @@ void ProvinceMappingsGrid::createLink(const int linkID)
 			InsertRows(rowCounter, 1, false);
 			SetCellValue(rowCounter, 0, link->toRowString());
 			activateLinkRowColor(rowCounter);
-			activeLink = link;
 			// If we have an active link, restore its color.
 			if (activeRow)
 				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.

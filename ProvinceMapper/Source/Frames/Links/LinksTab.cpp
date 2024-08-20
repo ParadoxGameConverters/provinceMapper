@@ -1,9 +1,12 @@
 #include "LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
+#include "ProvinceMappingsGrid.h"
 #include "Provinces/Province.h"
 #include "TriangulationPairsGrid.h"
-#include "ProvinceMappingsGrid.h"
+
+#include <wx/splitter.h>
+#include <wx/generic/splitter.h>
 
 
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, wxCommandEvent);
@@ -17,33 +20,52 @@ LinksTab::LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 {
 	Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 
-	wxStaticText* pairsTitle = new wxStaticText(this, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+	auto* sizer = new wxBoxSizer(wxVERTICAL);
+
+	auto* splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
+
+	auto* triangulationPairsPanel = new wxPanel(splitter, wxID_ANY);
+	auto* triangulationPairsPanelSizer = new wxBoxSizer(wxVERTICAL);
+	auto* pairsTitle = new wxStaticText(triangulationPairsPanel, wxID_ANY, "Triangulation Pairs", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	pairsTitle->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	triangulationPointGrid = new TriangulationPairsGrid(this, version);
-	GetParent()->Layout();
+	triangulationPointGrid = new TriangulationPairsGrid(triangulationPairsPanel, version);
+	triangulationPairsPanelSizer->Add(pairsTitle, 0, wxEXPAND);
+	triangulationPairsPanelSizer->Add(triangulationPointGrid, 1, wxEXPAND);
+	triangulationPairsPanel->SetSizer(triangulationPairsPanelSizer);
 
-	wxStaticText* linksTitle = new wxStaticText(this, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
+	auto* linksPanel = new wxPanel(splitter, wxID_ANY);
+	auto* linksPanelSizer = new wxBoxSizer(wxVERTICAL);
+	auto* linksTitle = new wxStaticText(linksPanel, wxID_ANY, "Province Links", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER);
 	linksTitle->SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	provinceMappingsGrid = new ProvinceMappingsGrid(this, version);
-	GetParent()->Layout();
+	provinceMappingsGrid = new ProvinceMappingsGrid(linksPanel, version);
+	linksPanelSizer->Add(linksTitle, 0, wxEXPAND);
+	linksPanelSizer->Add(provinceMappingsGrid, 1, wxEXPAND);
+	linksPanel->SetSizer(linksPanelSizer);
 
-	auto* gridSizer = new wxFlexGridSizer(1);
-	gridSizer->Add(pairsTitle, 0, wxALIGN_CENTER | wxALL, 10);
-	gridSizer->Add(triangulationPointGrid, wxSizerFlags(1).Expand());
+	splitter->SplitHorizontally(triangulationPairsPanel, linksPanel);
+	splitter->SetSashInvisible(false);
+	splitter->SetSashGravity(0.5);
+	splitter->SetSashPosition(200);
+	sizer->Add(splitter, 1, wxEXPAND);
 
-	gridSizer->AddSpacer(20); // Visually separate the triangulation pairs grid from the province links grid.
-	gridSizer->Add(linksTitle, 0, wxALIGN_CENTER | wxALL, 10);
-	gridSizer->Add(provinceMappingsGrid, wxSizerFlags(3).Expand());
-	SetSizer(gridSizer);
-	gridSizer->Fit(this);
+	this->SetSizer(sizer);
+
 	triangulationPointGrid->ForceRefresh();
 	provinceMappingsGrid->ForceRefresh();
+
+	triangulationPointGrid->Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
+	provinceMappingsGrid->Bind(wxEVT_KEY_DOWN, &LinksTab::onKeyDown, this);
 }
 
 
-void LinksTab::redraw()
+void LinksTab::redraw() const
 {
 	triangulationPointGrid->redraw();
+	redrawProvinceLinksGrid();
+}
+
+void LinksTab::redrawProvinceLinksGrid() const
+{
 	provinceMappingsGrid->redraw();
 }
 
@@ -77,6 +99,11 @@ void LinksTab::activateLinkByID(int theID)
 void LinksTab::activateLinkByIndex(const int index)
 {
 	provinceMappingsGrid->activateLinkByIndex(index);
+}
+
+void LinksTab::activateTriangulationPairByID(const int theID) const
+{
+	triangulationPointGrid->activatePairByID(theID);
 }
 
 void LinksTab::activateTriangulationPairByIndex(int index)
@@ -122,9 +149,12 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 		case WXK_F6:
 			stageAddTriangulationPair();
 			break;
+		case WXK_F7:
+			stageAutogenerateMappings();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
-			stageDeleteLink();
+			stageDeleteLinkOrTriangulationPair();
 			break;
 		case WXK_NUMPAD_SUBTRACT:
 			stageMoveUp();
@@ -145,7 +175,7 @@ void LinksTab::onKeyDown(wxKeyEvent& event)
 
 void LinksTab::stageAddComment()
 {
-	if (triangulationPointGrid->activeLink)
+	if (triangulationPointGrid->getActiveLink())
 	{
 		triangulationPointGrid->stageAddComment();
 	}
@@ -155,14 +185,16 @@ void LinksTab::stageAddComment()
 	}
 }
 
-void LinksTab::stageDeleteLink() const
+void LinksTab::stageDeleteLinkOrTriangulationPair() const
 {
-	if (triangulationPointGrid->activeLink) {
+	if (triangulationPointGrid->getActiveLink())
+	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
 		eventListener->QueueEvent(evt->Clone());
+		return;
 	}
 	// Do nothing unless working on active link. Don't want accidents here.
-	else if (provinceMappingsGrid->activeLink)
+	if (provinceMappingsGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventListener->QueueEvent(evt->Clone());
@@ -170,13 +202,13 @@ void LinksTab::stageDeleteLink() const
 }
 
 void LinksTab::stageMoveUp() const
-{	
-	if (triangulationPointGrid->activeLink)
+{
+	if (triangulationPointGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP);
 		eventListener->QueueEvent(evt->Clone());
 	}
-	else if (provinceMappingsGrid->activeLink)
+	else if (provinceMappingsGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventListener->QueueEvent(evt->Clone());
@@ -185,12 +217,12 @@ void LinksTab::stageMoveUp() const
 
 void LinksTab::stageMoveDown() const
 {
-	if (triangulationPointGrid->activeLink)
+	if (triangulationPointGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN);
 		eventListener->QueueEvent(evt->Clone());
 	}
-	else if (provinceMappingsGrid->activeLink)
+	else if (provinceMappingsGrid->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventListener->QueueEvent(evt->Clone());
@@ -224,6 +256,12 @@ void LinksTab::stageAddLink() const
 void LinksTab::stageAddTriangulationPair() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
+	eventListener->QueueEvent(evt->Clone());
+}
+
+void LinksTab::stageAutogenerateMappings() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_AUTOGENERATE_MAPPINGS);
 	eventListener->QueueEvent(evt->Clone());
 }
 

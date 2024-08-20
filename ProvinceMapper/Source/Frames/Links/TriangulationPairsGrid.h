@@ -3,10 +3,11 @@
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
+#include "GridBase.h"
+#include "LinkMapper/LinkMappingVersion.h"
+
 #include <optional>
 #include <wx/grid.h>
-#include <wx/notebook.h>
-#include "GridBase.h"
 
 
 
@@ -18,6 +19,7 @@ wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_AUTOGENERATE_MAPPINGS, wxCommandEvent);
 
 
 class LinkMappingVersion;
@@ -30,15 +32,18 @@ class TriangulationPairsGrid final: public GridBase
 	void redraw();
 	void stageAddComment();
 
-	void leftUp(const wxGridEvent& event);
-	void rightUp(wxGridEvent& event);
+	void leftUp(const wxGridEvent& event) override;
+	void rightUp(wxGridEvent& event) override;
 
 	void activateLinkRowColor(int row);
 	void restoreLinkRowColor(int row);
 
 	void deactivateTriangulationPair();
-	void activatePairByIndex(const int index);
+	void activatePairByID(int ID);
+	void activatePairByIndex(int index);
 	void createTriangulationPair(int pairID);
+
+	[[nodiscard]] const std::shared_ptr<LinkBase> getActiveLink() override { return version->getActiveTriangulationPair(); }
 
   private:
 	void onUpdateComment(const wxCommandEvent& event);

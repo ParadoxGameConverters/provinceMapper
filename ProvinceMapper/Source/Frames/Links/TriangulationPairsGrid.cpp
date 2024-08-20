@@ -1,8 +1,10 @@
 #include "TriangulationPairsGrid.h"
+
 #include "LinkMapper/LinkMappingVersion.h"
 #include "Log.h"
 #include "Provinces/Province.h"
 #include "TriangulationPairDialogComment.h"
+#include <utility>
 
 
 
@@ -14,9 +16,10 @@ wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_UP, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOVE_ACTIVE_TRIANGULATION_PAIR_DOWN, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_ADD_TRIANGULATION_PAIR, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_REFRESH_ACTIVE_TRIANGULATION_PAIR, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_AUTOGENERATE_MAPPINGS, wxCommandEvent);
 
 
-TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion) : GridBase(parent, theVersion)
+TriangulationPairsGrid::TriangulationPairsGrid(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion): GridBase(parent, std::move(theVersion))
 {
 	Bind(wxEVT_UPDATE_TRIANGULATION_PAIR_COMMENT, &TriangulationPairsGrid::onUpdateComment, this);
 }
@@ -50,7 +53,7 @@ void TriangulationPairsGrid::leftUp(const wxGridEvent& event)
 		if (activeRow && *activeRow == row)
 		{
 			auto* centerEvt = new wxCommandEvent(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR);
-			centerEvt->SetInt(activeLink->getID());
+			centerEvt->SetInt(getActiveLink()->getID());
 			eventListener->QueueEvent(centerEvt->Clone());
 			return;
 		}
@@ -76,7 +79,8 @@ void TriangulationPairsGrid::redraw()
 	for (const auto& pair: *version->getTriangulationPairs())
 	{
 		auto bgColor = pair->getBaseRowColour();
-		if (activeLink && *pair == *activeLink)
+		const auto& activeTriangulationPair = version->getActiveTriangulationPair();
+		if (activeTriangulationPair && *pair == *activeTriangulationPair)
 		{
 			bgColor = pair->getActiveRowColour(); // bright green for selected triangulation pairs
 			activeRow = rowCounter;
@@ -104,11 +108,10 @@ void TriangulationPairsGrid::stageAddComment()
 
 void TriangulationPairsGrid::rightUp(wxGridEvent& event)
 {
-	const wxCommandEvent* evt;
 
 	// Right up means deselect active link, which is serious stuff.
 	// If our active link is dry, we're not deselecting it, we're deleting it.
-	evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
+	const wxCommandEvent* evt = new wxCommandEvent(wxEVT_DEACTIVATE_TRIANGULATION_PAIR);
 
 	eventListener->QueueEvent(evt->Clone());
 	event.Skip();
@@ -139,10 +142,9 @@ void TriangulationPairsGrid::createTriangulationPair(int pairID)
 			SetCellValue(rowCounter, 0, pair->toRowString());
 
 			activateLinkRowColor(rowCounter);
-			activeLink = pair;
 			// If we have an active link, restore its color.
 			if (activeRow)
-				restoreLinkRowColor(*activeRow + 1); // We have a link inserted so we need to fix the following one.
+				restoreLinkRowColor(*activeRow + 1); // We have a link inserted, so we need to fix the following one.
 			activeRow = rowCounter;
 			lastClickedRow = rowCounter;
 			// let's insert it.
@@ -180,7 +182,7 @@ void TriangulationPairsGrid::deactivateTriangulationPair()
 {
 	if (activeRow)
 	{
-		// Active pair may have been deleted by linkmapper. Check our records.
+		// Active pair may have been deleted by the LinkMapper. Check our records.
 		if (static_cast<int>(version->getTriangulationPairs()->size()) == GetNumberRows())
 		{
 			// all is well, just deactivate.
@@ -194,9 +196,33 @@ void TriangulationPairsGrid::deactivateTriangulationPair()
 				--lastClickedRow;
 		}
 	}
-	activeLink.reset();
 	activeRow.reset();
 	ForceRefresh();
+}
+
+void TriangulationPairsGrid::activatePairByID(const int ID)
+{
+	// We need to find not only which pair this is, but its row as well, so we can scroll the grid.
+	// Thankfully, we're anal about their order.
+
+	// If we're already active, restore color.
+	if (activeRow)
+		restoreLinkRowColor(*activeRow);
+
+	auto rowCounter = 0;
+	for (const auto& pair: *version->getTriangulationPairs())
+	{
+		if (pair->getID() == ID)
+		{
+			activeRow = rowCounter;
+			activateLinkRowColor(rowCounter);
+			if (!IsVisible(rowCounter, 0, false))
+				focusOnActiveRow();
+			lastClickedRow = rowCounter;
+			break;
+		}
+		++rowCounter;
+	}
 }
 
 void TriangulationPairsGrid::activatePairByIndex(const int index)
@@ -208,9 +234,7 @@ void TriangulationPairsGrid::activatePairByIndex(const int index)
 	if (index >= static_cast<int>(version->getTriangulationPairs()->size()))
 		return; // uh-huh
 
-	const auto& pair = version->getTriangulationPairs()->at(index);
 	activeRow = index;
-	activeLink = pair;
 	activateLinkRowColor(index);
 	if (!IsVisible(index, 0, false))
 		focusOnActiveRow();

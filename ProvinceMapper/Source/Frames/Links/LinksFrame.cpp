@@ -82,11 +82,25 @@ void LinksFrame::activateLinkByIndex(const int index) const
 		activePage->activateLinkByIndex(index);
 }
 
+void LinksFrame::activateTriangulationPairByID(const int ID) const
+{
+	if (activePage)
+		activePage->activateTriangulationPairByID(ID);
+}
+
 void LinksFrame::activateTriangulationPairByIndex(int index) const
 {
 	if (activePage)
 	{
 		activePage->activateTriangulationPairByIndex(index);
+	}
+}
+
+void LinksFrame::redrawProvinceLinksGrid() const
+{
+	if (activePage)
+	{
+		activePage->redrawProvinceLinksGrid();
 	}
 }
 

@@ -1,10 +1,19 @@
 #include "ImageFrame.h"
 #include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
+#include "LinkMapper/Automapper.h"
+#include "LinkMapper/Triangle.h"
+#include "LinkMapper/TriangulationPointPair.h"
 #include "OSCompatibilityLayer.h"
+#include "Provinces/Province.h"
 #include "StatusBar.h"
+
+#include <ranges>
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
+
+
+using Delaunay = tpp::Delaunay;
 
 ImageFrame::ImageFrame(wxWindow* parent,
 	 const wxPoint& position,
@@ -20,6 +29,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 {
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
+	Bind(wxEVT_MENU, &ImageFrame::onToggleTriangulationMesh, this, wxID_VIEW_SMALLICONS);
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
 	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
@@ -30,6 +40,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_SCROLL_RELEASE_H, &ImageFrame::onScrollReleaseH, this);
 	Bind(wxEVT_SCROLL_RELEASE_V, &ImageFrame::onScrollReleaseV, this);
 	Bind(wxEVT_LOCK, &ImageFrame::onLock, this);
+	Bind(wxEVT_DELAUNAY_TRIANGULATE, &ImageFrame::onDelaunayTriangulate, this);
 
 	splitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_LIVE_UPDATE | wxEXPAND);
 
@@ -59,6 +70,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	statusBar = new StatusBar(this, sbPosition, configuration);
 	if (configuration->isStatusBarOn())
 		statusBar->Show();
+
+	delaunayTriangulate();
 }
 
 void ImageFrame::onScrollPaint(wxPaintEvent& event)
@@ -162,19 +175,24 @@ void ImageFrame::renderSource() const
 	const wxImage bmp(sourceCanvas->getWidth(), sourceCanvas->getHeight(), sourceCanvas->getImageData(), true);
 	sourceDC.DrawBitmap(bmp, 0, 0);
 
-	// Draw all the triangulation pair points.
-	for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+	if (showTriangulationMesh)
 	{
-		if (!pair->getSourcePoint())
+		renderTriangulationMesh(sourceDC, true);
+
+		// Draw all the triangulation pair points.
+		for (const auto& pair: *sourceCanvas->getTriangulationPairs())
 		{
-			continue;
+			if (!pair->getSourcePoint())
+			{
+				continue;
+			}
+			wxPen pen = sourceDC.GetPen();
+			pen.SetColour("white");
+			pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+			sourceDC.SetPen(pen);
+			sourceDC.SetBrush(*wxGREY_BRUSH);
+			sourceDC.DrawCircle(*pair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 		}
-		wxPen pen = sourceDC.GetPen();
-		pen.SetColour("white");
-		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
-		sourceDC.SetPen(pen);
-		sourceDC.SetBrush(*wxGREY_BRUSH);
-		sourceDC.DrawCircle(*pair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 	}
 
 	// Draw the active triangulation pair point with a different colour.
@@ -185,7 +203,7 @@ void ImageFrame::renderSource() const
 		pen.SetColour("white");
 		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
 		sourceDC.SetPen(pen);
-		sourceDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulatin points per canvas
+		sourceDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulation points per canvas
 		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 	}
 
@@ -236,19 +254,24 @@ void ImageFrame::renderTarget() const
 	const wxImage bmp2(targetCanvas->getWidth(), targetCanvas->getHeight(), targetCanvas->getImageData(), true);
 	targetDC.DrawBitmap(bmp2, 0, 0);
 
-	// Draw all the triangulation pair points.
-	for (const auto& pair: *targetCanvas->getTriangulationPairs())
+	if (showTriangulationMesh)
 	{
-		if (!pair->getTargetPoint())
+		renderTriangulationMesh(targetDC, false);
+
+		// Draw all the triangulation pair points.
+		for (const auto& pair: *targetCanvas->getTriangulationPairs())
 		{
-			continue;
+			if (!pair->getTargetPoint())
+			{
+				continue;
+			}
+			wxPen pen = targetDC.GetPen();
+			pen.SetColour("white");
+			pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+			targetDC.SetPen(pen);
+			targetDC.SetBrush(*wxGREY_BRUSH);
+			targetDC.DrawCircle(*pair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 		}
-		wxPen pen = targetDC.GetPen();
-		pen.SetColour("white");
-		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
-		targetDC.SetPen(pen);
-		targetDC.SetBrush(*wxGREY_BRUSH);
-		targetDC.DrawCircle(*pair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 	}
 
 	// Draw the active triangulation pair point with a different colour.
@@ -259,7 +282,7 @@ void ImageFrame::renderTarget() const
 		pen.SetColour("white");
 		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
 		targetDC.SetPen(pen);
-		targetDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulatin points per canvas
+		targetDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulation points per canvas
 		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 	}
 
@@ -343,6 +366,15 @@ void ImageFrame::onToggleBlack(wxCommandEvent& event)
 	Refresh();
 }
 
+void ImageFrame::onToggleTriangulationMesh(wxCommandEvent& event)
+{
+	showTriangulationMesh = !showTriangulationMesh;
+	sourceCanvas->toggleTriangulationMesh();
+	targetCanvas->toggleTriangulationMesh();
+	render();
+	Refresh();
+}
+
 void ImageFrame::onClose(const wxCloseEvent& event)
 {
 	// We need to kill the app.
@@ -399,6 +431,9 @@ void ImageFrame::deleteActiveLink()
 
 void ImageFrame::deleteActiveTriangulationPair()
 {
+	// Recalculate the triangulation mesh.
+	delaunayTriangulate();
+
 	// Re-render will cause the triangulation pair's points to disappear.
 	render();
 	Refresh();
@@ -445,21 +480,22 @@ void ImageFrame::centerMap(int ID)
 {
 	const auto pt1 = sourceCanvas->locateLinkCoordinates(ID);
 	const auto pt2 = targetCanvas->locateLinkCoordinates(ID);
-	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
-	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
-	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
-	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
 
-	auto units = wxPoint(static_cast<int>(pt1.x * sourceCanvas->getScale()), static_cast<int>(pt1.y * sourceCanvas->getScale()));
-	auto offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
-	sourceCanvas->Scroll(offset);
+	centerMap(pt1, pt2);
+}
 
-	units = wxPoint(static_cast<int>(pt2.x * targetCanvas->getScale()), static_cast<int>(pt2.y * targetCanvas->getScale()));
-	offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
-	targetCanvas->Scroll(offset);
+void ImageFrame::centerMapToTriangulationPair(int pairID)
+{
+	for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+	{
+		if (pair->getID() != pairID)
+		{
+			continue;
+		}
 
-	render();
-	Refresh();
+		centerMap(pair->getSourcePoint(), pair->getTargetPoint());
+		break;
+	}
 }
 
 void ImageFrame::centerProvince(ImageTabSelector selector, const std::string& ID)
@@ -495,6 +531,7 @@ void ImageFrame::setVersion(const std::shared_ptr<LinkMappingVersion>& version)
 	targetCanvas->clearStrafedPixels();
 	sourceCanvas->restoreImageData();
 	targetCanvas->restoreImageData();
+	delaunayTriangulate();
 
 	if (black == true)
 	{
@@ -512,6 +549,240 @@ void ImageFrame::showToolbar() const
 	configuration->setStatusBarOn(true);
 	configuration->save();
 	statusBar->Show();
+}
+
+void ImageFrame::onDelaunayTriangulate(const wxCommandEvent& event)
+{
+	delaunayTriangulate();
+}
+
+void ImageFrame::centerMap(const std::optional<wxPoint>& sourceMapPoint, const std::optional<wxPoint>& targetMapPoint)
+{
+	const auto sourceScrollPageSizeX = sourceCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto sourceScrollPageSizeY = sourceCanvas->GetScrollPageSize(wxVERTICAL);
+	const auto targetScrollPageSizeX = targetCanvas->GetScrollPageSize(wxHORIZONTAL);
+	const auto targetScrollPageSizeY = targetCanvas->GetScrollPageSize(wxVERTICAL);
+
+	wxPoint units;
+	wxPoint offset;
+	if (sourceMapPoint)
+	{
+		units = wxPoint(static_cast<int>(sourceMapPoint->x * sourceCanvas->getScale()), static_cast<int>(sourceMapPoint->y * sourceCanvas->getScale()));
+		offset = wxPoint(units.x - sourceScrollPageSizeX / 2, units.y - sourceScrollPageSizeY / 2);
+		sourceCanvas->Scroll(offset);
+	}
+
+	if (targetMapPoint)
+	{
+		units = wxPoint(static_cast<int>(targetMapPoint->x * targetCanvas->getScale()), static_cast<int>(targetMapPoint->y * targetCanvas->getScale()));
+		offset = wxPoint(units.x - targetScrollPageSizeX / 2, units.y - targetScrollPageSizeY / 2);
+		targetCanvas->Scroll(offset);
+	}
+
+	render();
+	Refresh();
+}
+
+wxPoint findMapCornerPointEquivalent(const std::vector<std::shared_ptr<TriangulationPointPair>>& validPairs, const auto& cornerPoint)
+{
+	std::optional<std::shared_ptr<TriangulationPointPair>> closestPair1;
+	std::optional<std::shared_ptr<TriangulationPointPair>> closestPair2;
+
+	// Calculate the closest 2 points as 2 points with the smallest distance to the corner.
+	for (const auto& pair: validPairs)
+	{
+		const auto& sourcePoint = pair->getSourcePoint();
+		const auto& distance = std::sqrt(std::pow(cornerPoint.x - sourcePoint->x, 2) + std::pow(cornerPoint.y - sourcePoint->y, 2));
+
+		if (!closestPair1 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair1)->getSourcePoint()->x, 2) +
+																std::pow(cornerPoint.y - (*closestPair1)->getSourcePoint()->y, 2)))
+		{
+			closestPair2 = closestPair1;
+			closestPair1 = pair;
+		}
+		else if (!closestPair2 || distance < std::sqrt(std::pow(cornerPoint.x - (*closestPair2)->getSourcePoint()->x, 2) +
+																	  std::pow(cornerPoint.y - (*closestPair2)->getSourcePoint()->y, 2)))
+		{
+			closestPair2 = pair;
+		}
+	}
+
+	// Let A and B be the two closest source points to the corner.
+	// Let C be the corner point.
+
+	const auto& a = (*closestPair1)->getSourcePoint();
+	const auto& b = (*closestPair2)->getSourcePoint();
+
+	const auto& c = cornerPoint;
+
+	// Let D and E be the equivalents of A and B on the target map.
+	// Let F be the target map's equivalent of the corner point.
+	// The ABC and DEF triangles should be similar.
+	// We're calculating F.
+	const auto& d = (*closestPair1)->getTargetPoint();
+	const auto& e = (*closestPair2)->getTargetPoint();
+
+	// 1. Calculate the scale factor between the source and target triangles.
+	const double abDistance = std::sqrt(std::pow(b->x - a->x, 2) + std::pow(b->y - a->y, 2));
+	const double deDistance = std::sqrt(std::pow(e->x - d->x, 2) + std::pow(e->y - d->y, 2));
+	const double scale = deDistance / abDistance;
+
+	// 2. Determine the rotation and translation.
+	const double abAngle = std::atan2(b->y - a->y, b->x - a->x);
+	const double deAngle = std::atan2(e->y - d->y, e->x - d->x);
+	const double angle = deAngle - abAngle;
+
+	// 3. Apply the transformation to find F.
+	// 3.1. Rotate the vector AC by the angle.
+	const double acX = c.x - a->x;
+	const double acY = c.y - a->y;
+	const double rotatedX = acX * std::cos(angle) - acY * std::sin(angle);
+	const double rotatedY = acX * std::sin(angle) + acY * std::cos(angle);
+	// 3.2. Scale the vector by the scale factor.
+	const double scaledX = rotatedX * scale;
+	const double scaledY = rotatedY * scale;
+	// 3.3. Translate the scaled coordinates by D.
+	const double fX = d->x + scaledX;
+	const double fY = d->y + scaledY;
+
+	const auto f = wxPoint(static_cast<int>(fX), static_cast<int>(fY));
+	return f;
+}
+
+void ImageFrame::delaunayTriangulate()
+{
+	triangles.clear();
+
+	// We need to have at least 3 point pairs to triangulate.
+	std::vector<std::shared_ptr<TriangulationPointPair>> validPairs;
+
+	for (auto& pair: *sourceCanvas->getTriangulationPairs())
+	{
+		// A pair must have both a source and a target point.
+		if (!pair->getSourcePoint() || !pair->getTargetPoint())
+		{
+			continue;
+		}
+
+		validPairs.push_back(pair);
+	}
+
+	if (validPairs.size() < 3)
+	{
+		Log(LogLevel::Info) << "Cannot triangulate with less than 3 point pairs.";
+		return;
+	}
+
+	// Create a virtual point pair for each map corner.
+	// For each source map corner, find the equivalent point on the target map.
+	const auto& sourceMapWidth = sourceCanvas->getWidth();
+	const auto& sourceMapHeight = sourceCanvas->getHeight();
+
+	std::vector cornerPoints = {
+		 wxPoint(0, 0),
+		 wxPoint(sourceMapWidth - 1, 0),
+		 wxPoint(0, sourceMapHeight - 1),
+		 wxPoint(sourceMapWidth - 1, sourceMapHeight - 1),
+	};
+
+	for (const auto& cornerPoint: cornerPoints)
+	{
+		const auto cornerEquivalentPoint = findMapCornerPointEquivalent(validPairs, cornerPoint);
+
+		int idToUse;
+		std::set<int> usedIds;
+		for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+		{
+			usedIds.insert(pair->getID());
+		}
+		// Find an ID of TriangulationPointPair that's not used.
+		for (int i = 0; i < INT_MAX; i++)
+		{
+			if (!usedIds.contains(i))
+			{
+				idToUse = i;
+				break;
+			}
+		}
+		auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
+		cornerPair->setSourcePoint(cornerPoint);
+		cornerPair->setTargetPoint(cornerEquivalentPoint);
+
+		validPairs.push_back(cornerPair);
+	}
+
+	std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
+
+	std::vector<Delaunay::Point> delaunaySourceInput;
+	for (const auto& pair: validPairs)
+	{
+		const auto& sourcePoint = pair->getSourcePoint();
+		pointToPairMap[std::make_pair(sourcePoint->x, sourcePoint->y)] = pair;
+
+		delaunaySourceInput.emplace_back(sourcePoint->x, sourcePoint->y);
+	}
+
+	// Use standard (non-constrained) Delaunay triangulation.
+	Delaunay sourceTriangulator(delaunaySourceInput);
+	sourceTriangulator.Triangulate();
+
+	for (const auto& t: sourceTriangulator.faces())
+	{
+		// Get triangle's vertices.
+		const auto& vertex1 = delaunaySourceInput[t.Org()];
+		const auto& vertex2 = delaunaySourceInput[t.Dest()];
+		const auto& vertex3 = delaunaySourceInput[t.Apex()];
+
+		auto intPair1 = std::make_pair(static_cast<int>(vertex1[0]), static_cast<int>(vertex1[1]));
+		auto intPair2 = std::make_pair(static_cast<int>(vertex2[0]), static_cast<int>(vertex2[1]));
+		auto intPair3 = std::make_pair(static_cast<int>(vertex3[0]), static_cast<int>(vertex3[1]));
+
+		const auto& pair1 = pointToPairMap[intPair1];
+		const auto& pair2 = pointToPairMap[intPair2];
+		const auto& pair3 = pointToPairMap[intPair3];
+
+		auto triangle = std::make_shared<Triangle>(pair1, pair2, pair3);
+
+		triangles.push_back(triangle);
+	}
+}
+
+void ImageFrame::renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const
+{
+	if (triangles.empty())
+	{
+		return;
+	}
+
+	wxPen pen = paintDC.GetPen();
+	pen.SetColour("red");
+	paintDC.SetPen(pen);
+
+	// iterate over triangles
+	for (const auto& triangle: triangles)
+	{
+
+		// Draw the triangle.
+		if (isSourceMap)
+		{
+			const auto& srcPoint1 = triangle->getSourcePoint1();
+			const auto& srcPoint2 = triangle->getSourcePoint2();
+			const auto& srcPoint3 = triangle->getSourcePoint3();
+			paintDC.DrawLine(srcPoint1.x, srcPoint1.y, srcPoint2.x, srcPoint2.y);
+			paintDC.DrawLine(srcPoint2.x, srcPoint2.y, srcPoint3.x, srcPoint3.y);
+			paintDC.DrawLine(srcPoint3.x, srcPoint3.y, srcPoint1.x, srcPoint1.y);
+		}
+		else
+		{
+			const auto& tgtPoint1 = triangle->getTargetPoint1();
+			const auto& tgtPoint2 = triangle->getTargetPoint2();
+			const auto& tgtPoint3 = triangle->getTargetPoint3();
+
+			paintDC.DrawLine(tgtPoint1.x, tgtPoint1.y, tgtPoint2.x, tgtPoint2.y);
+			paintDC.DrawLine(tgtPoint2.x, tgtPoint2.y, tgtPoint3.x, tgtPoint3.y);
+			paintDC.DrawLine(tgtPoint3.x, tgtPoint3.y, tgtPoint1.x, tgtPoint1.y);
+		}
+	}
 }
 
 void ImageFrame::onTriangulate(wxCommandEvent& event)
@@ -784,4 +1055,142 @@ void ImageFrame::onScrollReleaseV(const wxCommandEvent& event)
 
 	sourceCanvas->clearOldScrollV();
 	targetCanvas->clearOldScrollV();
+}
+
+bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const wxPoint& vertex2, const wxPoint& vertex3)
+{
+	const auto sign = [](const wxPoint& p1, const wxPoint& p2, const wxPoint& p3) {
+		return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+	};
+
+	const auto d1 = sign(point, vertex1, vertex2);
+	const auto d2 = sign(point, vertex2, vertex3);
+	const auto d3 = sign(point, vertex3, vertex1);
+
+	const auto hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+	const auto hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+	return !(hasNeg && hasPos);
+}
+
+void ImageFrame::autogenerateMappings()
+{
+	const auto& activeVersion = sourceCanvas->getActiveVersion();
+	Log(LogLevel::Debug) << "Removing all existing autogenerated links...";
+	std::set<int> linkIDsToRemove;
+	for (const auto& link: *activeVersion->getLinks())
+	{
+		if (link->isAutogenerated())
+		{
+			linkIDsToRemove.insert(link->getID());
+		}
+	}
+	for (const auto& linkID: linkIDsToRemove)
+	{
+		activeVersion->deleteLinkByID(linkID);
+	}
+
+	// For every triangle, determine all the pixels/points inside it.
+	// wxPoint can't be used as a key in a map, so we'll use a pair of integers instead.
+	Log(LogLevel::Debug) << "Mapping points to triangles...";
+	std::map<std::pair<int, int>, std::shared_ptr<Triangle>> pointToTriangleMap;
+	for (const auto& triangle: triangles)
+	{
+		const auto& sourcePoint1 = triangle->getSourcePoint1();
+		const auto& sourcePoint2 = triangle->getSourcePoint2();
+		const auto& sourcePoint3 = triangle->getSourcePoint3();
+
+		// Determine the bounding box of the triangle.
+		const auto minX = std::min({sourcePoint1.x, sourcePoint2.x, sourcePoint3.x});
+		const auto minY = std::min({sourcePoint1.y, sourcePoint2.y, sourcePoint3.y});
+		const auto maxX = std::max({sourcePoint1.x, sourcePoint2.x, sourcePoint3.x});
+		const auto maxY = std::max({sourcePoint1.y, sourcePoint2.y, sourcePoint3.y});
+
+		// For every pixel in the bounding box, determine if it's inside the triangle.
+		for (auto x = minX; x <= maxX; x++)
+		{
+			for (auto y = minY; y <= maxY; y++)
+			{
+				const auto point = wxPoint(x, y);
+				if (isPointInsideTriangle(point, sourcePoint1, sourcePoint2, sourcePoint3))
+				{
+					pointToTriangleMap[std::make_pair(x, y)] = triangle;
+				}
+			}
+		}
+	}
+
+	Log(LogLevel::Debug) << "Determined triangles for all source map points.";
+
+	const auto targetMapWidth = targetCanvas->getWidth();
+	const auto targetMapHeight = targetCanvas->getHeight();
+
+	auto automapper = Automapper(activeVersion);
+
+	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
+	{
+		// Skip if the source province is already mapped (implying a hand-made mapping).
+		if (activeVersion->isProvinceMapped(sourceProvince->ID, true) == Mapping::MAPPED)
+			continue;
+
+		const bool water = sourceProvince->isWater();
+
+		// Determine which target province every pixel of the source province corresponds to.
+		for (const auto& sourcePixel: sourceProvince->getAllPixels())
+		{
+			// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
+			if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
+			{
+				continue;
+			}
+
+			const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
+
+			const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
+			const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
+
+			// Skip if tgtPoint is outside the target map.
+			if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
+			{
+				continue;
+			}
+
+			const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
+			if (!tgtProvince)
+			{
+				continue;
+			}
+
+			// Skip if the target province is already mapped (implying a hand-made mapping).
+			if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
+				continue;
+
+			// If source is water, target should be water.
+			// If source is land, target should be land.
+			if (water != tgtProvince->isWater())
+			{
+				continue;
+			}
+
+			automapper.registerMatch(sourceProvince, tgtProvince);
+		}
+	}
+
+	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
+
+	Log(LogLevel::Debug) << "Generating links...";
+	automapper.generateLinks();
+
+	if (black == true)
+	{
+		// Refresh The Shade.
+		sourceCanvas->generateShadedPixels();
+		sourceCanvas->applyShadedPixels();
+		targetCanvas->generateShadedPixels();
+		targetCanvas->applyShadedPixels();
+		sourceCanvas->applyStrafedPixels();
+		targetCanvas->applyStrafedPixels();
+	}
+	render();
+	Refresh();
 }

@@ -1,9 +1,11 @@
 #include "GridBase.h"
+
+#include <utility>
 #include "LinkMapper/LinkBase.h"
 
 
 GridBase::GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion):
-	 wxGrid(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(theVersion), eventListener(parent)
+	 wxGrid(parent, wxID_ANY, wxPoint(0, 22), wxDefaultSize, wxFULL_REPAINT_ON_RESIZE | wxEXPAND), version(std::move(theVersion)), eventListener(parent)
 {
 	Bind(wxEVT_GRID_CELL_LEFT_CLICK, &GridBase::leftUp, this);
 	Bind(wxEVT_GRID_CELL_RIGHT_CLICK, &GridBase::rightUp, this);
@@ -13,7 +15,7 @@ GridBase::GridBase(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVers
 	HideCellEditControl();
 	HideRowLabels();
 	HideColLabels();
-	SetScrollRate(0, 10);
+	SetScrollRate(0, 20);
 	SetColMinimalAcceptableWidth(600);
 	GetGridWindow()->Bind(wxEVT_MOTION, &GridBase::onGridMotion, this);
 	SetColMinimalWidth(0, 600);
@@ -40,7 +42,7 @@ void GridBase::focusOnActiveRow()
 
 void GridBase::moveActiveLinkUp()
 {
-	if (activeLink && activeRow && *activeRow > 0)
+	if (getActiveLink() && activeRow && *activeRow > 0)
 	{
 		const auto text = GetCellValue(*activeRow, 0);
 		const auto color = GetCellBackgroundColour(*activeRow, 0);
@@ -53,10 +55,9 @@ void GridBase::moveActiveLinkUp()
 }
 
 
-
 void GridBase::moveActiveLinkDown()
 {
-	if (activeLink && activeRow && *activeRow < GetNumberRows() - 1)
+	if (getActiveLink() && activeRow && *activeRow < GetNumberRows() - 1)
 	{
 		const auto text = GetCellValue(*activeRow, 0);
 		const auto color = GetCellBackgroundColour(*activeRow, 0);
@@ -72,6 +73,7 @@ void GridBase::refreshActiveLink()
 {
 	// this is called when we're toggling a province within the active link
 
+   const auto activeLink = getActiveLink();
 	if (activeRow && activeLink)
 	{
 		SetCellValue(*activeRow, 0, activeLink->toRowString());

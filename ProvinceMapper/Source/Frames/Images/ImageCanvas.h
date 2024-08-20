@@ -6,15 +6,16 @@
 #include "Definitions/DefinitionsInterface.h"
 #include "Provinces/Pixel.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "LinkMapper/TriangulationPointPair.h"
 
 wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_DELAUNAY_TRIANGULATE, wxCommandEvent);
 
 class wxTipWindow;
 struct Province;
@@ -26,7 +27,7 @@ enum class ImageTabSelector
 
 class LinkMapping;
 class Definitions;
-class ImageCanvas: public wxScrolledCanvas
+class ImageCanvas final: public wxScrolledCanvas
 {
   public:
 	ImageCanvas(wxWindow* parent,
@@ -44,10 +45,13 @@ class ImageCanvas: public wxScrolledCanvas
 	[[nodiscard]] wxPoint locateProvinceCoordinates(const std::string& ID) const;
 	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
+	[[nodiscard]] std::shared_ptr<Province> provinceAtCoords(const wxPoint& point) const;
 	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
 	[[nodiscard]] auto getOldScrollV() const { return oldScrollPositionV; }
+	[[nodiscard]] const auto& getActiveVersion() const { return activeVersion; }
 	[[nodiscard]] const auto& getActiveTriangulationPair() const { return activeVersion->getActiveTriangulationPair(); }
 	[[nodiscard]] const auto& getTriangulationPairs() const { return activeVersion->getTriangulationPairs(); }
+	[[nodiscard]] const auto& getDefinitions() const { return definitions; }
  
 	void clearShadedPixels() { shadedPixels.clear(); }
 	void clearStrafedPixels() { strafedPixels.clear(); }
@@ -70,6 +74,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version) { activeVersion = version; }
 	void pushZoomLevel(int zoomLevel);
 	void toggleTriangulate();
+	void toggleTriangulationMesh() { showTriangulationMesh = !showTriangulationMesh; }
 
   private:
 	void onMouseOver(wxMouseEvent& event);
@@ -80,7 +85,7 @@ class ImageCanvas: public wxScrolledCanvas
 	void onScrollRelease(wxScrollWinEvent& event);
 
 	void stageAddComment();
-	void stageDeleteLink() const;
+	void stageDeleteLinkOrTriangulationPair() const;
 	void stageToggleProvinceByID(const std::string& provinceID) const;
 	void strafeProvinces();
 	void strafeProvince(const std::shared_ptr<Province>& province);
@@ -96,9 +101,12 @@ class ImageCanvas: public wxScrolledCanvas
 	void stageSave() const;
 	void stageAddLink() const;
 	void stageAddTriangulationPair() const;
+	void stageAutogenerateMappings() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 	void stagePointPlaced() const;
+	void stageDelaunayTriangulate() const;
+	void stageActivateTriangulationPairByID(int ID) const;
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 
@@ -106,8 +114,10 @@ class ImageCanvas: public wxScrolledCanvas
 	ImageTabSelector selector;
 	int lastClickedRow = 0;
 
+	bool showTriangulationMesh = false;
+
 	bool triangulate = false;
-	std::vector<wxPoint> points;
+	std::vector<wxPoint> points; // points used for the old triangulation version
 
 	wxImage* image;
 	unsigned char* imageData;
@@ -125,7 +135,6 @@ class ImageCanvas: public wxScrolledCanvas
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 	std::shared_ptr<DefinitionsInterface> definitions;
-	std::shared_ptr<LinkMapping> activeLink;
 
 	std::pair<unsigned int, std::string> tooltipCache;
 

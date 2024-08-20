@@ -23,7 +23,8 @@ class LinksTab final: public wxNotebookPage
 {
   public:
 	LinksTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> theVersion);
-	void redraw();
+	void redraw() const;
+	void redrawProvinceLinksGrid() const;
 
 	void restoreTriangulationPairRowColor(int pairRow) const;
 
@@ -33,6 +34,7 @@ class LinksTab final: public wxNotebookPage
 	void deactivateTriangulationPair();
 	void activateLinkByID(int theID);
 	void activateLinkByIndex(int index);
+	void activateTriangulationPairByID(int theID) const;
 	void activateTriangulationPairByIndex(int index);
 	void refreshActiveLink();
 	void refreshActiveTriangulationPair();
@@ -45,12 +47,13 @@ class LinksTab final: public wxNotebookPage
 	void onKeyDown(wxKeyEvent& event);
 
 	void stageAddComment();
-	void stageDeleteLink() const;
+	void stageDeleteLinkOrTriangulationPair() const;
 	void stageMoveUp() const;
 	void stageMoveDown() const;
 	void stageSave() const;
 	void stageAddLink() const;
 	void stageAddTriangulationPair() const;
+	void stageAutogenerateMappings() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
 

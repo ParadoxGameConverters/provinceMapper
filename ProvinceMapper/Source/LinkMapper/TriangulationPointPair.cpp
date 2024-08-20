@@ -1,12 +1,11 @@
-#include "Parser.h"
-#include "CommonRegexes.h"
 #include "TriangulationPointPair.h"
+#include "CommonRegexes.h"
 #include "Log.h"
+#include "Parser.h"
 #include "ParserHelpers.h"
 #include "Provinces/Province.h"
 
-TriangulationPointPair::TriangulationPointPair(std::istream& theStream,
-	 const int theID): LinkBase(theID)
+TriangulationPointPair::TriangulationPointPair(std::istream& theStream, const int theID): LinkBase(theID)
 {
 	auto parser = commonItems::parser();
 	registerKeys(parser);
@@ -22,19 +21,17 @@ const std::string TriangulationPointPair::toRowString()
 {
 	std::string name;
 
-	const auto& sourcePoint = getSourcePoint();
 	if (sourcePoint)
 	{
-		wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint->x, sourcePoint->y);
+		const wxString sourcePointStr = wxString::Format("(%d, %d)", sourcePoint->x, sourcePoint->y);
 		name += std::string(sourcePointStr.mb_str());
 	}
 
 	name += " -> ";
 
-	const auto& targetPoint = getTargetPoint();
 	if (targetPoint)
 	{
-		wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint->x, targetPoint->y);
+		const wxString targetPointStr = wxString::Format("(%d, %d)", targetPoint->x, targetPoint->y);
 		name += std::string(targetPointStr.mb_str());
 	}
 
@@ -44,10 +41,10 @@ const std::string TriangulationPointPair::toRowString()
 	return name;
 }
 
-static const wxColour baseRowColour = wxColour(240, 240, 240);
-static const wxColour commentColour = wxColour(150, 150, 150);
-static const wxColour activeRowColour = wxColour(150, 250, 150); // Bright green for selected pairs.
-static const wxColour selectedCommentColour = wxColour(50, 180, 50); // dark green for selected comments
+static const auto baseRowColour = wxColour(240, 240, 240);
+static const auto commentColour = wxColour(150, 150, 150);
+static const auto activeRowColour = wxColour(150, 250, 150);	  // Bright green for selected pairs.
+static const auto selectedCommentColour = wxColour(50, 180, 50); // dark green for selected comments
 
 const wxColour TriangulationPointPair::getBaseRowColour()
 {
@@ -72,22 +69,22 @@ void TriangulationPointPair::registerKeys(commonItems::parser& parser)
 	parser.registerKeyword("srcX", [this](std::istream& theStream) {
 		if (!sourcePoint)
 			sourcePoint = wxPoint();
-		(*sourcePoint).x = commonItems::getDouble(theStream);
+		sourcePoint->x = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("srcY", [this](std::istream& theStream) {
 		if (!sourcePoint)
 			sourcePoint = wxPoint();
-		(*sourcePoint).y = commonItems::getDouble(theStream);
+		sourcePoint->y = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("dstX", [this](std::istream& theStream) {
 		if (!targetPoint)
 			targetPoint = wxPoint();
-		(*targetPoint).x = commonItems::getDouble(theStream);
+		targetPoint->x = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("dstY", [this](std::istream& theStream) {
 		if (!targetPoint)
 			targetPoint = wxPoint();
-		(*targetPoint).y = commonItems::getDouble(theStream);
+		targetPoint->y = commonItems::getInt(theStream);
 	});
 	parser.registerKeyword("comment", [this](std::istream& theStream) {
 		comment = commonItems::getString(theStream);

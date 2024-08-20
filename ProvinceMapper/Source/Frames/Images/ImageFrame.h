@@ -6,12 +6,14 @@
 #include "Definitions/DefinitionsInterface.h"
 #include <optional>
 
+class Triangle;
 class StatusBar;
 class LinkMappingVersion;
 class wxSplitterWindow;
 class ImageCanvas;
 enum class ImageTabSelector;
 class Configuration;
+class wxAutoBufferedPaintDC;
 class ImageFrame: public wxFrame
 {
   public:
@@ -33,17 +35,20 @@ class ImageFrame: public wxFrame
 	void toggleProvinceByID(const std::string& ID, bool sourceImage);
 	void shadeProvinceByID(const std::string& ID, bool sourceImage);
 	void centerMap(int ID);
+	void centerMapToTriangulationPair(int pairID);
 	void centerProvince(ImageTabSelector selector, const std::string& ID);
 	void deleteActiveLink();
 	void deleteActiveTriangulationPair();
-	void activateTriangulationPairByID(const int ID);
+	void activateTriangulationPairByID(int ID);
 	void setVersion(const std::shared_ptr<LinkMappingVersion>& version);
 	void showToolbar() const;
+	void autogenerateMappings();
 
   private:
 	void onScrollPaint(wxPaintEvent& event);
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
+	void onToggleTriangulationMesh(wxCommandEvent& event);
 	void onClose(const wxCloseEvent& event);
 	void onRefresh(const wxCommandEvent& event);
 	void onTriangulate(wxCommandEvent& event);
@@ -54,10 +59,17 @@ class ImageFrame: public wxFrame
 	void onLock(const wxCommandEvent& event);
 	void onScrollReleaseH(const wxCommandEvent& event);
 	void onScrollReleaseV(const wxCommandEvent& event);
+	void onDelaunayTriangulate(const wxCommandEvent& event);
+	void centerMap(const std::optional<wxPoint>& sourceMapPoint, const std::optional<wxPoint>& targetMapPoint);
 
 	void render() const;
 	void renderSource() const;
 	void renderTarget() const;
+	void renderTriangulationMesh(wxAutoBufferedPaintDC& paintDC, bool isSourceMap) const;
+
+	void delaunayTriangulate();
+	std::vector<std::shared_ptr<Triangle>> triangles;
+	bool showTriangulationMesh = false;
 
 	void determineTriangulationSanity();
 	void buildBounds();

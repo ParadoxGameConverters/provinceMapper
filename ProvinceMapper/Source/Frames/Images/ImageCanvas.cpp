@@ -8,11 +8,13 @@
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_REFRESH, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
+wxDEFINE_EVENT(wxEVT_DELAUNAY_TRIANGULATE, wxCommandEvent);
 
 ImageCanvas::ImageCanvas(wxWindow* parent,
 	 ImageTabSelector theSelector,
@@ -70,7 +72,6 @@ void ImageCanvas::activateLinkByIndex(const int row)
 {
 	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
 	{
-		activeLink = activeVersion->getLinks()->at(row);
 		lastClickedRow = row;
 		// Strafe our provinces' pixels.
 		strafeProvinces();
@@ -86,7 +87,6 @@ void ImageCanvas::activateLinkByID(const int ID)
 	{
 		if (link->getID() == ID)
 		{
-			activeLink = link;
 			lastClickedRow = counter;
 			// Strafe our provinces' pixels.
 			strafeProvinces();
@@ -98,6 +98,13 @@ void ImageCanvas::activateLinkByID(const int ID)
 
 void ImageCanvas::strafeProvinces()
 {
+	if (!activeVersion)
+		return;
+
+	const auto& activeLink = activeVersion->getActiveLink();
+	if (!activeLink)
+		return;
+
 	for (const auto& province: getRelevantProvinces(activeLink))
 		strafeProvince(province);
 }
@@ -155,7 +162,6 @@ void ImageCanvas::applyStrafedPixels()
 
 void ImageCanvas::deactivateLink()
 {
-	activeLink.reset();
 	// restore color
 	for (const auto& pixel: strafedPixels)
 	{
@@ -174,6 +180,13 @@ void ImageCanvas::deactivateLink()
 		}
 	}
 	strafedPixels.clear();
+}
+
+void ImageCanvas::stageActivateTriangulationPairByID(const int ID) const
+{
+	auto* evt = new wxCommandEvent(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID);
+	evt->SetInt(ID);
+	eventHandler->QueueEvent(evt->Clone());
 }
 
 void ImageCanvas::onMouseOver(wxMouseEvent& event)
@@ -212,8 +225,9 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// 1. select a mapping, or
 	// 2. add a province to the existing mapping, or
 	// 3. remove it from active mapping.
-	// 4 - special: if we're initing triangulation, we need raw points.
-	// 5. - special: if we're adding a permanent triangulation pair, 
+	// 4. special: if we're initing triangulation, we need raw points.
+	// 5. special: if we're adding a permanent triangulation pair, add source/target point
+	// 6. when triangulation mesh is enabled, and we clicked within the radius of a triangulation pair point, activate the pair.
 
 	// What province have we clicked?
 	auto x = CalcUnscrolledPosition(event.GetPosition()).x;
@@ -224,9 +238,45 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 	// We may be out of scope if mouse leaves canvas.
 	if (x >= 0 && x <= width - 1 && y >= 0 && y <= height - 1)
 	{
+
+		// case 6: enable triangulation pair if the user clicked within the radius of a point.
+		if (showTriangulationMesh)
+		{
+			const auto pointRadius = static_cast<int>(std::round(5.0 / getScale()));
+			if (selector == ImageTabSelector::SOURCE)
+			{
+				for (const auto& pair: *activeVersion->getTriangulationPairs())
+				{
+					const auto& sourcePoint = pair->getSourcePoint();
+					if (!sourcePoint)
+						continue;
+					const auto clickDistToPoint = std::sqrt(std::pow(sourcePoint->x - x, 2) + std::pow(sourcePoint->y - y, 2));
+					if (clickDistToPoint <= pointRadius)
+					{
+						stageActivateTriangulationPairByID(pair->getID());
+						return;
+					}
+				}
+			}
+			else
+			{
+				for (const auto& pair: *activeVersion->getTriangulationPairs())
+				{
+					const auto& targetPoint = pair->getTargetPoint();
+					if (!targetPoint)
+						continue;
+					const auto clickDistToPoint = std::sqrt(std::pow(targetPoint->x - x, 2) + std::pow(targetPoint->y - y, 2));
+					if (clickDistToPoint <= pointRadius)
+					{
+						stageActivateTriangulationPairByID(pair->getID());
+						return;
+					}
+				}
+			}
+		}
+
 		// case 5: check if we're in the process of editing a triangulation pair
-		const auto& activeTriangulationPair = getActiveTriangulationPair();
-		if (activeTriangulationPair)
+		if (const auto& activeTriangulationPair = getActiveTriangulationPair())
 		{
 			const auto point = wxPoint(x, y);
 			if (selector == ImageTabSelector::SOURCE)
@@ -237,6 +287,9 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 			{
 				activeTriangulationPair->setTargetPoint(point);
 			}
+			// Update the triangle generator.
+			stageDelaunayTriangulate();
+
 			stageTriangulationPairPointPlaced();
 			stageRefresh();
 			return;
@@ -252,7 +305,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 				if (knownPoint == point)
 					return;
 			// insert and ping.
-			points.emplace_back(wxPoint(x, y));
+			points.emplace_back(x, y);
 			stagePointPlaced();
 			return;
 		}
@@ -267,6 +320,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 		}
 
 		// Case 1: DESELECT PROVINCE if we have an active link with this province inside.
+		const auto& activeLink = activeVersion->getActiveLink();
 		if (activeLink)
 		{
 			for (const auto& relevantProvince: getRelevantProvinces(activeLink))
@@ -302,7 +356,7 @@ void ImageCanvas::rightUp(wxMouseEvent& event)
 {
 	// Right up means deselect active link, which is serious stuff.
 	// If our active link is dry, we're not deselecting it, we're deleting it.
-	if (activeLink)
+	if (activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DEACTIVATE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
@@ -346,6 +400,10 @@ void ImageCanvas::stageToggleProvinceByID(const std::string& provinceID) const
 
 void ImageCanvas::toggleProvinceByID(const std::string& ID)
 {
+	if (!activeVersion)
+		return;
+
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (!activeLink)
 		return;
 
@@ -390,7 +448,8 @@ wxPoint ImageCanvas::locateLinkCoordinates(int ID) const
 {
 	auto toReturn = wxPoint(0, 0);
 	std::shared_ptr<LinkMapping> link = nullptr;
-	// We're presumably operating on our own activeLink
+	// We're presumably operating on the activeLink.
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (activeLink && activeLink->getID() == ID)
 		link = activeLink;
 	else
@@ -439,13 +498,13 @@ wxPoint ImageCanvas::locateProvinceCoordinates(const std::string& ID) const
 
 void ImageCanvas::deleteActiveLink()
 {
+	const auto& activeLink = activeVersion->getActiveLink();
 	if (activeLink)
 	{
 		// We need to restore full color to our provinces.
 		for (const auto& province: getRelevantProvinces(activeLink))
 			dismarkProvince(province);
 		strafedPixels.clear();
-		activeLink.reset();
 	}
 }
 
@@ -466,9 +525,12 @@ void ImageCanvas::onKeyDown(wxKeyEvent& event)
 		case WXK_F6:
 			stageAddTriangulationPair();
 			break;
+		case WXK_F7:
+			stageAutogenerateMappings();
+			break;
 		case WXK_DELETE:
 		case WXK_NUMPAD_DELETE:
-			stageDeleteLink();
+			stageDeleteLinkOrTriangulationPair();
 			break;
 		case WXK_NUMPAD_SUBTRACT:
 			stageMoveUp();
@@ -493,10 +555,15 @@ void ImageCanvas::stageAddComment()
 	dialog->ShowModal();
 }
 
-void ImageCanvas::stageDeleteLink() const
+void ImageCanvas::stageDeleteLinkOrTriangulationPair() const
 {
 	// Do nothing unless working on active link. Don't want accidents here.
-	if (activeLink)
+	if (activeVersion->getActiveTriangulationPair())
+	{
+		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_TRIANGULATION_PAIR);
+		eventHandler->QueueEvent(evt->Clone());
+	}
+	if (activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_DELETE_ACTIVE_LINK);
 		eventHandler->QueueEvent(evt->Clone());
@@ -597,9 +664,15 @@ void ImageCanvas::stagePointPlaced() const
 	eventHandler->QueueEvent(evt.Clone());
 }
 
+void ImageCanvas::stageDelaunayTriangulate() const
+{
+	const wxCommandEvent evt(wxEVT_DELAUNAY_TRIANGULATE);
+	eventHandler->QueueEvent(evt.Clone());
+}
+
 void ImageCanvas::stageMoveUp() const
 {
-	if (activeLink)
+	if (activeVersion && activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_UP);
 		eventHandler->QueueEvent(evt->Clone());
@@ -608,7 +681,7 @@ void ImageCanvas::stageMoveUp() const
 
 void ImageCanvas::stageMoveDown() const
 {
-	if (activeLink)
+	if (activeVersion && activeVersion->getActiveLink())
 	{
 		const auto* evt = new wxCommandEvent(wxEVT_MOVE_ACTIVE_LINK_DOWN);
 		eventHandler->QueueEvent(evt->Clone());
@@ -630,6 +703,12 @@ void ImageCanvas::stageAddLink() const
 void ImageCanvas::stageAddTriangulationPair() const
 {
 	const auto* evt = new wxCommandEvent(wxEVT_ADD_TRIANGULATION_PAIR);
+	eventHandler->QueueEvent(evt->Clone());
+}
+
+void ImageCanvas::stageAutogenerateMappings() const
+{
+	const auto* evt = new wxCommandEvent(wxEVT_AUTOGENERATE_MAPPINGS);
 	eventHandler->QueueEvent(evt->Clone());
 }
 
@@ -690,6 +769,14 @@ std::string ImageCanvas::nameAtCoords(const wxPoint& point)
 		tooltipCache = std::pair(chroma, name);
 	}
 	return name;
+}
+
+std::shared_ptr<Province> ImageCanvas::provinceAtCoords(const wxPoint& point) const
+{
+	const auto offs = coordsToOffset(point.x, point.y, width);
+	const auto chroma = pixelPack(image->GetData()[offs], image->GetData()[offs + 1], image->GetData()[offs + 2]);
+
+	return definitions->getProvinceForChroma(chroma);
 }
 
 void ImageCanvas::onScrollRelease(wxScrollWinEvent& event)

@@ -36,6 +36,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onSaveLinks, this, wxID_SAVE);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddLink, this, wxEVT_ADD_LINK);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddTriangulationPair, this, wxEVT_ADD_TRIANGULATION_PAIR);
+	Bind(wxEVT_MENU, &MainFrame::onAutogenerateMappings, this, wxEVT_AUTOGENERATE_MAPPINGS);
 	Bind(wxEVT_MENU, &MainFrame::onDeleteActiveLinkOrTriangulationPair, this, wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR);
 	Bind(wxEVT_MENU, &MainFrame::onLinksAddComment, this, wxMENU_ADD_COMMENT);
 	Bind(wxEVT_MENU, &MainFrame::onVersionsAddVersion, this, wxMENU_ADD_VERSION);
@@ -57,8 +58,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SELECT_LINK_BY_INDEX, &MainFrame::onActivateLinkByIndex, this);
 	Bind(wxEVT_SELECT_TRIANGULATION_PAIR_BY_INDEX, &MainFrame::onActivateTriangulationPairByIndex, this);
 	Bind(wxEVT_SELECT_LINK_BY_ID, &MainFrame::onActivateLinkByID, this);
+	Bind(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, &MainFrame::onActivateTriangulationPairByID, this);
 	Bind(wxEVT_TOGGLE_PROVINCE, &MainFrame::onToggleProvince, this);
 	Bind(wxEVT_CENTER_MAP, &MainFrame::onCenterMap, this);
+	Bind(wxEVT_CENTER_MAP_TO_TRIANGULATION_PAIR, &MainFrame::onCenterMapToTriangulationPair, this);
 	Bind(wxEVT_ADD_COMMENT, &MainFrame::onAddComment, this);
 	Bind(wxEVT_UPDATE_NAME, &MainFrame::onRenameVersion, this);
 	Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, &MainFrame::onChangeTab, this);
@@ -67,6 +70,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_SAVE_LINKS, &MainFrame::onSaveLinks, this);
 	Bind(wxEVT_ADD_LINK, &MainFrame::onLinksAddLink, this);
 	Bind(wxEVT_ADD_TRIANGULATION_PAIR, &MainFrame::onLinksAddTriangulationPair, this);
+	Bind(wxEVT_AUTOGENERATE_MAPPINGS, &MainFrame::onAutogenerateMappings, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_LEFT, &MainFrame::onLinksMoveVersionLeft, this);
 	Bind(wxEVT_MOVE_ACTIVE_VERSION_RIGHT, &MainFrame::onLinksMoveVersionRight, this);
 	Bind(wxEVT_PROVINCE_CENTER_MAP, &MainFrame::onCenterProvince, this);
@@ -253,6 +257,7 @@ void MainFrame::initLinksFrame()
 	linksDropDown->Append(wxEVT_ADD_LINK, "Add Link [F3]\tCtrl-L");
 	linksDropDown->Append(wxMENU_ADD_COMMENT, "Add Comment [F4]\tCtrl-C");
 	linksDropDown->Append(wxEVT_ADD_TRIANGULATION_PAIR, "Add Triangulation Point Pair [F6]");
+	linksDropDown->Append(wxEVT_AUTOGENERATE_MAPPINGS, "Autogenerate mappings from triangulation pairs [F7]");
 	linksDropDown->Append(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, "Delete Selected [Del]\tCtrl-D");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_UP, "Move Selected Up\tNum -");
 	linksDropDown->Append(wxEVT_MOVE_ACTIVE_LINK_DOWN, "Move Selected Down\tNum +");
@@ -398,6 +403,7 @@ void MainFrame::initImageFrame()
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
+	menuDropDown->Append(wxID_VIEW_SMALLICONS, "Toggle the Triangulation Mesh");
 	auto* toolbarDropDown = new wxMenu;
 	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");
 	auto* unmappedDropDown = new wxMenu;
@@ -600,7 +606,7 @@ void MainFrame::onDeactivateTriangulationPair(wxCommandEvent& evt)
 
 void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)
 {
-	deactiveActiveLinkOrTriangulationPair();
+	deactivateActiveLinkOrTriangulationPair();
 
 	linkMapper.activateLinkByIndex(evt.GetInt());
 	linksFrame->activateLinkByIndex(evt.GetInt());
@@ -609,14 +615,14 @@ void MainFrame::onActivateLinkByIndex(const wxCommandEvent& evt)
 
 void MainFrame::onActivateTriangulationPairByIndex(const wxCommandEvent& evt)
 {
-	deactiveActiveLinkOrTriangulationPair();
+	deactivateActiveLinkOrTriangulationPair();
 
 	linkMapper.activateTriangulationPairByIndex(evt.GetInt());
 	linksFrame->activateTriangulationPairByIndex(evt.GetInt());
 	imageFrame->activateTriangulationPairByIndex(evt.GetInt());
 }
 
-void MainFrame::deactiveActiveLinkOrTriangulationPair()
+void MainFrame::deactivateActiveLinkOrTriangulationPair()
 {
 	linkMapper.deactivateLink();
 	linksFrame->deactivateLink();
@@ -632,6 +638,12 @@ void MainFrame::onRefreshActiveTriangulationPair(wxCommandEvent& evt)
 	linksFrame->refreshActiveTriangulationPair();
 }
 
+void MainFrame::onAutogenerateMappings(const wxCommandEvent& evt)
+{
+	imageFrame->autogenerateMappings();
+	linksFrame->redrawProvinceLinksGrid();
+}
+
 void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 {
 	// This is coming from one of the imageCanvases, so we need to update everything.
@@ -641,6 +653,15 @@ void MainFrame::onActivateLinkByID(const wxCommandEvent& evt)
 	linkMapper.activateLinkByID(evt.GetInt());
 	imageFrame->activateLinkByID(evt.GetInt());
 	linksFrame->activateLinkByID(evt.GetInt());
+}
+
+void MainFrame::onActivateTriangulationPairByID(const wxCommandEvent& evt)
+{
+	deactivateActiveLinkOrTriangulationPair();
+
+	linkMapper.activateTriangulationPairByID(evt.GetInt());
+	linksFrame->activateTriangulationPairByID(evt.GetInt());
+	imageFrame->activateTriangulationPairByID(evt.GetInt());
 }
 
 void MainFrame::onToggleProvince(const wxCommandEvent& evt)
@@ -695,6 +716,11 @@ void MainFrame::onCenterProvince(const wxCommandEvent& evt)
 	imageFrame->centerProvince(selector, evt.GetString().ToStdString());
 }
 
+void MainFrame::onCenterMapToTriangulationPair(const wxCommandEvent& evt)
+{
+	imageFrame->centerMapToTriangulationPair(evt.GetInt());
+}
+
 void MainFrame::onAddComment(const wxCommandEvent& evt)
 {
 	const auto newLinkID = linkMapper.addCommentByIndex(evt.GetString().ToStdString(), evt.GetInt());
@@ -718,15 +744,24 @@ void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)
 void MainFrame::onDeleteActiveTriangulationPair(wxCommandEvent& evt)
 {
 	// We don't need an ID since this works only on active pair.
-	imageFrame->deleteActiveTriangulationPair(); // Images first so it knows which provinces to recolor.
 	linkMapper.deleteActiveTriangulationPair();
 	linksFrame->deactivateTriangulationPair();
+	imageFrame->deleteActiveTriangulationPair();
 }
 
 void MainFrame::onDeleteActiveLinkOrTriangulationPair(wxCommandEvent& evt)
 {
+	const auto& version = linkMapper.getActiveVersion();
+	if (!version)
+		return;
+
+	if (version->getActiveTriangulationPair())
+	{
+		onDeleteActiveTriangulationPair(evt);
+		return;
+	}
+
 	onDeleteActiveLink(evt);
-	onDeleteActiveTriangulationPair(evt);
 }
 
 void MainFrame::onLinksAddLink(wxCommandEvent& evt)
@@ -735,6 +770,7 @@ void MainFrame::onLinksAddLink(wxCommandEvent& evt)
 	const auto newLinkID = linkMapper.addRawLink();
 	if (newLinkID)
 	{
+		linksFrame->deactivateTriangulationPair();
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
 		imageFrame->deactivateTriangulationPair();
@@ -748,6 +784,7 @@ void MainFrame::onLinksAddComment(wxCommandEvent& evt)
 	const auto newLinkID = linkMapper.addRawComment();
 	if (newLinkID)
 	{
+		linksFrame->deactivateTriangulationPair();
 		linksFrame->createLink(*newLinkID);
 		imageFrame->deactivateLink();
 		imageFrame->deactivateTriangulationPair();
@@ -761,6 +798,7 @@ void MainFrame::onLinksAddTriangulationPair(wxCommandEvent& evt)
 	const auto newPairID = linkMapper.addRawTriangulationPair();
 	if (newPairID)
 	{
+		linksFrame->deactivateLink();
 		linksFrame->createTriangulationPair(*newPairID);
 		imageFrame->deactivateLink();
 		imageFrame->deactivateTriangulationPair();
