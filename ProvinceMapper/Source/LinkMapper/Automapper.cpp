@@ -382,7 +382,7 @@ void Automapper::forUnmappedSourcesTryToStealTargetsFromExistingLinks()
 	cleanUpSourceProvinceShares();
 }
 
-void Automapper::generateLinks(const std::unique_ptr<wxTaskBarButton>& taskBarBtn)
+void Automapper::generateLinks(wxTaskBarButton* taskBarBtn)
 {
 	// General rules for the automapping:
 	// - We don't modify the hand-made links.

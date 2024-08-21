@@ -28,6 +28,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
 	 configuration(std::move(theConfiguration)), eventHandler(parent)
 {
+	taskBarBtn = MSWGetTaskBarButton();
+
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleTriangulationMesh, this, wxID_VIEW_SMALLICONS);
@@ -1076,7 +1078,6 @@ bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const w
 
 void ImageFrame::autogenerateMappings()
 {
-	std::unique_ptr<wxTaskBarButton> taskBarBtn(MSWGetTaskBarButton());
 	if (taskBarBtn)
 	{
 		taskBarBtn->SetProgressRange(20);
