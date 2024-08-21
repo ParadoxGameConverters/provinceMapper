@@ -1082,6 +1082,7 @@ void ImageFrame::autogenerateMappings()
 	{
 		taskBarBtn->SetProgressRange(20);
 		taskBarBtn->SetProgressValue(0);
+		taskBarBtn->SetProgressState(wxTASKBAR_BUTTON_NORMAL);
 	}
 
 	const auto& activeVersion = sourceCanvas->getActiveVersion();
@@ -1208,10 +1209,10 @@ void ImageFrame::autogenerateMappings()
 	render();
 	Refresh();
 
-	if (taskBarBtn)
-		taskBarBtn->SetProgressValue(20);
-
 	// Remove the progress indicator from the taskbar button.
 	if (taskBarBtn)
+	{
+		taskBarBtn->SetProgressValue(0);
 		taskBarBtn->SetProgressState(wxTASKBAR_BUTTON_NO_PROGRESS);
+	}
 }
