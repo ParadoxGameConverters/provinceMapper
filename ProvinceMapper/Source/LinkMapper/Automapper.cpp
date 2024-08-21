@@ -4,6 +4,7 @@
 #include "Provinces/Province.h"
 
 #include <ranges>
+#include <wx/taskbarbutton.h>
 
 void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince)
 {
@@ -381,7 +382,7 @@ void Automapper::forUnmappedSourcesTryToStealTargetsFromExistingLinks()
 	cleanUpSourceProvinceShares();
 }
 
-void Automapper::generateLinks()
+void Automapper::generateLinks(wxTaskBarButton* taskBarBtn)
 {
 	// General rules for the automapping:
 	// - We don't modify the hand-made links.
@@ -389,73 +390,106 @@ void Automapper::generateLinks()
 	// - We don't create many-to-many mappings.
 
 	activeVersion->deactivateLink();
+	int currentProgress = 3;
 
 	// 1. For all non-impassable target provinces:
 	//	   If the most matching source province is available and not impassable, map them.
 	//	   Require both sides to be currently unmapped.
 	Log(LogLevel::Debug) << "Link generation step 1...";
 	forUnmappedTargetsMapUnmappedSources();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 2. For all yet unmapped non-impassable source provinces:
 	//	   If the most matching target province is available and not impassable, map them.
 	//	   Require both sides to be currently unmapped.
 	Log(LogLevel::Debug) << "Link generation step 2...";
 	forUnmappedSourcesMapUnmappedTargets();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 3. For all non-impassable target provinces:
 	//	   If the most matching source province is available and not impassable, map them.
 	Log(LogLevel::Debug) << "Link generation step 3...";
 	forNonImpassableTargetsMapTryToMapFirstChoices();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 4. For all yet unmapped non-impassable source provinces:
 	//	   If the most matching target province is available and not impassable, map them.
 	Log(LogLevel::Debug) << "Link generation step 4...";
 	forNonImpassableSourcesMapTryToMapFirstChoices();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 5. For all yet unmapped non-impassable target provinces:
 	//	   Try to use the most matching available non-impassable source province to map them.
 	Log(LogLevel::Debug) << "Link generation step 5...";
 	forUnmappedTargetsEvaluateAllNonImpassableMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 6. For all yet unmapped non-impassable source provinces:target
 	//	   Try to use the most matching available non-impassable target province to map them.
 	Log(LogLevel::Debug) << "Link generation step 6...";
 	forUnmappedSourcesEvaluateAllNonImpassableMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 7. For all yet unmapped target provinces:
 	//    Try to use the most matching available source province to map them.
 	Log(LogLevel::Debug) << "Link generation step 7...";
 	forUnmappedTargetsEvaluateAllMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 8. For all yet unmapped source provinces:
 	//    Try to use the most matching available target province to map them.
 	Log(LogLevel::Debug) << "Link generation step 8...";
 	forUnmappedSourcesEvaluateAllMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 9. For all yet unmapped non-impassable target provinces, we're running out of options, so we turn to theft.
 	//    Check if we can steal a source province from an existing many-to-one link.
 	Log(LogLevel::Debug) << "Link generation step 9...";
 	forUnmappedTargetsTryToStealSourcesFromExistingLinks();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// 10. For all yet unmapped non-impassable source provinces, we're running out of options, so we turn to theft.
 	//     Check if we can steal a target province from an existing one-to-many link.
 	Log(LogLevel::Debug) << "Link generation step 10...";
 	forUnmappedSourcesTryToStealTargetsFromExistingLinks();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	// After steps 9 and 10, it may be possible to map some provinces that were previously impossible to map.
 	// Repeat steps 3 to 8.
 	Log(LogLevel::Debug) << "Link generation step 11...";
 	forNonImpassableTargetsMapTryToMapFirstChoices();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 	Log(LogLevel::Debug) << "Link generation step 12...";
 	forNonImpassableSourcesMapTryToMapFirstChoices();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 	Log(LogLevel::Debug) << "Link generation step 13...";
 	forUnmappedTargetsEvaluateAllNonImpassableMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 	Log(LogLevel::Debug) << "Link generation step 14...";
 	forUnmappedSourcesEvaluateAllNonImpassableMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 	Log(LogLevel::Debug) << "Link generation step 15...";
 	forUnmappedTargetsEvaluateAllMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 	Log(LogLevel::Debug) << "Link generation step 16...";
 	forUnmappedSourcesEvaluateAllMatches();
+	if (taskBarBtn)
+		taskBarBtn->SetProgressValue(++currentProgress);
 
 	Log(LogLevel::Info) << "<> Automapping complete.";
 }
