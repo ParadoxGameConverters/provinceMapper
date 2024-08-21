@@ -1076,7 +1076,7 @@ bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const w
 
 void ImageFrame::autogenerateMappings()
 {
-	wxTaskBarButton* taskBarBtn = MSWGetTaskBarButton();
+	std::unique_ptr<wxTaskBarButton> taskBarBtn(MSWGetTaskBarButton());
 	if (taskBarBtn)
 	{
 		taskBarBtn->SetProgressRange(20);
