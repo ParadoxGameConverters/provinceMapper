@@ -4,12 +4,13 @@
 #include <map>
 #include <string>
 
+class wxTaskBarButton;
 class Automapper final
 {
   public:
 	explicit Automapper(std::shared_ptr<LinkMappingVersion> activeVersion): activeVersion(std::move(activeVersion)) {}
 	void registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince);
-	void generateLinks();
+	void generateLinks(wxTaskBarButton* taskBarBtn);
 
   private:
 	[[nodiscard]] bool canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID, bool allowAddingToExistingLink) const;

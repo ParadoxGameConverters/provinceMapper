@@ -82,6 +82,7 @@ class ImageFrame: public wxFrame
 	ImageCanvas* targetCanvas = nullptr;
 	wxSplitterWindow* splitter = nullptr;
 	StatusBar* statusBar = nullptr;
+	wxTaskBarButton* taskBarBtn;
 
 	bool black = false;
 	bool triangulationIsSane = false;
