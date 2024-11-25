@@ -6,21 +6,28 @@
 #include <ranges>
 #include <wx/taskbarbutton.h>
 
+static void incrementShare(std::map<std::string, int>& shares, const std::string& provID)
+{
+	if (shares.contains(provID))
+	{
+		shares[provID]++;
+	}
+	else
+	{
+		shares[provID] = 1;
+	}
+}
+
 void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince)
 {
+	std::lock_guard lock(automapperMutex); // Lock the mutex
+
 	const auto& srcProvinceID = srcProvince->ID;
 	const auto& targetProvinceID = targetProvince->ID;
 
 	if (sourceProvinceShares.contains(srcProvinceID))
 	{
-		if (sourceProvinceShares[srcProvinceID].contains(targetProvinceID))
-		{
-			sourceProvinceShares[srcProvinceID][targetProvinceID]++;
-		}
-		else
-		{
-			sourceProvinceShares[srcProvinceID][targetProvinceID] = 1;
-		}
+		incrementShare(sourceProvinceShares[srcProvinceID], targetProvinceID);
 	}
 	else
 	{
@@ -35,14 +42,7 @@ void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, con
 
 	if (targetProvinceShares.contains(targetProvinceID))
 	{
-		if (targetProvinceShares[targetProvinceID].contains(srcProvinceID))
-		{
-			targetProvinceShares[targetProvinceID][srcProvinceID]++;
-		}
-		else
-		{
-			targetProvinceShares[targetProvinceID][srcProvinceID] = 1;
-		}
+		incrementShare(targetProvinceShares[targetProvinceID], srcProvinceID);
 	}
 	else
 	{

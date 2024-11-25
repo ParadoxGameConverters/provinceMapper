@@ -2,6 +2,7 @@
 #include "LinkMappingVersion.h"
 
 #include <map>
+#include <mutex>
 #include <string>
 
 class wxTaskBarButton;
@@ -40,4 +41,6 @@ class Automapper final
 	std::set<std::string> alreadyMappedTgtProvincesCache;
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
+
+   std::mutex automapperMutex; // Mutex for thread safety
 };

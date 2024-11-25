@@ -8,6 +8,7 @@
 #include "Provinces/Province.h"
 #include "StatusBar.h"
 
+#include <future>
 #include <ranges>
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
@@ -1140,53 +1141,77 @@ void ImageFrame::autogenerateMappings()
 
 	auto automapper = Automapper(activeVersion);
 
-	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
+	// Split source provinces into chunks for parallel processing
+	const auto& sourceProvinces = sourceCanvas->getDefinitions()->getProvinces() | std::ranges::views::values;
+	std::vector sourceProvincesVector(sourceProvinces.begin(), sourceProvinces.end());
+	const size_t numThreads = std::thread::hardware_concurrency();
+	const size_t chunkSize = (sourceProvinces.size() + numThreads - 1) / numThreads;
+
+	std::vector<std::future<void>> futures;
+
+	for (size_t i = 0; i < numThreads; ++i)
 	{
-		// Skip if the source province is already mapped (implying a hand-made mapping).
-		if (activeVersion->isProvinceMapped(sourceProvince->ID, true) == Mapping::MAPPED)
-			continue;
+		auto startIt = sourceProvincesVector.begin() + i * chunkSize;
+		auto endIt = (i == numThreads - 1) ? sourceProvincesVector.end() : startIt + chunkSize;
 
-		const bool water = sourceProvince->isWater();
-
-		// Determine which target province every pixel of the source province corresponds to.
-		for (const auto& sourcePixel: sourceProvince->getAllPixels())
-		{
-			// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
-			if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
+		futures.push_back(std::async(std::launch::async, [&, startIt, endIt] {
+			for (auto it = startIt; it != endIt; ++it)
 			{
-				continue;
+				const auto& sourceProvince = *it;
+
+				// Skip if the source province is already mapped (implying a hand-made mapping).
+				if (activeVersion->isProvinceMapped(sourceProvince->ID, true) == Mapping::MAPPED)
+					continue;
+
+				const bool water = sourceProvince->isWater();
+
+				// Determine which target province every pixel of the source province corresponds to.
+				for (const auto& sourcePixel: sourceProvince->getAllPixels())
+				{
+					// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
+					if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
+					{
+						continue;
+					}
+
+					const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
+
+					const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
+					const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
+
+					// Skip if tgtPoint is outside the target map.
+					if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
+					{
+						continue;
+					}
+
+					const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
+					if (!tgtProvince)
+					{
+						continue;
+					}
+
+					// Skip if the target province is already mapped (implying a hand-made mapping).
+					if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
+						continue;
+
+					// If source is water, target should be water.
+					// If source is land, target should be land.
+					if (water != tgtProvince->isWater())
+					{
+						continue;
+					}
+
+					automapper.registerMatch(sourceProvince, tgtProvince);
+				}
 			}
+		}));
+	}
 
-			const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
-
-			const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
-			const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
-
-			// Skip if tgtPoint is outside the target map.
-			if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
-			{
-				continue;
-			}
-
-			const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
-			if (!tgtProvince)
-			{
-				continue;
-			}
-
-			// Skip if the target province is already mapped (implying a hand-made mapping).
-			if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
-				continue;
-
-			// If source is water, target should be water.
-			// If source is land, target should be land.
-			if (water != tgtProvince->isWater())
-			{
-				continue;
-			}
-
-			automapper.registerMatch(sourceProvince, tgtProvince);
-		}
+	// Wait for all tasks to complete
+	for (auto& future: futures)
+	{
+		future.get();
 	}
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
