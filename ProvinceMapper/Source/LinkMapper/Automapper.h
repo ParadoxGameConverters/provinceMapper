@@ -42,5 +42,5 @@ class Automapper final
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 
-   std::mutex automapperMutex; // Mutex for thread safety
+	std::mutex automapperMutex; // Mutex for thread safety
 };
