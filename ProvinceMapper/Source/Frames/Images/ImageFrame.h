@@ -4,7 +4,11 @@
 #include <wx/wx.h>
 #endif
 #include "Definitions/DefinitionsInterface.h"
+#include "LinkMapper/Automapper.h"
+#include "Provinces/Pixel.h"
+
 #include <optional>
+#include <vector>
 
 class Triangle;
 class StatusBar;
@@ -70,6 +74,12 @@ class ImageFrame: public wxFrame
 	void delaunayTriangulate();
 	std::vector<std::shared_ptr<Triangle>> triangles;
 	bool showTriangulationMesh = false;
+
+	inline static void determineTargetProvinceForSourcePixels(const std::shared_ptr<Province>& sourceProvince, const std::vector<Pixel>& sourcePixels, std::map<std::pair<int, int>,
+		std::shared_ptr<Triangle>>&
+		pointToTriangleMap, const std::shared_ptr<LinkMappingVersion>& activeVersion, const std::shared_ptr<
+		DefinitionsInterface>& tgtProvinceDefinitions, int targetMapWidth, int targetMapHeight, bool water, Automapper&
+		automapper);
 
 	void determineTriangulationSanity();
 	void buildBounds();

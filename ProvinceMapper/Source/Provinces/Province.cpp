@@ -90,13 +90,3 @@ bool Province::isImpassable() const
 {
 	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
 }
-
-std::vector<Pixel> Province::getAllPixels() const
-{
-	std::vector<Pixel> allPixels;
-	allPixels.reserve(innerPixels.size() + borderPixels.size());
-	allPixels.insert(allPixels.end(), innerPixels.begin(), innerPixels.end());
-	allPixels.insert(allPixels.end(), borderPixels.begin(), borderPixels.end());
-
-	return allPixels;
-}

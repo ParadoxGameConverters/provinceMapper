@@ -1077,6 +1077,69 @@ bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const w
 	return !(hasNeg && hasPos);
 }
 
+
+typedef uint64_t PackedCoordinates;
+static std::unordered_map<PackedCoordinates, std::shared_ptr<Province>> packedTgtPointToTgtProvinceMap;
+
+[[nodiscard]] static PackedCoordinates packCoordinates(const int x, const int y)
+{
+	return static_cast<PackedCoordinates>(x) << 32 | y;
+}
+
+void ImageFrame::determineTargetProvinceForSourcePixels(
+	const std::shared_ptr<Province>& sourceProvince,
+	const std::vector<Pixel>& sourcePixels,
+	std::map<std::pair<int, int>, std::shared_ptr<Triangle>>& pointToTriangleMap,
+	const std::shared_ptr<LinkMappingVersion>& activeVersion,
+	const std::shared_ptr<DefinitionsInterface>& tgtProvinceDefinitions,
+	const int targetMapWidth,
+	const int targetMapHeight,
+	const bool water,
+	Automapper& automapper)
+{
+	for (const auto& sourcePixel: sourcePixels)
+	{
+		// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
+		if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
+		{
+			continue;
+		}
+
+		const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
+
+		const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
+		const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
+
+		// Skip if tgtPoint is outside the target map.
+		if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
+		{
+			continue;
+		}
+
+
+		// const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
+		// const auto& tgtProvince = tgtPointToTgtProvinceMap[tgtPoint];
+		const auto& tgtProvince = packedTgtPointToTgtProvinceMap[packCoordinates(tgtPoint.x, tgtPoint.y)];
+		if (!tgtProvince)
+		{
+			continue;
+		}
+
+		// Skip if the target province is already mapped (implying a hand-made mapping).
+		if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
+			continue;
+
+		// If source is water, target should be water.
+		// If source is land, target should be land.
+		if (water != tgtProvince->isWater())
+		{
+			continue;
+		}
+
+		automapper.registerMatch(sourceProvince, tgtProvince);
+	}
+}
+
 void ImageFrame::autogenerateMappings()
 {
 	if (taskBarBtn)
@@ -1141,6 +1204,20 @@ void ImageFrame::autogenerateMappings()
 
 	auto automapper = Automapper(activeVersion);
 
+	const auto& tgtProvinceDefinitions = targetCanvas->getDefinitions();
+	// Initialize the packedTgtPointToTgtProvinceMap. This only needs to be done once.
+	if (packedTgtPointToTgtProvinceMap.empty())
+	{
+		Log(LogLevel::Debug) << "Initializing point to province dict for target map...";
+		for (const auto& tgtProvince: tgtProvinceDefinitions->getProvinces() | std::views::values)
+		{
+			for (const auto& pixel: tgtProvince->innerPixels)
+			{
+				packedTgtPointToTgtProvinceMap[packCoordinates(pixel.x, pixel.y)] = tgtProvince;
+			}
+		}
+	}
+
 	// Split source provinces into chunks for parallel processing
 	const auto& sourceProvinces = sourceCanvas->getDefinitions()->getProvinces() | std::ranges::views::values;
 	std::vector sourceProvincesVector(sourceProvinces.begin(), sourceProvinces.end());
@@ -1166,44 +1243,24 @@ void ImageFrame::autogenerateMappings()
 				const bool water = sourceProvince->isWater();
 
 				// Determine which target province every pixel of the source province corresponds to.
-				for (const auto& sourcePixel: sourceProvince->getAllPixels())
-				{
-					// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
-					if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
-					{
-						continue;
-					}
-
-					const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
-
-					const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
-					const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
-
-					// Skip if tgtPoint is outside the target map.
-					if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
-					{
-						continue;
-					}
-
-					const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
-					if (!tgtProvince)
-					{
-						continue;
-					}
-
-					// Skip if the target province is already mapped (implying a hand-made mapping).
-					if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
-						continue;
-
-					// If source is water, target should be water.
-					// If source is land, target should be land.
-					if (water != tgtProvince->isWater())
-					{
-						continue;
-					}
-
-					automapper.registerMatch(sourceProvince, tgtProvince);
-				}
+				determineTargetProvinceForSourcePixels(sourceProvince,
+					 sourceProvince->innerPixels,
+					 pointToTriangleMap,
+					 activeVersion,
+					 tgtProvinceDefinitions,
+					 targetMapWidth,
+					 targetMapHeight,
+					 water,
+					 automapper);
+				determineTargetProvinceForSourcePixels(sourceProvince,
+					 sourceProvince->borderPixels,
+					 pointToTriangleMap,
+					 activeVersion,
+					 tgtProvinceDefinitions,
+					 targetMapWidth,
+					 targetMapHeight,
+					 water,
+					 automapper);
 			}
 		}));
 	}
