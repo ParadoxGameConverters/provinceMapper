@@ -11,26 +11,21 @@ Province::Province(std::string theID, const unsigned char tr, const unsigned cha
 void Province::setAreaName(std::string name)
 {
 	areaName = std::move(name);
-	determineIfWater();
 }
 
 void Province::setRegionName(std::string name)
 {
 	regionName = std::move(name);
-	determineIfWater();
 }
 
 void Province::setSuperRegionName(std::string name)
 {
 	superRegionName = std::move(name);
-	determineIfWater();
 }
 
 void Province::setProvinceType(std::string name)
 {
 	provinceType = std::move(name);
-	determineIfWater();
-	determineIfImpassable();
 }
 
 bool Province::operator==(const Province& rhs) const
@@ -48,32 +43,29 @@ bool Province::operator!=(const Province& rhs) const
 	return ID != rhs.ID;
 }
 
-void Province::determineIfWater()
+bool Province::isWater() const
 {
 	// For EU4, use region and area names to determine what is water.
 	if (superRegionName && superRegionName.value().ends_with("_sea_superregion"))
 	{
-		water = true;
-		return;
+		return true;
 	}
 	if (regionName && regionName.value().ends_with("_sea_region"))
 	{
-		water = true;
-		return;
+		return true;
 	}
 	if (areaName && areaName.value().ends_with("_sea_area"))
 	{
-		water = true;
-		return;
+		return true;
 	}
 
 	// For games like I:R and CK3, province type is defined and can be used.
-	water = provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
+	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
 }
 
-void Province::determineIfImpassable()
+bool Province::isImpassable() const
 {
-	impassable = provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
+	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
 }
 
 bool Province::operator<(const Province& rhs) const

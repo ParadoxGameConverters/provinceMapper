@@ -16,8 +16,8 @@ class Province final
 	[[nodiscard]] const std::optional<std::string>& getRegionName() const { return regionName; }
 	[[nodiscard]] const std::optional<std::string>& getSuperRegionName() const { return superRegionName; }
 	[[nodiscard]] const std::optional<std::string>& getProvinceType() const { return provinceType; }
-	[[nodiscard]] bool isWater() const { return water; }
-	[[nodiscard]] bool isImpassable() const { return impassable; }
+	[[nodiscard]] bool isWater() const;
+	[[nodiscard]] bool isImpassable() const;
 
    void setAreaName(std::string name);
 	void setRegionName(std::string name);
@@ -39,16 +39,10 @@ class Province final
 	std::vector<Pixel> borderPixels;
 
   private:
-	void determineIfWater();
-	void determineIfImpassable();
-
 	std::optional<std::string> areaName;
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
 	std::optional<std::string> provinceType;
-
-   bool water = false;
-	bool impassable = false;
 };
 
 #endif // PROVINCE_H
