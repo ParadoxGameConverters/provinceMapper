@@ -57,15 +57,15 @@ wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoi
 	return target + targets[0];
 }
 
-static void incrementShare(std::map<std::string, int>& shares, const std::string& provID)
+static void increaseShare(std::map<std::string, int>& shares, const std::string& provID, const int amount)
 {
 	if (shares.contains(provID))
 	{
-		shares[provID]++;
+		shares[provID] += amount;
 	}
 	else
 	{
-		shares[provID] = 1;
+		shares[provID] = amount;
 	}
 }
 
@@ -77,12 +77,10 @@ inline void Automapper::determineTargetProvinceForSourcePixels(
 	 const int targetMapWidth,
 	 const int targetMapHeight)
 {
+	std::map<std::shared_ptr<Province>, int> shares; // src prov, <target prov, shares>
+
 	for (const auto& sourcePixel: sourcePixels)
 	{
-		// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
-		if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
-			continue;
-
 		const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
 		const auto& triangleItr = srcPointToTriangleMap.find(sourcePoint);
 		if (triangleItr == srcPointToTriangleMap.end())
@@ -93,22 +91,19 @@ inline void Automapper::determineTargetProvinceForSourcePixels(
 
 		// Skip if tgtPoint is outside the target map.
 		if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
-		{
 			continue;
-		}
 
 		// Get tgtProvince from the packed map, or skip if not found.
-		const auto& tgtProvince = tgtPointToProvinceMap.find(tgtPoint);
-		if (tgtProvince == tgtPointToProvinceMap.end())
-		{
-			continue;
-		}
-
-		// Skip if the target province is already mapped (implying a hand-made mapping).
-		if (activeVersion->isProvinceMapped(tgtProvince->second->ID, false) == Mapping::MAPPED)
+		const auto& tgtProvinceItr = tgtPointToProvinceMap.find(tgtPoint);
+		if (tgtProvinceItr == tgtPointToProvinceMap.end())
 			continue;
 
-		registerMatch(sourceProvince, tgtProvince->second);
+		shares[tgtProvinceItr->second]++;
+	}
+
+   for (const auto& [tgtProv, amount]: shares)
+	{
+		registerMatch(sourceProvince, tgtProv, amount);
 	}
 }
 
@@ -164,20 +159,20 @@ void Automapper::matchTargetProvsToSourceProvs(
 	}
 }
 
-void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince)
+void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince, const int amount)
 {
-	std::lock_guard lock(automapperMutex); // Lock the mutex
-
 	const auto& srcProvinceID = srcProvince->ID;
 	const auto& targetProvinceID = targetProvince->ID;
 
+	std::lock_guard lock(automapperMutex); // Lock the mutex
+
 	if (sourceProvinceShares.contains(srcProvinceID))
 	{
-		incrementShare(sourceProvinceShares[srcProvinceID], targetProvinceID);
+		increaseShare(sourceProvinceShares[srcProvinceID], targetProvinceID, amount);
 	}
 	else
 	{
-		sourceProvinceShares[srcProvinceID][targetProvinceID] = 1;
+		sourceProvinceShares[srcProvinceID][targetProvinceID] = amount;
 
 		// When registering a new source province, update the cache of impassable source provinces.
 		if (srcProvince->isImpassable())
@@ -188,11 +183,11 @@ void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, con
 
 	if (targetProvinceShares.contains(targetProvinceID))
 	{
-		incrementShare(targetProvinceShares[targetProvinceID], srcProvinceID);
+		increaseShare(targetProvinceShares[targetProvinceID], srcProvinceID, amount);
 	}
 	else
 	{
-		targetProvinceShares[targetProvinceID][srcProvinceID] = 1;
+		targetProvinceShares[targetProvinceID][srcProvinceID] = amount;
 
 		// When registering a new target province, update the cache of impassable target provinces.
 		if (targetProvince->isImpassable())

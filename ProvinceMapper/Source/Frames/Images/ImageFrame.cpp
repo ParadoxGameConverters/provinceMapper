@@ -12,7 +12,6 @@
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 #include <wx/taskbarbutton.h>
-#include <chrono> // TODO: REMOVE THIS
 
 
 using Delaunay = tpp::Delaunay;
@@ -1031,8 +1030,6 @@ bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const w
 }
 
 
-
-
 void ImageFrame::autogenerateMappings()
 {
 	if (taskBarBtn)
@@ -1096,13 +1093,16 @@ void ImageFrame::autogenerateMappings()
 
 	auto automapper = Automapper(activeVersion);
 
-   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // TODO: Remove this line.
-
 	const auto& tgtProvinceDefinitions = targetCanvas->getDefinitions();
 	if (!tgtPointToProvinceDictInitialized)
 	{
 		for (const auto& tgtProvince: tgtProvinceDefinitions->getProvinces() | std::views::values)
 		{
+			// Don't include the province if it's already mapped.
+			// Mapped province can't be used by the automapper.
+			if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
+				continue;
+
 			if (tgtProvince->isWater())
 			{
 				for (const auto& pixel: tgtProvince->innerPixels)
@@ -1142,9 +1142,6 @@ void ImageFrame::autogenerateMappings()
 		 tgtPointToWaterProvinceMap,
 		 targetMapWidth,
 		 targetMapHeight);
-
-   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now(); // TODO: Remove this line.
-	Log(LogLevel::Notice) << "Elapsed time (sec): " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) / 1000000.0;
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 	if (taskBarBtn)

@@ -23,15 +23,10 @@ struct wxPointHash
 	std::size_t operator()(const wxPoint& point) const { return std::hash<int>()(point.x) ^ (std::hash<int>()(point.y) << 1); }
 };
 
-struct wxPointEqual
-{
-	bool operator()(const wxPoint& a, const wxPoint& b) const { return a.x == b.x && a.y == b.y; }
-};
-
 class Triangle;
 class Province;
-typedef robin_hood::unordered_map<wxPoint, std::shared_ptr<Triangle>, wxPointHash, wxPointEqual> PointToTriangleMap;
-typedef robin_hood::unordered_map<wxPoint, std::shared_ptr<Province>, wxPointHash, wxPointEqual> PointToProvinceMap;
+typedef robin_hood::unordered_map<wxPoint, std::shared_ptr<Triangle>, wxPointHash> PointToTriangleMap;
+typedef robin_hood::unordered_map<wxPoint, std::shared_ptr<Province>, wxPointHash> PointToProvinceMap;
 
 
 struct Pixel;
@@ -46,7 +41,7 @@ class Automapper final
 		 const PointToProvinceMap& tgtPointToProvinceMap,
 		 int targetMapWidth,
 		 int targetMapHeight);
-	void registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince);
+	void registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince, int amount);
 	void generateLinks(wxTaskBarButton* taskBarBtn);
 
   private:
