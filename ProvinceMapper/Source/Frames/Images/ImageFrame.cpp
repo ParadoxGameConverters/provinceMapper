@@ -1092,8 +1092,6 @@ void ImageFrame::autogenerateMappings()
 
 	auto automapper = Automapper(activeVersion);
 
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // TODO: Remove this line.
-
 	const auto& tgtProvinceDefinitions = targetCanvas->getDefinitions();
 	if (!tgtPointToProvinceDictInitialized)
 	{
@@ -1143,10 +1141,6 @@ void ImageFrame::autogenerateMappings()
 		 tgtPointToWaterProvinceMap,
 		 targetMapWidth,
 		 targetMapHeight);
-
-   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now(); // TODO: Remove this line.
-	Log(LogLevel::Notice) << "Elapsed time (sec): " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) / 1000000.0;
-
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 	if (taskBarBtn)
