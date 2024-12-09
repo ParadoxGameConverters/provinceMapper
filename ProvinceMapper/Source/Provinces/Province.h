@@ -19,7 +19,7 @@ class Province final
 	[[nodiscard]] bool isWater() const;
 	[[nodiscard]] bool isImpassable() const;
 
-   void setAreaName(std::string name);
+	void setAreaName(std::string name);
 	void setRegionName(std::string name);
 	void setSuperRegionName(std::string name);
 	void setProvinceType(std::string name);

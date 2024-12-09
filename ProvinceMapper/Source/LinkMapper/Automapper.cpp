@@ -115,7 +115,6 @@ void Automapper::matchTargetProvsToSourceProvs(
 	 const int targetMapHeight)
 {
 	// Split source provinces into chunks for parallel processing
-	// std::vector sourceProvincesVector(sourceProvinces.begin(), sourceProvinces.end());
 	const size_t numThreads = std::thread::hardware_concurrency();
 	const size_t chunkSize = (sourceProvinces.size() + numThreads - 1) / numThreads;
 

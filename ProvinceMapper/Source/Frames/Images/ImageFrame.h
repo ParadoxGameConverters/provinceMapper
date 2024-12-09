@@ -70,7 +70,7 @@ class ImageFrame final: public wxFrame
 	std::vector<std::shared_ptr<Triangle>> triangles;
 	bool showTriangulationMesh = false;
 
-   bool tgtPointToProvinceDictInitialized = false;
+	bool tgtPointToProvinceDictInitialized = false;
 	PointToProvinceMap tgtPointToLandProvinceMap;
 	PointToProvinceMap tgtPointToWaterProvinceMap;
 
