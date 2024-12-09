@@ -1,11 +1,6 @@
 #pragma once
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkMapper/Automapper.h"
-#include "Provinces/Pixel.h"
 
 #include <optional>
 #include <vector>
@@ -18,7 +13,7 @@ class ImageCanvas;
 enum class ImageTabSelector;
 class Configuration;
 class wxAutoBufferedPaintDC;
-class ImageFrame: public wxFrame
+class ImageFrame final: public wxFrame
 {
   public:
 	ImageFrame(wxWindow* parent,
@@ -75,11 +70,9 @@ class ImageFrame: public wxFrame
 	std::vector<std::shared_ptr<Triangle>> triangles;
 	bool showTriangulationMesh = false;
 
-	inline static void determineTargetProvinceForSourcePixels(const std::shared_ptr<Province>& sourceProvince, const std::vector<Pixel>& sourcePixels, std::map<std::pair<int, int>,
-		std::shared_ptr<Triangle>>&
-		pointToTriangleMap, const std::shared_ptr<LinkMappingVersion>& activeVersion, const std::shared_ptr<
-		DefinitionsInterface>& tgtProvinceDefinitions, int targetMapWidth, int targetMapHeight, bool water, Automapper&
-		automapper);
+   bool tgtPointToProvinceDictInitialized = false;
+	PointToProvinceMap tgtPointToLandProvinceMap;
+	PointToProvinceMap tgtPointToWaterProvinceMap;
 
 	void determineTriangulationSanity();
 	void buildBounds();
@@ -97,8 +90,6 @@ class ImageFrame: public wxFrame
 	bool black = false;
 	bool triangulationIsSane = false;
 	bool lock = false;
-
-	static wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint);
 
 	std::shared_ptr<Configuration> configuration;
 

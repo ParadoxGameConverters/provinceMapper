@@ -1,7 +1,6 @@
 #include "ImageFrame.h"
 #include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
-#include "LinkMapper/Automapper.h"
 #include "LinkMapper/Triangle.h"
 #include "LinkMapper/TriangulationPointPair.h"
 #include "OSCompatibilityLayer.h"
@@ -13,6 +12,7 @@
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 #include <wx/taskbarbutton.h>
+#include <chrono> // TODO: REMOVE THIS
 
 
 using Delaunay = tpp::Delaunay;
@@ -927,53 +927,6 @@ void ImageFrame::triangulateAtPoint(const wxCommandEvent& event)
 	Refresh();
 }
 
-wxPoint ImageFrame::triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint)
-{
-	// move the source point in reference to the source origin
-	const auto movedSource = sourcePoint - sources[0];
-
-	// construct a basis matrix for the source triangle:
-	// ( A B ) = ( x1 x2 )
-	// ( C D ) = ( y1 y2 )
-	const auto sourceA = static_cast<float>(sources[1].x) - static_cast<float>(sources[0].x);
-	const auto sourceB = static_cast<float>(sources[2].x) - static_cast<float>(sources[0].x);
-	const auto sourceC = static_cast<float>(sources[1].y) - static_cast<float>(sources[0].y);
-	const auto sourceD = static_cast<float>(sources[2].y) - static_cast<float>(sources[0].y);
-
-	// construct the inverse of the source basis matrix:
-	// ___1___ ( d -b )
-	// ad - bc (-c  a )
-	const auto sourceDeterminant = 1 / (sourceA * sourceD - sourceB * sourceC);
-	const auto inverseA = sourceDeterminant * sourceD;
-	const auto inverseB = sourceDeterminant * -sourceB;
-	const auto inverseC = sourceDeterminant * -sourceC;
-	const auto inverseD = sourceDeterminant * sourceA;
-
-	// transform the source point into the source triangle basis
-	const auto sourceU = static_cast<float>(movedSource.x) * inverseA + static_cast<float>(movedSource.y) * inverseB;
-	const auto sourceV = static_cast<float>(movedSource.x) * inverseC + static_cast<float>(movedSource.y) * inverseD;
-
-	// silently move from source triangle basis to destination triangle basis
-	const auto targetU = sourceU;
-	const auto targetV = sourceV;
-
-	// construct a basis matrix for the target triangle:
-	// ( A B ) = ( x1 x2 )
-	// ( C D ) = ( y1 y2 )
-	const auto targetA = static_cast<float>(targets[1].x) - static_cast<float>(targets[0].x);
-	const auto targetB = static_cast<float>(targets[2].x) - static_cast<float>(targets[0].x);
-	const auto targetC = static_cast<float>(targets[1].y) - static_cast<float>(targets[0].y);
-	const auto targetD = static_cast<float>(targets[2].y) - static_cast<float>(targets[0].y);
-
-	// transform the target point from the destination triangle basis
-	wxPoint target;
-	target.x = static_cast<int>(std::round(targetU * targetA + targetV * targetB));
-	target.y = static_cast<int>(std::round(targetU * targetC + targetV * targetD));
-
-	// move the target point in reference to the source origin
-	return target + targets[0];
-}
-
 void ImageFrame::onResize(wxSizeEvent& event)
 {
 	if (!IsMaximized())
@@ -1078,67 +1031,7 @@ bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const w
 }
 
 
-typedef uint64_t PackedCoordinates;
-static std::unordered_map<PackedCoordinates, std::shared_ptr<Province>> packedTgtPointToTgtProvinceMap;
 
-[[nodiscard]] static PackedCoordinates packCoordinates(const int x, const int y)
-{
-	return static_cast<PackedCoordinates>(x) << 32 | y;
-}
-
-void ImageFrame::determineTargetProvinceForSourcePixels(
-	const std::shared_ptr<Province>& sourceProvince,
-	const std::vector<Pixel>& sourcePixels,
-	std::map<std::pair<int, int>, std::shared_ptr<Triangle>>& pointToTriangleMap,
-	const std::shared_ptr<LinkMappingVersion>& activeVersion,
-	const std::shared_ptr<DefinitionsInterface>& tgtProvinceDefinitions,
-	const int targetMapWidth,
-	const int targetMapHeight,
-	const bool water,
-	Automapper& automapper)
-{
-	for (const auto& sourcePixel: sourcePixels)
-	{
-		// Only map every other pixel, in order to speed up the loop by about 50% while keeping a perfectly fine accuracy.
-		if ((sourcePixel.x + sourcePixel.y) % 2 == 0)
-		{
-			continue;
-		}
-
-		const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
-
-		const auto& triangle = pointToTriangleMap[std::make_pair(sourcePoint.x, sourcePoint.y)];
-		const auto tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
-
-		// Skip if tgtPoint is outside the target map.
-		if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
-		{
-			continue;
-		}
-
-
-		// const auto& tgtProvince = targetCanvas->provinceAtCoords(tgtPoint);
-		// const auto& tgtProvince = tgtPointToTgtProvinceMap[tgtPoint];
-		const auto& tgtProvince = packedTgtPointToTgtProvinceMap[packCoordinates(tgtPoint.x, tgtPoint.y)];
-		if (!tgtProvince)
-		{
-			continue;
-		}
-
-		// Skip if the target province is already mapped (implying a hand-made mapping).
-		if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
-			continue;
-
-		// If source is water, target should be water.
-		// If source is land, target should be land.
-		if (water != tgtProvince->isWater())
-		{
-			continue;
-		}
-
-		automapper.registerMatch(sourceProvince, tgtProvince);
-	}
-}
 
 void ImageFrame::autogenerateMappings()
 {
@@ -1167,9 +1060,8 @@ void ImageFrame::autogenerateMappings()
 		taskBarBtn->SetProgressValue(1);
 
 	// For every triangle, determine all the pixels/points inside it.
-	// wxPoint can't be used as a key in a map, so we'll use a pair of integers instead.
 	Log(LogLevel::Debug) << "Mapping points to triangles...";
-	std::map<std::pair<int, int>, std::shared_ptr<Triangle>> pointToTriangleMap;
+	PointToTriangleMap srcPointToTriangleMap;
 	for (const auto& triangle: triangles)
 	{
 		const auto& sourcePoint1 = triangle->getSourcePoint1();
@@ -1190,7 +1082,7 @@ void ImageFrame::autogenerateMappings()
 				const auto point = wxPoint(x, y);
 				if (isPointInsideTriangle(point, sourcePoint1, sourcePoint2, sourcePoint3))
 				{
-					pointToTriangleMap[std::make_pair(x, y)] = triangle;
+					srcPointToTriangleMap[point] = triangle;
 				}
 			}
 		}
@@ -1204,72 +1096,55 @@ void ImageFrame::autogenerateMappings()
 
 	auto automapper = Automapper(activeVersion);
 
+   std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // TODO: Remove this line.
+
 	const auto& tgtProvinceDefinitions = targetCanvas->getDefinitions();
-	// Initialize the packedTgtPointToTgtProvinceMap. This only needs to be done once.
-	if (packedTgtPointToTgtProvinceMap.empty())
+	if (!tgtPointToProvinceDictInitialized)
 	{
-		Log(LogLevel::Debug) << "Initializing point to province dict for target map...";
 		for (const auto& tgtProvince: tgtProvinceDefinitions->getProvinces() | std::views::values)
 		{
-			for (const auto& pixel: tgtProvince->innerPixels)
+			if (tgtProvince->isWater())
 			{
-				packedTgtPointToTgtProvinceMap[packCoordinates(pixel.x, pixel.y)] = tgtProvince;
+				for (const auto& pixel: tgtProvince->innerPixels)
+					tgtPointToWaterProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
+				for (const auto& pixel: tgtProvince->borderPixels)
+					tgtPointToWaterProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
+			} else
+			{
+				for (const auto& pixel: tgtProvince->innerPixels)
+					tgtPointToLandProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
+				for (const auto& pixel: tgtProvince->borderPixels)
+					tgtPointToLandProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
 			}
 		}
+		tgtPointToProvinceDictInitialized = true;
+		Log(LogLevel::Debug) << "Initialized point to province dictionary for target map.";
 	}
 
-	// Split source provinces into chunks for parallel processing
-	const auto& sourceProvinces = sourceCanvas->getDefinitions()->getProvinces() | std::ranges::views::values;
-	std::vector sourceProvincesVector(sourceProvinces.begin(), sourceProvinces.end());
-	const size_t numThreads = std::thread::hardware_concurrency();
-	const size_t chunkSize = (sourceProvinces.size() + numThreads - 1) / numThreads;
-
-	std::vector<std::future<void>> futures;
-
-	for (size_t i = 0; i < numThreads; ++i)
+   // We're mapping water to water and land to land, so split the source provinces and target provinces into two separate sets.
+	auto sourceLandProvinces = std::vector<std::shared_ptr<Province>>();
+	auto sourceWaterProvinces = std::vector<std::shared_ptr<Province>>();
+	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
 	{
-		auto startIt = sourceProvincesVector.begin() + i * chunkSize;
-		auto endIt = (i == numThreads - 1) ? sourceProvincesVector.end() : startIt + chunkSize;
-
-		futures.push_back(std::async(std::launch::async, [&, startIt, endIt] {
-			for (auto it = startIt; it != endIt; ++it)
-			{
-				const auto& sourceProvince = *it;
-
-				// Skip if the source province is already mapped (implying a hand-made mapping).
-				if (activeVersion->isProvinceMapped(sourceProvince->ID, true) == Mapping::MAPPED)
-					continue;
-
-				const bool water = sourceProvince->isWater();
-
-				// Determine which target province every pixel of the source province corresponds to.
-				determineTargetProvinceForSourcePixels(sourceProvince,
-					 sourceProvince->innerPixels,
-					 pointToTriangleMap,
-					 activeVersion,
-					 tgtProvinceDefinitions,
-					 targetMapWidth,
-					 targetMapHeight,
-					 water,
-					 automapper);
-				determineTargetProvinceForSourcePixels(sourceProvince,
-					 sourceProvince->borderPixels,
-					 pointToTriangleMap,
-					 activeVersion,
-					 tgtProvinceDefinitions,
-					 targetMapWidth,
-					 targetMapHeight,
-					 water,
-					 automapper);
-			}
-		}));
+		if (sourceProvince->isWater())
+			sourceWaterProvinces.push_back(sourceProvince);
+		else
+			sourceLandProvinces.push_back(sourceProvince);
 	}
 
-	// Wait for all tasks to complete
-	for (auto& future: futures)
-	{
-		future.get();
-	}
+	automapper.matchTargetProvsToSourceProvs(sourceLandProvinces,
+		srcPointToTriangleMap,
+		tgtPointToLandProvinceMap,
+		targetMapWidth,
+		targetMapHeight);
+	automapper.matchTargetProvsToSourceProvs(sourceWaterProvinces,
+		 srcPointToTriangleMap,
+		 tgtPointToWaterProvinceMap,
+		 targetMapWidth,
+		 targetMapHeight);
+
+   std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now(); // TODO: Remove this line.
+	Log(LogLevel::Notice) << "Elapsed time (sec): " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) / 1000000.0;
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 	if (taskBarBtn)

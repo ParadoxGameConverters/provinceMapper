@@ -194,6 +194,7 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
+    <ClCompile Include="robin-hood-hashing\src\robin_hood.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Triangle.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Automapper.cpp" />
   </ItemGroup>
