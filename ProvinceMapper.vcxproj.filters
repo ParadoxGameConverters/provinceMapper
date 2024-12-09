@@ -194,7 +194,6 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
-    <ClCompile Include="robin-hood-hashing\src\robin_hood.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Triangle.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Automapper.cpp" />
   </ItemGroup>
@@ -342,6 +341,12 @@
       <Filter>Resources</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="README.md">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="LICENSE">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="NOTICE.md">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="wxWidgets\3.2.1\lib\vc14x_x64_dll\wxbase32u_vc14x_x64.dll">

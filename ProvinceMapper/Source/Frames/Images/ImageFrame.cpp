@@ -1097,11 +1097,6 @@ void ImageFrame::autogenerateMappings()
 	{
 		for (const auto& tgtProvince: tgtProvinceDefinitions->getProvinces() | std::views::values)
 		{
-			// Don't include the province if it's already mapped.
-			// Mapped province can't be used by the automapper.
-			if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
-				continue;
-
 			if (tgtProvince->isWater())
 			{
 				for (const auto& pixel: tgtProvince->innerPixels)
@@ -1120,27 +1115,27 @@ void ImageFrame::autogenerateMappings()
 		Log(LogLevel::Debug) << "Initialized point to province dictionary for target map.";
 	}
 
-   // We're mapping water to water and land to land, so split the source provinces and target provinces into two separate sets.
-	auto sourceLandProvinces = std::vector<std::shared_ptr<Province>>();
-	auto sourceWaterProvinces = std::vector<std::shared_ptr<Province>>();
-	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
+
+	// Exclude target provinces that are already mapped.
+	// Manually mapped provinces can't be used by the automapper.
+	gtl::flat_hash_set<std::string> excludedTgtProvinceIDs;
+	for (const auto& tgtProvince: tgtProvinceDefinitions->getProvinces() | std::views::values)
 	{
-		if (sourceProvince->isWater())
-			sourceWaterProvinces.push_back(sourceProvince);
-		else
-			sourceLandProvinces.push_back(sourceProvince);
+		if (activeVersion->isProvinceMapped(tgtProvince->ID, false) == Mapping::MAPPED)
+			excludedTgtProvinceIDs.insert(tgtProvince->ID);
 	}
 
-	automapper.matchTargetProvsToSourceProvs(sourceLandProvinces,
+	std::vector<std::shared_ptr<Province>> sourceProvinces;
+	for (const auto& sourceProvince: sourceCanvas->getDefinitions()->getProvinces() | std::views::values)
+		sourceProvinces.push_back(sourceProvince);
+
+	automapper.matchTargetProvsToSourceProvs(sourceProvinces,
 		srcPointToTriangleMap,
 		tgtPointToLandProvinceMap,
+		tgtPointToWaterProvinceMap,
+		excludedTgtProvinceIDs,
 		targetMapWidth,
 		targetMapHeight);
-	automapper.matchTargetProvsToSourceProvs(sourceWaterProvinces,
-		 srcPointToTriangleMap,
-		 tgtPointToWaterProvinceMap,
-		 targetMapWidth,
-		 targetMapHeight);
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 	if (taskBarBtn)

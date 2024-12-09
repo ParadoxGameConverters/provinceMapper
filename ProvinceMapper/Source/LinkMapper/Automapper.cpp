@@ -74,6 +74,7 @@ inline void Automapper::determineTargetProvinceForSourcePixels(
 	 const std::vector<Pixel>& sourcePixels,
 	 const PointToTriangleMap& srcPointToTriangleMap,
 	 const PointToProvinceMap& tgtPointToProvinceMap,
+	 const gtl::flat_hash_set<std::string>& excludedTgtProvinceIDs,
 	 const int targetMapWidth,
 	 const int targetMapHeight)
 {
@@ -98,7 +99,11 @@ inline void Automapper::determineTargetProvinceForSourcePixels(
 		if (tgtProvinceItr == tgtPointToProvinceMap.end())
 			continue;
 
-		shares[tgtProvinceItr->second]++;
+		const auto& tgtProvince = tgtProvinceItr->second;
+		if (excludedTgtProvinceIDs.contains(tgtProvince->ID))
+			continue;
+
+		shares[tgtProvince]++;
 	}
 
    for (const auto& [tgtProv, amount]: shares)
@@ -110,7 +115,9 @@ inline void Automapper::determineTargetProvinceForSourcePixels(
 void Automapper::matchTargetProvsToSourceProvs(
 	 const std::vector<std::shared_ptr<Province>>& sourceProvinces,
 	 const PointToTriangleMap& srcPointToTriangleMap,
-	 const PointToProvinceMap& tgtPointToProvinceMap,
+	 const PointToProvinceMap& tgtPointToLandProvinceMap,
+	 const PointToProvinceMap& tgtPointToWaterProvinceMap,
+	 const gtl::flat_hash_set<std::string>& excludedTgtProvinceIDs,
 	 const int targetMapWidth,
 	 const int targetMapHeight)
 {
@@ -128,23 +135,27 @@ void Automapper::matchTargetProvsToSourceProvs(
 		futures.push_back(std::async(std::launch::async, [&, startIt, endIt] {
 			for (auto it = startIt; it != endIt; ++it)
 			{
-				const auto& sourceProvince = *it;
+				const auto& srcProv = *it;
 
 				// Skip if the source province is already mapped (implying a hand-made mapping).
-				if (activeVersion->isProvinceMapped(sourceProvince->ID, true) == Mapping::MAPPED)
+				if (activeVersion->isProvinceMapped(srcProv->ID, true) == Mapping::MAPPED)
 					continue;
 
+				const auto& tgtProvsMapToUse = srcProv->isWater() ? tgtPointToWaterProvinceMap : tgtPointToLandProvinceMap;
+
 				// Determine which target province every pixel of the source province corresponds to.
-				determineTargetProvinceForSourcePixels(sourceProvince,
-					 sourceProvince->innerPixels,
+				determineTargetProvinceForSourcePixels(srcProv,
+					 srcProv->innerPixels,
 					 srcPointToTriangleMap,
-					 tgtPointToProvinceMap,
+					 tgtProvsMapToUse,
+					 excludedTgtProvinceIDs,
 					 targetMapWidth,
 					 targetMapHeight);
-				determineTargetProvinceForSourcePixels(sourceProvince,
-					 sourceProvince->borderPixels,
+				determineTargetProvinceForSourcePixels(srcProv,
+					 srcProv->borderPixels,
 					 srcPointToTriangleMap,
-					 tgtPointToProvinceMap,
+					 tgtProvsMapToUse,
+					 excludedTgtProvinceIDs,
 					 targetMapWidth,
 					 targetMapHeight);
 			}

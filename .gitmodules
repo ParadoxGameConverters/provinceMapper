@@ -7,6 +7,6 @@
 [submodule "TrianglePP"]
 	path = TrianglePP
 	url = https://github.com/mrkkrj/TrianglePP.git
-[submodule "robin-hood-hashing"]
-	path = robin-hood-hashing
-	url = https://github.com/martinus/robin-hood-hashing.git
+[submodule "gtl"]
+	path = gtl
+	url = https://github.com/greg7mdp/gtl

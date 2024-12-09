@@ -5,12 +5,10 @@
 #include <wx/wx.h>
 #endif
 
-#include "robin_hood.h"
+#include <gtl/phmap.hpp>
 #include <future>
 #include <map>
 #include <mutex>
-#include <ranges>
-#include <set>
 #include <string>
 
 wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint);
@@ -25,8 +23,8 @@ struct wxPointHash
 
 class Triangle;
 class Province;
-typedef robin_hood::unordered_map<wxPoint, std::shared_ptr<Triangle>, wxPointHash> PointToTriangleMap;
-typedef robin_hood::unordered_map<wxPoint, std::shared_ptr<Province>, wxPointHash> PointToProvinceMap;
+typedef gtl::flat_hash_map<wxPoint, std::shared_ptr<Triangle>, wxPointHash> PointToTriangleMap;
+typedef gtl::flat_hash_map<wxPoint, std::shared_ptr<Province>, wxPointHash> PointToProvinceMap;
 
 
 struct Pixel;
@@ -38,7 +36,9 @@ class Automapper final
 	
 	void matchTargetProvsToSourceProvs(const std::vector<std::shared_ptr<Province>>& sourceProvinces,
 		 const PointToTriangleMap& srcPointToTriangleMap,
-		 const PointToProvinceMap& tgtPointToProvinceMap,
+		 const PointToProvinceMap& tgtPointToLandProvinceMap,
+		 const PointToProvinceMap& tgtPointToWaterProvinceMap,
+		 const gtl::flat_hash_set<std::string>& excludedTgtProvinceIDs,
 		 int targetMapWidth,
 		 int targetMapHeight);
 	void registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince, int amount);
@@ -65,11 +65,11 @@ class Automapper final
 	std::map<std::string, std::map<std::string, int>> sourceProvinceShares; // src prov ID, <target prov ID, shares>
 	std::map<std::string, std::map<std::string, int>> targetProvinceShares; // target prov ID, <src prov ID, shares>
 
-	std::set<std::string> srcImpassablesCache;
-	std::set<std::string> tgtImpassablesCache;
+	gtl::flat_hash_set<std::string> srcImpassablesCache;
+	gtl::flat_hash_set<std::string> tgtImpassablesCache;
 
-	std::set<std::string> alreadyMappedSrcProvincesCache;
-	std::set<std::string> alreadyMappedTgtProvincesCache;
+	gtl::flat_hash_set<std::string> alreadyMappedSrcProvincesCache;
+	gtl::flat_hash_set<std::string> alreadyMappedTgtProvincesCache;
 
 	std::shared_ptr<LinkMappingVersion> activeVersion;
 
@@ -79,6 +79,7 @@ class Automapper final
 		 const std::vector<Pixel>& sourcePixels,
 		 const PointToTriangleMap& srcPointToTriangleMap,
 		 const PointToProvinceMap& tgtPointToProvinceMap,
+		 const gtl::flat_hash_set<std::string>& excludedTgtProvinceIDs,
 		 int targetMapWidth,
 		 int targetMapHeight);
 };
