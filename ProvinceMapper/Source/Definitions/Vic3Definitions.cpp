@@ -123,7 +123,7 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 		if (locType == LocalizationMapper::LocType::SOURCE && localizationMapper.getLocForSourceKey(id))
 		{
 			auto stateName = *localizationMapper.getLocForSourceKey(id);
-			province->areaName = stateName;
+			province->setAreaName(stateName);
 
 			if (const auto& cmatch = localizationMapper.getLocForSourceKey(id + "_city"); cmatch)
 			{
@@ -177,31 +177,31 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 			}
 			if (!province->locName)
 			{
-				province->locName = province->areaName;
+				province->locName = province->getAreaName();
 			}
 
 			if (const auto& match = localizationMapper.getLocForSourceKey(stateName); match)
-				province->areaName = *match;
+				province->setAreaName(*match);
 			if (const auto& regionName = vic3regions.getParentRegionName(stateName); regionName)
 			{
 				if (const auto& match = localizationMapper.getLocForSourceKey(*regionName); match)
-					province->regionName = *match;
+					province->setRegionName(*match);
 				else
-					province->regionName = *regionName;
+					province->setRegionName(*regionName);
 			}
 			if (const auto& regionName = vic3regions.getParentSuperRegionName(stateName); regionName)
 			{
 				if (const auto& match = localizationMapper.getLocForSourceKey(*regionName); match)
-					province->superRegionName = *match;
+					province->setSuperRegionName(*match);
 				else
-					province->superRegionName = *regionName;
+					province->setSuperRegionName(*regionName);
 			}
 		}
 
 		if (locType == LocalizationMapper::LocType::TARGET && localizationMapper.getLocForTargetKey(id))
 		{
 			auto stateName = *localizationMapper.getLocForTargetKey(id);
-			province->areaName = stateName;
+			province->setAreaName(stateName);
 
 			if (const auto& cmatch = localizationMapper.getLocForTargetKey(id + "_city"); cmatch)
 			{
@@ -255,24 +255,24 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 			}
 			if (!province->locName)
 			{
-				province->locName = province->areaName;
+				province->locName = province->getAreaName();
 			}
 
 			if (const auto& match = localizationMapper.getLocForTargetKey(stateName); match)
-				province->areaName = *match;
+				province->setAreaName(*match);
 			if (const auto& regionName = vic3regions.getParentRegionName(stateName); regionName)
 			{
 				if (const auto& match = localizationMapper.getLocForTargetKey(*regionName); match)
-					province->regionName = *match;
+					province->setRegionName(*match);
 				else
-					province->regionName = *regionName;
+					province->setRegionName(*regionName);
 			}
 			if (const auto& regionName = vic3regions.getParentSuperRegionName(stateName); regionName)
 			{
 				if (const auto& match = localizationMapper.getLocForTargetKey(*regionName); match)
-					province->superRegionName = *match;
+					province->setSuperRegionName(*match);
 				else
-					province->superRegionName = *regionName;
+					province->setSuperRegionName(*regionName);
 			}
 		}
 	}

@@ -7,6 +7,27 @@ Province::Province(std::string theID, const unsigned char tr, const unsigned cha
 {
 }
 
+
+void Province::setAreaName(std::string name)
+{
+	areaName = std::move(name);
+}
+
+void Province::setRegionName(std::string name)
+{
+	regionName = std::move(name);
+}
+
+void Province::setSuperRegionName(std::string name)
+{
+	superRegionName = std::move(name);
+}
+
+void Province::setProvinceType(std::string name)
+{
+	provinceType = std::move(name);
+}
+
 bool Province::operator==(const Province& rhs) const
 {
 	return ID == rhs.ID;
@@ -67,7 +88,7 @@ std::string Province::miscName() const
 }
 
 bool Province::isWater() const
-{	
+{
 	// For EU4, use region and area names to determine what is water.
 	if (superRegionName && superRegionName.value().ends_with("_sea_superregion"))
 	{
@@ -89,14 +110,4 @@ bool Province::isWater() const
 bool Province::isImpassable() const
 {
 	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
-}
-
-std::vector<Pixel> Province::getAllPixels() const
-{
-	std::vector<Pixel> allPixels;
-	allPixels.reserve(innerPixels.size() + borderPixels.size());
-	allPixels.insert(allPixels.end(), innerPixels.begin(), innerPixels.end());
-	allPixels.insert(allPixels.end(), borderPixels.begin(), borderPixels.end());
-
-	return allPixels;
 }

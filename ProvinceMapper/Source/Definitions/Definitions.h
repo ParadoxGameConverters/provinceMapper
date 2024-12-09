@@ -3,7 +3,7 @@
 #include "DefinitionsInterface.h"
 #include "EU4Regions/RegionManager.h"
 
-struct Province;
+class Province;
 class Definitions: public DefinitionsInterface
 {
   public:

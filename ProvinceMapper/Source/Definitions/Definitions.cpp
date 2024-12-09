@@ -133,26 +133,26 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 					const auto& locName = localizationMapper.getLocForSourceKey(*regName);
 					if (locName && !locName->empty())
 					{
-						province->areaName = *locName;
+						province->setAreaName(*locName);
 					}
 					else
-						province->areaName = *regName;
+						province->setAreaName(*regName);
 				}
 				if (const auto& regName = eu4RegionManager.getParentRegionName(province->ID); regName)
 				{
 					const auto& locName = localizationMapper.getLocForSourceKey(*regName);
 					if (locName && !locName->empty())
-						province->regionName = *locName;
+						province->setRegionName(*locName);
 					else
-						province->regionName = *regName;
+						province->setRegionName(*regName);
 				}
 				if (const auto& regName = eu4RegionManager.getParentSuperRegionName(province->ID); regName)
 				{
 					const auto& locName = localizationMapper.getLocForSourceKey(*regName);
 					if (locName && !locName->empty())
-						province->superRegionName = *locName;
+						province->setSuperRegionName(*locName);
 					else
-						province->superRegionName = *regName;
+						province->setSuperRegionName(*regName);
 				}
 				provinces.insert(std::pair(province->ID, province));
 				chromaCache.insert(std::pair(pixelPack(province->r, province->g, province->b), province));
@@ -304,7 +304,7 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			for (auto& id: provIds)
 			{
 				if (provinces.contains(id) && provinces.at(id))
-					provinces[id]->provinceType = lowerCaseProvinceType;
+					provinces[id]->setProvinceType(lowerCaseProvinceType);
 			}
 		}
 		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
@@ -322,7 +322,7 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			{
 				std::string idStr = std::to_string(id);
 				if (provinces.contains(idStr) && provinces.at(idStr))
-					provinces[idStr]->provinceType = lowerCaseProvinceType;
+					provinces[idStr]->setProvinceType(lowerCaseProvinceType);
 			}
 		}
 		else if (strOfItemStr.find("{") == 0) // simple list
@@ -333,7 +333,7 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 
 			for (auto& id: provIds)
 			{
-				provinces[id]->provinceType = lowerCaseProvinceType;
+				provinces[id]->setProvinceType(lowerCaseProvinceType);
 			}
 		}
 		else

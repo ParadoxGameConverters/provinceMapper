@@ -1,37 +1,188 @@
 #include "Automapper.h"
 
 #include "Log.h"
+#include "Frames/Images/ImageFrame.h"
+#include "LinkMappingVersion.h"
 #include "Provinces/Province.h"
+#include "Triangle.h"
 
 #include <ranges>
 #include <wx/taskbarbutton.h>
 
-static void incrementShare(std::map<std::string, int>& shares, const std::string& provID)
+
+wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint)
+{
+	// move the source point in reference to the source origin
+	const auto movedSource = sourcePoint - sources[0];
+
+	// construct a basis matrix for the source triangle:
+	// ( A B ) = ( x1 x2 )
+	// ( C D ) = ( y1 y2 )
+	const auto sourceA = static_cast<float>(sources[1].x) - static_cast<float>(sources[0].x);
+	const auto sourceB = static_cast<float>(sources[2].x) - static_cast<float>(sources[0].x);
+	const auto sourceC = static_cast<float>(sources[1].y) - static_cast<float>(sources[0].y);
+	const auto sourceD = static_cast<float>(sources[2].y) - static_cast<float>(sources[0].y);
+
+	// construct the inverse of the source basis matrix:
+	// ___1___ ( d -b )
+	// ad - bc (-c  a )
+	const auto sourceDeterminant = 1 / (sourceA * sourceD - sourceB * sourceC);
+	const auto inverseA = sourceDeterminant * sourceD;
+	const auto inverseB = sourceDeterminant * -sourceB;
+	const auto inverseC = sourceDeterminant * -sourceC;
+	const auto inverseD = sourceDeterminant * sourceA;
+
+	// transform the source point into the source triangle basis
+	const auto sourceU = static_cast<float>(movedSource.x) * inverseA + static_cast<float>(movedSource.y) * inverseB;
+	const auto sourceV = static_cast<float>(movedSource.x) * inverseC + static_cast<float>(movedSource.y) * inverseD;
+
+	// silently move from source triangle basis to destination triangle basis
+	const auto targetU = sourceU;
+	const auto targetV = sourceV;
+
+	// construct a basis matrix for the target triangle:
+	// ( A B ) = ( x1 x2 )
+	// ( C D ) = ( y1 y2 )
+	const auto targetA = static_cast<float>(targets[1].x) - static_cast<float>(targets[0].x);
+	const auto targetB = static_cast<float>(targets[2].x) - static_cast<float>(targets[0].x);
+	const auto targetC = static_cast<float>(targets[1].y) - static_cast<float>(targets[0].y);
+	const auto targetD = static_cast<float>(targets[2].y) - static_cast<float>(targets[0].y);
+
+	// transform the target point from the destination triangle basis
+	wxPoint target;
+	target.x = static_cast<int>(std::round(targetU * targetA + targetV * targetB));
+	target.y = static_cast<int>(std::round(targetU * targetC + targetV * targetD));
+
+	// move the target point in reference to the source origin
+	return target + targets[0];
+}
+
+static void increaseShare(std::map<std::string, int>& shares, const std::string& provID, const int amount)
 {
 	if (shares.contains(provID))
 	{
-		shares[provID]++;
+		shares[provID] += amount;
 	}
 	else
 	{
-		shares[provID] = 1;
+		shares[provID] = amount;
 	}
 }
 
-void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince)
+inline void Automapper::determineTargetProvinceForSourcePixels(
+	 const std::shared_ptr<Province>& sourceProvince,
+	 const std::vector<Pixel>& sourcePixels,
+	 const PointToTriangleMap& srcPointToTriangleMap,
+	 const PointToProvinceMap& tgtPointToProvinceMap,
+	 const gtl::flat_hash_set<std::string>& excludedTgtProvinceIDs,
+	 const int targetMapWidth,
+	 const int targetMapHeight)
 {
-	std::lock_guard lock(automapperMutex); // Lock the mutex
+	std::map<std::shared_ptr<Province>, int> shares; // src prov, <target prov, shares>
 
+	for (const auto& sourcePixel: sourcePixels)
+	{
+		const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
+		const auto& triangleItr = srcPointToTriangleMap.find(sourcePoint);
+		if (triangleItr == srcPointToTriangleMap.end())
+			throw std::runtime_error("Could not find triangle for source map point " + std::to_string(sourcePixel.x) + ", " + std::to_string(sourcePixel.y));
+		const auto& triangle = triangleItr->second;
+
+		const auto& tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);
+
+		// Skip if tgtPoint is outside the target map.
+		if (tgtPoint.x < 0 || tgtPoint.x >= targetMapWidth || tgtPoint.y < 0 || tgtPoint.y >= targetMapHeight)
+			continue;
+
+		// Get tgtProvince from the packed map, or skip if not found.
+		const auto& tgtProvinceItr = tgtPointToProvinceMap.find(tgtPoint);
+		if (tgtProvinceItr == tgtPointToProvinceMap.end())
+			continue;
+
+		const auto& tgtProvince = tgtProvinceItr->second;
+		if (excludedTgtProvinceIDs.contains(tgtProvince->ID))
+			continue;
+
+		shares[tgtProvince]++;
+	}
+
+   for (const auto& [tgtProv, amount]: shares)
+	{
+		registerMatch(sourceProvince, tgtProv, amount);
+	}
+}
+
+void Automapper::matchTargetProvsToSourceProvs(
+	 const std::vector<std::shared_ptr<Province>>& sourceProvinces,
+	 const PointToTriangleMap& srcPointToTriangleMap,
+	 const PointToProvinceMap& tgtPointToLandProvinceMap,
+	 const PointToProvinceMap& tgtPointToWaterProvinceMap,
+	 const gtl::flat_hash_set<std::string>& excludedTgtProvinceIDs,
+	 const int targetMapWidth,
+	 const int targetMapHeight)
+{
+	// Split source provinces into chunks for parallel processing
+	const size_t numThreads = std::thread::hardware_concurrency();
+	const size_t chunkSize = (sourceProvinces.size() + numThreads - 1) / numThreads;
+
+	std::vector<std::future<void>> futures;
+
+	for (size_t i = 0; i < numThreads; ++i)
+	{
+		auto startIt = sourceProvinces.begin() + i * chunkSize;
+		auto endIt = (i == numThreads - 1) ? sourceProvinces.end() : startIt + chunkSize;
+
+		futures.push_back(std::async(std::launch::async, [&, startIt, endIt] {
+			for (auto it = startIt; it != endIt; ++it)
+			{
+				const auto& srcProv = *it;
+
+				// Skip if the source province is already mapped (implying a hand-made mapping).
+				if (activeVersion->isProvinceMapped(srcProv->ID, true) == Mapping::MAPPED)
+					continue;
+
+				const auto& tgtProvsMapToUse = srcProv->isWater() ? tgtPointToWaterProvinceMap : tgtPointToLandProvinceMap;
+
+				// Determine which target province every pixel of the source province corresponds to.
+				determineTargetProvinceForSourcePixels(srcProv,
+					 srcProv->innerPixels,
+					 srcPointToTriangleMap,
+					 tgtProvsMapToUse,
+					 excludedTgtProvinceIDs,
+					 targetMapWidth,
+					 targetMapHeight);
+				determineTargetProvinceForSourcePixels(srcProv,
+					 srcProv->borderPixels,
+					 srcPointToTriangleMap,
+					 tgtProvsMapToUse,
+					 excludedTgtProvinceIDs,
+					 targetMapWidth,
+					 targetMapHeight);
+			}
+		}));
+	}
+
+	// Wait for all tasks to complete
+	for (auto& future: futures)
+	{
+		future.get();
+	}
+}
+
+void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince, const int amount)
+{
 	const auto& srcProvinceID = srcProvince->ID;
 	const auto& targetProvinceID = targetProvince->ID;
 
+	std::lock_guard lock(automapperMutex); // Lock the mutex
+
 	if (sourceProvinceShares.contains(srcProvinceID))
 	{
-		incrementShare(sourceProvinceShares[srcProvinceID], targetProvinceID);
+		increaseShare(sourceProvinceShares[srcProvinceID], targetProvinceID, amount);
 	}
 	else
 	{
-		sourceProvinceShares[srcProvinceID][targetProvinceID] = 1;
+		sourceProvinceShares[srcProvinceID][targetProvinceID] = amount;
 
 		// When registering a new source province, update the cache of impassable source provinces.
 		if (srcProvince->isImpassable())
@@ -42,11 +193,11 @@ void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, con
 
 	if (targetProvinceShares.contains(targetProvinceID))
 	{
-		incrementShare(targetProvinceShares[targetProvinceID], srcProvinceID);
+		increaseShare(targetProvinceShares[targetProvinceID], srcProvinceID, amount);
 	}
 	else
 	{
-		targetProvinceShares[targetProvinceID][srcProvinceID] = 1;
+		targetProvinceShares[targetProvinceID][srcProvinceID] = amount;
 
 		// When registering a new target province, update the cache of impassable target provinces.
 		if (targetProvince->isImpassable())

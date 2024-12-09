@@ -18,7 +18,7 @@ wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_DELAUNAY_TRIANGULATE, wxCommandEvent);
 
 class wxTipWindow;
-struct Province;
+class Province;
 enum class ImageTabSelector
 {
 	SOURCE,

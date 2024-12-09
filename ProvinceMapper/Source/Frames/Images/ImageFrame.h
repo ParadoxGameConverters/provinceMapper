@@ -1,10 +1,9 @@
 #pragma once
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
 #include "Definitions/DefinitionsInterface.h"
+#include "LinkMapper/Automapper.h"
+
 #include <optional>
+#include <vector>
 
 class Triangle;
 class StatusBar;
@@ -14,7 +13,7 @@ class ImageCanvas;
 enum class ImageTabSelector;
 class Configuration;
 class wxAutoBufferedPaintDC;
-class ImageFrame: public wxFrame
+class ImageFrame final: public wxFrame
 {
   public:
 	ImageFrame(wxWindow* parent,
@@ -71,6 +70,10 @@ class ImageFrame: public wxFrame
 	std::vector<std::shared_ptr<Triangle>> triangles;
 	bool showTriangulationMesh = false;
 
+	bool tgtPointToProvinceDictInitialized = false;
+	PointToProvinceMap tgtPointToLandProvinceMap;
+	PointToProvinceMap tgtPointToWaterProvinceMap;
+
 	void determineTriangulationSanity();
 	void buildBounds();
 	wxRect sourceRect;
@@ -87,8 +90,6 @@ class ImageFrame: public wxFrame
 	bool black = false;
 	bool triangulationIsSane = false;
 	bool lock = false;
-
-	static wxPoint triangulate(const std::vector<wxPoint>& sources, const std::vector<wxPoint>& targets, const wxPoint& sourcePoint);
 
 	std::shared_ptr<Configuration> configuration;
 

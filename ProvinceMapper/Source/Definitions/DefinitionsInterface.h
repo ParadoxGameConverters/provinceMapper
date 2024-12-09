@@ -8,7 +8,7 @@
 #include <string>
 
 
-struct Province;
+class Province;
 
 
 class DefinitionsInterface
