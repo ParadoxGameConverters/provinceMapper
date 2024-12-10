@@ -12,7 +12,7 @@ enum class Mapping
 	UNMAPPED,
 	FAIL
 };
-struct Province;
+class Province;
 class LinkMapping final: public LinkBase
 {
   public:

@@ -343,6 +343,12 @@
     <CopyFileToFolders Include="README.md">
       <Filter>Resources</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="LICENSE">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="NOTICE.md">
+      <Filter>Resources</Filter>
+    </CopyFileToFolders>
     <CopyFileToFolders Include="wxWidgets\3.2.1\lib\vc14x_x64_dll\wxbase32u_vc14x_x64.dll">
       <Filter>Resources</Filter>
     </CopyFileToFolders>

@@ -462,7 +462,7 @@ void LinkMappingVersion::generateUnmapped() const
 							  << " unmapped target provinces.";
 }
 
-Mapping LinkMappingVersion::isProvinceMapped(const std::string& provinceID, bool isSource) const
+Mapping LinkMappingVersion::isProvinceMapped(const std::string& provinceID, const bool isSource) const
 {
 	if (isSource)
 	{
