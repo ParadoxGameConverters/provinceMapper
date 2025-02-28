@@ -49,7 +49,7 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 		{
 			// We have a closing ; but name may still be just "x".
 			mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
-			if (mapDataName == "x" || mapDataName != "X")
+			if (mapDataName == "x" || mapDataName == "X")
 				mapDataName.clear();
 		}
 		return std::make_tuple(ID, r, g, b, mapDataName);
