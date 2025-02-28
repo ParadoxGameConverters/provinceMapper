@@ -42,14 +42,14 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 			// There is no closing ;
 			// This may be an actual name ot just "x" indicating name isn't defined.
 			const auto potentialMapDataName = line.substr(sepLocSave + 1, line.length());
-			if (potentialMapDataName != "x")
+			if (potentialMapDataName != "x" && potentialMapDataName != "X")
 				mapDataName = potentialMapDataName;
 		}
 		else
 		{
 			// We have a closing ; but name may still be just "x".
 			mapDataName = line.substr(sepLocSave + 1, sepLoc - sepLocSave - 1);
-			if (mapDataName == "x")
+			if (mapDataName == "x" || mapDataName != "X")
 				mapDataName.clear();
 		}
 		return std::make_tuple(ID, r, g, b, mapDataName);
