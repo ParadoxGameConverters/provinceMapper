@@ -45,7 +45,7 @@ static bool findStringIC(const std::string& strHaystack, const std::string& strN
 	return (it != strHaystack.end());
 }
 
-const std::vector<std::shared_ptr<LinkMapping>> SearchTab::getRelevantLinks() const // TODO: CHECK IF THIS RETURNS GOOD RESULTS
+const std::vector<std::shared_ptr<LinkMapping>> SearchTab::getRelevantLinks() const
 {
 	// If the search string is empty, return an empty vector.
 	if (searchString.empty())
@@ -89,7 +89,7 @@ void SearchTab::redrawGrid()
 	theGrid->ForceRefresh();
 }
 
-void SearchTab::leftUp(const wxGridEvent& event) // TODO: check if this correctly focuses the map on the clicked link
+void SearchTab::leftUp(const wxGridEvent& event)
 {
 	// Left Up means "center on this link". Not mark, not anything, just center.
 
