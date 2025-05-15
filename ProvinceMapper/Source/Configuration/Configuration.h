@@ -56,7 +56,6 @@ class Configuration: commonItems::parser
 	void setLinksFramePos(const int x, const int y) { linksFramePos = Rect(x, y); }
 	void setLinksFrameSize(const int x, const int y) { linksFrameSize = Rect(x, y); }
 	void setLinksFrameMaximized(const bool on) { linksFrameMaximized = on; }
-
 	void setUnmappedFramePos(const int x, const int y) { unmappedFramePos = Rect(x, y); }
 	void setUnmappedFrameSize(const int x, const int y) { unmappedFrameSize = Rect(x, y); }
 	void setUnmappedFrameMaximized(const bool on) { unmappedFrameMaximized = on; }
@@ -89,7 +88,6 @@ class Configuration: commonItems::parser
 	std::optional<Rect> linksFramePos;
 	std::optional<Rect> linksFrameSize;
 	bool linksFrameMaximized = false;
-
 	std::optional<Rect> unmappedFramePos;
 	std::optional<Rect> unmappedFrameSize;
 	bool unmappedFrameMaximized = false;

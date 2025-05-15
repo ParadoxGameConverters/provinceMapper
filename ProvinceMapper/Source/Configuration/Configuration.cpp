@@ -53,7 +53,6 @@ void Configuration::registerKeys()
 	registerKeyword("linksFrameMaximized", [this](std::istream& theStream) {
 		linksFrameMaximized = commonItems::getString(theStream) == "true";
 	});
-
 	registerKeyword("unmappedFramePos", [this](std::istream& theStream) {
 		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
