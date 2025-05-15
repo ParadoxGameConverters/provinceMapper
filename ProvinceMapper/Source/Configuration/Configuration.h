@@ -36,6 +36,10 @@ class Configuration: commonItems::parser
 	[[nodiscard]] const auto& getUnmappedFrameSize() const { return unmappedFrameSize; }
 	[[nodiscard]] auto isUnmappedFrameMaximized() const { return unmappedFrameMaximized; }
 	[[nodiscard]] auto isUnmappedFrameOn() const { return unmappedFrameOn; }
+	[[nodiscard]] const auto& getSearchFramePos() const { return searchFramePos; }
+	[[nodiscard]] const auto& getSearchFrameSize() const { return searchFrameSize; }
+	[[nodiscard]] auto isSearchFrameMaximized() const { return searchFrameMaximized; }
+	[[nodiscard]] auto isSearchFrameOn() const { return searchFrameOn; }
 	[[nodiscard]] const auto& getStatusBarPos() const { return statusBarPos; }
 	[[nodiscard]] auto isStatusBarOn() const { return statusBarOn; }
 
@@ -52,10 +56,15 @@ class Configuration: commonItems::parser
 	void setLinksFramePos(const int x, const int y) { linksFramePos = Rect(x, y); }
 	void setLinksFrameSize(const int x, const int y) { linksFrameSize = Rect(x, y); }
 	void setLinksFrameMaximized(const bool on) { linksFrameMaximized = on; }
+
 	void setUnmappedFramePos(const int x, const int y) { unmappedFramePos = Rect(x, y); }
 	void setUnmappedFrameSize(const int x, const int y) { unmappedFrameSize = Rect(x, y); }
 	void setUnmappedFrameMaximized(const bool on) { unmappedFrameMaximized = on; }
 	void setUnmappedFrameOn(const bool on) { unmappedFrameOn = on; }
+	void setSearchFramePos(const int x, const int y) { searchFramePos = Rect(x, y); }
+	void setSearchFrameSize(const int x, const int y) { searchFrameSize = Rect(x, y); }
+	void setSearchFrameMaximized(const bool on) { searchFrameMaximized = on; }
+	void setSearchFrameOn(const bool on) { searchFrameOn = on; }
 	void setStatusBarPos(const int x, const int y) { statusBarPos = Rect(x, y); }
 	void setStatusBarOn(const bool on) { statusBarOn = on; }
 
@@ -80,10 +89,15 @@ class Configuration: commonItems::parser
 	std::optional<Rect> linksFramePos;
 	std::optional<Rect> linksFrameSize;
 	bool linksFrameMaximized = false;
+
 	std::optional<Rect> unmappedFramePos;
 	std::optional<Rect> unmappedFrameSize;
 	bool unmappedFrameMaximized = false;
 	bool unmappedFrameOn = false;
+	std::optional<Rect> searchFramePos;
+	std::optional<Rect> searchFrameSize;
+	bool searchFrameMaximized = false;
+	bool searchFrameOn = false;
 	std::optional<Rect> statusBarPos;
 	bool statusBarOn = true;
 };

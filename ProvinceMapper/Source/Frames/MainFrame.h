@@ -10,6 +10,7 @@
 #include <array>
 #include <wx/splitter.h>
 
+class SearchFrame;
 wxDECLARE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_COPY_VERSION, wxCommandEvent);
@@ -17,6 +18,7 @@ wxDECLARE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_SHOW_TOOLBAR, wxCommandEvent);
 wxDECLARE_EVENT(wxMENU_SHOW_UNMAPPED, wxCommandEvent);
+wxDECLARE_EVENT(wxMENU_SHOW_SEARCH, wxCommandEvent);
 
 class UnmappedFrame;
 class wxBookCtrlEvent;
@@ -39,6 +41,7 @@ class MainFrame final : public wxFrame
 	void initImageFrame();
 	void initLinksFrame();
 	void initUnmappedFrame();
+	void initSearchFrame();
 	void mergeRivers() const;
 	static void mergeRiverData(unsigned char* imgData, const unsigned char* riverData, const int size);
 	static bool isRiverMask(unsigned char r, unsigned char g, unsigned char b);
@@ -79,12 +82,14 @@ class MainFrame final : public wxFrame
 	void onLinksMoveVersionRight(wxCommandEvent& evt);
 	void onShowToolbar(wxCommandEvent& evt);
 	void onShowUnmapped(wxCommandEvent& evt);
+	void onShowSearch(wxCommandEvent& evt);
 	void deactivateActiveLinkOrTriangulationPair();
 	void onRefreshActiveTriangulationPair(wxCommandEvent& evt);
 	void onAutogenerateMappings(const wxCommandEvent& evt);
 
 	LinksFrame* linksFrame = nullptr;
 	UnmappedFrame* unmappedFrame = nullptr;
+	SearchFrame* searchFrame = nullptr;
 	wxFlexGridSizer* sizer = nullptr;
 
 	ImageFrame* imageFrame = nullptr;

@@ -7,6 +7,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ProvinceMapper\Source\Frames\Search\SearchFrame.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Frames\Search\SearchTab.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Automapper.cpp" />
     <ClCompile Include="commonItems\Color.cpp" />
     <ClCompile Include="commonItems\CommonFunctions.cpp" />
@@ -60,6 +62,8 @@
     <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchFrame.h" />
+    <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchTab.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\Automapper.h" />
     <ClInclude Include="commonItems\Color.h" />
     <ClInclude Include="commonItems\CommonFunctions.h" />

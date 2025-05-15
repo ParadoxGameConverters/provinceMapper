@@ -53,6 +53,7 @@ void Configuration::registerKeys()
 	registerKeyword("linksFrameMaximized", [this](std::istream& theStream) {
 		linksFrameMaximized = commonItems::getString(theStream) == "true";
 	});
+
 	registerKeyword("unmappedFramePos", [this](std::istream& theStream) {
 		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
@@ -68,6 +69,22 @@ void Configuration::registerKeys()
 	});
 	registerKeyword("unmappedFrameOn", [this](std::istream& theStream) {
 		unmappedFrameOn = commonItems::getString(theStream) == "true";
+	});
+	registerKeyword("searchFramePos", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
+		if (theInts.size() == 2)
+			searchFramePos = Rect(theInts[0], theInts[1]);
+	});
+	registerKeyword("searchFrameSize", [this](std::istream& theStream) {
+		const auto& theInts = commonItems::getInts(theStream);
+		if (theInts.size() == 2)
+			searchFrameSize = Rect(theInts[0], theInts[1]);
+	});
+	registerKeyword("searchFrameMaximized", [this](std::istream& theStream) {
+		searchFrameMaximized = commonItems::getString(theStream) == "true";
+	});
+	registerKeyword("searchFrameOn", [this](std::istream& theStream) {
+		searchFrameOn = commonItems::getString(theStream) == "true";
 	});
 	registerKeyword("statusBarPos", [this](std::istream& theStream) {
 		const auto& theInts = commonItems::getInts(theStream);
@@ -112,7 +129,8 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "linksFrameMaximized = true\n";
 	else
 		output << "linksFrameMaximized = false\n";
-	if (configuration.linksFramePos)
+
+	if (configuration.unmappedFramePos)
 		output << "unmappedFramePos = { " << configuration.unmappedFramePos->x << " " << configuration.unmappedFramePos->y << " }\n";
 	if (configuration.unmappedFrameSize)
 		output << "unmappedFrameSize = { " << configuration.unmappedFrameSize->x << " " << configuration.unmappedFrameSize->y << " }\n";
@@ -124,6 +142,20 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "unmappedFrameOn = true\n";
 	else
 		output << "unmappedFrameOn = false\n";
+
+	if (configuration.searchFramePos)
+		output << "searchFramePos = { " << configuration.searchFramePos->x << " " << configuration.searchFramePos->y << " }\n";
+	if (configuration.searchFrameSize)
+		output << "searchFrameSize = { " << configuration.searchFrameSize->x << " " << configuration.searchFrameSize->y << " }\n";
+	if (configuration.searchFrameMaximized)
+		output << "searchFrameMaximized = true\n";
+	else
+		output << "searchFrameMaximized = false\n";
+	if (configuration.searchFrameOn)
+		output << "searchFrameOn = true\n";
+	else
+		output << "searchFrameOn = false\n";
+
 	if (configuration.statusBarPos)
 		output << "statusBarPos = { " << configuration.statusBarPos->x << " " << configuration.statusBarPos->y << " }\n";
 	if (configuration.statusBarOn)
