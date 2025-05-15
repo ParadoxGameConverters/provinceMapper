@@ -1,5 +1,6 @@
 #include "Province.h"
 #include <algorithm>
+#include <numeric>
 #include <Configuration/Configuration.h>
 
 Province::Province(std::string theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
@@ -23,9 +24,9 @@ void Province::setSuperRegionName(std::string name)
 	superRegionName = std::move(name);
 }
 
-void Province::setProvinceType(std::string name)
+void Province::addProvinceType(std::string name)
 {
-	provinceType = std::move(name);
+	provinceTypes.emplace(std::move(name));
 }
 
 bool Province::operator==(const Province& rhs) const
@@ -68,10 +69,16 @@ std::string Province::miscName() const
 {
 	std::string name;
 
-	name = "\nType: ";
-	if (provinceType)
+	name = "\nTypes: ";
+	if (!provinceTypes.empty())
 	{
-		name += *provinceType;
+		name += std::accumulate(
+			 ++provinceTypes.begin(),
+			 provinceTypes.end(),
+			 *provinceTypes.begin(), 
+			 [](const std::string& a, const std::string& b) {
+				 return a + ", " + b;
+			 });
 	}
 	else
 	{
@@ -104,10 +111,10 @@ bool Province::isWater() const
 	}
 
 	// For games like I:R and CK3, province type is defined and can be used.
-	return provinceType == "sea_zones" || provinceType == "river_provinces" || provinceType == "lakes" || provinceType == "impassable_seas";
+	return provinceTypes.contains("sea_zones") || provinceTypes.contains("river_provinces") || provinceTypes.contains("lakes") || provinceTypes.contains("impassable_seas");
 }
 
 bool Province::isImpassable() const
 {
-	return provinceType == "wasteland" || provinceType == "impassable_terrain" || provinceType == "impassable_mountains";
+	return provinceTypes.contains("wasteland") || provinceTypes.contains("impassable_terrain") || provinceTypes.contains("impassable_mountains");
 }

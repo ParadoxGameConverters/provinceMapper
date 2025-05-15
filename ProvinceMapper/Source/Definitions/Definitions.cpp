@@ -84,6 +84,9 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 	std::string line;
 	getline(theStream, line); // discard first line.
 
+	// If the first line contains a comment about province 0 being ignored, respect that.
+	const bool ignoreProvince0 = line.find("#Province id 0 is ignored") != std::string::npos;
+
 	while (!theStream.eof())
 	{
 		getline(theStream, line);
@@ -96,6 +99,12 @@ void Definitions::parseStream(std::istream& theStream, const LocalizationMapper&
 			if (parsedLine)
 			{
 				const auto [ID, r, g, b, mapDataName] = *parsedLine;
+
+				if (ignoreProvince0 && ID == "0")
+				{
+					continue;
+				}
+
 				auto province = std::make_shared<Province>(ID, r, g, b, mapDataName);
 				if (locType == LocalizationMapper::LocType::SOURCE)
 				{
@@ -304,14 +313,14 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			for (auto& id: provIds)
 			{
 				if (provinces.contains(id) && provinces.at(id))
-					provinces[id]->setProvinceType(lowerCaseProvinceType);
+					provinces[id]->addProvinceType(lowerCaseProvinceType);
 			}
 		}
 		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
 		{
 			auto provIds = commonItems::getULlongs(stream);
 			auto groupSize = provIds.size();
-			if (provIds.size() < 1 || groupSize > 2)
+			if (provIds.empty() || groupSize > 2)
 			{
 				throw new std::runtime_error("A range of provinces should have 1 or 2 elements!");
 			}
@@ -322,18 +331,18 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 			{
 				std::string idStr = std::to_string(id);
 				if (provinces.contains(idStr) && provinces.at(idStr))
-					provinces[idStr]->setProvinceType(lowerCaseProvinceType);
+					provinces[idStr]->addProvinceType(lowerCaseProvinceType);
 			}
 		}
-		else if (strOfItemStr.find("{") == 0) // simple list
+		else if (strOfItemStr.starts_with("{")) // simple list
 		{
 			std::stringstream ss;
 			ss << strOfItemStr;
-			auto provIds = commonItems::getStrings(ss);
+			const auto provIds = commonItems::getStrings(ss);
 
 			for (auto& id: provIds)
 			{
-				provinces[id]->setProvinceType(lowerCaseProvinceType);
+				provinces[id]->addProvinceType(lowerCaseProvinceType);
 			}
 		}
 		else

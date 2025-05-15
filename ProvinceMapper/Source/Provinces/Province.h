@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <set>
 
 class Province final
 {
@@ -15,14 +16,14 @@ class Province final
 	[[nodiscard]] const std::optional<std::string>& getAreaName() const { return areaName; }
 	[[nodiscard]] const std::optional<std::string>& getRegionName() const { return regionName; }
 	[[nodiscard]] const std::optional<std::string>& getSuperRegionName() const { return superRegionName; }
-	[[nodiscard]] const std::optional<std::string>& getProvinceType() const { return provinceType; }
+	[[nodiscard]] const std::set<std::string>& getProvinceTypes() const { return provinceTypes; }
 	[[nodiscard]] bool isWater() const;
 	[[nodiscard]] bool isImpassable() const;
 
 	void setAreaName(std::string name);
 	void setRegionName(std::string name);
 	void setSuperRegionName(std::string name);
-	void setProvinceType(std::string name);
+	void addProvinceType(std::string name);
 
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;
@@ -42,7 +43,7 @@ class Province final
 	std::optional<std::string> areaName;
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
-	std::optional<std::string> provinceType;
+	std::set<std::string> provinceTypes;
 };
 
 #endif // PROVINCE_H
