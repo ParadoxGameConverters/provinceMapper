@@ -44,6 +44,7 @@ class LinkMapping final: public LinkBase
 	[[nodiscard]] const auto& getTargets() const { return targets; }
 
 	[[nodiscard]] const std::string toRowString() override;
+	[[nodiscard]] const std::string toRowStringForSearchFrame() const;
 	[[nodiscard]] const wxColour getBaseRowColour() override;
 	[[nodiscard]] auto getActiveRowColour() -> const wxColour override;
 

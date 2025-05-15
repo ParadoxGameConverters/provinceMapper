@@ -11,9 +11,9 @@
 #include "Log.h"
 #include "OSCompatibilityLayer.h"
 #include "PixelReader/PixelReader.h"
-#include "Provinces/Province.h"
 #include "Unmapped/UnmappedFrame.h"
 #include "Unmapped/UnmappedTab.h"
+#include "Search/SearchFrame.h"
 #include "wx/splitter.h"
 #include <fstream>
 #include <wx/filepicker.h>
@@ -26,6 +26,7 @@ wxDEFINE_EVENT(wxMENU_DELETE_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_RENAME_VERSION, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_SHOW_TOOLBAR, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_SHOW_UNMAPPED, wxCommandEvent);
+wxDEFINE_EVENT(wxMENU_SHOW_SEARCH, wxCommandEvent);
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size):
 	 wxFrame(nullptr, wxID_ANY, title, pos, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL)
@@ -49,6 +50,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	Bind(wxEVT_MENU, &MainFrame::onLinksMoveVersionRight, this, wxEVT_MOVE_ACTIVE_VERSION_RIGHT);
 	Bind(wxEVT_MENU, &MainFrame::onShowToolbar, this, wxMENU_SHOW_TOOLBAR);
 	Bind(wxEVT_MENU, &MainFrame::onShowUnmapped, this, wxMENU_SHOW_UNMAPPED);
+	Bind(wxEVT_MENU, &MainFrame::onShowSearch, this, wxMENU_SHOW_SEARCH);
 
 	Bind(wxEVT_DEACTIVATE_LINK, &MainFrame::onDeactivateLink, this);
 	Bind(wxEVT_DEACTIVATE_TRIANGULATION_PAIR, &MainFrame::onDeactivateTriangulationPair, this);
@@ -408,15 +410,35 @@ void MainFrame::initImageFrame()
 	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");
 	auto* unmappedDropDown = new wxMenu;
 	unmappedDropDown->Append(wxMENU_SHOW_UNMAPPED, "Show Unmapped Provinces");
+	auto* searchDropDown = new wxMenu;
+	searchDropDown->Append(wxMENU_SHOW_SEARCH, "Show Search Window");
 	auto* imageMenuBar = new wxMenuBar;
 	imageMenuBar->Append(menuDropDown, "&Image");
 	imageMenuBar->Append(toolbarDropDown, "&Toolbar");
 	imageMenuBar->Append(unmappedDropDown, "&Unmapped");
+	imageMenuBar->Append(searchDropDown, "&Search");
 	imageFrame->SetMenuBar(imageMenuBar);
 
 	imageFrame->Show();
 	if (maximize)
 		imageFrame->Maximize(true);
+}
+
+void MainFrame::initSearchFrame()
+{
+	auto position = wxDefaultPosition;
+	if (configuration->getSearchFramePos())
+		position = wxPoint(configuration->getSearchFramePos()->x, configuration->getSearchFramePos()->y);
+	auto size = wxSize(300, 900);
+	if (configuration->getSearchFrameSize())
+		size = wxSize(configuration->getSearchFrameSize()->x, configuration->getSearchFrameSize()->y);
+	const auto maximize = configuration->isSearchFrameMaximized();
+	searchFrame = new SearchFrame(this, position, size, linkMapper.getActiveVersion(), configuration);
+
+	if (configuration->isSearchFrameOn())
+		searchFrame->Show();
+	if (maximize)
+		searchFrame->Maximize(true);
 }
 
 void MainFrame::onExit(wxCommandEvent& event)
@@ -578,6 +600,7 @@ void MainFrame::onStartButton(wxCommandEvent& evt)
 	initImageFrame();
 	initLinksFrame();
 	initUnmappedFrame();
+	initSearchFrame();
 	Hide();
 }
 
@@ -739,6 +762,7 @@ void MainFrame::onDeleteActiveLink(wxCommandEvent& evt)
 	linkMapper.deleteActiveLink();
 	linksFrame->deactivateLink();
 	unmappedFrame->refreshList();
+	searchFrame->refreshList();
 }
 
 void MainFrame::onDeleteActiveTriangulationPair(wxCommandEvent& evt)
@@ -869,6 +893,7 @@ void MainFrame::onVersionsAddVersion(wxCommandEvent& evt)
 	linksFrame->addVersion(newVersion);
 	imageFrame->setVersion(newVersion);
 	unmappedFrame->setVersion(newVersion);
+	searchFrame->setVersion(newVersion);
 }
 
 void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
@@ -881,6 +906,7 @@ void MainFrame::onVersionsCopyVersion(wxCommandEvent& evt)
 	linksFrame->addVersion(newVersion);
 	imageFrame->setVersion(newVersion);
 	unmappedFrame->setVersion(newVersion);
+	searchFrame->setVersion(newVersion);
 }
 
 void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
@@ -893,6 +919,7 @@ void MainFrame::onVersionsDeleteVersion(wxCommandEvent& evt)
 	linksFrame->deleteActiveAndSwapToVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
 	unmappedFrame->setVersion(activeVersion);
+	searchFrame->setVersion(activeVersion);
 }
 
 void MainFrame::onVersionsRenameVersion(wxCommandEvent& evt)
@@ -925,6 +952,7 @@ void MainFrame::onChangeTab(const wxBookCtrlEvent& event)
 	linksFrame->setVersion(activeVersion);
 	imageFrame->setVersion(activeVersion);
 	unmappedFrame->setVersion(activeVersion);
+	searchFrame->setVersion(activeVersion);
 }
 
 void MainFrame::onLinksMoveUp(wxCommandEvent& evt)
@@ -961,4 +989,11 @@ void MainFrame::onShowUnmapped(wxCommandEvent& evt)
 	configuration->setUnmappedFrameOn(true);
 	configuration->save();
 	unmappedFrame->Show();
+}
+
+void MainFrame::onShowSearch(wxCommandEvent& evt)
+{
+	configuration->setSearchFrameOn(true);
+	configuration->save();
+	searchFrame->Show();
 }

@@ -291,6 +291,41 @@ const std::string LinkMapping::toRowString()
 	return name;
 }
 
+const std::string LinkMapping::toRowStringForSearchFrame() const
+{
+	if (comment)
+	{
+		return *comment;
+	}
+
+	std::string name;
+	std::string comma;
+	for (const auto& source: getSources())
+	{
+		name += comma;
+		name += source->ID;
+		if (source->locName)
+			name += " (" + *source->locName + ")";
+		else if (!source->mapDataName.empty())
+			name += " (" + source->mapDataName + ")";
+		comma = ", ";
+	}
+	name += " -> ";
+	comma.clear();
+	for (const auto& target: getTargets())
+	{
+		name += comma;
+		name += target->ID;
+		if (target->locName)
+			name += " (" + *target->locName + ")";
+		else if (!target->mapDataName.empty())
+			name += " (" + target->mapDataName + ")";
+		comma = ", ";
+	}
+
+	return name;
+}
+
 static const wxColour commentColour = wxColour(150, 150, 150);
 static const wxColour regularColour = wxColour(240, 240, 240);
 
