@@ -7,7 +7,7 @@ wxDEFINE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_LOCK, wxCommandEvent);
 
 StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Image Toolbar", position, wxSize(500, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxSTAY_ON_TOP),
+	 wxFrame(parent, wxID_ANY, "Image Toolbar", position, wxSize(410, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxSTAY_ON_TOP),
 	 configuration(std::move(theConfiguration)),
 	 eventHandler(parent)
 {
@@ -16,7 +16,7 @@ StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<
 
 	auto* holderPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxEXPAND);
 	holderPanel->SetBackgroundColour(wxColour(230, 230, 230));
-	auto* sizer = new wxFlexGridSizer(8, 5, 5);
+	auto* sizer = new wxFlexGridSizer(5, 5, 5);
 	holderPanel->SetSizer(sizer);
 
 	lockButton = new wxButton(holderPanel, wxID_ANY, "Lock", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Lock");

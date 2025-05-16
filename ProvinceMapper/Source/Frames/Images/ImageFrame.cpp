@@ -189,7 +189,7 @@ void ImageFrame::renderSource() const
 				continue;
 			}
 			wxPen pen = sourceDC.GetPen();
-			pen.SetColour("white");
+			pen.SetColour(*wxWHITE);
 			pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
 			sourceDC.SetPen(pen);
 			sourceDC.SetBrush(*wxGREY_BRUSH);
@@ -202,11 +202,25 @@ void ImageFrame::renderSource() const
 	if (activeTriangulationPair && activeTriangulationPair->getSourcePoint())
 	{
 		wxPen pen = sourceDC.GetPen();
-		pen.SetColour("white");
+		pen.SetColour(*wxWHITE);
+		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+		sourceDC.SetPen(pen);
+		sourceDC.SetBrush(*wxBLUE_BRUSH);
+		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
+	}
+
+	// Draw the points of the triangle being used for manual triangulation with a different colour.
+	if (manualTriangulationTriangle)
+	{
+		wxPen pen = sourceDC.GetPen();
+		pen.SetColour(*wxWHITE);
 		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
 		sourceDC.SetPen(pen);
 		sourceDC.SetBrush(*wxRED_BRUSH);
-		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
+		for (const auto& point: manualTriangulationTriangle->getSourcePoints())
+		{
+			sourceDC.DrawCircle(point, static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
+		}
 	}
 
 	if (sourcePointer)
@@ -254,7 +268,7 @@ void ImageFrame::renderTarget() const
 				continue;
 			}
 			wxPen pen = targetDC.GetPen();
-			pen.SetColour("white");
+			pen.SetColour(*wxWHITE);
 			pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
 			targetDC.SetPen(pen);
 			targetDC.SetBrush(*wxGREY_BRUSH);
@@ -267,11 +281,25 @@ void ImageFrame::renderTarget() const
 	if (activeTriangulationPair && activeTriangulationPair->getTargetPoint())
 	{
 		wxPen pen = targetDC.GetPen();
-		pen.SetColour("white");
+		pen.SetColour(*wxWHITE);
+		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+		targetDC.SetPen(pen);
+		targetDC.SetBrush(*wxBLUE_BRUSH);
+		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
+	}
+
+	// Draw the points of the triangle being used for manual triangulation with a different colour.
+	if (manualTriangulationTriangle)
+	{
+		wxPen pen = targetDC.GetPen();
+		pen.SetColour(*wxWHITE);
 		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
 		targetDC.SetPen(pen);
 		targetDC.SetBrush(*wxRED_BRUSH);
-		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
+		for (const auto& point: manualTriangulationTriangle->getTargetPoints())
+		{
+			targetDC.DrawCircle(point, static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
+		}
 	}
 
 	if (targetPointer)
@@ -768,14 +796,6 @@ void ImageFrame::onTriangulate(wxCommandEvent& event)
 	Refresh();
 }
 
-void ImageFrame::onPointPlaced(const wxCommandEvent& event)
-{
-	// TODO: see what is the role for this function  AFTER the switch to the new triangulation.
-
-	determineTriangulationSanity();
-	Refresh();
-}
-
 void ImageFrame::determineTriangulationSanity()
 {
 	if (statusBar->isTriangulate())
@@ -798,79 +818,66 @@ void ImageFrame::determineTriangulationSanity()
 		{
 			triangulationIsSane = true;
 			statusBar->setTriangulationSane(true);
-			buildBounds();
 		}
 		else
 		{
 			statusBar->setTriangulationSane(false);
 			triangulationIsSane = false;
+			manualTriangulationTriangle = nullptr;
 		}
 	}
 	else
 	{
 		statusBar->setTriangulationSane(false);
 		triangulationIsSane = false;
+		manualTriangulationTriangle = nullptr;
 	}
 }
 
-void ImageFrame::buildBounds()
+static bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const wxPoint& vertex2, const wxPoint& vertex3)
 {
-	// these bounds are the limits in which our triangulation will work.
+	const auto sign = [](const wxPoint& p1, const wxPoint& p2, const wxPoint& p3) {
+		return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+	};
 
-	double maxX = -1;
-	double minX = sourceCanvas->getWidth();
-	double maxY = -1;
-	double minY = sourceCanvas->getHeight();
-	for (const auto& point: sourceCanvas->getPoints())
-	{
-		if (point.x < minX)
-			minX = point.x;
-		if (point.x > maxX)
-			maxX = point.x;
-		if (point.y < minY)
-			minY = point.y;
-		if (point.y > maxY)
-			maxY = point.y;
-	}
-	// expand by 50% for convenience.
-	if (minX - (maxX - minX) * 0.5 > 0)
-		minX = minX - (maxX - minX) * 0.5;
-	if (minY - (maxY - minY) * 0.5 > 0)
-		minY = minY - (maxY - minY) * 0.5;
-	if (maxX + (maxX - minX) * 0.5 < sourceCanvas->getWidth())
-		maxX = maxX + (maxX - minX) * 0.5;
-	if (maxY + (maxY - minY) * 0.5 < sourceCanvas->getHeight())
-		maxY = maxY + (maxY - minY) * 0.5;
-	minX = std::round(minX);
-	minY = std::round(minY);
-	maxX = std::round(maxX);
-	maxY = std::round(maxY);
-	sourceRect = wxRect(wxPoint(static_cast<int>(minX), static_cast<int>(minY)), wxPoint(static_cast<int>(maxX), static_cast<int>(maxY)));
+	const auto d1 = sign(point, vertex1, vertex2);
+	const auto d2 = sign(point, vertex2, vertex3);
+	const auto d3 = sign(point, vertex3, vertex1);
 
-	maxX = -1;
-	minX = targetCanvas->getWidth();
-	maxY = -1;
-	minY = targetCanvas->getHeight();
-	for (const auto& point: targetCanvas->getPoints())
+	const auto hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+	const auto hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+	return !(hasNeg && hasPos);
+}
+
+static std::shared_ptr<Triangle> getTriangleContainingPoint(const std::vector<std::shared_ptr<Triangle>>& triangles, const wxPoint& point, const bool fromTargetCanvas)
+{
+	for (const auto& triangle: triangles)
 	{
-		if (point.x < minX)
-			minX = point.x;
-		if (point.x > maxX)
-			maxX = point.x;
-		if (point.y < minY)
-			minY = point.y;
-		if (point.y > maxY)
-			maxY = point.y;
+		const auto& point1 = fromTargetCanvas ? triangle->getTargetPoint1() : triangle->getSourcePoint1();
+		const auto& point2 = fromTargetCanvas ? triangle->getTargetPoint2() : triangle->getSourcePoint2();
+		const auto& point3 = fromTargetCanvas ? triangle->getTargetPoint3() : triangle->getSourcePoint3();
+
+		// Before a precise check, perform a quick bounding box check.
+		auto [minX, maxX] = std::minmax({point1.x, point2.x, point3.x});
+		if (point.x < minX || point.x > maxX)
+		{
+			continue;
+		}
+		auto [minY, maxY] = std::minmax({point1.y, point2.y, point3.y});
+		if (point.y < minY || point.y > maxY)
+		{
+			continue;
+		}
+
+		// For every pixel in the bounding box, determine if it's inside the triangle.
+		if (isPointInsideTriangle(point, point1, point2, point3))
+		{
+			return triangle;
+		}
 	}
-	if (minX - (maxX - minX) * 0.5 > 0)
-		minX = minX - (maxX - minX) * 0.5;
-	if (minY - (maxY - minY) * 0.5 > 0)
-		minY = minY - (maxY - minY) * 0.5;
-	if (maxX + (maxX - minX) * 0.5 < targetCanvas->getWidth())
-		maxX = maxX + (maxX - minX) * 0.5;
-	if (maxY + (maxY - minY) * 0.5 < targetCanvas->getHeight())
-		maxY = maxY + (maxY - minY) * 0.5;
-	targetRect = wxRect(wxPoint(static_cast<int>(minX), static_cast<int>(minY)), wxPoint(static_cast<int>(maxX), static_cast<int>(maxY)));
+
+   return nullptr;
 }
 
 void ImageFrame::triangulateAtPoint(const wxCommandEvent& event)
@@ -878,18 +885,27 @@ void ImageFrame::triangulateAtPoint(const wxCommandEvent& event)
 	if (!triangulationIsSane)
 		return;
 
+	const bool fromTargetCanvas = event.GetId() < 0;
+
 	wxPoint currentPosition;
-	if (event.GetId() < 0)
+	if (fromTargetCanvas)
 		currentPosition.x = -event.GetId();
 	else
 		currentPosition.x = event.GetId();
 	currentPosition.y = event.GetInt();
 
-	if (event.GetId() < 0) // this comes from target canvas.
+	// Determine the triangle that contains the point.
+	manualTriangulationTriangle = getTriangleContainingPoint(triangles, currentPosition, fromTargetCanvas);
+	if (!manualTriangulationTriangle)
 	{
-		if (targetRect.Contains(currentPosition))
+		return;
+	}
+
+	if (fromTargetCanvas) // this comes from target canvas.
+	{
+		if (currentPosition.x >= 0 && currentPosition.x < targetCanvas->getWidth() && currentPosition.y >= 0 && currentPosition.y < targetCanvas->getHeight())
 		{
-			sourcePointer = triangulate(targetCanvas->getPoints(), sourceCanvas->getPoints(), currentPosition);
+			sourcePointer = triangulate(manualTriangulationTriangle->getTargetPoints(), manualTriangulationTriangle->getSourcePoints(), currentPosition);
 			sourcePointer->x = std::min(std::max(sourcePointer->x, 20), sourceCanvas->getWidth() - 20);
 			sourcePointer->y = std::min(std::max(sourcePointer->y, 20), sourceCanvas->getHeight() - 20);
 			renderSource();
@@ -901,9 +917,9 @@ void ImageFrame::triangulateAtPoint(const wxCommandEvent& event)
 	}
 	else
 	{
-		if (sourceRect.Contains(currentPosition))
+		if (currentPosition.x >= 0 && currentPosition.x < sourceCanvas->getWidth() && currentPosition.y >= 0 && currentPosition.y < sourceCanvas->getHeight())
 		{
-			targetPointer = triangulate(sourceCanvas->getPoints(), targetCanvas->getPoints(), currentPosition);
+			targetPointer = triangulate(manualTriangulationTriangle->getSourcePoints(), manualTriangulationTriangle->getTargetPoints(), currentPosition);
 			targetPointer->x = std::min(std::max(targetPointer->x, 20), targetCanvas->getWidth() - 20);
 			targetPointer->y = std::min(std::max(targetPointer->y, 20), targetCanvas->getHeight() - 20);
 			renderTarget();
@@ -1001,22 +1017,6 @@ void ImageFrame::onScrollReleaseV(const wxCommandEvent& event)
 
 	sourceCanvas->clearOldScrollV();
 	targetCanvas->clearOldScrollV();
-}
-
-bool isPointInsideTriangle(const wxPoint& point, const wxPoint& vertex1, const wxPoint& vertex2, const wxPoint& vertex3)
-{
-	const auto sign = [](const wxPoint& p1, const wxPoint& p2, const wxPoint& p3) {
-		return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
-	};
-
-	const auto d1 = sign(point, vertex1, vertex2);
-	const auto d2 = sign(point, vertex2, vertex3);
-	const auto d3 = sign(point, vertex3, vertex1);
-
-	const auto hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-	const auto hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-	return !(hasNeg && hasPos);
 }
 
 void ImageFrame::autogenerateMappings()

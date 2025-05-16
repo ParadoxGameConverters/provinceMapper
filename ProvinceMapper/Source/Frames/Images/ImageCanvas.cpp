@@ -713,7 +713,6 @@ void ImageCanvas::toggleTriangulate()
 	else
 	{
 		triangulate = true;
-		points.clear();
 	}
 }
 
