@@ -197,18 +197,6 @@ void ImageFrame::renderSource() const
 		}
 	}
 
-	// Draw the active triangulation pair point with a different colour.
-	const auto& activeTriangulationPair = sourceCanvas->getActiveTriangulationPair();
-	if (activeTriangulationPair && activeTriangulationPair->getSourcePoint())
-	{
-		wxPen pen = sourceDC.GetPen();
-		pen.SetColour(*wxWHITE);
-		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
-		sourceDC.SetPen(pen);
-		sourceDC.SetBrush(*wxBLUE_BRUSH);
-		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
-	}
-
 	// Draw the points of the triangle being used for manual triangulation with a different colour.
 	if (manualTriangulationTriangle)
 	{
@@ -221,6 +209,18 @@ void ImageFrame::renderSource() const
 		{
 			sourceDC.DrawCircle(point, static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 		}
+	}
+
+	// Draw the active triangulation pair point with a different colour.
+	const auto& activeTriangulationPair = sourceCanvas->getActiveTriangulationPair();
+	if (activeTriangulationPair && activeTriangulationPair->getSourcePoint())
+	{
+		wxPen pen = sourceDC.GetPen();
+		pen.SetColour(*wxWHITE);
+		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
+		sourceDC.SetPen(pen);
+		sourceDC.SetBrush(*wxBLUE_BRUSH);
+		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 	}
 
 	if (sourcePointer)
@@ -276,18 +276,6 @@ void ImageFrame::renderTarget() const
 		}
 	}
 
-	// Draw the active triangulation pair point with a different colour.
-	const auto& activeTriangulationPair = targetCanvas->getActiveTriangulationPair();
-	if (activeTriangulationPair && activeTriangulationPair->getTargetPoint())
-	{
-		wxPen pen = targetDC.GetPen();
-		pen.SetColour(*wxWHITE);
-		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
-		targetDC.SetPen(pen);
-		targetDC.SetBrush(*wxBLUE_BRUSH);
-		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
-	}
-
 	// Draw the points of the triangle being used for manual triangulation with a different colour.
 	if (manualTriangulationTriangle)
 	{
@@ -300,6 +288,18 @@ void ImageFrame::renderTarget() const
 		{
 			targetDC.DrawCircle(point, static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 		}
+	}
+
+	// Draw the active triangulation pair point with a different colour.
+	const auto& activeTriangulationPair = targetCanvas->getActiveTriangulationPair();
+	if (activeTriangulationPair && activeTriangulationPair->getTargetPoint())
+	{
+		wxPen pen = targetDC.GetPen();
+		pen.SetColour(*wxWHITE);
+		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
+		targetDC.SetPen(pen);
+		targetDC.SetBrush(*wxBLUE_BRUSH);
+		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 	}
 
 	if (targetPointer)
