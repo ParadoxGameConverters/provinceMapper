@@ -41,36 +41,17 @@ StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<
 	triangulateButton = new wxButton(holderPanel, wxID_ANY, "Enable", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "Toggle Triangulation");
 	triangulateButton->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &StatusBar::onTriangulate, this);
 
-	sTriangulate1 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	sTriangulate1->SetBackgroundColour("gray");
-	sTriangulate2 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	sTriangulate2->SetBackgroundColour("gray");
-	sTriangulate3 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	sTriangulate3->SetBackgroundColour("gray");
-	tTriangulate1 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	tTriangulate1->SetBackgroundColour("gray");
-	tTriangulate2 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	tTriangulate2->SetBackgroundColour("gray");
-	tTriangulate3 = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
-	tTriangulate3->SetBackgroundColour("gray");
-
 	sizer->Add(lockButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(sZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(sourceZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(sourceResetButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 	sizer->Add(triangulateText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
-	sizer->Add(sTriangulate1, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
-	sizer->Add(sTriangulate2, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
-	sizer->Add(sTriangulate3, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxTOP, 5).Center());
 
 	sizer->Add(lockStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(tZoomText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(targetZoomField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(targetResetButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 	sizer->Add(triangulateButton, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
-	sizer->Add(tTriangulate1, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
-	sizer->Add(tTriangulate2, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
-	sizer->Add(tTriangulate3, wxSizerFlags(0).Align(wxVERTICAL).Border(wxRIGHT | wxBOTTOM, 5).Center());
 
 	auto* boxSizer = new wxBoxSizer(wxHORIZONTAL);
 	boxSizer->Add(holderPanel, wxSizerFlags(1).Expand());
@@ -170,24 +151,12 @@ void StatusBar::onTriangulate(wxCommandEvent& evt)
 	if (triangulate)
 	{
 		triangulate = false;
-		sTriangulate1->SetBackgroundColour("gray");
-		sTriangulate2->SetBackgroundColour("gray");
-		sTriangulate3->SetBackgroundColour("gray");
-		tTriangulate1->SetBackgroundColour("gray");
-		tTriangulate2->SetBackgroundColour("gray");
-		tTriangulate3->SetBackgroundColour("gray");
 		triangulateButton->SetLabelText("Enable");
 		triangulateText->SetBackgroundColour(wxColor(230, 230, 230));
 	}
 	else
 	{
 		triangulate = true;
-		sTriangulate1->SetBackgroundColour("red");
-		sTriangulate2->SetBackgroundColour("red");
-		sTriangulate3->SetBackgroundColour("red");
-		tTriangulate1->SetBackgroundColour("red");
-		tTriangulate2->SetBackgroundColour("red");
-		tTriangulate3->SetBackgroundColour("red");
 		triangulateButton->SetLabelText("Disable");
 		triangulateText->SetBackgroundColour("red");
 	}
@@ -201,34 +170,6 @@ void StatusBar::onClose(wxCloseEvent& event)
 	configuration->setStatusBarOn(false);
 	configuration->save();
 	Hide();
-}
-
-void StatusBar::setPointPlaced(const int pointID)
-{
-	switch (pointID)
-	{
-		case 1:
-			sTriangulate1->SetBackgroundColour("green");
-			break;
-		case 2:
-			sTriangulate2->SetBackgroundColour("green");
-			break;
-		case 3:
-			sTriangulate3->SetBackgroundColour("green");
-			break;
-		case 4:
-			tTriangulate1->SetBackgroundColour("green");
-			break;
-		case 5:
-			tTriangulate2->SetBackgroundColour("green");
-			break;
-		case 6:
-			tTriangulate3->SetBackgroundColour("green");
-			break;
-		default:
-			break;
-	}
-	Refresh();
 }
 
 void StatusBar::setTriangulationSane(const bool sane)

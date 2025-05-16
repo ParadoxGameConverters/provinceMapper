@@ -25,8 +25,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 const std::shared_ptr<DefinitionsInterface>& sourceDefs,
 	 const std::shared_ptr<DefinitionsInterface>& targetDefs,
 	 std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
-	 configuration(std::move(theConfiguration)), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), configuration(std::move(theConfiguration)),
+	 eventHandler(parent)
 {
 	taskBarBtn = MSWGetTaskBarButton();
 
@@ -36,7 +36,6 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
 	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
-	Bind(wxEVT_POINT_PLACED, &ImageFrame::onPointPlaced, this);
 	Bind(wxEVT_MOUSE_AT, &ImageFrame::triangulateAtPoint, this);
 	Bind(wxEVT_SIZE, &ImageFrame::onResize, this);
 	Bind(wxEVT_MOVE, &ImageFrame::onMove, this);
@@ -206,22 +205,8 @@ void ImageFrame::renderSource() const
 		pen.SetColour("white");
 		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
 		sourceDC.SetPen(pen);
-		sourceDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulation points per canvas
-		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
-	}
-
-	if (statusBar->isTriangulate())
-	{
-		wxPen pen = sourceDC.GetPen();
-		pen.SetColour("white");
-		pen.SetWidth(static_cast<int>(std::round(3.0 / sourceCanvas->getScale())));
-		sourceDC.SetPen(pen);
 		sourceDC.SetBrush(*wxRED_BRUSH);
-		// triangulation points
-		for (const auto& point: sourceCanvas->getPoints())
-		{
-			sourceDC.DrawCircle(point, static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
-		}
+		sourceDC.DrawCircle(*activeTriangulationPair->getSourcePoint(), static_cast<int>(std::round(5.0 / sourceCanvas->getScale())));
 	}
 
 	if (sourcePointer)
@@ -285,22 +270,8 @@ void ImageFrame::renderTarget() const
 		pen.SetColour("white");
 		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
 		targetDC.SetPen(pen);
-		targetDC.SetBrush(*wxBLUE_BRUSH); // blue instead of red, to differentiate from the old 3 triangulation points per canvas
-		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
-	}
-
-	if (statusBar->isTriangulate())
-	{
-		wxPen pen = targetDC.GetPen();
-		pen.SetColour("white");
-		pen.SetWidth(static_cast<int>(std::round(3.0 / targetCanvas->getScale())));
-		targetDC.SetPen(pen);
 		targetDC.SetBrush(*wxRED_BRUSH);
-		// triangulation points
-		for (const auto& point: targetCanvas->getPoints())
-		{
-			targetDC.DrawCircle(point, static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
-		}
+		targetDC.DrawCircle(*activeTriangulationPair->getTargetPoint(), static_cast<int>(std::round(5.0 / targetCanvas->getScale())));
 	}
 
 	if (targetPointer)
@@ -799,22 +770,41 @@ void ImageFrame::onTriangulate(wxCommandEvent& event)
 
 void ImageFrame::onPointPlaced(const wxCommandEvent& event)
 {
-	statusBar->setPointPlaced(event.GetInt());
-	if (event.GetInt() <= 3)
-		renderSource();
-	else
-		renderTarget();
+	// TODO: see what is the role for this function  AFTER the switch to the new triangulation.
+
 	determineTriangulationSanity();
 	Refresh();
 }
 
 void ImageFrame::determineTriangulationSanity()
 {
-	if (statusBar->isTriangulate() && sourceCanvas->getPoints().size() == 3 && targetCanvas->getPoints().size() == 3)
+	if (statusBar->isTriangulate())
 	{
-		triangulationIsSane = true;
-		statusBar->setTriangulationSane(true);
-		buildBounds();
+		// We need at least 3 valid triangulation pairs to triangulate.
+		byte validTriangulationPairsCount = 0;
+		for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+		{
+			if (pair->getSourcePoint() && pair->getTargetPoint())
+			{
+				++validTriangulationPairsCount;
+				if (validTriangulationPairsCount >= 3)
+				{
+					break;
+				}
+			}
+		}
+
+		if (validTriangulationPairsCount >= 3)
+		{
+			triangulationIsSane = true;
+			statusBar->setTriangulationSane(true);
+			buildBounds();
+		}
+		else
+		{
+			statusBar->setTriangulationSane(false);
+			triangulationIsSane = false;
+		}
 	}
 	else
 	{
@@ -1103,7 +1093,8 @@ void ImageFrame::autogenerateMappings()
 					tgtPointToWaterProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
 				for (const auto& pixel: tgtProvince->borderPixels)
 					tgtPointToWaterProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
-			} else
+			}
+			else
 			{
 				for (const auto& pixel: tgtProvince->innerPixels)
 					tgtPointToLandProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
@@ -1130,12 +1121,12 @@ void ImageFrame::autogenerateMappings()
 		sourceProvinces.push_back(sourceProvince);
 
 	automapper.matchTargetProvsToSourceProvs(sourceProvinces,
-		srcPointToTriangleMap,
-		tgtPointToLandProvinceMap,
-		tgtPointToWaterProvinceMap,
-		excludedTgtProvinceIDs,
-		targetMapWidth,
-		targetMapHeight);
+		 srcPointToTriangleMap,
+		 tgtPointToLandProvinceMap,
+		 tgtPointToWaterProvinceMap,
+		 excludedTgtProvinceIDs,
+		 targetMapWidth,
+		 targetMapHeight);
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 	if (taskBarBtn)
