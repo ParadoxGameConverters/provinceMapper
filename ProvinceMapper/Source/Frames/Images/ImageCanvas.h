@@ -11,7 +11,6 @@ wxDECLARE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_REFRESH, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
 wxDECLARE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
@@ -43,7 +42,6 @@ class ImageCanvas final: public wxScrolledCanvas
 	[[nodiscard]] const auto& getImageData() const { return imageData; }
 	[[nodiscard]] wxPoint locateLinkCoordinates(int ID) const;
 	[[nodiscard]] wxPoint locateProvinceCoordinates(const std::string& ID) const;
-	[[nodiscard]] const auto& getPoints() const { return points; }
 	[[nodiscard]] std::string nameAtCoords(const wxPoint& point);
 	[[nodiscard]] std::shared_ptr<Province> provinceAtCoords(const wxPoint& point) const;
 	[[nodiscard]] auto getOldScrollH() const { return oldScrollPositionH; }
@@ -104,7 +102,6 @@ class ImageCanvas final: public wxScrolledCanvas
 	void stageAutogenerateMappings() const;
 	void stageMoveVersionLeft() const;
 	void stageMoveVersionRight() const;
-	void stagePointPlaced() const;
 	void stageDelaunayTriangulate() const;
 	void stageActivateTriangulationPairByID(int ID) const;
 
@@ -116,8 +113,7 @@ class ImageCanvas final: public wxScrolledCanvas
 
 	bool showTriangulationMesh = false;
 
-	bool triangulate = false;
-	std::vector<wxPoint> points; // points used for the old triangulation version
+	bool triangulate = false; // Whether the manual triangulation is enabled.
 
 	wxImage* image;
 	unsigned char* imageData;

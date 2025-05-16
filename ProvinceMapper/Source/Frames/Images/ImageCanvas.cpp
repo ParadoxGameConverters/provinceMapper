@@ -10,7 +10,6 @@ wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_TRIANGULATION_PAIR_BY_ID, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_REFRESH, wxCommandEvent);
-wxDEFINE_EVENT(wxEVT_POINT_PLACED, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_MOUSE_AT, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_H, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SCROLL_RELEASE_V, wxCommandEvent);
@@ -292,21 +291,6 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 
 			stageTriangulationPairPointPlaced();
 			stageRefresh();
-			return;
-		}
-
-		// case 4: special.
-		if (triangulate && points.size() < 3)
-		{
-			// we're initing a point here.
-			const auto point = wxPoint(x, y);
-			// do we have this point already?
-			for (const auto& knownPoint: points)
-				if (knownPoint == point)
-					return;
-			// insert and ping.
-			points.emplace_back(x, y);
-			stagePointPlaced();
 			return;
 		}
 
@@ -654,16 +638,6 @@ void ImageCanvas::stageTriangulationPairPointPlaced() const
 	eventHandler->QueueEvent(evt.Clone());
 }
 
-void ImageCanvas::stagePointPlaced() const
-{
-	wxCommandEvent evt(wxEVT_POINT_PLACED);
-	if (selector == ImageTabSelector::SOURCE)
-		evt.SetInt(static_cast<int>(points.size()));
-	else if (selector == ImageTabSelector::TARGET)
-		evt.SetInt(3 + static_cast<int>(points.size())); // gotta be creative.
-	eventHandler->QueueEvent(evt.Clone());
-}
-
 void ImageCanvas::stageDelaunayTriangulate() const
 {
 	const wxCommandEvent evt(wxEVT_DELAUNAY_TRIANGULATE);
@@ -739,7 +713,6 @@ void ImageCanvas::toggleTriangulate()
 	else
 	{
 		triangulate = true;
-		points.clear();
 	}
 }
 
