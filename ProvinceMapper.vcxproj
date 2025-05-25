@@ -59,7 +59,10 @@
     <ClCompile Include="ProvinceMapper\Source\Frames\Links\TriangulationPairDialogComment.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Triangle.cpp" />
     <ClCompile Include="TrianglePP\source\tpp_assert.cpp" />
-    <ClCompile Include="TrianglePP\source\tpp_impl.cpp" />
+    <ClCompile Include="TrianglePP\source\tpp_impl.cpp">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchFrame.h" />
@@ -174,6 +177,7 @@
       <WarningLevel>Level3</WarningLevel>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
