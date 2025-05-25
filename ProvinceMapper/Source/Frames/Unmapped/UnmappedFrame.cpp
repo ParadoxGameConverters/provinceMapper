@@ -3,16 +3,15 @@
 #include "Frames/Images/ImageCanvas.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "Log.h"
 #include "UnmappedTab.h"
+#include <Log.h>
 
 UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	 const wxPoint& position,
 	 const wxSize& size,
 	 const std::shared_ptr<LinkMappingVersion>& activeVersion,
 	 std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Unmapped Provinces", position, size, wxDEFAULT_FRAME_STYLE),
-	 configuration(std::move(theConfiguration)), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Unmapped Provinces", position, size, wxDEFAULT_FRAME_STYLE), configuration(std::move(theConfiguration)), eventHandler(parent)
 {
 	Bind(wxEVT_SIZE, &UnmappedFrame::onResize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &UnmappedFrame::onClose, this);

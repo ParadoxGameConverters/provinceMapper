@@ -1,8 +1,8 @@
 #include "LinksFrame.h"
 #include "Configuration/Configuration.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "Log.h"
 #include "Provinces/Province.h"
+#include <Log.h>
 
 LinksFrame::LinksFrame(wxWindow* parent,
 	 const wxPoint& position,
@@ -10,8 +10,7 @@ LinksFrame::LinksFrame(wxWindow* parent,
 	 const std::vector<std::shared_ptr<LinkMappingVersion>>& versions,
 	 const std::shared_ptr<LinkMappingVersion>& activeVersion,
 	 std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Links", position, size, wxDEFAULT_FRAME_STYLE),
-	 configuration(std::move(theConfiguration)), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Links", position, size, wxDEFAULT_FRAME_STYLE), configuration(std::move(theConfiguration)), eventHandler(parent)
 {
 	Bind(wxEVT_SIZE, &LinksFrame::onResize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &LinksFrame::onClose, this);

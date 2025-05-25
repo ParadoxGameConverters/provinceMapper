@@ -8,16 +8,16 @@
 #include "Links/LinksFrame.h"
 #include "Links/ProvinceMappingsGrid.h"
 #include "Links/TriangulationPairsGrid.h"
-#include "Log.h"
-#include "OSCompatibilityLayer.h"
 #include "PixelReader/PixelReader.h"
+#include "Search/SearchFrame.h"
 #include "Unmapped/UnmappedFrame.h"
 #include "Unmapped/UnmappedTab.h"
-#include "Search/SearchFrame.h"
-#include "wx/splitter.h"
+#include <Log.h>
+#include <OSCompatibilityLayer.h>
 #include <fstream>
 #include <wx/filepicker.h>
 #include <wx/rawbmp.h>
+#include <wx/splitter.h>
 
 wxDEFINE_EVENT(wxMENU_ADD_COMMENT, wxCommandEvent);
 wxDEFINE_EVENT(wxMENU_ADD_VERSION, wxCommandEvent);
@@ -185,29 +185,26 @@ void MainFrame::initFrame()
 
 void MainFrame::populateFrame()
 {
-	std::string path;
-	std::wstring path16;
+	std::filesystem::path path;
 
 	// Source path
 	if (configuration->getSourceDir())
 	{
 		path = *configuration->getSourceDir();
-		path16 = commonItems::convertUTF8ToUTF16(path);
 	}
-	sourceDirPicker->SetPath(path16);
-	sourceDirPicker->SetInitialDirectory(path16);
-	auto bootEvent0 = wxFileDirPickerEvent(wxEVT_FILEPICKER_CHANGED, this, 0, path16);
+	sourceDirPicker->SetPath(path.string());
+	sourceDirPicker->SetInitialDirectory(path.string());
+	auto bootEvent0 = wxFileDirPickerEvent(wxEVT_FILEPICKER_CHANGED, this, 0, path.string());
 	onPathChanged(bootEvent0);
 
 	// target path
 	if (configuration->getTargetDir())
 	{
 		path = *configuration->getTargetDir();
-		path16 = commonItems::convertUTF8ToUTF16(path);
 	}
-	targetDirPicker->SetPath(path16);
-	targetDirPicker->SetInitialDirectory(path16);
-	auto bootEvent1 = wxFileDirPickerEvent(wxEVT_FILEPICKER_CHANGED, this, 1, path16);
+	targetDirPicker->SetPath(path.string());
+	targetDirPicker->SetInitialDirectory(path.string());
+	auto bootEvent1 = wxFileDirPickerEvent(wxEVT_FILEPICKER_CHANGED, this, 1, path.string());
 	onPathChanged(bootEvent1);
 
 	// source token
@@ -230,14 +227,12 @@ void MainFrame::populateFrame()
 	if (configuration->getLinkFile())
 	{
 		path = *configuration->getLinkFile();
-		path16 = commonItems::convertUTF8ToUTF16(path);
-		const auto rawFile = trimPath(path);
-		const auto rawPath = path.substr(0, rawFile.size());
-		initialPath = commonItems::convertUTF8ToUTF16(rawPath);
+		const auto rawFile = path.filename();
+		const auto initialPath = path.parent_path();
 	}
-	linkFilePicker->SetPath(path16);
+	linkFilePicker->SetPath(path.string());
 	linkFilePicker->SetInitialDirectory(initialPath);
-	auto bootEvent2 = wxFileDirPickerEvent(wxEVT_FILEPICKER_CHANGED, this, 2, path16);
+	auto bootEvent2 = wxFileDirPickerEvent(wxEVT_FILEPICKER_CHANGED, this, 2, path.string());
 	onPathChanged(bootEvent2);
 }
 
@@ -307,7 +302,7 @@ void MainFrame::initImageFrame()
 
 	std::optional<LocalizationMapper::LocType> vic3SideloadStates;
 
-	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/definition.csv"))
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "definition.csv"))
 	{
 		auto definitions = std::make_shared<Definitions>();
 		definitions->loadDefinitions(*configuration->getSourceDir(), localizationMapper, LocalizationMapper::LocType::SOURCE);
@@ -322,7 +317,7 @@ void MainFrame::initImageFrame()
 		Log(LogLevel::Info) << "Loaded Vic3 source provinces.";
 	}
 
-	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/definition.csv"))
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "definition.csv"))
 	{
 		auto definitions = std::make_shared<Definitions>();
 		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
@@ -341,25 +336,25 @@ void MainFrame::initImageFrame()
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
 	sourceRiversImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.png"))
-		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.png");
-	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/provinces.bmp"))
-		sourceImg->LoadFile(*configuration->getSourceDir() + "/provinces.bmp");
-	if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.png"))
-		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.png");
-	else if (commonItems::DoesFileExist(*configuration->getSourceDir() + "/rivers.bmp"))
-		sourceRiversImg->LoadFile(*configuration->getSourceDir() + "/rivers.bmp");
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.png"))
+		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.png");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.bmp"))
+		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.bmp");
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.png"))
+		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.png");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.bmp"))
+		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.bmp");
 
 	targetImg = new wxImage();
 	targetRiversImg = new wxImage();
-	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.png"))
-		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.png");
-	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/provinces.bmp"))
-		targetImg->LoadFile(*configuration->getTargetDir() + "/provinces.bmp");
-	if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.png"))
-		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.png");
-	else if (commonItems::DoesFileExist(*configuration->getTargetDir() + "/rivers.bmp"))
-		targetRiversImg->LoadFile(*configuration->getTargetDir() + "/rivers.bmp");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.png"))
+		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.png");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.bmp"))
+		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.bmp");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.png"))
+		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.png");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.bmp"))
+		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.bmp");
 
 	mergeRivers();
 
@@ -389,7 +384,7 @@ void MainFrame::initImageFrame()
 	sourceDefs->ditchAdjacencies("source_adjacencies.txt");
 	targetDefs->ditchAdjacencies("target_adjacencies.txt");
 
-	linkMapper.loadMappings(linksFileString, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
+	linkMapper.loadMappings(linksFile, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
 	Log(LogLevel::Info) << "Loaded " << activeLinks->size() << " active links.";
 
@@ -462,15 +457,15 @@ void MainFrame::onSupportUs(wxCommandEvent& event)
 
 void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 {
-	const auto validPath = commonItems::DoesFolderExist(commonItems::UTF16ToUTF8(evt.GetPath().ToStdWstring()));
-	const auto result = commonItems::UTF16ToUTF8(evt.GetPath().ToStdWstring());
+	const auto validPath = commonItems::DoesFolderExist(std::filesystem::path(commonItems::UTF16ToUTF8(evt.GetPath().ToStdWstring())));
+	const auto result = std::filesystem::path(commonItems::UTF16ToUTF8(evt.GetPath().ToStdWstring()));
 	const auto green = wxColour(130, 250, 130);
 	const auto red = wxColour(250, 130, 130);
 
 	// source path
 	if (evt.GetId() == 0)
 	{
-		if (validPath && (commonItems::DoesFileExist(result + "/provinces.bmp") || commonItems::DoesFileExist(result + "/provinces.png")))
+		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png")))
 		{
 			sourceDirStatus->SetBackgroundColour(green);
 			sanity[0] = true;
@@ -485,7 +480,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 	// target path
 	else if (evt.GetId() == 1)
 	{
-		if (validPath && (commonItems::DoesFileExist(result + "/provinces.bmp") || commonItems::DoesFileExist(result + "/provinces.png")))
+		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png")))
 		{
 			targetDirStatus->SetBackgroundColour(green);
 			sanity[1] = true;
@@ -503,10 +498,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 		if (commonItems::DoesFileExist(result))
 		{
 			linkFileStatus->SetBackgroundColour(green);
-			std::ifstream linksFile(result);
-			if (linksFile.is_open())
-				linksFileString.assign(std::istreambuf_iterator<char>(linksFile), std::istreambuf_iterator<char>());
-			linksFile.close();
+			linksFile = result;
 			sanity[2] = true;
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
@@ -517,7 +509,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 		{
 			// We allow for nothing.
 			linkFileStatus->SetBackgroundColour(green);
-			linksFileString.clear();
+			linksFile.clear();
 			sanity[2] = true;
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
@@ -527,7 +519,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 		else
 		{
 			linkFileStatus->SetBackgroundColour(red);
-			linksFileString.clear();
+			linksFile.clear();
 			sanity[2] = false;
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
@@ -551,7 +543,7 @@ void MainFrame::onTokenChanged(const wxCommandEvent& evt)
 	{
 		const auto input = sourceTokenField->GetValue();
 		const auto rawInput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFileString.find(rawInput) != std::string::npos || linksFileString.empty()))
+		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFile.string().find(rawInput) != std::string::npos || linksFile.empty()))
 		{
 			sourceTokenStatus->SetBackgroundColour(green);
 			sanity[3] = true;
@@ -568,7 +560,7 @@ void MainFrame::onTokenChanged(const wxCommandEvent& evt)
 	{
 		const auto input = targetTokenField->GetValue();
 		const auto rawInput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFileString.find(rawInput) != std::string::npos || linksFileString.empty()))
+		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFile.string().find(rawInput) != std::string::npos || linksFile.empty()))
 		{
 			targetTokenStatus->SetBackgroundColour(green);
 			sanity[4] = true;

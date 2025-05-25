@@ -1,12 +1,15 @@
 #include "LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "Log.h"
 #include "ProvinceMappingsGrid.h"
 #include "Provinces/Province.h"
 #include "TriangulationPairsGrid.h"
+#include <Log.h>
 
+// clang-format off
+// these must be included in the proper order
 #include <wx/splitter.h>
 #include <wx/generic/splitter.h>
+// clang-format on
 
 
 wxDEFINE_EVENT(wxEVT_DELETE_ACTIVE_LINK_OR_TRIANGULATION_PAIR, wxCommandEvent);
