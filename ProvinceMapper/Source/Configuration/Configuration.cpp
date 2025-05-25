@@ -1,7 +1,7 @@
 #include "Configuration.h"
-#include "OSCompatibilityLayer.h"
-#include "ParserHelpers.h"
-#include "CommonRegexes.h"
+#include <CommonRegexes.h>
+#include <OSCompatibilityLayer.h>
+#include <ParserHelpers.h>
 #include <fstream>
 
 void Configuration::registerKeys()
@@ -99,11 +99,11 @@ void Configuration::registerKeys()
 std::ostream& operator<<(std::ostream& output, const Configuration& configuration)
 {
 	if (configuration.sourceDir)
-		output << "sourceDir = \"" << *configuration.sourceDir << "\"\n";
+		output << "sourceDir = \"" << configuration.sourceDir->string() << "\"\n";
 	if (configuration.reverseSource)
 		output << "reverseSource = true\n";
 	if (configuration.targetDir)
-		output << "targetDir = \"" << *configuration.targetDir << "\"\n";
+		output << "targetDir = \"" << configuration.targetDir->string() << "\"\n";
 	if (configuration.reverseTarget)
 		output << "reverseTarget = true\n";
 	if (configuration.sourceToken)
@@ -111,7 +111,7 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 	if (configuration.targetToken)
 		output << "targetToken = \"" << *configuration.targetToken << "\"\n";
 	if (configuration.linkFile)
-		output << "linkFile = \"" << *configuration.linkFile << "\"\n";
+		output << "linkFile = \"" << configuration.linkFile->string() << "\"\n";
 	if (configuration.imageFramePos)
 		output << "imageFramePos = { " << configuration.imageFramePos->x << " " << configuration.imageFramePos->y << " }\n";
 	if (configuration.imageFrameSize)
@@ -175,7 +175,7 @@ void Configuration::save() const
 void Configuration::load()
 {
 	registerKeys();
-	if (commonItems::DoesFileExist("configuration.txt"))
-		parseFile("configuration.txt");
+	if (commonItems::DoesFileExist(std::filesystem::path("configuration.txt")))
+		parseFile(std::filesystem::path("configuration.txt"));
 	clearRegisteredKeywords();
 }

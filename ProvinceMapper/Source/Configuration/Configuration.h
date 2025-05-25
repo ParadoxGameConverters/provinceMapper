@@ -1,7 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#include "Parser.h"
+#include <Parser.h>
 
 struct Rect
 {
@@ -77,11 +77,11 @@ class Configuration: commonItems::parser
 
 	bool reverseSource = false;
 	bool reverseTarget = false;
-	std::optional<std::string> sourceDir;
-	std::optional<std::string> targetDir;
+	std::optional<std::filesystem::path> sourceDir;
+	std::optional<std::filesystem::path> targetDir;
 	std::optional<std::string> sourceToken;
 	std::optional<std::string> targetToken;
-	std::optional<std::string> linkFile;
+	std::optional<std::filesystem::path> linkFile;
 	std::optional<Rect> imageFramePos;
 	std::optional<Rect> imageFrameSize;
 	bool imageFrameMaximized = false;
