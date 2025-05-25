@@ -2,19 +2,19 @@
 #define LINK_MAPPER_H
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkMappingVersion.h"
-#include "Parser.h"
+#include <Parser.h>
 
 
 class LinkMapper: commonItems::parser
 {
   public:
-	void loadMappings(const std::string& linksFileString,
+	void loadMappings(const std::filesystem::path& linksFile,
 		 std::shared_ptr<DefinitionsInterface> theSourceDefs,
 		 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 		 std::string theSourceToken,
 		 std::string theTargetToken);
 
-	void exportMappings(const std::string& linksFile) const;
+	void exportMappings(const std::filesystem::path& linksFile) const;
 	void deactivateLink() const;
 	void deactivateTriangulationPair() const;
 	void activateLinkByIndex(int row) const;

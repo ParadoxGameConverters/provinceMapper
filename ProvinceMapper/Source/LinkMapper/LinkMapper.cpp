@@ -1,11 +1,11 @@
 #include "LinkMapper.h"
-#include "CommonRegexes.h"
-#include "Log.h"
-#include "ParserHelpers.h"
 #include "Provinces/Province.h"
+#include <CommonRegexes.h>
+#include <Log.h>
+#include <ParserHelpers.h>
 #include <fstream>
 
-void LinkMapper::loadMappings(const std::string& linksFileString,
+void LinkMapper::loadMappings(const std::filesystem::path& linksFile,
 	 std::shared_ptr<DefinitionsInterface> theSourceDefs,
 	 std::shared_ptr<DefinitionsInterface> theTargetDefs,
 	 std::string theSourceToken,
@@ -17,8 +17,7 @@ void LinkMapper::loadMappings(const std::string& linksFileString,
 	targetToken = std::move(theTargetToken);
 
 	registerKeys();
-	std::stringstream linksStream(linksFileString);
-	parseStream(linksStream);
+	parseFile(linksFile);
 	clearRegisteredKeywords();
 	if (versions.empty())
 	{
@@ -41,7 +40,7 @@ void LinkMapper::registerKeys()
 	registerRegex(commonItems::catchallRegex, commonItems::ignoreItem);
 }
 
-void LinkMapper::exportMappings(const std::string& linksFile) const
+void LinkMapper::exportMappings(const std::filesystem::path& linksFile) const
 {
 	std::ofstream linkFile(linksFile);
 	for (const auto& version: versions)
