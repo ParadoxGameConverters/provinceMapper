@@ -499,6 +499,10 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 		{
 			linkFileStatus->SetBackgroundColour(green);
 			linksFile = result;
+			std::ifstream linksFile(result);
+			if (linksFile.is_open())
+				linksFileContents.assign(std::istreambuf_iterator<char>(linksFile), std::istreambuf_iterator<char>());
+			linksFile.close();
 			sanity[2] = true;
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
@@ -510,6 +514,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 			// We allow for nothing.
 			linkFileStatus->SetBackgroundColour(green);
 			linksFile.clear();
+			linksFileContents.clear();
 			sanity[2] = true;
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
@@ -520,6 +525,7 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 		{
 			linkFileStatus->SetBackgroundColour(red);
 			linksFile.clear();
+			linksFileContents.clear();
 			sanity[2] = false;
 			auto bootEvent3 = wxCommandEvent(wxEVT_NULL, 3);
 			onTokenChanged(bootEvent3);
@@ -543,7 +549,7 @@ void MainFrame::onTokenChanged(const wxCommandEvent& evt)
 	{
 		const auto input = sourceTokenField->GetValue();
 		const auto rawInput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFile.string().find(rawInput) != std::string::npos || linksFile.empty()))
+		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFileContents.find(rawInput) != std::string::npos || linksFileContents.empty()))
 		{
 			sourceTokenStatus->SetBackgroundColour(green);
 			sanity[3] = true;
@@ -560,7 +566,7 @@ void MainFrame::onTokenChanged(const wxCommandEvent& evt)
 	{
 		const auto input = targetTokenField->GetValue();
 		const auto rawInput = commonItems::UTF16ToUTF8(input.ToStdWstring());
-		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFile.string().find(rawInput) != std::string::npos || linksFile.empty()))
+		if (!rawInput.empty() && rawInput.size() >= 2 && (linksFileContents.find(rawInput) != std::string::npos || linksFileContents.empty()))
 		{
 			targetTokenStatus->SetBackgroundColour(green);
 			sanity[4] = true;
