@@ -1,21 +1,21 @@
 #include "RegionManager.h"
-#include "Log.h"
-#include "OSCompatibilityLayer.h"
-#include "ParserHelpers.h"
+#include <Log.h>
+#include <OSCompatibilityLayer.h>
+#include <ParserHelpers.h>
 #include <filesystem>
 #include <fstream>
 #include <ranges>
 namespace fs = std::filesystem;
 
-void EU4::RegionManager::loadRegions(const std::string& EU4Path)
+void EU4::RegionManager::loadRegions(const std::filesystem::path& EU4Path)
 {
 	Log(LogLevel::Info) << "EU4 Region manager online.";
 
-	auto areaFilename = EU4Path + "/area.txt";
-	auto regionFilename = EU4Path + "/region.txt";
-	auto superRegionFilename = EU4Path + "/superregion.txt";
+	auto areaFilename = EU4Path / "area.txt";
+	auto regionFilename = EU4Path / "region.txt";
+	auto superRegionFilename = EU4Path / " superregion.txt";
 
-	std::ifstream areaStream(fs::u8path(areaFilename));
+	std::ifstream areaStream(areaFilename);
 	if (!areaStream.is_open())
 		throw std::runtime_error("Could not open area.txt!");
 	registerAreaKeys();
@@ -23,7 +23,7 @@ void EU4::RegionManager::loadRegions(const std::string& EU4Path)
 	clearRegisteredKeywords();
 	areaStream.close();
 
-	std::ifstream superRegionStream(fs::u8path(superRegionFilename));
+	std::ifstream superRegionStream(superRegionFilename);
 	if (!superRegionStream.is_open())
 		throw std::runtime_error("Could not open superregion.txt!");
 	registerSuperRegionKeys();
@@ -31,7 +31,7 @@ void EU4::RegionManager::loadRegions(const std::string& EU4Path)
 	clearRegisteredKeywords();
 	superRegionStream.close();
 
-	std::ifstream regionStream(fs::u8path(regionFilename));
+	std::ifstream regionStream(regionFilename);
 	if (!regionStream.is_open())
 		throw std::runtime_error("Could not open region.txt!");
 	registerRegionKeys();

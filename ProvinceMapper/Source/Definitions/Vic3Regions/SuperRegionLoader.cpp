@@ -1,27 +1,27 @@
 #include "SuperRegionLoader.h"
-#include "CommonFunctions.h"
-#include "Log.h"
-#include "OSCompatibilityLayer.h"
 #include "V3Region.h"
 #include "V3SuperRegion.h"
+#include <CommonFunctions.h>
+#include <Log.h>
+#include <OSCompatibilityLayer.h>
 #include <filesystem>
 #include <fstream>
 #include <ranges>
 namespace fs = std::filesystem;
 
-void V3::SuperRegionLoader::loadSuperRegions(const std::string& folderPath)
+void V3::SuperRegionLoader::loadSuperRegions(const fs::path& folderPath)
 {
 	Log(LogLevel::Info) << "Vic3 Regions online.";
-	for (const auto& fileName: commonItems::GetAllFilesInFolder(folderPath + "/../common/strategic_regions/"))
+	for (const auto& fileName: commonItems::GetAllFilesInFolder(folderPath / "../common/strategic_regions/"))
 	{
-		if (getExtension(fileName) != "txt")
+		if (fileName.extension() != ".txt")
 			continue;
-		std::ifstream superRegionStream(fs::u8path(folderPath + "/../common/strategic_regions/" + fileName));
+		std::ifstream superRegionStream(folderPath / "../common/strategic_regions" / fileName);
 		if (!superRegionStream.is_open())
-			throw std::runtime_error("Could not open " + fileName + " !");
+			throw std::runtime_error("Could not open " + fileName.string() + " !");
 
 		const auto superRegion = std::make_shared<SuperRegion>();
-		const auto superRegionName = trimPath(trimExtension(fileName));
+		const auto superRegionName = fileName.filename().stem().string();
 		superRegion->initializeSuperRegion(superRegionStream);
 		superRegions.emplace(superRegionName, superRegion);
 	}

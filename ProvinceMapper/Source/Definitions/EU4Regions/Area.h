@@ -1,6 +1,6 @@
 #ifndef EU4_AREA_H
 #define EU4_AREA_H
-#include "Parser.h"
+#include <Parser.h>
 #include <set>
 
 namespace EU4
