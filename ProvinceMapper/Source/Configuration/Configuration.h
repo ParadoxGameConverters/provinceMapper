@@ -43,11 +43,11 @@ class Configuration: commonItems::parser
 	[[nodiscard]] const auto& getStatusBarPos() const { return statusBarPos; }
 	[[nodiscard]] auto isStatusBarOn() const { return statusBarOn; }
 
-	void setSourceDir(const std::string& dir) { sourceDir = dir; }
-	void setTargetDir(const std::string& dir) { targetDir = dir; }
+	void setSourceDir(const std::filesystem::path& dir) { sourceDir = dir; }
+	void setTargetDir(const std::filesystem::path& dir) { targetDir = dir; }
 	void setSourceToken(const std::string& token) { sourceToken = token; }
 	void setTargetToken(const std::string& token) { targetToken = token; }
-	void setLinkFile(const std::string& file) { linkFile = file; }
+	void setLinkFile(const std::filesystem::path& file) { linkFile = file; }
 	void setSourceReversed(const bool reversed) { reverseSource = reversed; }
 	void setTargetReversed(const bool reversed) { reverseTarget = reversed; }
 	void setImageFramePos(const int x, const int y) { imageFramePos = Rect(x, y); }
