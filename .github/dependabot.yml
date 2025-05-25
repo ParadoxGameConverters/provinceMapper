@@ -6,14 +6,14 @@ updates:
     # default location of `.github/workflows`
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
 
   - package-ecosystem: "gitsubmodule"
     directory: "common_items"
     schedule:
-      interval: "daily"
+      interval: "monthly"
 
   - package-ecosystem: "gitsubmodule"
     directory: "wxWidgets"
     schedule:
-      interval: "daily"
+      interval: "monthly"
