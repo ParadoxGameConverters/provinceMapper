@@ -1,13 +1,13 @@
 #ifndef VIC3_STATE_REGION_SCRAPER
 #define VIC3_STATE_REGION_SCRAPER
-#include "Parser.h"
+#include <Parser.h>
 #include <map>
 #include <string>
 
 class Vic3StateRegionScraper: commonItems::parser
 {
   public:
-	Vic3StateRegionScraper(const std::string& fileName);
+	Vic3StateRegionScraper(const std::filesystem::path& fileName);
 
 	[[nodiscard]] const auto& getLocalizations() const { return localizations; }
 

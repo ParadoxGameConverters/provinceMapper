@@ -1,12 +1,13 @@
 #ifndef CSV_SCRAPER
 #define CSV_SCRAPER
+#include <filesystem>
 #include <map>
 #include <string>
 
 class CsvScraper
 {
   public:
-	CsvScraper(const std::string& fileName);
+	CsvScraper(const std::filesystem::path& fileName);
 
 	[[nodiscard]] const auto& getLocalizations() const { return localizations; }
 
