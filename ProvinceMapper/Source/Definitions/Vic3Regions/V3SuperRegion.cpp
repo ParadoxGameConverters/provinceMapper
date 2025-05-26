@@ -1,8 +1,8 @@
 #include "V3SuperRegion.h"
-#include "CommonFunctions.h"
-#include "CommonRegexes.h"
-#include "ParserHelpers.h"
 #include "V3Region.h"
+#include <CommonFunctions.h>
+#include <CommonRegexes.h>
+#include <ParserHelpers.h>
 
 void V3::SuperRegion::initializeSuperRegion(std::istream& theStream)
 {

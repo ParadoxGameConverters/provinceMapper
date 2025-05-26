@@ -1,6 +1,7 @@
 #ifndef DEFINITIONS_INTERFACE_H
 #define DEFINITIONS_INTERFACE_H
 #include "Localization/LocalizationMapper.h"
+#include <filesystem>
 #include <map>
 #include <memory>
 #include <optional>
@@ -17,9 +18,9 @@ class DefinitionsInterface
 	virtual void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) = 0;
 	virtual void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) = 0;
 	virtual void loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType) = 0;
-	virtual void loadVic3Regions(const std::string& folderPath) = 0;
+	virtual void loadVic3Regions(const std::filesystem::path& folderPath) = 0;
 	virtual void registerNeighbor(unsigned int provinceChroma, unsigned int neighborChroma) = 0;
-	virtual void ditchAdjacencies(const std::string& fileName) = 0;
+	virtual void ditchAdjacencies(const std::filesystem::path& fileName) = 0;
 
 	[[nodiscard]] const auto& getProvinces() const { return provinces; }
 	[[nodiscard]] virtual std::map<unsigned int, std::set<unsigned int>> getNeighborChromas() const = 0;

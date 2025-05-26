@@ -2,9 +2,9 @@
 #define LINK_MAPPING_VERSION_H
 #include "Definitions/DefinitionsInterface.h"
 #include "LinkMapping.h"
-#include "Parser.h"
 #include "TriangulationPointPair.h"
-#include "tpp_interface.hpp"
+#include <Parser.h>
+#include <tpp_interface.hpp>
 
 class LinkMappingVersion
 {

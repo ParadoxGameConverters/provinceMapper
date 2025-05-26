@@ -1,7 +1,7 @@
 #ifndef EU4_REGION_H
 #define EU4_REGION_H
 #include "Area.h"
-#include "Parser.h"
+#include <Parser.h>
 
 namespace EU4
 {

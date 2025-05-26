@@ -3,16 +3,16 @@
 #include "Frames/Images/ImageCanvas.h"
 #include "Frames/Links/LinksTab.h"
 #include "LinkMapper/LinkMappingVersion.h"
-#include "Log.h"
 #include "SearchTab.h"
+#include <Log.h>
 
 SearchFrame::SearchFrame(wxWindow* parent,
 	 const wxPoint& position,
 	 const wxSize& size,
 	 const std::shared_ptr<LinkMappingVersion>& activeVersion,
 	 std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Search by province ID or name", position, size, wxDEFAULT_FRAME_STYLE),
-	 configuration(std::move(theConfiguration)), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Search by province ID or name", position, size, wxDEFAULT_FRAME_STYLE), configuration(std::move(theConfiguration)),
+	 eventHandler(parent)
 {
 	Bind(wxEVT_SIZE, &SearchFrame::onResize, this);
 	Bind(wxEVT_CLOSE_WINDOW, &SearchFrame::onClose, this);

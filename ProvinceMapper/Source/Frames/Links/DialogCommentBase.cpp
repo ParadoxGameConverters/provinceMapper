@@ -1,5 +1,5 @@
 #include "DialogCommentBase.h"
-#include "Log.h"
+#include <Log.h>
 
 DialogCommentBase::DialogCommentBase(wxWindow* parent, const wxString& title, const std::string& theComment, const int row):
 	 wxDialog(parent, -1, title, wxDefaultPosition, wxSize(250, 170)), ID(row), eventHandler(parent)

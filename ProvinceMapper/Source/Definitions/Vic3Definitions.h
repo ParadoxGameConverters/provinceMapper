@@ -11,9 +11,9 @@ class Vic3Definitions: public DefinitionsInterface
 	void registerPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) override;
 	void registerBorderPixel(int x, int y, unsigned char r, unsigned char g, unsigned char b) override;
 	void loadLocalizations(const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType) override;
-	void loadVic3Regions(const std::string& folderPath) override;
+	void loadVic3Regions(const std::filesystem::path& folderPath) override;
 	void registerNeighbor(unsigned int provinceChroma, unsigned int neighborChroma) override;
-	void ditchAdjacencies(const std::string& fileName) override;
+	void ditchAdjacencies(const std::filesystem::path& fileName) override;
 
 	[[nodiscard]] std::optional<std::string> getNameForChroma(unsigned int chroma) override;
 	[[nodiscard]] std::optional<std::string> getMiscForChroma(unsigned int chroma) override;

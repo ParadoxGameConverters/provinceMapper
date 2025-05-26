@@ -1,11 +1,11 @@
 #include "Vic3StateRegionScraper.h"
-#include "ParserHelpers.h"
 #include "Vic3StateRegionScraping.h"
 #include <CommonRegexes.h>
+#include <ParserHelpers.h>
 
 #include "Log.h"
 
-Vic3StateRegionScraper::Vic3StateRegionScraper(const std::string& fileName)
+Vic3StateRegionScraper::Vic3StateRegionScraper(const std::filesystem::path& fileName)
 {
 	registerKeys();
 	parseFile(fileName);

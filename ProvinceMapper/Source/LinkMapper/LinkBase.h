@@ -1,5 +1,5 @@
 #pragma once
-#include "Parser.h"
+#include <Parser.h>
 
 class wxColour;
 class LinkBase

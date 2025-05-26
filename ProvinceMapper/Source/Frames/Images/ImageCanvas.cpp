@@ -3,8 +3,8 @@
 #include "Frames/Links/LinksTab.h"
 #include "Frames/Links/ProvinceMappingsGrid.h"
 #include "Frames/Links/TriangulationPairsGrid.h"
-#include "Log.h"
 #include "Provinces/Province.h"
+#include <Log.h>
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_PROVINCE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_SELECT_LINK_BY_ID, wxCommandEvent);
@@ -21,8 +21,8 @@ ImageCanvas::ImageCanvas(wxWindow* parent,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 	 wxImage* theImage,
 	 std::shared_ptr<DefinitionsInterface> theDefinitions):
-	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL),
-	 definitions(std::move(theDefinitions)), eventHandler(parent)
+	 wxScrolledCanvas(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL), definitions(std::move(theDefinitions)),
+	 eventHandler(parent)
 {
 	Bind(wxEVT_MOTION, &ImageCanvas::onMouseOver, this);
 	Bind(wxEVT_LEFT_UP, &ImageCanvas::leftUp, this);

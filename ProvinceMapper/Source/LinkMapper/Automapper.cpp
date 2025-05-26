@@ -1,10 +1,10 @@
 #include "Automapper.h"
 
-#include "Log.h"
 #include "Frames/Images/ImageFrame.h"
 #include "LinkMappingVersion.h"
 #include "Provinces/Province.h"
 #include "Triangle.h"
+#include <Log.h>
 
 #include <ranges>
 #include <wx/taskbarbutton.h>
@@ -69,8 +69,7 @@ static void increaseShare(std::map<std::string, int>& shares, const std::string&
 	}
 }
 
-inline void Automapper::determineTargetProvinceForSourcePixels(
-	 const std::shared_ptr<Province>& sourceProvince,
+inline void Automapper::determineTargetProvinceForSourcePixels(const std::shared_ptr<Province>& sourceProvince,
 	 const std::vector<Pixel>& sourcePixels,
 	 const PointToTriangleMap& srcPointToTriangleMap,
 	 const PointToProvinceMap& tgtPointToProvinceMap,
@@ -106,14 +105,13 @@ inline void Automapper::determineTargetProvinceForSourcePixels(
 		shares[tgtProvince]++;
 	}
 
-   for (const auto& [tgtProv, amount]: shares)
+	for (const auto& [tgtProv, amount]: shares)
 	{
 		registerMatch(sourceProvince, tgtProv, amount);
 	}
 }
 
-void Automapper::matchTargetProvsToSourceProvs(
-	 const std::vector<std::shared_ptr<Province>>& sourceProvinces,
+void Automapper::matchTargetProvsToSourceProvs(const std::vector<std::shared_ptr<Province>>& sourceProvinces,
 	 const PointToTriangleMap& srcPointToTriangleMap,
 	 const PointToProvinceMap& tgtPointToLandProvinceMap,
 	 const PointToProvinceMap& tgtPointToWaterProvinceMap,

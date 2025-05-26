@@ -1,12 +1,13 @@
 #ifndef YML_SCRAPER
 #define YML_SCRAPER
+#include <filesystem>
 #include <map>
 #include <string>
 
 class YmlScraper
 {
   public:
-	YmlScraper(const std::string& fileName);
+	YmlScraper(const std::filesystem::path& fileName);
 
 	[[nodiscard]] const auto& getLocalizations() const { return localizations; }
 

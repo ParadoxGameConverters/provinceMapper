@@ -3,9 +3,9 @@
 #include "ImageCanvas.h"
 #include "LinkMapper/Triangle.h"
 #include "LinkMapper/TriangulationPointPair.h"
-#include "OSCompatibilityLayer.h"
 #include "Provinces/Province.h"
 #include "StatusBar.h"
+#include <OSCompatibilityLayer.h>
 
 #include <future>
 #include <ranges>
@@ -25,8 +25,8 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 const std::shared_ptr<DefinitionsInterface>& sourceDefs,
 	 const std::shared_ptr<DefinitionsInterface>& targetDefs,
 	 std::shared_ptr<Configuration> theConfiguration):
-	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
-	 configuration(std::move(theConfiguration)), eventHandler(parent)
+	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), configuration(std::move(theConfiguration)),
+	 eventHandler(parent)
 {
 	taskBarBtn = MSWGetTaskBarButton();
 
@@ -1103,7 +1103,8 @@ void ImageFrame::autogenerateMappings()
 					tgtPointToWaterProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
 				for (const auto& pixel: tgtProvince->borderPixels)
 					tgtPointToWaterProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
-			} else
+			}
+			else
 			{
 				for (const auto& pixel: tgtProvince->innerPixels)
 					tgtPointToLandProvinceMap[wxPoint(pixel.x, pixel.y)] = tgtProvince;
@@ -1130,12 +1131,12 @@ void ImageFrame::autogenerateMappings()
 		sourceProvinces.push_back(sourceProvince);
 
 	automapper.matchTargetProvsToSourceProvs(sourceProvinces,
-		srcPointToTriangleMap,
-		tgtPointToLandProvinceMap,
-		tgtPointToWaterProvinceMap,
-		excludedTgtProvinceIDs,
-		targetMapWidth,
-		targetMapHeight);
+		 srcPointToTriangleMap,
+		 tgtPointToLandProvinceMap,
+		 tgtPointToWaterProvinceMap,
+		 excludedTgtProvinceIDs,
+		 targetMapWidth,
+		 targetMapHeight);
 
 	Log(LogLevel::Debug) << "Determined point matches for all provinces.";
 	if (taskBarBtn)

@@ -1,6 +1,6 @@
 #include "Region.h"
-#include "CommonRegexes.h"
-#include "ParserHelpers.h"
+#include <CommonRegexes.h>
+#include <ParserHelpers.h>
 #include <ranges>
 
 EU4::Region::Region(std::istream& theStream)
