@@ -1,6 +1,7 @@
 #include "MainFrame.h"
 #include "CommonFunctions.h"
 #include "Definitions/Definitions.h"
+#include "Definitions/EU5Definitions.h"
 #include "Definitions/Vic3Definitions.h"
 #include "Images/ImageCanvas.h"
 #include "Images/ImageFrame.h"
@@ -309,6 +310,13 @@ void MainFrame::initImageFrame()
 		sourceDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
 	}
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "definitions.txt"))
+	{
+		auto definitions = std::make_shared<EU5Definitions>();
+		definitions->loadDefinitions(*configuration->getSourceDir(), localizationMapper, LocalizationMapper::LocType::SOURCE);
+		sourceDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
+	}
 	else
 	{
 		sourceDefs = std::make_shared<Vic3Definitions>();
@@ -322,6 +330,13 @@ void MainFrame::initImageFrame()
 		auto definitions = std::make_shared<Definitions>();
 		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
 		targetDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
+	}
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "definitions.txt"))
+	{
+		auto definitions = std::make_shared<EU5Definitions>();
+		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
+		sourceDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 	}
 	else
@@ -340,6 +355,8 @@ void MainFrame::initImageFrame()
 		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.bmp"))
 		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "locations.png"))
+		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/locations.png");
 	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.png"))
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.bmp"))
@@ -351,6 +368,8 @@ void MainFrame::initImageFrame()
 		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.bmp"))
 		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "locations.png"))
+		targetImg->LoadFile(configuration->getTargetDir()->string() + "/locations.png");
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.png"))
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.bmp"))
@@ -465,7 +484,8 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 	// source path
 	if (evt.GetId() == 0)
 	{
-		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png")))
+		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png") ||
+									commonItems::DoesFileExist(result / "locations.png")))
 		{
 			sourceDirStatus->SetBackgroundColour(green);
 			sanity[0] = true;
@@ -480,7 +500,8 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 	// target path
 	else if (evt.GetId() == 1)
 	{
-		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png")))
+		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png") ||
+									commonItems::DoesFileExist(result / "locations.png")))
 		{
 			targetDirStatus->SetBackgroundColour(green);
 			sanity[1] = true;

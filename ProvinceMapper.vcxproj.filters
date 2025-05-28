@@ -52,6 +52,9 @@
     <Filter Include="ProvinceMapper\Definitions\Vic3Regions">
       <UniqueIdentifier>{b892f8a5-fac3-452c-9543-d7e7240a6026}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ProvinceMapper\Definitions\EU5Regions">
+      <UniqueIdentifier>{ef028f55-f639-4a9b-a126-5aacd0000724}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commonItems\ParserHelpers.cpp">
@@ -198,6 +201,27 @@
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Automapper.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Search\SearchFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Search\SearchTab.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Definitions.cpp">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5RegionManager.cpp">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Area.cpp">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Continent.cpp">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Province.cpp">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Region.cpp">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClCompile>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5SuperRegion.cpp">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commonItems\ParserHelpers.h">
@@ -339,6 +363,27 @@
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\Automapper.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchTab.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Definitions.h">
+      <Filter>ProvinceMapper\Definitions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5RegionManager.h">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Area.h">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Continent.h">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Province.h">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Region.h">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClInclude>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5SuperRegion.h">
+      <Filter>ProvinceMapper\Definitions\EU5Regions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="ProvinceMapper\Resources\converter.ico">

@@ -13,16 +13,20 @@ class Province final
 
 	[[nodiscard]] std::string bespokeName() const;
 	[[nodiscard]] std::string miscName() const;
+	[[nodiscard]] const std::optional<std::string>& getProvinceName() const { return provinceName; }
 	[[nodiscard]] const std::optional<std::string>& getAreaName() const { return areaName; }
 	[[nodiscard]] const std::optional<std::string>& getRegionName() const { return regionName; }
 	[[nodiscard]] const std::optional<std::string>& getSuperRegionName() const { return superRegionName; }
+	[[nodiscard]] const std::optional<std::string>& getContinentName() const { return continentName; }
 	[[nodiscard]] const std::set<std::string>& getProvinceTypes() const { return provinceTypes; }
 	[[nodiscard]] bool isWater() const;
 	[[nodiscard]] bool isImpassable() const;
 
+	void setProvinceName(std::string name);
 	void setAreaName(std::string name);
 	void setRegionName(std::string name);
 	void setSuperRegionName(std::string name);
+	void setContinentName(std::string name);
 	void addProvinceType(std::string name);
 
 	bool operator==(const Province& rhs) const;
@@ -40,9 +44,11 @@ class Province final
 	std::vector<Pixel> borderPixels;
 
   private:
+	std::optional<std::string> provinceName; // in case this "province" is actually a /location/
 	std::optional<std::string> areaName;
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
+	std::optional<std::string> continentName; 
 	std::set<std::string> provinceTypes;
 };
 

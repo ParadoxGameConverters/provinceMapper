@@ -17,14 +17,31 @@ void LocalizationMapper::scrapeSourceDir(const std::filesystem::path& dirPath)
 	}
 
 	if (commonItems::DoesFolderExist(dirPath / "../localisation")) // ck2, eu4, vic2
+	{
 		actualPath = dirPath / "../localisation";
+		Log(LogLevel::Info) << "Priming for Ck2/EU4/Vic2 Source Locs.";
+	}
 	else if (commonItems::DoesFolderExist(dirPath / "../localization/english")) // ck3, imp, vic3
+	{
 		actualPath = dirPath / "../localization/english";
+		Log(LogLevel::Info) << "Priming for CK3/Imp/Vic3 Source Locs.";
+	}
+	else if (commonItems::DoesFolderExist(dirPath / "../../main_menu/localization/english")) // eu5
+	{
+		actualPath = dirPath / "../../main_menu/localization/english";
+		Log(LogLevel::Info) << "Priming for EU5 Source Locs.";
+	}
 	else if (actualPath.empty())
+	{
+		Log(LogLevel::Warning) << "No source locs found!";
 		return;
+	}
 
 	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
+	{
+		Log(LogLevel::Debug) << "into file :::::::::: " << (actualPath / fileName).string();
 		scrapeFile(actualPath / fileName, LocType::SOURCE);
+	}
 }
 
 void LocalizationMapper::scrapeTargetDir(const std::filesystem::path& dirPath)
@@ -39,11 +56,25 @@ void LocalizationMapper::scrapeTargetDir(const std::filesystem::path& dirPath)
 	}
 
 	if (commonItems::DoesFolderExist(dirPath / "../localisation")) // ck2, eu4, vic2
+	{
 		actualPath = dirPath / "../localisation";
+		Log(LogLevel::Info) << "Priming for Ck2/EU4/Vic2 Target Locs.";
+	}
 	else if (commonItems::DoesFolderExist(dirPath / "../localization/english")) // ck3, imp, vic3
+	{
 		actualPath = dirPath / "../localization/english";
+		Log(LogLevel::Info) << "Priming for CK3/Imp/Vic3 Target Locs.";
+	}
+	else if (commonItems::DoesFolderExist(dirPath / "../../main_menu/localization/english")) // eu5
+	{
+		actualPath = dirPath / "../../main_menu/localization/english";
+		Log(LogLevel::Warning) << "No target locs found!";
+	}
 	else if (actualPath.empty())
+	{
+
 		return;
+	}
 
 	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
 		scrapeFile(actualPath / fileName, LocType::TARGET);

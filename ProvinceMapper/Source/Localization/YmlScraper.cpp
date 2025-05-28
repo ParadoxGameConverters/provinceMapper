@@ -10,7 +10,7 @@ YmlScraper::YmlScraper(const std::filesystem::path& fileName)
 	fileStream.close();
 }
 
-void YmlScraper::scrapeStream(std::istream& theStream)
+void YmlScraper::scrapeStream(std::istream& theStream, bool degrade = false)
 {
 	std::string line;
 	getline(theStream, line); // This is header line.
@@ -34,8 +34,13 @@ void YmlScraper::scrapeStream(std::istream& theStream)
 			continue;
 		auto value = newLine.substr(quoteLoc + 1, quote2Loc - quoteLoc - 1);
 
-		// we're degrading to 1252 because we usually have mix of mapdatanames, and old 1252 locs, all of which are shady.
-		value = commonItems::convertUTF8ToWin1252(value);
+		if (degrade)
+		{
+			// we're degrading to 1252 because we usually have mix of mapdatanames, and old 1252 locs, all of which are shady.
+			value = commonItems::convertUTF8ToWin1252(value);
+		}
+
 		localizations[key] = value;
+		Log(LogLevel::Debug) << " -- " << key << "  :   " << value;
 	}
 }

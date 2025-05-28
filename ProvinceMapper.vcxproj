@@ -7,6 +7,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Definitions.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Area.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Continent.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Province.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Region.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5RegionManager.cpp" />
+    <ClCompile Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5SuperRegion.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Search\SearchFrame.cpp" />
     <ClCompile Include="ProvinceMapper\Source\Frames\Search\SearchTab.cpp" />
     <ClCompile Include="ProvinceMapper\Source\LinkMapper\Automapper.cpp" />
@@ -65,6 +72,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Definitions.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Area.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Continent.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Province.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5Region.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5RegionManager.h" />
+    <ClInclude Include="ProvinceMapper\Source\Definitions\EU5Regions\EU5SuperRegion.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchFrame.h" />
     <ClInclude Include="ProvinceMapper\Source\Frames\Search\SearchTab.h" />
     <ClInclude Include="ProvinceMapper\Source\LinkMapper\Automapper.h" />

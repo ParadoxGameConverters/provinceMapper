@@ -1,13 +1,17 @@
 #include "Province.h"
+#include <Configuration/Configuration.h>
 #include <algorithm>
 #include <numeric>
-#include <Configuration/Configuration.h>
 
 Province::Province(std::string theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
 	 ID(std::move(theID)), r(tr), g(tg), b(tb), mapDataName(std::move(theName))
 {
 }
 
+void Province::setProvinceName(std::string name)
+{
+	provinceName = std::move(name);
+}
 
 void Province::setAreaName(std::string name)
 {
@@ -22,6 +26,11 @@ void Province::setRegionName(std::string name)
 void Province::setSuperRegionName(std::string name)
 {
 	superRegionName = std::move(name);
+}
+
+void Province::setContinentName(std::string name)
+{
+	continentName = std::move(name);
 }
 
 void Province::addProvinceType(std::string name)
@@ -72,25 +81,25 @@ std::string Province::miscName() const
 	name = "\nTypes: ";
 	if (!provinceTypes.empty())
 	{
-		name += std::accumulate(
-			 ++provinceTypes.begin(),
-			 provinceTypes.end(),
-			 *provinceTypes.begin(), 
-			 [](const std::string& a, const std::string& b) {
-				 return a + ", " + b;
-			 });
+		name += std::accumulate(++provinceTypes.begin(), provinceTypes.end(), *provinceTypes.begin(), [](const std::string& a, const std::string& b) {
+			return a + ", " + b;
+		});
 	}
 	else
 	{
 		name += "normal";
 	}
 
+	if (provinceName)
+		name += "\nProvince: " + *provinceName;
 	if (areaName)
 		name += "\nArea: " + *areaName;
 	if (regionName)
 		name += "\nRegion: " + *regionName;
 	if (superRegionName)
 		name += "\nSuperRegion: " + *superRegionName;
+	if (continentName)
+		name += "\nContinent: " + *continentName;
 	return name;
 }
 
@@ -111,7 +120,8 @@ bool Province::isWater() const
 	}
 
 	// For games like I:R and CK3, province type is defined and can be used.
-	return provinceTypes.contains("sea_zones") || provinceTypes.contains("river_provinces") || provinceTypes.contains("lakes") || provinceTypes.contains("impassable_seas");
+	return provinceTypes.contains("sea_zones") || provinceTypes.contains("river_provinces") || provinceTypes.contains("lakes") ||
+			 provinceTypes.contains("impassable_seas");
 }
 
 bool Province::isImpassable() const
