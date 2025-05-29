@@ -28,7 +28,7 @@ class wxFileDirPickerEvent;
 enum class ImageTabSelector;
 class ImageFrame;
 class LinksFrame;
-class MainFrame final : public wxFrame
+class MainFrame final: public wxFrame
 {
   public:
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
@@ -111,6 +111,8 @@ class MainFrame final : public wxFrame
 	wxWindow* linkFileStatus = nullptr;
 	wxWindow* sourceTokenStatus = nullptr;
 	wxWindow* targetTokenStatus = nullptr;
+
+	wxCheckBox* ditchCheck = nullptr;
 
 	wxButton* startButton = nullptr;
 

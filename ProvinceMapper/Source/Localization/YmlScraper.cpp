@@ -10,7 +10,7 @@ YmlScraper::YmlScraper(const std::filesystem::path& fileName)
 	fileStream.close();
 }
 
-void YmlScraper::scrapeStream(std::istream& theStream, bool degrade = false)
+void YmlScraper::scrapeStream(std::istream& theStream)
 {
 	std::string line;
 	getline(theStream, line); // This is header line.
@@ -26,7 +26,12 @@ void YmlScraper::scrapeStream(std::istream& theStream, bool degrade = false)
 		const auto sepLoc = line.find(':');
 		if (sepLoc == std::string::npos)
 			continue;
-		const auto key = line.substr(1, sepLoc - 1);
+
+		// first character (whitespace) may or may not be present due to bugs.
+		const std::string delims(" \t");
+		auto keyStart = line.find_first_not_of(delims); // We're ok not testing as we know there's a : somewhere in there.
+		const std::string key = line.substr(keyStart, sepLoc - keyStart);
+
 		const auto newLine = line.substr(sepLoc + 1, line.length());
 		const auto quoteLoc = newLine.find('\"');
 		const auto quote2Loc = newLine.find('\"', quoteLoc + 1);
@@ -34,13 +39,10 @@ void YmlScraper::scrapeStream(std::istream& theStream, bool degrade = false)
 			continue;
 		auto value = newLine.substr(quoteLoc + 1, quote2Loc - quoteLoc - 1);
 
-		if (degrade)
-		{
-			// we're degrading to 1252 because we usually have mix of mapdatanames, and old 1252 locs, all of which are shady.
-			value = commonItems::convertUTF8ToWin1252(value);
-		}
+		// we're degrading to 1252 because we usually have mix of mapdatanames, and old 1252 locs, all of which are shady.
+		// There is no downside degrading pure UTF8 sources like EU5, more ascii-like the better.
+		value = commonItems::convertUTF8ToWin1252(value);
 
 		localizations[key] = value;
-		Log(LogLevel::Debug) << " -- " << key << "  :   " << value;
 	}
 }

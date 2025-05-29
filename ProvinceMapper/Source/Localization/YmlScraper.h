@@ -12,7 +12,7 @@ class YmlScraper
 	[[nodiscard]] const auto& getLocalizations() const { return localizations; }
 
   private:
-	void scrapeStream(std::istream& theStream, bool degrade = false);
+	void scrapeStream(std::istream& theStream);
 
 	std::map<std::string, std::string> localizations;
 };

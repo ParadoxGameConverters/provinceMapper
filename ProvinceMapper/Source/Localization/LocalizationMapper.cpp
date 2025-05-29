@@ -38,10 +38,7 @@ void LocalizationMapper::scrapeSourceDir(const std::filesystem::path& dirPath)
 	}
 
 	for (const auto& fileName: commonItems::GetAllFilesInFolderRecursive(actualPath))
-	{
-		Log(LogLevel::Debug) << "into file :::::::::: " << (actualPath / fileName).string();
 		scrapeFile(actualPath / fileName, LocType::SOURCE);
-	}
 }
 
 void LocalizationMapper::scrapeTargetDir(const std::filesystem::path& dirPath)

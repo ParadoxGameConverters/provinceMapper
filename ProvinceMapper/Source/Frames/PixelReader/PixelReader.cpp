@@ -13,7 +13,7 @@ void* PixelReader::Entry()
 			// border or regular pixel?
 			if (!isSameColorAtCoords(x, y, x - 1, y))
 			{
-				if (x > 0)
+				if (ditchAdjacencies && x > 0)
 				{
 					const auto borderOffs = coordsToOffset(x - 1, y, image->GetSize().GetX());
 					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
@@ -23,7 +23,7 @@ void* PixelReader::Entry()
 			}
 			if (!isSameColorAtCoords(x, y, x + 1, y))
 			{
-				if (x < image->GetSize().GetX() - 1)
+				if (ditchAdjacencies && x < image->GetSize().GetX() - 1)
 				{
 					const auto borderOffs = coordsToOffset(x + 1, y, image->GetSize().GetX());
 					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
@@ -33,7 +33,7 @@ void* PixelReader::Entry()
 			}
 			if (!isSameColorAtCoords(x, y, x, y - 1))
 			{
-				if (y > 0)
+				if (ditchAdjacencies && y > 0)
 				{
 					const auto borderOffs = coordsToOffset(x, y - 1, image->GetSize().GetX());
 					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),
@@ -43,7 +43,7 @@ void* PixelReader::Entry()
 			}
 			if (!isSameColorAtCoords(x, y, x, y + 1))
 			{
-				if (y < image->GetSize().GetY() - 1)
+				if (ditchAdjacencies && y < image->GetSize().GetY() - 1)
 				{
 					const auto borderOffs = coordsToOffset(x, y + 1, image->GetSize().GetX());
 					definitions->registerNeighbor(pixelPack(rgb[offs], rgb[offs + 1], rgb[offs + 2]),

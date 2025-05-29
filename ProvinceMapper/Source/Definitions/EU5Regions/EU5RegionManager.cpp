@@ -14,15 +14,11 @@ void EU5::EU5RegionManager::loadContinents(const std::filesystem::path& EU5Path)
 
 	auto definitionFile = EU5Path / "definitions.txt";
 
-	std::ifstream defsStream(definitionFile);
-	if (!defsStream.is_open())
-		throw std::runtime_error("Could not open definitions.txt!");
 	registerKeys();
-	parseStream(defsStream);
+	parseFile(definitionFile);
 	clearRegisteredKeywords();
-	defsStream.close();
 
-	Log(LogLevel::Info) << "EU4 Region manager : " << continents.size() << " continents.";
+	Log(LogLevel::Info) << "EU5 Region manager : " << continents.size() << " continents.";
 }
 
 void EU5::EU5RegionManager::registerKeys()

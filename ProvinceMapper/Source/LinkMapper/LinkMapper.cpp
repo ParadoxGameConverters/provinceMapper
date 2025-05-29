@@ -17,7 +17,8 @@ void LinkMapper::loadMappings(const std::filesystem::path& linksFile,
 	targetToken = std::move(theTargetToken);
 
 	registerKeys();
-	parseFile(linksFile);
+	if (!linksFile.empty())
+		parseFile(linksFile);
 	clearRegisteredKeywords();
 	if (versions.empty())
 	{

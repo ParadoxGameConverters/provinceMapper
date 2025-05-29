@@ -140,10 +140,22 @@ void MainFrame::initFrame()
 	linkFilePicker->Bind(wxEVT_FILEPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	linkFileStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
+	// Ditch adjacencies check
+	ditchCheck = new wxCheckBox(holderPanel, 0, "Ditch Adjacencies?", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE, wxDefaultValidator);
+	if (configuration->isDitchAdjacencies())
+		ditchCheck->SetValue(true);
+	ditchCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (ditchCheck->GetValue())
+			configuration->setDitchAdjacencies(true);
+		else
+			configuration->setDitchAdjacencies(false);
+		configuration->save();
+	});
+
 	sizer->Add(linkFileText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->Add(linkFilePicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->Add(linkFileStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
-	sizer->AddStretchSpacer(0);
+	sizer->Add(ditchCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 
 	// Source Token
 	auto* sourceTokenText = new wxStaticText(holderPanel, wxID_ANY, "Source Token", wxDefaultPosition);
@@ -384,11 +396,11 @@ void MainFrame::initImageFrame()
 
 	// Multithreading where it counts!
 	auto* const pixelReader = new PixelReader(this);
-	pixelReader->prepare(sourceImg, sourceDefs);
+	pixelReader->prepare(sourceImg, sourceDefs, configuration->isDitchAdjacencies());
 	pixelReader->Create();
 	pixelReader->Run();
 	auto* const pixelReader2 = new PixelReader(this);
-	pixelReader2->prepare(targetImg, targetDefs);
+	pixelReader2->prepare(targetImg, targetDefs, configuration->isDitchAdjacencies());
 	pixelReader2->Create();
 	pixelReader2->Run();
 
@@ -400,8 +412,15 @@ void MainFrame::initImageFrame()
 	else if (vic3SideloadStates == LocalizationMapper::LocType::TARGET)
 		targetDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::TARGET);
 
-	sourceDefs->ditchAdjacencies("source_adjacencies.txt");
-	targetDefs->ditchAdjacencies("target_adjacencies.txt");
+	if (configuration->isDitchAdjacencies())
+	{
+		sourceDefs->ditchAdjacencies("source_adjacencies.txt");
+		targetDefs->ditchAdjacencies("target_adjacencies.txt");
+	}
+	else
+	{
+		Log(LogLevel::Info) << "Not ditching adjacencies.";
+	}
 
 	linkMapper.loadMappings(linksFile, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();

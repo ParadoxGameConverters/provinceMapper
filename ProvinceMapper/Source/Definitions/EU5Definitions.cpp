@@ -83,7 +83,6 @@ void EU5Definitions::filloutProvinceDetails(const LocalizationMapper& localizati
 			auto locName = localizationMapper.getLocForSourceKey(provinceName);
 			if (locName && !locName->empty())
 			{
-				Log(LogLevel::Debug) << "for sourcename for " << provinceName << " : " << *locName;
 				province->locName = *locName;
 			}
 		}
