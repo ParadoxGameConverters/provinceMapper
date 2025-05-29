@@ -1,7 +1,7 @@
 #include "Vic3Definitions.h"
-#include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
 #include "Provinces/Province.h"
+#include <OSCompatibilityLayer.h>
 #include <fstream>
 #include <iomanip>
 
@@ -278,7 +278,7 @@ void Vic3Definitions::loadLocalizations(const LocalizationMapper& localizationMa
 	}
 }
 
-void Vic3Definitions::loadVic3Regions(const std::string& folderPath)
+void Vic3Definitions::loadVic3Regions(const std::filesystem::path& folderPath)
 {
 	vic3regions.loadSuperRegions(folderPath);
 }
@@ -295,7 +295,7 @@ std::map<unsigned int, std::set<unsigned int>> Vic3Definitions::getNeighborChrom
 	return neighborChromas;
 }
 
-void Vic3Definitions::ditchAdjacencies(const std::string& fileName)
+void Vic3Definitions::ditchAdjacencies(const std::filesystem::path& fileName)
 {
 	std::map<std::string, std::set<std::string>> adjacencies;
 	for (const auto& [sourceChroma, targetChromas]: neighborChromas)

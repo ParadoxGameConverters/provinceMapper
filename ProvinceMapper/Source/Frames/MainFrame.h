@@ -120,7 +120,9 @@ class MainFrame final : public wxFrame
 	std::shared_ptr<Configuration> configuration;
 	LocalizationMapper localizationMapper;
 
-	std::string linksFileString;
+	std::filesystem::path linksFile;
+	// For some checks we want the file contents
+	std::string linksFileContents;
 
 	// source/target pickers, links, source/target tokens
 	std::array<bool, 5> sanity = {false, false, false, false, false};

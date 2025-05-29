@@ -1,6 +1,6 @@
 #include "V3Region.h"
-#include "CommonRegexes.h"
-#include "ParserHelpers.h"
+#include <CommonRegexes.h>
+#include <ParserHelpers.h>
 
 void V3::Region::initializeRegion(std::istream& theStream)
 {

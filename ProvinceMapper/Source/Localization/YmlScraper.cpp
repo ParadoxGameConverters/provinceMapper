@@ -1,8 +1,8 @@
 #include "YmlScraper.h"
-#include "OSCompatibilityLayer.h"
+#include <OSCompatibilityLayer.h>
 #include <fstream>
 
-YmlScraper::YmlScraper(const std::string& fileName)
+YmlScraper::YmlScraper(const std::filesystem::path& fileName)
 {
 	std::ifstream fileStream(fileName);
 	if (fileStream.is_open())

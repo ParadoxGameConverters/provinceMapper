@@ -1,7 +1,7 @@
 #include "Definitions.h"
-#include "OSCompatibilityLayer.h"
 #include "Provinces/Pixel.h"
 #include "Provinces/Province.h"
+#include <OSCompatibilityLayer.h>
 #include <ParserHelpers.h>
 #include <algorithm>
 #include <filesystem>
@@ -64,15 +64,15 @@ std::optional<std::tuple<std::string, unsigned char, unsigned char, unsigned cha
 } // namespace
 
 
-void Definitions::loadDefinitions(const std::string& mapDataPath, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
+void Definitions::loadDefinitions(const fs::path& mapDataPath, const LocalizationMapper& localizationMapper, LocalizationMapper::LocType locType)
 {
-	if (!commonItems::DoesFileExist(mapDataPath + "/definition.csv"))
+	if (!commonItems::DoesFileExist(mapDataPath / "definition.csv"))
 		throw std::runtime_error("Definitions file cannot be found!");
 
-	if (commonItems::DoesFileExist(mapDataPath + "/area.txt"))
+	if (commonItems::DoesFileExist(mapDataPath / "area.txt"))
 		eu4RegionManager.loadRegions(mapDataPath);
 
-	std::ifstream definitionsFile(mapDataPath + "/definition.csv");
+	std::ifstream definitionsFile(mapDataPath / "definition.csv");
 	parseStream(definitionsFile, localizationMapper, locType);
 	definitionsFile.close();
 
@@ -253,7 +253,7 @@ std::map<unsigned int, std::set<unsigned int>> Definitions::getNeighborChromas()
 	return neighborChromas;
 }
 
-void Definitions::ditchAdjacencies(const std::string& fileName)
+void Definitions::ditchAdjacencies(const fs::path& fileName)
 {
 	std::map<std::string, std::set<std::string>> adjacencies;
 	for (const auto& [sourceChroma, targetChromas]: neighborChromas)
@@ -289,11 +289,10 @@ std::string tolower(std::string str)
 	return str;
 }
 
-void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
+void Definitions::tryToLoadProvinceTypes(const fs::path& mapDataPath)
 {
-	fs::path filePath = fs::path(mapDataPath) / fs::path("default.map");
-	auto filePathStr = filePath.string();
-	if (!commonItems::DoesFileExist(filePathStr))
+	const fs::path filePath = mapDataPath / "default.map";
+	if (!commonItems::DoesFileExist(filePath))
 	{
 		return;
 	}
@@ -351,5 +350,5 @@ void Definitions::tryToLoadProvinceTypes(const std::string& mapDataPath)
 		}
 	});
 	parser.IgnoreAndLogUnregisteredItems();
-	parser.parseFile(filePathStr);
+	parser.parseFile(filePath);
 }

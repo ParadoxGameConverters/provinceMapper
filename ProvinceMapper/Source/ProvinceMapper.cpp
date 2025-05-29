@@ -1,7 +1,7 @@
 #include "ProvinceMapper.h"
 
 #include "Frames/MainFrame.h"
-#include "Log.h"
+#include <Log.h>
 
 wxIMPLEMENT_APP(ProvinceMapper);
 

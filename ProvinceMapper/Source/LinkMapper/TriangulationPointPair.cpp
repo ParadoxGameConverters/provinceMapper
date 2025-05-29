@@ -1,9 +1,9 @@
 #include "TriangulationPointPair.h"
-#include "CommonRegexes.h"
-#include "Log.h"
-#include "Parser.h"
-#include "ParserHelpers.h"
 #include "Provinces/Province.h"
+#include <CommonRegexes.h>
+#include <Log.h>
+#include <Parser.h>
+#include <ParserHelpers.h>
 
 TriangulationPointPair::TriangulationPointPair(std::istream& theStream, const int theID): LinkBase(theID)
 {

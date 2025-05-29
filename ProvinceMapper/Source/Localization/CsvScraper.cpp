@@ -1,7 +1,7 @@
 #include "CsvScraper.h"
 #include <fstream>
 
-CsvScraper::CsvScraper(const std::string& fileName)
+CsvScraper::CsvScraper(const std::filesystem::path& fileName)
 {
 	std::ifstream theFile(fileName);
 	if (theFile.is_open())

@@ -1,7 +1,7 @@
 #include "Vic3StateRegionScraping.h"
-#include "CommonRegexes.h"
-#include "ParserHelpers.h"
-#include "StringUtils.h"
+#include <CommonRegexes.h>
+#include <ParserHelpers.h>
+#include <StringUtils.h>
 
 namespace
 {

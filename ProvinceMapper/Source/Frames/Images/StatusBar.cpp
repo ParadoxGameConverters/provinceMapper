@@ -1,15 +1,14 @@
 #include "StatusBar.h"
 #include "Configuration/Configuration.h"
 #include "ImageCanvas.h"
-#include "Log.h"
+#include <Log.h>
 
 wxDEFINE_EVENT(wxEVT_TOGGLE_TRIANGULATE, wxCommandEvent);
 wxDEFINE_EVENT(wxEVT_LOCK, wxCommandEvent);
 
 StatusBar::StatusBar(wxWindow* parent, const wxPoint& position, std::shared_ptr<Configuration> theConfiguration):
 	 wxFrame(parent, wxID_ANY, "Image Toolbar", position, wxSize(410, 100), wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxSTAY_ON_TOP),
-	 configuration(std::move(theConfiguration)),
-	 eventHandler(parent)
+	 configuration(std::move(theConfiguration)), eventHandler(parent)
 {
 	Bind(wxEVT_CLOSE_WINDOW, &StatusBar::onClose, this);
 	Bind(wxEVT_MOVE, &StatusBar::onMove, this);

@@ -1,7 +1,7 @@
 #include "TriangulationPairsGrid.h"
 
 #include "LinkMapper/LinkMappingVersion.h"
-#include "Log.h"
+#include <Log.h>
 #include "Provinces/Province.h"
 #include "TriangulationPairDialogComment.h"
 #include <utility>

@@ -1,16 +1,16 @@
 #ifndef EU4_REGIONMANAGER_H
 #define EU4_REGIONMANAGER_H
 #include "Area.h"
-#include "Parser.h"
 #include "Region.h"
 #include "SuperRegion.h"
+#include <Parser.h>
 
 namespace EU4
 {
 class RegionManager: commonItems::parser
 {
   public:
-	void loadRegions(const std::string& EU4Path);
+	void loadRegions(const std::filesystem::path& EU4Path);
 
 	[[nodiscard]] std::optional<std::string> getParentAreaName(const std::string& provinceID) const;
 	[[nodiscard]] std::optional<std::string> getParentRegionName(const std::string& provinceID) const;

@@ -3,9 +3,9 @@
 #include "ImageCanvas.h"
 #include "LinkMapper/Triangle.h"
 #include "LinkMapper/TriangulationPointPair.h"
-#include "OSCompatibilityLayer.h"
 #include "Provinces/Province.h"
 #include "StatusBar.h"
+#include <OSCompatibilityLayer.h>
 
 #include <future>
 #include <ranges>
