@@ -51,7 +51,6 @@ class ImageFrame final: public wxFrame
 	void onClose(const wxCloseEvent& event);
 	void onRefresh(const wxCommandEvent& event);
 	void onTriangulate(wxCommandEvent& event);
-	void onPointPlaced(const wxCommandEvent& event);
 	void triangulateAtPoint(const wxCommandEvent& event);
 	void onResize(wxSizeEvent& event);
 	void onMove(wxMoveEvent& event);
@@ -75,11 +74,9 @@ class ImageFrame final: public wxFrame
 	PointToProvinceMap tgtPointToWaterProvinceMap;
 
 	void determineTriangulationSanity();
-	void buildBounds();
-	wxRect sourceRect;
-	wxRect targetRect;
 	std::optional<wxPoint> sourcePointer;
 	std::optional<wxPoint> targetPointer;
+	std::shared_ptr<Triangle> manualTriangulationTriangle;
 
 	ImageCanvas* sourceCanvas = nullptr;
 	ImageCanvas* targetCanvas = nullptr;
