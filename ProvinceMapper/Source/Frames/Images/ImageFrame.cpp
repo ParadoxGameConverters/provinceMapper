@@ -75,6 +75,9 @@ ImageFrame::ImageFrame(wxWindow* parent,
 		statusBar->Show();
 
 	delaunayTriangulate();
+
+   auto dummyevt = wxCommandEvent();
+   onToggleBlack(dummyevt);
 }
 
 void ImageFrame::onScrollPaint(wxPaintEvent& event)
