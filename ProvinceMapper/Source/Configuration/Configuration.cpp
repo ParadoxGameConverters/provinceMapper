@@ -27,6 +27,9 @@ void Configuration::registerKeys()
 	registerKeyword("reverseTarget", [this](std::istream& theStream) {
 		reverseTarget = commonItems::getString(theStream) == "true";
 	});
+	registerKeyword("ditchAdjacencies", [this](std::istream& theStream) {
+		ditchAdjacencies = commonItems::getString(theStream) == "true";
+	});
 	registerKeyword("imageFramePos", [this](std::istream& theStream) {
 		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
@@ -106,6 +109,8 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "targetDir = \"" << configuration.targetDir->string() << "\"\n";
 	if (configuration.reverseTarget)
 		output << "reverseTarget = true\n";
+	if (configuration.ditchAdjacencies)
+		output << "ditchAdjacencies = true\n";
 	if (configuration.sourceToken)
 		output << "sourceToken = \"" << *configuration.sourceToken << "\"\n";
 	if (configuration.targetToken)

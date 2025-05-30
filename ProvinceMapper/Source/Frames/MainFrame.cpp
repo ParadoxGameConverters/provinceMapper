@@ -1,6 +1,7 @@
 #include "MainFrame.h"
 #include "CommonFunctions.h"
 #include "Definitions/Definitions.h"
+#include "Definitions/EU5Definitions.h"
 #include "Definitions/Vic3Definitions.h"
 #include "Images/ImageCanvas.h"
 #include "Images/ImageFrame.h"
@@ -139,10 +140,22 @@ void MainFrame::initFrame()
 	linkFilePicker->Bind(wxEVT_FILEPICKER_CHANGED, &MainFrame::onPathChanged, this);
 	linkFileStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
+	// Ditch adjacencies check
+	ditchCheck = new wxCheckBox(holderPanel, 0, "Ditch Adjacencies?", wxDefaultPosition, wxDefaultSize, wxCHK_2STATE, wxDefaultValidator);
+	if (configuration->isDitchAdjacencies())
+		ditchCheck->SetValue(true);
+	ditchCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (ditchCheck->GetValue())
+			configuration->setDitchAdjacencies(true);
+		else
+			configuration->setDitchAdjacencies(false);
+		configuration->save();
+	});
+
 	sizer->Add(linkFileText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->Add(linkFilePicker, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->Add(linkFileStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
-	sizer->AddStretchSpacer(0);
+	sizer->Add(ditchCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 
 	// Source Token
 	auto* sourceTokenText = new wxStaticText(holderPanel, wxID_ANY, "Source Token", wxDefaultPosition);
@@ -309,6 +322,13 @@ void MainFrame::initImageFrame()
 		sourceDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
 	}
+	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "definitions.txt"))
+	{
+		auto definitions = std::make_shared<EU5Definitions>();
+		definitions->loadDefinitions(*configuration->getSourceDir(), localizationMapper, LocalizationMapper::LocType::SOURCE);
+		sourceDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
+	}
 	else
 	{
 		sourceDefs = std::make_shared<Vic3Definitions>();
@@ -322,6 +342,13 @@ void MainFrame::initImageFrame()
 		auto definitions = std::make_shared<Definitions>();
 		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
 		targetDefs = definitions;
+		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
+	}
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "definitions.txt"))
+	{
+		auto definitions = std::make_shared<EU5Definitions>();
+		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
+		sourceDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 	}
 	else
@@ -340,6 +367,8 @@ void MainFrame::initImageFrame()
 		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.bmp"))
 		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "locations.png"))
+		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/locations.png");
 	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.png"))
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.bmp"))
@@ -351,6 +380,8 @@ void MainFrame::initImageFrame()
 		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.bmp"))
 		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.bmp");
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "locations.png"))
+		targetImg->LoadFile(configuration->getTargetDir()->string() + "/locations.png");
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.png"))
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.bmp"))
@@ -365,11 +396,11 @@ void MainFrame::initImageFrame()
 
 	// Multithreading where it counts!
 	auto* const pixelReader = new PixelReader(this);
-	pixelReader->prepare(sourceImg, sourceDefs);
+	pixelReader->prepare(sourceImg, sourceDefs, configuration->isDitchAdjacencies());
 	pixelReader->Create();
 	pixelReader->Run();
 	auto* const pixelReader2 = new PixelReader(this);
-	pixelReader2->prepare(targetImg, targetDefs);
+	pixelReader2->prepare(targetImg, targetDefs, configuration->isDitchAdjacencies());
 	pixelReader2->Create();
 	pixelReader2->Run();
 
@@ -381,8 +412,15 @@ void MainFrame::initImageFrame()
 	else if (vic3SideloadStates == LocalizationMapper::LocType::TARGET)
 		targetDefs->loadLocalizations(localizationMapper, LocalizationMapper::LocType::TARGET);
 
-	sourceDefs->ditchAdjacencies("source_adjacencies.txt");
-	targetDefs->ditchAdjacencies("target_adjacencies.txt");
+	if (configuration->isDitchAdjacencies())
+	{
+		sourceDefs->ditchAdjacencies("source_adjacencies.txt");
+		targetDefs->ditchAdjacencies("target_adjacencies.txt");
+	}
+	else
+	{
+		Log(LogLevel::Info) << "Not ditching adjacencies.";
+	}
 
 	linkMapper.loadMappings(linksFile, sourceDefs, targetDefs, *configuration->getSourceToken(), *configuration->getTargetToken());
 	const auto& activeLinks = linkMapper.getActiveVersion()->getLinks();
@@ -465,7 +503,8 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 	// source path
 	if (evt.GetId() == 0)
 	{
-		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png")))
+		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png") ||
+									commonItems::DoesFileExist(result / "locations.png")))
 		{
 			sourceDirStatus->SetBackgroundColour(green);
 			sanity[0] = true;
@@ -480,7 +519,8 @@ void MainFrame::onPathChanged(wxFileDirPickerEvent& evt)
 	// target path
 	else if (evt.GetId() == 1)
 	{
-		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png")))
+		if (validPath && (commonItems::DoesFileExist(result / "provinces.bmp") || commonItems::DoesFileExist(result / "provinces.png") ||
+									commonItems::DoesFileExist(result / "locations.png")))
 		{
 			targetDirStatus->SetBackgroundColour(green);
 			sanity[1] = true;

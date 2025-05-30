@@ -26,6 +26,7 @@ class Configuration: commonItems::parser
 	[[nodiscard]] const auto& getLinkFile() const { return linkFile; }
 	[[nodiscard]] auto isSourceReversed() const { return reverseSource; }
 	[[nodiscard]] auto isTargetReversed() const { return reverseTarget; }
+	[[nodiscard]] auto isDitchAdjacencies() const { return ditchAdjacencies; }
 	[[nodiscard]] const auto& getImageFramePos() const { return imageFramePos; }
 	[[nodiscard]] const auto& getImageFrameSize() const { return imageFrameSize; }
 	[[nodiscard]] auto isImageFrameMaximized() const { return imageFrameMaximized; }
@@ -50,6 +51,7 @@ class Configuration: commonItems::parser
 	void setLinkFile(const std::filesystem::path& file) { linkFile = file; }
 	void setSourceReversed(const bool reversed) { reverseSource = reversed; }
 	void setTargetReversed(const bool reversed) { reverseTarget = reversed; }
+	void setDitchAdjacencies(const bool ditch) { ditchAdjacencies = ditch; }
 	void setImageFramePos(const int x, const int y) { imageFramePos = Rect(x, y); }
 	void setImageFrameSize(const int x, const int y) { imageFrameSize = Rect(x, y); }
 	void setImageFrameMaximized(const bool on) { imageFrameMaximized = on; }
@@ -77,6 +79,7 @@ class Configuration: commonItems::parser
 
 	bool reverseSource = false;
 	bool reverseTarget = false;
+	bool ditchAdjacencies = false;
 	std::optional<std::filesystem::path> sourceDir;
 	std::optional<std::filesystem::path> targetDir;
 	std::optional<std::string> sourceToken;

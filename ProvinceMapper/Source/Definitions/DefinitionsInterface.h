@@ -31,7 +31,7 @@ class DefinitionsInterface
 	[[nodiscard]] virtual std::shared_ptr<Province> getProvinceForID(const std::string& ID) = 0;
 
   protected:
-	std::map<std::string, std::shared_ptr<Province>> provinces;		// ID, province
+	std::map<std::string, std::shared_ptr<Province>> provinces;		// ID, province (or location for eu5)
 	std::map<unsigned int, std::shared_ptr<Province>> chromaCache; // color, province
 };
 
