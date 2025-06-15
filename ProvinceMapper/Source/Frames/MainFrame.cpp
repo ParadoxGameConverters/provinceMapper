@@ -322,7 +322,7 @@ void MainFrame::initImageFrame()
 		sourceDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << sourceDefs->getProvinces().size() << " source provinces.";
 	}
-	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "definitions.txt"))
+	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "definitions.txt"))
 	{
 		auto definitions = std::make_shared<EU5Definitions>();
 		definitions->loadDefinitions(*configuration->getSourceDir(), localizationMapper, LocalizationMapper::LocType::SOURCE);
@@ -344,7 +344,7 @@ void MainFrame::initImageFrame()
 		targetDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 	}
-	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "definitions.txt"))
+	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "definitions.txt"))
 	{
 		auto definitions = std::make_shared<EU5Definitions>();
 		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
