@@ -13,7 +13,7 @@ void EU4::RegionManager::loadRegions(const std::filesystem::path& EU4Path)
 
 	auto areaFilename = EU4Path / "area.txt";
 	auto regionFilename = EU4Path / "region.txt";
-	auto superRegionFilename = EU4Path / " superregion.txt";
+	auto superRegionFilename = EU4Path / "superregion.txt";
 
 	std::ifstream areaStream(areaFilename);
 	if (!areaStream.is_open())
