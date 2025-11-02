@@ -306,7 +306,7 @@ void Definitions::tryToLoadProvinceTypes(const fs::path& mapDataPath)
 		parser.getNextTokenWithoutMatching(stream); // equals sign
 
 		auto strOfItemStr = commonItems::stringOfItem(stream).getString();
-		if (strOfItemStr == "LIST") // format found in Imperator and CK3
+		if (tolower(strOfItemStr) == "list") // format found in Imperator and CK3
 		{
 			auto provIds = commonItems::getStrings(stream);
 			for (auto& id: provIds)
@@ -315,7 +315,7 @@ void Definitions::tryToLoadProvinceTypes(const fs::path& mapDataPath)
 					provinces[id]->addProvinceType(lowerCaseProvinceType);
 			}
 		}
-		else if (strOfItemStr == "RANGE") // format found in Imperator and CK3
+		else if (tolower(strOfItemStr) == "range") // format found in Imperator and CK3
 		{
 			auto provIds = commonItems::getULlongs(stream);
 			auto groupSize = provIds.size();
