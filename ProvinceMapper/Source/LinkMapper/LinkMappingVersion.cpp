@@ -444,12 +444,16 @@ void LinkMappingVersion::generateUnmapped() const
 			mappedTargets.insert(target->ID);
 	}
 	for (const auto& [id, province]: sourceDefs->getProvinces())
-	{
+	{ // normal provinces have a mapdata name, at least. Plenty of unnamed reserve provinces we don't need.
+		if (province->mapDataName.empty())
+			continue;
 		if (!mappedSources.contains(id))
 			unmappedSources->emplace_back(province);
 	}
 	for (const auto& [id, province]: targetDefs->getProvinces())
 	{
+		if (province->mapDataName.empty())
+			continue;
 		if (!mappedTargets.contains(id))
 			unmappedTargets->emplace_back(province);
 	}

@@ -41,7 +41,7 @@ void YmlScraper::scrapeStream(std::istream& theStream)
 
 		// we're degrading to 1252 because we usually have mix of mapdatanames, and old 1252 locs, all of which are shady.
 		// There is no downside degrading pure UTF8 sources like EU5, more ascii-like the better.
-		value = commonItems::convertUTF8ToWin1252(value);
+		value = commonItems::convertUTF8ToASCII(value);
 
 		localizations[key] = value;
 	}
