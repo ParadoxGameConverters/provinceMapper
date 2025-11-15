@@ -163,10 +163,28 @@ void MainFrame::initFrame()
 	sourceTokenField->Bind(wxEVT_TEXT, &MainFrame::onTokenChanged, this);
 	sourceTokenStatus = new wxWindow(holderPanel, wxID_ANY, wxDefaultPosition, wxSize(15, 15));
 
+	// "Generate triangulation pairs for source map corners" check
+	generateTriangulationPairsForSourceMapCornersCheck = new wxCheckBox(holderPanel,
+	 0,
+	 "Generate triangulation pairs\nfor source map corners?",
+		 wxDefaultPosition,
+		 wxDefaultSize,
+		 wxCHK_2STATE,
+		 wxDefaultValidator);
+	if (configuration->isGenerateTriangulationPairsForSourceMapCorners())
+		generateTriangulationPairsForSourceMapCornersCheck->SetValue(true);
+	generateTriangulationPairsForSourceMapCornersCheck->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (generateTriangulationPairsForSourceMapCornersCheck->GetValue())
+			configuration->setGenerateTriangulationPairsForSourceMapCorners(true);
+		else
+			configuration->setGenerateTriangulationPairsForSourceMapCorners(false);
+		configuration->save();
+	});
+
 	sizer->Add(sourceTokenText, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->Add(sourceTokenField, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 	sizer->Add(sourceTokenStatus, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
-	sizer->AddStretchSpacer(0);
+	sizer->Add(generateTriangulationPairsForSourceMapCornersCheck, wxSizerFlags(0).Align(wxVERTICAL).Border(wxLEFT | wxRIGHT, 5).Center());
 
 	// Target Token
 	auto* targetTokenText = new wxStaticText(holderPanel, wxID_ANY, "Target Token", wxDefaultPosition);
