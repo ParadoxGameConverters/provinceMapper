@@ -381,6 +381,7 @@ void MainFrame::initImageFrame()
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
 	sourceRiversImg = new wxImage();
+	sourceHeightmapImg = new wxImage();
 	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.png"))
 		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.bmp"))
@@ -391,9 +392,12 @@ void MainFrame::initImageFrame()
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.bmp"))
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.bmp");
+   if (commonItems::DoesFileExist(*configuration->getSourceDir() / "heightmap.png"))
+		sourceHeightmapImg->LoadFile(configuration->getSourceDir()->string() + "/heightmap.png");
 
 	targetImg = new wxImage();
 	targetRiversImg = new wxImage();
+	targetHeightmapImg = new wxImage();
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.png"))
 		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.bmp"))
@@ -404,6 +408,8 @@ void MainFrame::initImageFrame()
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.bmp"))
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.bmp");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "heightmap.png"))
+		targetHeightmapImg->LoadFile(configuration->getTargetDir()->string() + "/heightmap.png");
 
 	mergeRivers();
 
