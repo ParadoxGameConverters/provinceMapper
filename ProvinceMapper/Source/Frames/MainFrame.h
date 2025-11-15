@@ -113,6 +113,7 @@ class MainFrame final: public wxFrame
 	wxWindow* targetTokenStatus = nullptr;
 
 	wxCheckBox* ditchCheck = nullptr;
+	wxCheckBox* generateTriangulationPairsForSourceMapCornersCheck = nullptr;
 
 	wxButton* startButton = nullptr;
 

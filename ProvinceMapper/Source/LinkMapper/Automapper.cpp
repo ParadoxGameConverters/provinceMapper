@@ -84,7 +84,10 @@ inline void Automapper::determineTargetProvinceForSourcePixels(const std::shared
 		const auto sourcePoint = wxPoint(sourcePixel.x, sourcePixel.y);
 		const auto& triangleItr = srcPointToTriangleMap.find(sourcePoint);
 		if (triangleItr == srcPointToTriangleMap.end())
-			throw std::runtime_error("Could not find triangle for source map point " + std::to_string(sourcePixel.x) + ", " + std::to_string(sourcePixel.y));
+		{
+			// The point is outside any triangle; skip it.
+			continue;
+		}
 		const auto& triangle = triangleItr->second;
 
 		const auto& tgtPoint = triangulate(triangle->getSourcePoints(), triangle->getTargetPoints(), sourcePoint);

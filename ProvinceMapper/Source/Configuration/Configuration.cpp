@@ -30,6 +30,9 @@ void Configuration::registerKeys()
 	registerKeyword("ditchAdjacencies", [this](std::istream& theStream) {
 		ditchAdjacencies = commonItems::getString(theStream) == "true";
 	});
+	registerKeyword("generateTriangulationPairsForSourceMapCorners", [this](std::istream& theStream) {
+		_generateTriangulationPairsForSrcMapCorners = commonItems::getString(theStream) == "true";
+	});
 	registerKeyword("imageFramePos", [this](std::istream& theStream) {
 		const auto& theInts = commonItems::getInts(theStream);
 		if (theInts.size() == 2)
@@ -111,6 +114,8 @@ std::ostream& operator<<(std::ostream& output, const Configuration& configuratio
 		output << "reverseTarget = true\n";
 	if (configuration.ditchAdjacencies)
 		output << "ditchAdjacencies = true\n";
+	if (configuration._generateTriangulationPairsForSrcMapCorners)
+		output << "generateTriangulationPairsForSourceMapCorners = true\n";
 	if (configuration.sourceToken)
 		output << "sourceToken = \"" << *configuration.sourceToken << "\"\n";
 	if (configuration.targetToken)

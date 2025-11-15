@@ -678,42 +678,45 @@ void ImageFrame::delaunayTriangulate()
 		return;
 	}
 
-	// Create a virtual point pair for each map corner.
-	// For each source map corner, find the equivalent point on the target map.
-	const auto& sourceMapWidth = sourceCanvas->getWidth();
-	const auto& sourceMapHeight = sourceCanvas->getHeight();
-
-	std::vector cornerPoints = {
-		 wxPoint(0, 0),
-		 wxPoint(sourceMapWidth - 1, 0),
-		 wxPoint(0, sourceMapHeight - 1),
-		 wxPoint(sourceMapWidth - 1, sourceMapHeight - 1),
-	};
-
-	for (const auto& cornerPoint: cornerPoints)
+   if (configuration->isGenerateTriangulationPairsForSourceMapCorners())
 	{
-		const auto cornerEquivalentPoint = findMapCornerPointEquivalent(validPairs, cornerPoint);
+		// Create a virtual point pair for each map corner.
+		// For each source map corner, find the equivalent point on the target map.
+		const auto& sourceMapWidth = sourceCanvas->getWidth();
+		const auto& sourceMapHeight = sourceCanvas->getHeight();
 
-		int idToUse;
-		std::set<int> usedIds;
-		for (const auto& pair: *sourceCanvas->getTriangulationPairs())
+		std::vector cornerPoints = {
+			 wxPoint(0, 0),
+			 wxPoint(sourceMapWidth - 1, 0),
+			 wxPoint(0, sourceMapHeight - 1),
+			 wxPoint(sourceMapWidth - 1, sourceMapHeight - 1),
+		};
+
+		for (const auto& cornerPoint: cornerPoints)
 		{
-			usedIds.insert(pair->getID());
-		}
-		// Find an ID of TriangulationPointPair that's not used.
-		for (int i = 0; i < INT_MAX; i++)
-		{
-			if (!usedIds.contains(i))
+			const auto cornerEquivalentPoint = findMapCornerPointEquivalent(validPairs, cornerPoint);
+
+			int idToUse;
+			std::set<int> usedIds;
+			for (const auto& pair: *sourceCanvas->getTriangulationPairs())
 			{
-				idToUse = i;
-				break;
+				usedIds.insert(pair->getID());
 			}
-		}
-		auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
-		cornerPair->setSourcePoint(cornerPoint);
-		cornerPair->setTargetPoint(cornerEquivalentPoint);
+			// Find an ID of TriangulationPointPair that's not used.
+			for (int i = 0; i < INT_MAX; i++)
+			{
+				if (!usedIds.contains(i))
+				{
+					idToUse = i;
+					break;
+				}
+			}
+			auto cornerPair = std::make_shared<TriangulationPointPair>(idToUse);
+			cornerPair->setSourcePoint(cornerPoint);
+			cornerPair->setTargetPoint(cornerEquivalentPoint);
 
-		validPairs.push_back(cornerPair);
+			validPairs.push_back(cornerPair);
+		}
 	}
 
 	std::map<std::pair<int, int>, std::shared_ptr<TriangulationPointPair>> pointToPairMap;
