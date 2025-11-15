@@ -24,11 +24,12 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 wxImage* sourceImg,
 	 wxImage* sourceHeightmapImg,
 	 wxImage* targetImg,
+	 wxImage* targetHeightmapImg,
 	 const std::shared_ptr<DefinitionsInterface>& sourceDefs,
 	 const std::shared_ptr<DefinitionsInterface>& targetDefs,
 	 std::shared_ptr<Configuration> theConfiguration):
 	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), configuration(std::move(theConfiguration)),
-	 sourcePrimaryImage(sourceImg), sourceHeightmapImage(sourceHeightmapImg),
+	 sourcePrimaryImage(sourceImg), sourceHeightmapImage(sourceHeightmapImg), targetPrimaryImage(targetImg), targetHeightmapImage(targetHeightmapImg),
 	 eventHandler(parent)
 {
 	taskBarBtn = MSWGetTaskBarButton();
@@ -36,7 +37,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleTriangulationMesh, this, wxID_VIEW_SMALLICONS);
-	Bind(wxEVT_MENU, &ImageFrame::onToggleSourceHeightmap, this, ID_TOGGLE_SOURCE_HEIGHTMAP);
+	Bind(wxEVT_MENU, &ImageFrame::onToggleHeightmap, this, ID_TOGGLE_HEIGHTMAP);
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
 	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
@@ -384,16 +385,16 @@ void ImageFrame::onToggleTriangulationMesh(wxCommandEvent& event)
 	Refresh();
 }
 
-void ImageFrame::onToggleSourceHeightmap(wxCommandEvent& event)
+void ImageFrame::onToggleHeightmap(wxCommandEvent& event)
 {
-	if (!sourceHeightmapImage || !sourceHeightmapImage->IsOk())
+	if (!sourcePrimaryImage || !sourcePrimaryImage->IsOk() || !targetPrimaryImage || !targetPrimaryImage->IsOk())
 	{
-		Log(LogLevel::Warning) << "Source heightmap image is unavailable; unable to toggle.";
+		Log(LogLevel::Warning) << "Primary images are unavailable; unable to toggle heightmap.";
 		return;
 	}
-	if (!sourcePrimaryImage || !sourcePrimaryImage->IsOk())
+	if (!sourceHeightmapImage || !sourceHeightmapImage->IsOk() || !targetHeightmapImage || !targetHeightmapImage->IsOk())
 	{
-		Log(LogLevel::Warning) << "Source provinces image is unavailable; unable to toggle heightmap.";
+		Log(LogLevel::Warning) << "Heightmap images are unavailable; unable to toggle heightmap view.";
 		return;
 	}
 	if (sourceHeightmapImage->GetSize() != sourcePrimaryImage->GetSize())
@@ -401,19 +402,33 @@ void ImageFrame::onToggleSourceHeightmap(wxCommandEvent& event)
 		Log(LogLevel::Warning) << "Source heightmap dimensions differ from provinces image; toggle aborted.";
 		return;
 	}
+	if (targetHeightmapImage->GetSize() != targetPrimaryImage->GetSize())
+	{
+		Log(LogLevel::Warning) << "Target heightmap dimensions differ from provinces image; toggle aborted.";
+		return;
+	}
 
-	showingSourceHeightmap = !showingSourceHeightmap;
-	if (showingSourceHeightmap)
+	showingHeightmap = !showingHeightmap;
+	if (showingHeightmap)
+	{
 		sourceCanvas->setImage(sourceHeightmapImage);
+		targetCanvas->setImage(targetHeightmapImage);
+	}
 	else
+	{
 		sourceCanvas->setImage(sourcePrimaryImage);
+		targetCanvas->setImage(targetPrimaryImage);
+	}
 
 	if (black)
 	{
 		sourceCanvas->generateShadedPixels();
 		sourceCanvas->applyShadedPixels();
+		targetCanvas->generateShadedPixels();
+		targetCanvas->applyShadedPixels();
 	}
 	sourceCanvas->applyStrafedPixels();
+	targetCanvas->applyStrafedPixels();
 	render();
 	Refresh();
 }
