@@ -394,6 +394,22 @@ void MainFrame::initImageFrame()
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.bmp");
    	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "heightmap.png"))
 		sourceHeightmapImg->LoadFile(configuration->getSourceDir()->string() + "/heightmap.png");
+	if (sourceHeightmapImg->IsOk() && sourceImg->IsOk())
+	{
+		const auto heightmapSize = sourceHeightmapImg->GetSize();
+		const auto mapSize = sourceImg->GetSize();
+		if (heightmapSize != mapSize)
+		{
+			const auto widthMultiple = heightmapSize.GetWidth() % mapSize.GetWidth() == 0;
+			const auto heightMultiple = heightmapSize.GetHeight() % mapSize.GetHeight() == 0;
+			if (widthMultiple && heightMultiple)
+			{
+				Log(LogLevel::Info) << "Scaling source heightmap from " << heightmapSize.GetWidth() << "x" << heightmapSize.GetHeight() << " down to "
+					 << mapSize.GetWidth() << "x" << mapSize.GetHeight() << '.';
+				sourceHeightmapImg->Rescale(mapSize.GetWidth(), mapSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
+			}
+		}
+	}
 
 	targetImg = new wxImage();
 	targetRiversImg = new wxImage();
@@ -410,6 +426,22 @@ void MainFrame::initImageFrame()
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.bmp");
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "heightmap.png"))
 		targetHeightmapImg->LoadFile(configuration->getTargetDir()->string() + "/heightmap.png");
+	if (targetHeightmapImg->IsOk() && targetImg->IsOk())
+	{
+		const auto heightmapSize = targetHeightmapImg->GetSize();
+		const auto mapSize = targetImg->GetSize();
+		if (heightmapSize != mapSize)
+		{
+			const auto widthMultiple = heightmapSize.GetWidth() % mapSize.GetWidth() == 0;
+			const auto heightMultiple = heightmapSize.GetHeight() % mapSize.GetHeight() == 0;
+			if (widthMultiple && heightMultiple)
+			{
+				Log(LogLevel::Info) << "Scaling target heightmap from " << heightmapSize.GetWidth() << "x" << heightmapSize.GetHeight() << " down to "
+					 << mapSize.GetWidth() << "x" << mapSize.GetHeight() << '.';
+				targetHeightmapImg->Rescale(mapSize.GetWidth(), mapSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
+			}
+		}
+	}
 
 	mergeRivers();
 
