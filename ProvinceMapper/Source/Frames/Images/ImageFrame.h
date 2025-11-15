@@ -13,6 +13,11 @@ class ImageCanvas;
 enum class ImageTabSelector;
 class Configuration;
 class wxAutoBufferedPaintDC;
+enum
+{
+	ID_TOGGLE_SOURCE_HEIGHTMAP = wxID_HIGHEST + 1
+};
+
 class ImageFrame final: public wxFrame
 {
   public:
@@ -21,6 +26,7 @@ class ImageFrame final: public wxFrame
 		 const wxSize& size,
 		 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 		 wxImage* sourceImg,
+		 wxImage* sourceHeightmapImg,
 		 wxImage* targetImg,
 		 const std::shared_ptr<DefinitionsInterface>& sourceDefs,
 		 const std::shared_ptr<DefinitionsInterface>& targetDefs,
@@ -48,6 +54,7 @@ class ImageFrame final: public wxFrame
 	void onToggleOrientation(wxCommandEvent& event);
 	void onToggleBlack(wxCommandEvent& event);
 	void onToggleTriangulationMesh(wxCommandEvent& event);
+	void onToggleSourceHeightmap(wxCommandEvent& event);
 	void onClose(const wxCloseEvent& event);
 	void onRefresh(const wxCommandEvent& event);
 	void onTriangulate(wxCommandEvent& event);
@@ -89,6 +96,9 @@ class ImageFrame final: public wxFrame
 	bool lock = false;
 
 	std::shared_ptr<Configuration> configuration;
+	wxImage* sourcePrimaryImage = nullptr;
+	wxImage* sourceHeightmapImage = nullptr;
+	bool showingSourceHeightmap = false;
 
   protected:
 	wxEvtHandler* eventHandler;

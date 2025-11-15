@@ -62,6 +62,7 @@ class ImageCanvas final: public wxScrolledCanvas
 	void clearScale() { oldScaleFactor = scaleFactor; }
 	void clearOldScrollH() { oldScrollPositionH = GetScrollPos(wxHORIZONTAL); }
 	void clearOldScrollV() { oldScrollPositionV = GetScrollPos(wxVERTICAL); }
+	void setImage(wxImage* newImage);
 
 	void activateLinkByIndex(int row);
 	void activateLinkByID(int ID);
@@ -104,6 +105,7 @@ class ImageCanvas final: public wxScrolledCanvas
 	void stageMoveVersionRight() const;
 	void stageDelaunayTriangulate() const;
 	void stageActivateTriangulationPairByID(int ID) const;
+	void refreshStrafedPixelColors();
 
 	[[nodiscard]] const std::vector<std::shared_ptr<Province>>& getRelevantProvinces(const std::shared_ptr<LinkMapping>& link) const;
 

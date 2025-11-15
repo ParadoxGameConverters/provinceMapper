@@ -5,6 +5,7 @@
 #include "LinkMapper/TriangulationPointPair.h"
 #include "Provinces/Province.h"
 #include "StatusBar.h"
+#include <Log.h>
 #include <OSCompatibilityLayer.h>
 
 #include <future>
@@ -21,11 +22,13 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	 const wxSize& size,
 	 const std::shared_ptr<LinkMappingVersion>& theActiveVersion,
 	 wxImage* sourceImg,
+	 wxImage* sourceHeightmapImg,
 	 wxImage* targetImg,
 	 const std::shared_ptr<DefinitionsInterface>& sourceDefs,
 	 const std::shared_ptr<DefinitionsInterface>& targetDefs,
 	 std::shared_ptr<Configuration> theConfiguration):
 	 wxFrame(parent, wxID_ANY, "Provinces", position, size, wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL), configuration(std::move(theConfiguration)),
+	 sourcePrimaryImage(sourceImg), sourceHeightmapImage(sourceHeightmapImg),
 	 eventHandler(parent)
 {
 	taskBarBtn = MSWGetTaskBarButton();
@@ -33,6 +36,7 @@ ImageFrame::ImageFrame(wxWindow* parent,
 	Bind(wxEVT_MENU, &ImageFrame::onToggleOrientation, this, wxID_REVERT);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleBlack, this, wxID_BOLD);
 	Bind(wxEVT_MENU, &ImageFrame::onToggleTriangulationMesh, this, wxID_VIEW_SMALLICONS);
+	Bind(wxEVT_MENU, &ImageFrame::onToggleSourceHeightmap, this, ID_TOGGLE_SOURCE_HEIGHTMAP);
 	Bind(wxEVT_CLOSE_WINDOW, &ImageFrame::onClose, this);
 	Bind(wxEVT_REFRESH, &ImageFrame::onRefresh, this);
 	Bind(wxEVT_TOGGLE_TRIANGULATE, &ImageFrame::onTriangulate, this);
@@ -376,6 +380,40 @@ void ImageFrame::onToggleTriangulationMesh(wxCommandEvent& event)
 	showTriangulationMesh = !showTriangulationMesh;
 	sourceCanvas->toggleTriangulationMesh();
 	targetCanvas->toggleTriangulationMesh();
+	render();
+	Refresh();
+}
+
+void ImageFrame::onToggleSourceHeightmap(wxCommandEvent& event)
+{
+	if (!sourceHeightmapImage || !sourceHeightmapImage->IsOk())
+	{
+		Log(LogLevel::Warning) << "Source heightmap image is unavailable; unable to toggle.";
+		return;
+	}
+	if (!sourcePrimaryImage || !sourcePrimaryImage->IsOk())
+	{
+		Log(LogLevel::Warning) << "Source provinces image is unavailable; unable to toggle heightmap.";
+		return;
+	}
+	if (sourceHeightmapImage->GetSize() != sourcePrimaryImage->GetSize())
+	{
+		Log(LogLevel::Warning) << "Source heightmap dimensions differ from provinces image; toggle aborted.";
+		return;
+	}
+
+	showingSourceHeightmap = !showingSourceHeightmap;
+	if (showingSourceHeightmap)
+		sourceCanvas->setImage(sourceHeightmapImage);
+	else
+		sourceCanvas->setImage(sourcePrimaryImage);
+
+	if (black)
+	{
+		sourceCanvas->generateShadedPixels();
+		sourceCanvas->applyShadedPixels();
+	}
+	sourceCanvas->applyStrafedPixels();
 	render();
 	Refresh();
 }

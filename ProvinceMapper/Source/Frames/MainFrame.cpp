@@ -392,7 +392,7 @@ void MainFrame::initImageFrame()
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.bmp"))
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.bmp");
-   if (commonItems::DoesFileExist(*configuration->getSourceDir() / "heightmap.png"))
+   	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "heightmap.png"))
 		sourceHeightmapImg->LoadFile(configuration->getSourceDir()->string() + "/heightmap.png");
 
 	targetImg = new wxImage();
@@ -457,11 +457,21 @@ void MainFrame::initImageFrame()
 	if (configuration->getImageFrameSize())
 		size = wxSize(configuration->getImageFrameSize()->x, configuration->getImageFrameSize()->y);
 	const auto maximize = configuration->isImageFrameMaximized();
-	imageFrame = new ImageFrame(this, position, size, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs, configuration);
+	imageFrame = new ImageFrame(this,
+		 position,
+		 size,
+		 linkMapper.getActiveVersion(),
+		 sourceImg,
+		 sourceHeightmapImg,
+		 targetImg,
+		 sourceDefs,
+		 targetDefs,
+		 configuration);
 
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
+	menuDropDown->Append(ID_TOGGLE_SOURCE_HEIGHTMAP, "Toggle Source Heightmap");
 	menuDropDown->Append(wxID_VIEW_SMALLICONS, "Toggle the Triangulation Mesh");
 	auto* toolbarDropDown = new wxMenu;
 	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");
