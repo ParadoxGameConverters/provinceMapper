@@ -97,6 +97,8 @@ class MainFrame final: public wxFrame
 	wxImage* targetImg = nullptr;
 	wxImage* sourceRiversImg = nullptr;
 	wxImage* targetRiversImg = nullptr;
+	wxImage* sourceHeightmapImg = nullptr;
+	wxImage* targetHeightmapImg = nullptr;
 
 	wxDirPickerCtrl* sourceDirPicker = nullptr;
 	wxDirPickerCtrl* targetDirPicker = nullptr;

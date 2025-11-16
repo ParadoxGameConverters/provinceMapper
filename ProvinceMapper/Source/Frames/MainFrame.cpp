@@ -381,6 +381,7 @@ void MainFrame::initImageFrame()
 	wxLogNull AD; // disable warning about proprietary and thus unsupported sRGB profiles in PDX PNGs.
 	sourceImg = new wxImage();
 	sourceRiversImg = new wxImage();
+	sourceHeightmapImg = new wxImage();
 	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.png"))
 		sourceImg->LoadFile(configuration->getSourceDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "provinces.bmp"))
@@ -391,9 +392,28 @@ void MainFrame::initImageFrame()
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getSourceDir() / "rivers.bmp"))
 		sourceRiversImg->LoadFile(configuration->getSourceDir()->string() + "/rivers.bmp");
+   	if (commonItems::DoesFileExist(*configuration->getSourceDir() / "heightmap.png"))
+		sourceHeightmapImg->LoadFile(configuration->getSourceDir()->string() + "/heightmap.png");
+	if (sourceHeightmapImg->IsOk() && sourceImg->IsOk())
+	{
+		const auto heightmapSize = sourceHeightmapImg->GetSize();
+		const auto mapSize = sourceImg->GetSize();
+		if (heightmapSize != mapSize)
+		{
+			const auto widthMultiple = heightmapSize.GetWidth() % mapSize.GetWidth() == 0;
+			const auto heightMultiple = heightmapSize.GetHeight() % mapSize.GetHeight() == 0;
+			if (widthMultiple && heightMultiple)
+			{
+				Log(LogLevel::Info) << "Scaling source heightmap from " << heightmapSize.GetWidth() << "x" << heightmapSize.GetHeight() << " down to "
+					 << mapSize.GetWidth() << "x" << mapSize.GetHeight() << '.';
+				sourceHeightmapImg->Rescale(mapSize.GetWidth(), mapSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
+			}
+		}
+	}
 
 	targetImg = new wxImage();
 	targetRiversImg = new wxImage();
+	targetHeightmapImg = new wxImage();
 	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.png"))
 		targetImg->LoadFile(configuration->getTargetDir()->string() + "/provinces.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "provinces.bmp"))
@@ -404,6 +424,24 @@ void MainFrame::initImageFrame()
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.png");
 	else if (commonItems::DoesFileExist(*configuration->getTargetDir() / "rivers.bmp"))
 		targetRiversImg->LoadFile(configuration->getTargetDir()->string() + "/rivers.bmp");
+	if (commonItems::DoesFileExist(*configuration->getTargetDir() / "heightmap.png"))
+		targetHeightmapImg->LoadFile(configuration->getTargetDir()->string() + "/heightmap.png");
+	if (targetHeightmapImg->IsOk() && targetImg->IsOk())
+	{
+		const auto heightmapSize = targetHeightmapImg->GetSize();
+		const auto mapSize = targetImg->GetSize();
+		if (heightmapSize != mapSize)
+		{
+			const auto widthMultiple = heightmapSize.GetWidth() % mapSize.GetWidth() == 0;
+			const auto heightMultiple = heightmapSize.GetHeight() % mapSize.GetHeight() == 0;
+			if (widthMultiple && heightMultiple)
+			{
+				Log(LogLevel::Info) << "Scaling target heightmap from " << heightmapSize.GetWidth() << "x" << heightmapSize.GetHeight() << " down to "
+					 << mapSize.GetWidth() << "x" << mapSize.GetHeight() << '.';
+				targetHeightmapImg->Rescale(mapSize.GetWidth(), mapSize.GetHeight(), wxIMAGE_QUALITY_HIGH);
+			}
+		}
+	}
 
 	mergeRivers();
 
@@ -451,11 +489,22 @@ void MainFrame::initImageFrame()
 	if (configuration->getImageFrameSize())
 		size = wxSize(configuration->getImageFrameSize()->x, configuration->getImageFrameSize()->y);
 	const auto maximize = configuration->isImageFrameMaximized();
-	imageFrame = new ImageFrame(this, position, size, linkMapper.getActiveVersion(), sourceImg, targetImg, sourceDefs, targetDefs, configuration);
+	imageFrame = new ImageFrame(this,
+		 position,
+		 size,
+		 linkMapper.getActiveVersion(),
+		 sourceImg,
+		 sourceHeightmapImg,
+		 targetImg,
+		 targetHeightmapImg,
+		 sourceDefs,
+		 targetDefs,
+		 configuration);
 
 	auto* menuDropDown = new wxMenu;
 	menuDropDown->Append(wxID_REVERT, "Toggle Orientation");
 	menuDropDown->Append(wxID_BOLD, "Toggle The Shade");
+	menuDropDown->Append(ID_TOGGLE_HEIGHTMAP, "Toggle Heightmap");
 	menuDropDown->Append(wxID_VIEW_SMALLICONS, "Toggle the Triangulation Mesh");
 	auto* toolbarDropDown = new wxMenu;
 	toolbarDropDown->Append(wxMENU_SHOW_TOOLBAR, "Show Toolbar");

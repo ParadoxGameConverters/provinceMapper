@@ -67,6 +67,26 @@ void ImageCanvas::restoreImageData() const
 	memcpy(imageData, image->GetData(), imageDataSize);
 }
 
+void ImageCanvas::setImage(wxImage* newImage)
+{
+	if (!newImage || !newImage->IsOk())
+		return;
+
+	image = newImage;
+	width = image->GetSize().GetX();
+	height = image->GetSize().GetY();
+	const auto newDataSize = static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(3);
+	if (newDataSize != imageDataSize || !imageData)
+	{
+		delete[] imageData;
+		imageData = new unsigned char[newDataSize];
+	}
+	imageDataSize = newDataSize;
+	memcpy(imageData, image->GetData(), imageDataSize);
+	SetVirtualSize(width, height);
+	refreshStrafedPixelColors();
+}
+
 void ImageCanvas::activateLinkByIndex(const int row)
 {
 	if (activeVersion && row < static_cast<int>(activeVersion->getLinks()->size()))
@@ -110,9 +130,13 @@ void ImageCanvas::strafeProvinces()
 
 void ImageCanvas::strafeProvince(const std::shared_ptr<Province>& province)
 {
+	const auto* baseData = image->GetData();
 	for (const auto& pixel: province->innerPixels)
 		if ((pixel.x + pixel.y) % 8 == 0)
-			strafedPixels.emplace_back(pixel);
+			{
+				const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+				strafedPixels.emplace_back(pixel.x, pixel.y, baseData[offset], baseData[offset + 1], baseData[offset + 2]);
+			}
 }
 
 void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) const
@@ -120,12 +144,13 @@ void ImageCanvas::dismarkProvince(const std::shared_ptr<Province>& province) con
 	// This fires when provinces within link are deselected, we're restoring their original color.
 	// We're not removing pixels from shadedPixels as it's faster to drop them all and regenerate them.
 
+	const auto* baseData = image->GetData();
 	for (const auto& pixel: province->innerPixels)
 	{
 		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
-		imageData[offset] = province->r;
-		imageData[offset + 1] = province->g;
-		imageData[offset + 2] = province->b;
+		imageData[offset] = baseData[offset];
+		imageData[offset + 1] = baseData[offset + 1];
+		imageData[offset + 2] = baseData[offset + 2];
 	}
 }
 
@@ -179,6 +204,24 @@ void ImageCanvas::deactivateLink()
 		}
 	}
 	strafedPixels.clear();
+}
+
+void ImageCanvas::refreshStrafedPixelColors()
+{
+	if (strafedPixels.empty() || !image)
+		return;
+
+	const auto* baseData = image->GetData();
+	const auto maxOffset = static_cast<int>(imageDataSize);
+	for (auto& pixel: strafedPixels)
+	{
+		const auto offset = coordsToOffset(pixel.x, pixel.y, width);
+		if (offset < 0 || offset + 2 >= maxOffset)
+			continue;
+		pixel.r = baseData[offset];
+		pixel.g = baseData[offset + 1];
+		pixel.b = baseData[offset + 2];
+	}
 }
 
 void ImageCanvas::stageActivateTriangulationPairByID(const int ID) const
