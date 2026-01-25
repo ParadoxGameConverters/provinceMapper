@@ -534,7 +534,7 @@ void Automapper::forUnmappedSourcesTryToStealTargetsFromExistingLinks()
 	cleanUpSourceProvinceShares();
 }
 
-void Automapper::generateLinks(wxTaskBarButton* taskBarBtn)
+void Automapper::generateLinks(wxTaskBarButton* taskBarBtn, bool mapSourceImpassables, bool mapTargetImpassables)
 {
 	// General rules for the automapping:
 	// - We don't modify the hand-made links.
@@ -588,19 +588,25 @@ void Automapper::generateLinks(wxTaskBarButton* taskBarBtn)
 	if (taskBarBtn)
 		taskBarBtn->SetProgressValue(++currentProgress);
 
-	// 7. For all yet unmapped target provinces:
-	//    Try to use the most matching available source province to map them.
-	Log(LogLevel::Debug) << "Link generation step 7...";
-	forUnmappedTargetsEvaluateAllMatches();
-	if (taskBarBtn)
-		taskBarBtn->SetProgressValue(++currentProgress);
+	if (mapSourceImpassables)
+	{
+		// 7. For all yet unmapped target provinces:
+		//    Try to use the most matching available source province (including impassables) to map them.
+		Log(LogLevel::Debug) << "Link generation step 7...";
+		forUnmappedTargetsEvaluateAllMatches();
+		if (taskBarBtn)
+			taskBarBtn->SetProgressValue(++currentProgress);
+	}
 
-	// 8. For all yet unmapped source provinces:
-	//    Try to use the most matching available target province to map them.
-	Log(LogLevel::Debug) << "Link generation step 8...";
-	forUnmappedSourcesEvaluateAllMatches();
-	if (taskBarBtn)
-		taskBarBtn->SetProgressValue(++currentProgress);
+	if (mapTargetImpassables)
+	{
+		// 8. For all yet unmapped source provinces:
+		//    Try to use the most matching available target province (including impassables) to map them.
+		Log(LogLevel::Debug) << "Link generation step 8...";
+		forUnmappedSourcesEvaluateAllMatches();
+		if (taskBarBtn)
+			taskBarBtn->SetProgressValue(++currentProgress);
+	}
 
 	// 9. For all yet unmapped non-impassable target provinces, we're running out of options, so we turn to theft.
 	//    Check if we can steal a source province from an existing many-to-one link.
