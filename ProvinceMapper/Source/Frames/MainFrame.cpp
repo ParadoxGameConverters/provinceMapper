@@ -366,7 +366,7 @@ void MainFrame::initImageFrame()
 	{
 		auto definitions = std::make_shared<EU5Definitions>();
 		definitions->loadDefinitions(*configuration->getTargetDir(), localizationMapper, LocalizationMapper::LocType::TARGET);
-		sourceDefs = definitions;
+		targetDefs = definitions;
 		Log(LogLevel::Info) << "Loaded " << targetDefs->getProvinces().size() << " target provinces.";
 	}
 	else
