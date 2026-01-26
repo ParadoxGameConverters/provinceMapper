@@ -42,7 +42,7 @@ class Automapper final
 		 int targetMapWidth,
 		 int targetMapHeight);
 	void registerMatch(const std::shared_ptr<Province>& srcProvince, const std::shared_ptr<Province>& targetProvince, int amount);
-	void generateLinks(wxTaskBarButton* taskBarBtn);
+	void generateLinks(wxTaskBarButton* taskBarBtn, bool mapSourceImpassables, bool mapTargetImpassables);
 
   private:
 	[[nodiscard]] bool canProvincesBeMapped(const std::string& srcProvID, const std::string& tgtProvID, bool allowAddingToExistingLink) const;

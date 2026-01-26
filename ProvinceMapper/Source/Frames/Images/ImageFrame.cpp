@@ -1192,7 +1192,9 @@ void ImageFrame::autogenerateMappings()
 		taskBarBtn->SetProgressValue(3);
 
 	Log(LogLevel::Debug) << "Generating links...";
-	automapper.generateLinks(taskBarBtn);
+	// Imperator impassables have usable culture and religion data. CK3 ones don't.
+	const bool mapSrcImpassables = configuration->getSourceToken() == "imp";
+	automapper.generateLinks(taskBarBtn, mapSrcImpassables, false);
 
 	if (black == true)
 	{
