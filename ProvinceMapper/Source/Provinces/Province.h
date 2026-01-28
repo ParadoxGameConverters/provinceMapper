@@ -1,14 +1,28 @@
 #ifndef PROVINCE_H
 #define PROVINCE_H
 #include "Pixel.h"
+#include <bitset>
 #include <optional>
 #include <string>
 #include <vector>
-#include <set>
 
 class Province final
 {
   public:
+	enum class ProvinceType: unsigned char
+	{
+		SeaZones,
+		Wasteland,
+		ImpassableTerrain,
+		Uninhabitable,
+		RiverProvinces,
+		Lakes,
+		ImpassableMountains,
+		ImpassableSeas,
+		NonOwnable,
+		Count
+	};
+
 	Province(std::string theID, unsigned char tr, unsigned char tg, unsigned char tb, std::string theName);
 
 	[[nodiscard]] std::string bespokeName() const;
@@ -18,7 +32,8 @@ class Province final
 	[[nodiscard]] const std::optional<std::string>& getRegionName() const { return regionName; }
 	[[nodiscard]] const std::optional<std::string>& getSuperRegionName() const { return superRegionName; }
 	[[nodiscard]] const std::optional<std::string>& getContinentName() const { return continentName; }
-	[[nodiscard]] const std::set<std::string>& getProvinceTypes() const { return provinceTypes; }
+	[[nodiscard]] const std::bitset<static_cast<size_t>(ProvinceType::Count)>& getProvinceTypes() const { return provinceTypes; }
+	[[nodiscard]] bool hasProvinceType(ProvinceType type) const { return provinceTypes.test(static_cast<size_t>(type)); }
 	[[nodiscard]] bool isWater() const;
 	[[nodiscard]] bool isImpassable() const;
 
@@ -27,7 +42,7 @@ class Province final
 	void setRegionName(std::string name);
 	void setSuperRegionName(std::string name);
 	void setContinentName(std::string name);
-	void addProvinceType(std::string name);
+	void addProvinceType(const std::string& name);
 
 	bool operator==(const Province& rhs) const;
 	bool operator==(const Pixel& rhs) const;
@@ -49,7 +64,7 @@ class Province final
 	std::optional<std::string> regionName;
 	std::optional<std::string> superRegionName;
 	std::optional<std::string> continentName; 
-	std::set<std::string> provinceTypes;
+	std::bitset<static_cast<size_t>(ProvinceType::Count)> provinceTypes;
 };
 
 #endif // PROVINCE_H

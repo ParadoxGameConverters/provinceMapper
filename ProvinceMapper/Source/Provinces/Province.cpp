@@ -1,7 +1,60 @@
 #include "Province.h"
+
+#include "Log.h"
+
 #include <Configuration/Configuration.h>
 #include <algorithm>
+#include <array>
+#include <bitset>
 #include <numeric>
+#include <string_view>
+
+namespace
+{
+	using ProvinceType = Province::ProvinceType;
+
+	constexpr std::array<std::string_view, static_cast<size_t>(ProvinceType::Count)> ProvinceTypeNames = {
+		"sea_zones",
+		"wasteland",
+		"impassable_terrain",
+		"uninhabitable",
+		"river_provinces",
+		"lakes",
+		"impassable_mountains",
+		"impassable_seas",
+		"non_ownable"
+	};
+
+	const std::bitset<static_cast<size_t>(ProvinceType::Count)> WaterTypesMask = [] {
+		std::bitset<static_cast<size_t>(ProvinceType::Count)> mask;
+		mask.set(static_cast<size_t>(ProvinceType::SeaZones));
+		mask.set(static_cast<size_t>(ProvinceType::RiverProvinces));
+		mask.set(static_cast<size_t>(ProvinceType::Lakes));
+		mask.set(static_cast<size_t>(ProvinceType::ImpassableSeas));
+		return mask;
+	}();
+
+	const std::bitset<static_cast<size_t>(ProvinceType::Count)> ImpassableTypesMask = [] {
+		std::bitset<static_cast<size_t>(ProvinceType::Count)> mask;
+		mask.set(static_cast<size_t>(ProvinceType::Wasteland));
+		mask.set(static_cast<size_t>(ProvinceType::ImpassableTerrain));
+		mask.set(static_cast<size_t>(ProvinceType::ImpassableMountains));
+		return mask;
+	}();
+
+	ProvinceType toProvinceType(const std::string& name)
+	{
+		for (size_t i = 0; i < ProvinceTypeNames.size(); ++i)
+		{
+			if (name == ProvinceTypeNames[i])
+				return static_cast<ProvinceType>(i);
+		}
+
+		const std::string errMsg = "Unsupported province type name: " + name;
+		Log(LogLevel::Error) << errMsg;
+		throw std::invalid_argument(errMsg);
+	}
+}
 
 Province::Province(std::string theID, const unsigned char tr, const unsigned char tg, const unsigned char tb, std::string theName):
 	 ID(std::move(theID)), r(tr), g(tg), b(tb), mapDataName(std::move(theName))
@@ -33,9 +86,9 @@ void Province::setContinentName(std::string name)
 	continentName = std::move(name);
 }
 
-void Province::addProvinceType(std::string name)
+void Province::addProvinceType(const std::string& name)
 {
-	provinceTypes.emplace(std::move(name));
+	provinceTypes.set(static_cast<size_t>(toProvinceType(name)));
 }
 
 bool Province::operator==(const Province& rhs) const
@@ -79,9 +132,15 @@ std::string Province::miscName() const
 	std::string name;
 
 	name = "\nTypes: ";
-	if (!provinceTypes.empty())
+	std::vector<std::string> types;
+	for (size_t i = 0; i < ProvinceTypeNames.size(); ++i)
 	{
-		name += std::accumulate(++provinceTypes.begin(), provinceTypes.end(), *provinceTypes.begin(), [](const std::string& a, const std::string& b) {
+		if (provinceTypes.test(i))
+			types.emplace_back(ProvinceTypeNames[i]);
+	}
+	if (!types.empty())
+	{
+		name += std::accumulate(++types.begin(), types.end(), *types.begin(), [](const std::string& a, const std::string& b) {
 			return a + ", " + b;
 		});
 	}
@@ -105,6 +164,12 @@ std::string Province::miscName() const
 
 bool Province::isWater() const
 {
+	// For games like I:R and CK3, province type is defined and can be used.
+	if ((provinceTypes & WaterTypesMask).any()) // cheap bitset operation
+	{
+		return true;
+	}
+
 	// For EU4, use region and area names to determine what is water.
 	if (superRegionName && superRegionName.value().ends_with("_sea_superregion"))
 	{
@@ -119,12 +184,10 @@ bool Province::isWater() const
 		return true;
 	}
 
-	// For games like I:R and CK3, province type is defined and can be used.
-	return provinceTypes.contains("sea_zones") || provinceTypes.contains("river_provinces") || provinceTypes.contains("lakes") ||
-			 provinceTypes.contains("impassable_seas");
+	return false;
 }
 
 bool Province::isImpassable() const
 {
-	return provinceTypes.contains("wasteland") || provinceTypes.contains("impassable_terrain") || provinceTypes.contains("impassable_mountains");
+	return (provinceTypes & ImpassableTypesMask).any();
 }
