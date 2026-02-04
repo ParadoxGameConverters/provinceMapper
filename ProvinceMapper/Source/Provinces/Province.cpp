@@ -34,6 +34,8 @@ namespace
 		return mask;
 	}();
 
+	// NonOwnable is included because it is a wasteland type - these provinces cannot be owned or settled.
+	// All types in this mask represent provinces that should be excluded from automapping.
 	const std::bitset<static_cast<size_t>(ProvinceType::Count)> ImpassableOrWastelandTypesMask = [] {
 		std::bitset<static_cast<size_t>(ProvinceType::Count)> mask;
 		mask.set(static_cast<size_t>(ProvinceType::Wasteland));
