@@ -56,7 +56,8 @@ const std::vector<std::shared_ptr<Province>> UnmappedTab::getRelevantProvinces()
 	if (excludeImpassablesAndWastelands)
 	{
 		std::vector<std::shared_ptr<Province>> filteredProvinces;
-		for (auto &p : relevantProvs | std::views::filter([](const std::shared_ptr<Province>& p){ return !p->isImpassableOrWasteland(); })) {
+		for (auto& p: relevantProvs | std::views::filter([](const std::shared_ptr<Province>& p) { return !p->isImpassableOrWasteland(); }))
+		{
 			filteredProvinces.push_back(p);
 		}
 		relevantProvs = filteredProvinces;
