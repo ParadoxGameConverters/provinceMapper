@@ -186,7 +186,7 @@ void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, con
 		sourceProvinceShares[srcProvinceID][targetProvinceID] = amount;
 
 		// When registering a new source province, update the cache of impassable source provinces.
-		if (srcProvince->isImpassable())
+		if (srcProvince->isImpassableOrWasteland())
 		{
 			srcImpassablesCache.insert(srcProvinceID);
 		}
@@ -201,7 +201,7 @@ void Automapper::registerMatch(const std::shared_ptr<Province>& srcProvince, con
 		targetProvinceShares[targetProvinceID][srcProvinceID] = amount;
 
 		// When registering a new target province, update the cache of impassable target provinces.
-		if (targetProvince->isImpassable())
+		if (targetProvince->isImpassableOrWasteland())
 		{
 			tgtImpassablesCache.insert(targetProvinceID);
 		}

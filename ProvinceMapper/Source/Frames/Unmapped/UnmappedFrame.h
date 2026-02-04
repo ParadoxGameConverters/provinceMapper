@@ -38,7 +38,7 @@ class UnmappedFrame final: public wxFrame
 	UnmappedTab* sources;
 	UnmappedTab* targets;
 	wxCheckBox* excludeWaterProvincesCheckbox;
-	wxCheckBox* excludeImpassablesCheckbox;
+	wxCheckBox* excludeImpassablesAndWastelandsCheckbox;
 
 	std::shared_ptr<Configuration> configuration;
 
