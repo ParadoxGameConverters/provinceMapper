@@ -47,24 +47,24 @@ UnmappedFrame::UnmappedFrame(wxWindow* parent,
 	});
 	sizer->Add(excludeWaterProvincesCheckbox);
 
-	excludeImpassablesCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude impassables");
-	excludeImpassablesCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
-		if (excludeImpassablesCheckbox->GetValue())
+	excludeImpassablesAndWastelandsCheckbox = new wxCheckBox(this, wxID_ANY, "Exclude impassables and wastelands");
+	excludeImpassablesAndWastelandsCheckbox->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& event) {
+		if (excludeImpassablesAndWastelandsCheckbox->GetValue())
 		{
-			sources->setExcludeImpassables(true);
-			targets->setExcludeImpassables(true);
+			sources->setExcludeImpassablesAndWastelands(true);
+			targets->setExcludeImpassablesAndWastelands(true);
 		}
 		else
 		{
-			sources->setExcludeImpassables(false);
-			targets->setExcludeImpassables(false);
+			sources->setExcludeImpassablesAndWastelands(false);
+			targets->setExcludeImpassablesAndWastelands(false);
 		}
 	});
-	sizer->Add(excludeImpassablesCheckbox);
+	sizer->Add(excludeImpassablesAndWastelandsCheckbox);
 	if (configuration->getSourceToken() == "eu4" || configuration->getTargetToken() == "eu4")
 	{
 		// Adding EU4 would require serious changes.
-		excludeImpassablesCheckbox->Hide();
+		excludeImpassablesAndWastelandsCheckbox->Hide();
 	}
 
 	sizer->Add(notebook, wxSizerFlags(1).Expand().Border(wxALL, 1));

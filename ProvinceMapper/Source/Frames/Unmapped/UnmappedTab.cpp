@@ -38,32 +38,32 @@ UnmappedTab::UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> t
 
 const std::vector<std::shared_ptr<Province>> UnmappedTab::getRelevantProvinces() const
 {
-	std::vector<std::shared_ptr<Province>> relevantProvinces;
+	std::vector<std::shared_ptr<Province>> relevantProvs;
 	if (selector == ImageTabSelector::SOURCE)
-		relevantProvinces = *version->getUnmappedSources();
+		relevantProvs = *version->getUnmappedSources();
 	else
-		relevantProvinces = *version->getUnmappedTargets();
+		relevantProvs = *version->getUnmappedTargets();
 
 	if (excludeWaterProvinces)
 	{
 		std::vector<std::shared_ptr<Province>> filteredProvinces;
-		for (auto &p : relevantProvinces | std::views::filter([](std::shared_ptr<Province> p){ return !p->isWater(); })) {
+		for (auto& p: relevantProvs | std::views::filter([](const std::shared_ptr<Province>& p) { return !p->isWater(); }))
+		{
 			filteredProvinces.push_back(p);
 		}
-		relevantProvinces = filteredProvinces;
+		relevantProvs = filteredProvinces;
 	}
-	if (excludeImpassables)
+	if (excludeImpassablesAndWastelands)
 	{
 		std::vector<std::shared_ptr<Province>> filteredProvinces;
-		for (auto &p : relevantProvinces | std::views::filter([](std::shared_ptr<Province> p){ return !p->isImpassable(); })) {
+		for (auto& p: relevantProvs | std::views::filter([](const std::shared_ptr<Province>& p) { return !p->isImpassableOrWasteland(); }))
+		{
 			filteredProvinces.push_back(p);
 		}
-		relevantProvinces = filteredProvinces;
+		relevantProvs = filteredProvinces;
 	}
 
-	return relevantProvinces;
-
-	
+	return relevantProvs;
 }
 
 void UnmappedTab::redrawGrid()
@@ -272,9 +272,9 @@ void UnmappedTab::setExcludeWaterProvinces(bool excludeWaterProvinces)
 	redrawGrid();
 }
 
-void UnmappedTab::setExcludeImpassables(bool excludeImpassables)
+void UnmappedTab::setExcludeImpassablesAndWastelands(bool excludeImpassablesAndWastelands)
 {
-	this->excludeImpassables = excludeImpassables;
+	this->excludeImpassablesAndWastelands = excludeImpassablesAndWastelands;
 	redrawGrid();
 }
 

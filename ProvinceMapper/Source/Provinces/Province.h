@@ -35,7 +35,7 @@ class Province final
 	[[nodiscard]] const std::bitset<static_cast<size_t>(ProvinceType::Count)>& getProvinceTypes() const { return provinceTypes; }
 	[[nodiscard]] bool hasProvinceType(ProvinceType type) const { return provinceTypes.test(static_cast<size_t>(type)); }
 	[[nodiscard]] bool isWater() const;
-	[[nodiscard]] bool isImpassable() const;
+	[[nodiscard]] bool isImpassableOrWasteland() const;
 
 	void setProvinceName(std::string name);
 	void setAreaName(std::string name);
