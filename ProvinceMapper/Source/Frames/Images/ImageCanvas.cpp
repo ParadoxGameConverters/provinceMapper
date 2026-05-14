@@ -285,6 +285,7 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 		if (showTriangulationMesh)
 		{
 			const auto pointRadius = static_cast<int>(std::round(5.0 / getScale()));
+			const auto pointRadiusSquared = static_cast<long long>(pointRadius) * pointRadius;
 			if (selector == ImageTabSelector::SOURCE)
 			{
 				for (const auto& pair: *activeVersion->getTriangulationPairs())
@@ -292,8 +293,10 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 					const auto& sourcePoint = pair->getSourcePoint();
 					if (!sourcePoint)
 						continue;
-					const auto clickDistToPoint = std::sqrt(std::pow(sourcePoint->x - x, 2) + std::pow(sourcePoint->y - y, 2));
-					if (clickDistToPoint <= pointRadius)
+					const auto dx = static_cast<long long>(sourcePoint->x) - x;
+					const auto dy = static_cast<long long>(sourcePoint->y) - y;
+					const auto clickDistanceSquared = dx * dx + dy * dy;
+					if (clickDistanceSquared <= pointRadiusSquared)
 					{
 						stageActivateTriangulationPairByID(pair->getID());
 						return;
@@ -307,8 +310,10 @@ void ImageCanvas::leftUp(const wxMouseEvent& event)
 					const auto& targetPoint = pair->getTargetPoint();
 					if (!targetPoint)
 						continue;
-					const auto clickDistToPoint = std::sqrt(std::pow(targetPoint->x - x, 2) + std::pow(targetPoint->y - y, 2));
-					if (clickDistToPoint <= pointRadius)
+					const auto dx = static_cast<long long>(targetPoint->x) - x;
+					const auto dy = static_cast<long long>(targetPoint->y) - y;
+					const auto clickDistanceSquared = dx * dx + dy * dy;
+					if (clickDistanceSquared <= pointRadiusSquared)
 					{
 						stageActivateTriangulationPairByID(pair->getID());
 						return;
