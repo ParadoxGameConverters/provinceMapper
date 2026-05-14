@@ -38,31 +38,20 @@ UnmappedTab::UnmappedTab(wxWindow* parent, std::shared_ptr<LinkMappingVersion> t
 
 const std::vector<std::shared_ptr<Province>> UnmappedTab::getRelevantProvinces() const
 {
+	const auto& unmappedProvinces = selector == ImageTabSelector::SOURCE ?
+		*version->getUnmappedSources() :
+		*version->getUnmappedTargets();
+
 	std::vector<std::shared_ptr<Province>> relevantProvs;
-	if (selector == ImageTabSelector::SOURCE)
-		relevantProvs = *version->getUnmappedSources();
-	else
-		relevantProvs = *version->getUnmappedTargets();
-
-	if (excludeWaterProvinces)
+	relevantProvs.reserve(unmappedProvinces.size());
+	for (const auto& province: unmappedProvinces)
 	{
-		std::vector<std::shared_ptr<Province>> filteredProvinces;
-		for (auto& p: relevantProvs | std::views::filter([](const std::shared_ptr<Province>& p) { return !p->isWater(); }))
-		{
-			filteredProvinces.push_back(p);
-		}
-		relevantProvs = filteredProvinces;
+		if (excludeWaterProvinces && province->isWater())
+			continue;
+		if (excludeImpassablesAndWastelands && province->isImpassableOrWasteland())
+			continue;
+		relevantProvs.push_back(province);
 	}
-	if (excludeImpassablesAndWastelands)
-	{
-		std::vector<std::shared_ptr<Province>> filteredProvinces;
-		for (auto& p: relevantProvs | std::views::filter([](const std::shared_ptr<Province>& p) { return !p->isImpassableOrWasteland(); }))
-		{
-			filteredProvinces.push_back(p);
-		}
-		relevantProvs = filteredProvinces;
-	}
-
 	return relevantProvs;
 }
 
